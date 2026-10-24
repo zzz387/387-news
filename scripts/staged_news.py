@@ -11,7 +11,6 @@ import argparse
 import base64
 from datetime import datetime, timedelta
 import gzip
-import io
 import json
 import os
 from pathlib import Path
@@ -20,7 +19,6 @@ import sys
 import time
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
-import zipfile
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
@@ -75,30 +73,30 @@ def request_json(url: str) -> dict:
 
 
 def fetch_latest_checkpoint(label: str, key: bytes) -> dict | None:
-    repo = os.environ.get('GITHUB_REPOSITORY','')
-    if not repo or '/' not in repo:
-        # Local tests can instead use NEWS_TEST_CHECKPOINT below.
-        local = os.environ.get('NEWS_TEST_CHECKPOINT')
-        if local and Path(local).is_file():
-            return decipher(Path(local).read_bytes(),key)
+    """Load the checkpoint downloaded by the official GitHub artifact action.
+
+    Never open GitHub's redirect-based ZIP endpoint directly: on some runs its
+    storage redirect returns HTTP 401 despite a successful artifact listing.
+    This function only reads a local ciphertext file; no article text is
+    printed or uploaded in plaintext.
+    """
+    path_str = os.environ.get('NEWS_CHECKPOINT_FILE')
+    if path_str:
+        path = Path(path_str)
+        if path.is_file():
+            state = decipher(path.read_bytes(), key)
+            print('[checkpoint] encrypted draft downloaded and decrypted',flush=True)
+            return state
+        if os.environ.get('NEWS_CHECKPOINT_EXPECTED', '').lower() == 'true':
+            raise RuntimeError('Checkpoint was found but the downloaded encrypted file is missing')
         return None
-    from urllib.parse import quote
-    api = f'https://api.github.com/repos/{repo}/actions/artifacts?per_page=100&name={quote(label)}'
-    candidates = request_json(api).get('artifacts',[])
-    candidates = [x for x in candidates if not x.get('expired') and x.get('name') == label]
-    if not candidates:
-        return None
-    latest = max(candidates, key=lambda x:(x.get('created_at',''), x['id']))
-    print(f'[checkpoint] found encrypted draft artifact ID={latest["id"]}',flush=True)
-    url = f'https://api.github.com/repos/{repo}/actions/artifacts/{latest["id"]}/zip'
-    req = Request(url,headers={
-        'Authorization':'Bearer '+os.environ['GH_TOKEN'],
-        'Accept':'application/vnd.github+json',
-        'User-Agent':'387-News-Checkpoint-Reader'})
-    with urlopen(req,timeout=65) as resp:
-        data = resp.read(12_000_000)
-    with zipfile.ZipFile(io.BytesIO(data)) as z:
-        return decipher(z.read('news-draft.enc'),key)
+    # Local development only. On GitHub always require the official download.
+    local = os.environ.get('NEWS_TEST_CHECKPOINT')
+    if local and Path(local).is_file():
+        return decipher(Path(local).read_bytes(), key)
+    if os.environ.get('GITHUB_REPOSITORY'):
+        raise RuntimeError('NEWS_CHECKPOINT_FILE was not configured by the workflow')
+    return None
 
 
 def save(state: dict, key: bytes):
@@ -229,7 +227,7 @@ def render(state: dict, preview: bool):
 
 def main():
     p=argparse.ArgumentParser()
-    p.add_argument('--phase', choices=['plan','write','audit','publish'],required=True)
+    p.add_argument('--phase', choices=['plan','write','audit','publish','check'],required=True)
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
     args=p.parse_args()
@@ -241,6 +239,13 @@ def main():
     state=fetch_latest_checkpoint(label,key)
     if state and (state.get('date')!=date or state.get('version')!=3):
         raise RuntimeError('Bad checkpoint metadata')
+    if args.phase=='check':
+        if state is None:
+            raise RuntimeError('No saved checkpoint found for this date and preview mode')
+        print(f'[checkpoint-test] OK; encrypted draft restored; '
+              f'{len(state.get("articles",{}))}/8 articles; '
+              f'target={state.get("date")}',flush=True)
+        return
     if args.phase=='plan':
         state=build_plan(state,date)
     else:
