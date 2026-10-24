@@ -105,6 +105,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           artifact-ids: ${{ steps.checkpoint.outputs.artifact_id }}
+          # Mandatory for an artifact created by an EARLIER workflow run.
+          # Without run-id the action searches this run and returns 0 artifacts.
+          run-id: ${{ steps.checkpoint.outputs.run_id }}
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/checkpoint
