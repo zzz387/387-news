@@ -1,0 +1,168 @@
+name: 387 News — staged edition v3 (encrypted drafts)
+
+on:
+  schedule:
+    # UTC; Moscow = UTC+3 all year.
+    # 12:17 Moscow — select sources & create tomorrow's editorial plan
+    - cron: '17 9 * * *'
+    # 16:17, 20:17, 00:17, 03:17 Moscow — two articles per batch
+    - cron: '17 13 * * *'
+    - cron: '17 17 * * *'
+    - cron: '17 21 * * *'
+    - cron: '17 0 * * *'
+    # 04:17 Moscow — audit, with catch-up on missed article drafts
+    - cron: '17 1 * * *'
+    # 05:54 Moscow — wait until 06:00 then publish; GitHub Pages may lag
+    - cron: '54 2 * * *'
+  workflow_dispatch:
+    inputs:
+      phase:
+        description: 'Safe phase to test: plan → write (repeat) → audit → publish'
+        type: choice
+        options: [plan, write, audit, publish]
+        default: plan
+        required: true
+      preview:
+        description: 'TEST mode: never publish to 387.su (keep checked)'
+        type: boolean
+        default: true
+        required: true
+      target_date:
+        description: 'Optional YYYY-MM-DD (usually leave blank)'
+        type: string
+        required: false
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 387-news-stage-v3
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    # This is deliberately OFF by default. Enable with repository variable
+    # NEWS_AUTOMATION_ENABLED=true after test and editorial review.
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.NEWS_AUTOMATION_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
+      GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
+    outputs:
+      ready: ${{ steps.commit.outputs.ready }}
+    steps:
+      - name: Read website repository
+        uses: actions/checkout@v4
+      - name: Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install encryption library
+        run: python -m pip install 'cryptography>=44,<49'
+      - name: Run unit tests (no API calls)
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Resolve phase and release date
+        id: context
+        shell: bash
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          MANUAL_PHASE: ${{ inputs.phase }}
+          MANUAL_PREVIEW: ${{ inputs.preview }}
+          MANUAL_DATE: ${{ inputs.target_date }}
+        run: |
+          if [[ "$GITHUB_EVENT_NAME" == 'schedule' ]]; then
+            case "$SCHEDULE" in
+              '17 9 * * *')  phase=plan ;;
+              '17 13 * * *'|'17 17 * * *'|'17 21 * * *'|'17 0 * * *') phase=write ;;
+              '17 1 * * *') phase=audit ;;
+              '54 2 * * *') phase=publish ;;
+              *) echo 'Unexpected schedule'; exit 1 ;;
+            esac
+            preview=false
+          else
+            phase="$MANUAL_PHASE"
+            preview="$MANUAL_PREVIEW"
+          fi
+          echo "phase=$phase" >> "$GITHUB_OUTPUT"
+          echo "preview=$preview" >> "$GITHUB_OUTPUT"
+          echo "target_date=$MANUAL_DATE" >> "$GITHUB_OUTPUT"
+          echo "phase=$phase preview=$preview"
+      - name: Prepare encrypted draft checkpoint or release
+        id: stage
+        env:
+          PHASE: ${{ steps.context.outputs.phase }}
+          PREVIEW: ${{ steps.context.outputs.preview }}
+          TARGET_DATE: ${{ steps.context.outputs.target_date }}
+        shell: bash
+        run: |
+          arguments=(--phase "$PHASE")
+          if [[ "$PREVIEW" == 'true' ]]; then arguments+=(--preview); fi
+          if [[ -n "$TARGET_DATE" ]]; then arguments+=(--target-date "$TARGET_DATE"); fi
+          python scripts/staged_news.py "${arguments[@]}"
+      - name: Save encrypted checkpoint only (never plain draft)
+        if: ${{ always() && steps.stage.outputs.checkpoint == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.stage.outputs.artifact_name }}
+          path: ${{ runner.temp }}/news-draft.enc
+          if-no-files-found: error
+          retention-days: 7
+      - name: Commit fully audited and released issue
+        id: commit
+        if: ${{ steps.stage.outputs.published == 'true' }}
+        shell: bash
+        run: |
+          git add index.html archive/index.html issues/ sitemap.xml
+          if git diff --cached --quiet; then
+            echo 'No changes; existing published issue unchanged.'
+            exit 0
+          fi
+          git config user.name '387 News Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "387 News: staged verified issue $(TZ=Europe/Moscow date +%F)"
+          git push origin HEAD:main
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+
+  deploy:
+    # Only fully verified issues go to Pages. A separate job avoids GH Pages
+    # environment restrictions applying to research/writing stages.
+    needs: prepare
+    if: ${{ needs.prepare.outputs.ready == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout latest published version
+        uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Verify generated issue exists
+        shell: bash
+        run: |
+          test -f index.html
+          test -f archive/index.html
+          test -f CNAME
+          ls -lah issues/
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Package published site
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: '.'
+      - name: Deploy published edition
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}
