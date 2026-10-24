@@ -214,41 +214,108 @@ def gather_sources(now):
     return verified
 
 
-def gemini(prompt, output_tokens=4800):
+class GeminiResponseError(RuntimeError):
+    """A generation reached the API but did not return a valid JSON object."""
+
+
+def _parse_gemini_response(result):
+    """Return data plus safe diagnostic metadata. Never log generated article text."""
+    candidates = result.get('candidates') or []
+    if not candidates:
+        reason = (result.get('promptFeedback') or {}).get('blockReason', 'NO_CANDIDATES')
+        raise GeminiResponseError(f'No answer from Gemini (blockReason={reason})')
+    candidate = candidates[0]
+    finish = candidate.get('finishReason', 'UNKNOWN')
+    usage = result.get('usageMetadata') or {}
+    tokens = usage.get('candidatesTokenCount', 'unknown')
+    thought_tokens = usage.get('thoughtsTokenCount', 'unknown')
+    parts = (candidate.get('content') or {}).get('parts') or []
+    text = ''.join(part.get('text', '') for part in parts
+                   if isinstance(part, dict) and not part.get('thought'))
+    metadata = f'finishReason={finish}, chars={len(text)}, outputTokens={tokens}, thoughtTokens={thought_tokens}'
+    if finish not in ('STOP', 'FINISH_REASON_UNSPECIFIED', 'UNKNOWN'):
+        raise GeminiResponseError('Generation incomplete or blocked (' + metadata + ')')
+    if not text.strip():
+        raise GeminiResponseError('Empty model answer (' + metadata + ')')
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        raise GeminiResponseError('Invalid JSON (' + metadata + ')') from None
+    if not isinstance(data, dict):
+        raise GeminiResponseError('JSON root must be an object (' + metadata + ')')
+    return data
+
+
+# Schema constraints improve JSON stability but do not substitute for fact checking.
+SCHEMAS = {
+    'plan': {'type':'object', 'properties':{
+        'articles':{'type':'array','items':{'type':'object','properties':{
+            'title':{'type':'string'}, 'category':{'type':'string','enum':list(VALID_CATEGORIES)},
+            'kind':{'type':'string'}, 'source_ids':{'type':'array','items':{'type':'string'}},
+            'angle':{'type':'string'}, 'long':{'type':'boolean'}},
+            'required':['title','category','kind','source_ids','angle','long']}}},
+        'required':['articles']},
+    'article': {'type':'object','properties':{
+        'title':{'type':'string'}, 'teaser':{'type':'string'},
+        'paragraphs':{'type':'array','items':{'type':'object','properties':{
+            'heading':{'type':'string'}, 'text':{'type':'string'}},
+            'required':['heading','text']}}},
+        'required':['title','teaser','paragraphs']},
+    'audit': {'type':'object','properties':{
+        'ok':{'type':'boolean'}, 'reasons':{'type':'array','items':{'type':'string'}}},
+        'required':['ok','reasons']},
+}
+
+
+def gemini(prompt, output_tokens=4800, *, schema=None):
     key = os.environ.get('GEMINI_API_KEY', '').strip()
     if not key:
         raise RuntimeError('GEMINI_API_KEY is missing in GitHub Secrets')
     url = f'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent'
-    payload = json.dumps({
-        'contents':[{'role':'user', 'parts':[{'text':prompt}]}],
-        'generationConfig': {'responseMimeType':'application/json', 'maxOutputTokens':output_tokens},
-    }, ensure_ascii=False).encode('utf-8')
-    req = Request(url, data=payload, method='POST', headers={'Content-Type':'application/json', 'x-goog-api-key':key})
+    # Gemini 3.6 Flash uses medium thinking by default. Thought tokens count
+    # towards maxOutputTokens, potentially leaving no room for JSON output.
+    # Keep thinking low and allow more room for long-form articles.
+    first_limit = max(output_tokens, 7500)
+    failures = []
     for attempt in range(3):
+        budget = min(32000, first_limit * (attempt + 1))
+        config = {
+            'responseMimeType': 'application/json',
+            'maxOutputTokens': budget,
+            'thinkingConfig': {'thinkingLevel': 'low'},
+        }
+        if schema:
+            config['responseJsonSchema'] = SCHEMAS[schema]
+        payload = json.dumps({
+            'contents':[{'role':'user', 'parts':[{'text':prompt}]}],
+            'generationConfig':config,
+        }, ensure_ascii=False).encode('utf-8')
+        req = Request(url, data=payload, method='POST',
+                      headers={'Content-Type':'application/json', 'x-goog-api-key':key})
         try:
             with urlopen(req, timeout=125) as response:
-                result = json.loads(response.read())
-            parts = result['candidates'][0]['content']['parts']
-            text = ''.join(p.get('text','') for p in parts)
-            data = json.loads(text)
-            if not isinstance(data, dict):
-                raise RuntimeError('Gemini did not return a JSON object')
-            return data
+                answer = json.loads(response.read())
+            return _parse_gemini_response(answer)
         except HTTPError as e:
             if e.code in (429, 500, 503) and attempt < 2:
-                print(f'[Gemini temporarily unavailable] HTTP {e.code}; retrying', file=sys.stderr)
-                time.sleep(15 * (attempt + 1))
+                print(f'[Gemini temporarily unavailable] HTTP {e.code}; retry {attempt+2}/3', file=sys.stderr,flush=True)
+                time.sleep(10 * (attempt + 1))
                 continue
-            # Do not print HTTP body: some APIs echo request details.
-            raise RuntimeError(f'Gemini HTTP {e.code}, no edition published') from None
-        except (KeyError, IndexError, ValueError, json.JSONDecodeError) as e:
-            raise RuntimeError(f'Gemini response could not be validated ({type(e).__name__})') from None
-    raise RuntimeError('Gemini unavailable')
+            raise RuntimeError(f'Gemini HTTP {e.code}. Edition was not published.') from None
+        except (GeminiResponseError, json.JSONDecodeError) as e:
+            failures.append(str(e))
+            print(f'[Gemini invalid answer, try {attempt+1}/3] {e}', file=sys.stderr,flush=True)
+            if attempt < 2:
+                time.sleep(3)
+                continue
+            raise RuntimeError('Gemini could not return complete valid JSON after three attempts. '
+                               'Last diagnostic: ' + failures[-1] + '. No edition published.') from None
+    raise RuntimeError('Gemini temporarily unavailable after retries. No edition published.')
 
 
-def json_catalog(sources, max_n=90):
+def json_catalog(sources, max_n=48):
     return [{'id':s['id'],'title':s['title'], 'date':s['published'], 'feed':s['feed'],
-             'excerpt':s['evidence'][:950], 'abstract_only':s.get('abstract_only',False), 'recent':s.get('recent',False)}
+             'excerpt':s['evidence'][:650], 'abstract_only':s.get('abstract_only',False), 'recent':s.get('recent',False)}
             for s in sources[:max_n]]
 
 
@@ -276,7 +343,7 @@ def choose_plan(sources, today):
 Верни только JSON вида: {{"articles":[{{"title":"...", "category":"Семья", "kind":"очерк", "source_ids":["S001"], "angle":"в чём содержательный сюжет", "long":true}}]}}.
 Категория только из {json.dumps(VALID_CATEGORIES, ensure_ascii=False)}.
 Не используй более 2 статей по одному источнику; разные темы обязательны.'''
-    plan = gemini(prompt, 4500)
+    plan = gemini(prompt, 8000, schema='plan')
     stories = plan.get('articles', [])
     if len(stories) != 8:
         raise RuntimeError('Editor could not select eight worthwhile articles')
@@ -317,7 +384,7 @@ def write_article(plan, source_map, today):
 Проверяемые исходные материалы: {json.dumps(links, ensure_ascii=False)}
 Писать как литературно качественный авторский материал с сильной завязкой, обстоятельным развитием, именами, проверенными деталями и содержательным финалом. Без рекламных восторгов, клише, банальных списков и чрезмерной персонализации. Строго отделяй факты от гипотез. НЕ выдумывай никаких имён, результатов опытов, дат выставок, часов, цен, цитат, статистики, научных выводов, которых нет в представленных источниках. Если исходные материалы кратки — углубляй объяснение контекста без новых неподтвержденных фактов; не выдавай обобщения за новые исследования. Никаких неподтверждённых медицинских обещаний. Не цитируй из оригинальных статей длинные фрагменты, используй собственную оригинальную речь. Ссылки на источники сайт добавит сам.
 Верни JSON: {{"title":"...", "teaser":"... (50–90 слов)", "paragraphs":[{{"heading":"возможный подзаголовок или пустая строка", "text":"связный абзац (без HTML и Markdown)"}}]}}. Нужно не менее 8 абзацев и объём около {want} слов. Не включай заметки о том, что ты ИИ.'''
-    data = gemini(prompt, 8000 if plan['long'] else 5000)
+    data = gemini(prompt, 12000 if plan['long'] else 8000, schema='article')
     paragraphs = data.get('paragraphs', [])
     if not isinstance(paragraphs, list) or len(paragraphs) < 7:
         raise RuntimeError(f'Article incomplete: {plan["title"]}')
@@ -355,7 +422,7 @@ def editorial_audit(articles, sources):
     condensed = [{'title':a['title'],'facts':(' '.join(p['text'] for p in a['paragraphs']))[:4000],
                   'sources':[{'url':source_map[s]['url'],'evidence':source_map[s]['evidence'][:1300]} for s in a['source_ids']]}
                  for a in articles]
-    check = gemini('Ты строгий фактчекер. На основе КОНКРЕТНЫХ выдержек из источников найди ясные явные выдумки, неверные даты, придуманные расписания, недоказанные медицинские утверждения. Если нет достаточной информации для проверки утверждения, тоже бракуй. Важна безопасность автоматической публикации. Верни JSON {"ok":true/false,"reasons":["..."]}. Данные: '+json.dumps(condensed, ensure_ascii=False), 4000)
+    check = gemini('Ты строгий фактчекер. На основе КОНКРЕТНЫХ выдержек из источников найди ясные явные выдумки, неверные даты, придуманные расписания, недоказанные медицинские утверждения. Если нет достаточной информации для проверки утверждения, тоже бракуй. Важна безопасность автоматической публикации. Верни JSON {"ok":true/false,"reasons":["..."]}. Данные: '+json.dumps(condensed, ensure_ascii=False), 5500, schema='audit')
     if check.get('ok') is not True:
         raise RuntimeError('Editorial factual audit failed: ' + ', '.join(check.get('reasons', [])[:2]))
     return total_words
