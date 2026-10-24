@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""387 News 3.0: encrypted incremental drafts, no premature public release.
+"""387 News 3.1: encrypted incremental drafts, no premature public release.
 
 Free GitHub Actions, no private repository or paid API needed. Draft articles
 are AES-256-GCM encrypted before any artifact upload. API credentials and
@@ -23,9 +23,10 @@ from urllib.request import Request, urlopen
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:
-    from scripts import news
+    from scripts import news, editorial31
 except ImportError:
     import news
+    import editorial31
 
 TZ = news.TZ
 ROOT = news.ROOT
@@ -102,7 +103,7 @@ def fetch_latest_checkpoint(label: str, key: bytes) -> dict | None:
 def save(state: dict, key: bytes):
     ARTIFACT_FILE.write_bytes(cipher(state, key))
     print(f'[checkpoint] AES-256-GCM encrypted; '
-          f'{len(state.get("articles",{}))}/8 article drafts', flush=True)
+          f'{len(state.get("articles",{}))}/8 vetted article drafts', flush=True)
 
 
 def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
@@ -116,7 +117,7 @@ def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
 
 
 def artifact_label(date: str, preview: bool) -> str:
-    return f'387news-{"test" if preview else "production"}-{date}'
+    return f'387news31-{"test" if preview else "production"}-{date}'
 
 
 def build_plan(state: dict | None, date: str):
@@ -131,56 +132,90 @@ def build_plan(state: dict | None, date: str):
                             news.is_recent(source.get('published', ''), target))
     if len(sources) < 12:
         raise RuntimeError(f'Only {len(sources)} retrieved sources; at least 12 required')
-    planned = news.choose_plan(sources, date)
-    return {'version':3, 'date':date, 'sources':sources, 'plan':planned,
-            'articles':{}, 'stage':'planned', 'audit_passed':False,
+    planned, candidates = editorial31.choose_plan(sources, date)
+    sources, planned = editorial31.enrich_originals(sources, planned)
+    return {'version':31, 'date':date, 'sources':sources, 'plan':planned,
+            'articles':{}, 'dossiers':{}, 'rejections':{}, 'candidates':candidates, 'stage':'planned', 'audit_passed':False,
             'created_at':datetime.now(TZ).isoformat()}
 
 
 def write_batch(state: dict, size=2):
+    """Save only individually verified articles; failed slots can be retried later."""
     if state.get('audit_passed'):
         print('[write] already audited; no edits allowed',flush=True)
         return state
     if not state.get('plan'):
-        raise RuntimeError('Missing story plan; run plan phase first')
-    known = {s['id']:s for s in state['sources']}
-    pending = [i for i in range(len(state['plan'])) if str(i) not in state['articles']]
+        raise RuntimeError('Missing strong story plan; run plan first')
+    known={s['id']:s for s in state['sources']}
+    articles=state.setdefault('articles',{})
+    dossiers=state.setdefault('dossiers',{})
+    rejections=state.setdefault('rejections',{})
+    pending=[i for i in range(len(state['plan'])) if str(i) not in articles]
     for i in pending[:size]:
-        print(f'[write] article {i+1}/8 category={state["plan"][i]["category"]}',flush=True)
+        slot=str(i)
+        plan=state['plan'][i]
+        print(f'[write] source-grounded article {i+1}/8 category={plan["category"]}',flush=True)
         try:
-            article = news.write_article(state['plan'][i],known,state['date'])
-            article['slug'] = news.slugify(article['title'],i+1)
-            state['articles'][str(i)] = article
-            print(f'[write] saved {i+1}/8, {article["word_count"]} words',flush=True)
+            if slot not in dossiers:
+                dossiers[slot]=editorial31.make_dossier(plan,known,state['date'])
+                print(f'[dossier] verified literal quotes: {len(dossiers[slot]["claims"])}',flush=True)
+            reason=rejections.get(slot,'')
+            article=editorial31.write_from_dossier(plan,dossiers[slot],state['date'],reason)
+            editorial31.verify_article(article,plan,dossiers[slot],known)
+            article['slug']=news.slugify(article['title'],i+1)
+            articles[slot]=article
+            rejections.pop(slot,None)
+            print(f'[write] VERIFIED and saved {i+1}/8, {article["word_count"]} words',flush=True)
         except Exception as e:
-            # Preserve completed items and give later batches a chance to retry.
-            print(f'[write] failed slot {i+1}; no public changes: {str(e)[:240]}',file=sys.stderr,flush=True)
-    state['stage'] = 'writing'
+            # FAIL CLOSED: do not count or publish a failed article; retain dossier.
+            rejections[slot]=str(e)[:700]
+            print(f'[write] SLOT {i+1} REJECTED: {str(e)[:220]}; checkpoint preserved',
+                  file=sys.stderr,flush=True)
+    state['stage']='writing' if len(articles)<8 else 'ready_for_audit'
     return state
 
 
-def audit(state: dict):
+def audit(state:dict):
     if state.get('audit_passed'):
-        print('[audit] approved previously, no extra model requests',flush=True)
+        print('[audit] previously approved — read-only',flush=True)
         return state
-    plan = state.get('plan',[])
-    articles = state.get('articles',{})
-    if len(plan) != 8 or len(articles) != 8:
-        raise RuntimeError(f'Incomplete issue: {len(articles)}/8. Not approved for publication.')
-    ordered = [articles[str(i)] for i in range(8)]
-    target_release = datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=TZ)
-    lookup = {x['id']:x for x in state['sources']}
-    for article in ordered:
-        if article['kind'].lower() == 'новость':
-            if not any(news.is_recent(lookup[i]['published'],target_release)
-                       for i in article['source_ids']):
-                raise RuntimeError('News item older than 72h at release; audit blocked')
-    count = news.editorial_audit(ordered,state['sources'])
-    state['audit_passed'] = True
-    state['stage'] = 'audited'
-    state['word_count'] = count
-    state['audited_at'] = datetime.now(TZ).isoformat()
-    print(f'[audit] approved 8 articles, {count} words; source IDs validated',flush=True)
+    articles=state.get('articles',{})
+    if len(articles)!=8:
+        raise RuntimeError(f'Incomplete issue: {len(articles)}/8; site unchanged')
+    ordered=[articles[str(i)] for i in range(8)]
+    lookup={s['id']:s for s in state['sources']}
+    release=datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=TZ)
+    for a in ordered:
+        if a['kind'].lower()=='новость' and not any(news.is_recent(lookup[i]['published'],release)
+                                                   for i in a['source_ids']):
+            state['audit_note']='News item stale at scheduled release'
+            state['stage']='audit_veto'
+            print('[AUDIT VETO] stale news — website unchanged',flush=True)
+            return state
+    try:
+        total=editorial31.audit_issue(ordered,state['plan'],lookup)
+    except Exception as e:
+        state['stage']='audit_veto'
+        state['audit_note']=str(e)[:1200]
+        # An editorial veto (not a temporary Gemini outage) must be repairable.
+        # Keep dossiers & other approved drafts; rewrite just the weakest slot.
+        if isinstance(e, ValueError):
+            index=min(range(8), key=lambda i: (
+                ordered[i]['word_count'] / (editorial31.MIN_LONG if state['plan'][i]['long']
+                                           else editorial31.MIN_SHORT),
+                state['plan'][i].get('editorial_score', 25)))
+            state.setdefault('rejections',{})[str(index)]='Final issue audit: '+str(e)[:500]
+            state['articles'].pop(str(index),None)
+            print(f'[audit] returned slot {index+1}/8 to revision queue',flush=True)
+        print('[AUDIT VETO] '+str(e)[:240]+' — website unchanged',flush=True)
+        return state
+    state['audit_passed']=True
+    state['stage']='audited'
+    state['word_count']=total
+    state['audited_at']=datetime.now(TZ).isoformat()
+    state.pop('audit_note',None)
+    print(f'[audit] EDITORIAL PRECHECK approved: 8 articles, {total} words. '
+          'External model review is NOT independent verification of truth.',flush=True)
     return state
 
 
@@ -196,6 +231,8 @@ def render(state: dict, preview: bool):
             raise RuntimeError('Too early to publish; refusing exposure of unreleased issue')
         print(f'[release] private until 06:00 MSK; waiting {int(seconds)} seconds',flush=True)
         time.sleep(seconds)
+    if not preview and os.environ.get('NEWS_RELEASE_APPROVED', '').lower() != 'true':
+        raise RuntimeError('Release veto: NEWS_RELEASE_APPROVED must be explicitly enabled')
     issue_dir = ROOT / 'issues' / date
     if issue_dir.exists():
         print('[release] issue already exists in repository; no duplicate',flush=True)
@@ -237,7 +274,7 @@ def main():
     print(f'[387 News] phase={args.phase}, target={date}, '
           f'mode={"TEST" if args.preview else "PRODUCTION"}',flush=True)
     state=fetch_latest_checkpoint(label,key)
-    if state and (state.get('date')!=date or state.get('version')!=3):
+    if state and (state.get('date')!=date or state.get('version')!=31):
         raise RuntimeError('Bad checkpoint metadata')
     if args.phase=='check':
         if state is None:
@@ -253,9 +290,7 @@ def main():
             raise RuntimeError('Encrypted draft missing; plan stage has not completed')
         if args.phase=='write':state=write_batch(state)
         elif args.phase=='audit':
-            # Recover missed articles in the last editing window where possible.
-            if len(state.get('articles',{})) < 8:
-                state=write_batch(state, size=8-len(state.get('articles',{})))
+            # Never generate unreviewed missing articles during the final audit.
             state=audit(state)
     if state:
         # The artifact uploader will only see ciphertext, never plaintext.
@@ -266,6 +301,8 @@ def main():
                 f.write('checkpoint=true\n')
                 f.write(f'artifact_name={label}\n')
     if args.phase=='publish':
+        if not state or not state.get('audit_passed'):
+            raise RuntimeError('Unapproved issue: cannot publish or preview release')
         ready=render(state,args.preview)
         output=os.environ.get('GITHUB_OUTPUT')
         if output and ready:

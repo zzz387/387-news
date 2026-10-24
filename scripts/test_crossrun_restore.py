@@ -10,7 +10,7 @@ try:
 except ImportError:
     import locate_checkpoint as locator
 
-LABEL = '387news-test-2026-10-25'
+LABEL = '387news31-test-2026-10-25'
 
 class CrossRunDownloadTests(unittest.TestCase):
     def run_locator(self, artifacts):
