@@ -1,1 +1,56 @@
+name: 387 News — Gemini endurance test (NO publishing)
+
+on:
+  workflow_dispatch:
+    inputs:
+      duration_minutes:
+        description: 'Test duration (minutes; first run: 240 = 4h)'
+        type: choice
+        options: ['60', '180', '240', '300']
+        default: '240'
+        required: true
+      interval_minutes:
+        description: 'Time between planned requests (minutes)'
+        type: choice
+        options: ['10', '15', '20']
+        default: '15'
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: 387-news-gemini-probe
+  cancel-in-progress: false
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: gemini-3.6-flash
+    steps:
+      - name: Read repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check diagnostic program before long run
+        run: python -m unittest discover -s scripts -p 'test_gemini_probe.py' -v
+      - name: Long, rate-limited simulation (never writes website)
+        run: |
+          python scripts/gemini_probe.py \
+            --duration-minutes '${{ inputs.duration_minutes }}' \
+            --interval-minutes '${{ inputs.interval_minutes }}' \
+            --max-calls 24
+      - name: Downloadable diagnostic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: 387-gemini-probe-report
+          path: diagnostics/gemini-probe/
+          retention-days: 7
+          if-no-files-found: warn
 
