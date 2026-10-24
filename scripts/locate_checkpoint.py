@@ -36,8 +36,16 @@ def main():
     newest = newest_artifact(records,label)
     outputs = {'found': 'true' if newest else 'false'}
     if newest:
+        # actions/download-artifact@v4 defaults to the CURRENT run, even
+        # when artifact-ids points to an artifact from an earlier run.
+        # The repository artifacts API includes workflow_run.id (source run).
+        source_run = (newest.get('workflow_run') or {}).get('id')
+        if type(source_run) is not int or source_run <= 0:
+            raise RuntimeError('Checkpoint artifact has no valid source workflow run ID; refusing unsafe restore')
         outputs['artifact_id'] = str(newest['id'])
-        print(f'[checkpoint] selected existing encrypted checkpoint artifact ID={newest["id"]}',flush=True)
+        outputs['run_id'] = str(source_run)
+        print(f'[checkpoint] selected encrypted checkpoint artifact ID={newest["id"]} '
+              f'from previous workflow run {source_run}', flush=True)
     else:
         print('[checkpoint] no existing encrypted checkpoint for this date/mode',flush=True)
     out = os.environ.get('GITHUB_OUTPUT')
