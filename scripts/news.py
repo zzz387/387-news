@@ -268,49 +268,72 @@ SCHEMAS = {
 
 
 def gemini(prompt, output_tokens=4800, *, schema=None):
+    """Robust free-tier client. Separate Lite quotas, fall back across models.
+
+    Never switch to a paid model. The user has not enabled billing; the
+    supported model list can be limited further via GEMINI_MODELS.
+    """
     key = os.environ.get('GEMINI_API_KEY', '').strip()
     if not key:
         raise RuntimeError('GEMINI_API_KEY is missing in GitHub Secrets')
-    url = f'https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent'
-    # Gemini 3.6 Flash uses medium thinking by default. Thought tokens count
-    # towards maxOutputTokens, potentially leaving no room for JSON output.
-    # Keep thinking low and allow more room for long-form articles.
-    first_limit = max(output_tokens, 7500)
-    failures = []
-    for attempt in range(3):
-        budget = min(32000, first_limit * (attempt + 1))
-        config = {
-            'responseMimeType': 'application/json',
-            'maxOutputTokens': budget,
-            'thinkingConfig': {'thinkingLevel': 'low'},
-        }
-        if schema:
-            config['responseJsonSchema'] = SCHEMAS[schema]
-        payload = json.dumps({
-            'contents':[{'role':'user', 'parts':[{'text':prompt}]}],
-            'generationConfig':config,
-        }, ensure_ascii=False).encode('utf-8')
-        req = Request(url, data=payload, method='POST',
-                      headers={'Content-Type':'application/json', 'x-goog-api-key':key})
-        try:
-            with urlopen(req, timeout=125) as response:
-                answer = json.loads(response.read())
-            return _parse_gemini_response(answer)
-        except HTTPError as e:
-            if e.code in (429, 500, 503) and attempt < 2:
-                print(f'[Gemini temporarily unavailable] HTTP {e.code}; retry {attempt+2}/3', file=sys.stderr,flush=True)
-                time.sleep(10 * (attempt + 1))
-                continue
-            raise RuntimeError(f'Gemini HTTP {e.code}. Edition was not published.') from None
-        except (GeminiResponseError, json.JSONDecodeError) as e:
-            failures.append(str(e))
-            print(f'[Gemini invalid answer, try {attempt+1}/3] {e}', file=sys.stderr,flush=True)
-            if attempt < 2:
-                time.sleep(3)
-                continue
-            raise RuntimeError('Gemini could not return complete valid JSON after three attempts. '
-                               'Last diagnostic: ' + failures[-1] + '. No edition published.') from None
-    raise RuntimeError('Gemini temporarily unavailable after retries. No edition published.')
+    model_list = [x.strip() for x in os.environ.get(
+        'GEMINI_MODELS', 'gemini-3.5-flash-lite,gemini-3.1-flash-lite'
+    ).split(',') if x.strip()]
+    SAFE_MODELS = {'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite',
+                   'gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3-flash-preview'}
+    if not model_list or any(x not in SAFE_MODELS for x in model_list):
+        raise RuntimeError('Invalid GEMINI_MODELS configuration; refusing unsupported model')
+    errors = []
+    for model in model_list:
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
+        for attempt in range(3):
+            generation = {
+                'responseMimeType': 'application/json',
+                'maxOutputTokens': min(30000, max(8000, output_tokens * 2)),
+                'thinkingConfig': {'thinkingLevel': 'minimal' if 'flash-lite' in model else 'low'},
+            }
+            if schema:
+                generation['responseJsonSchema'] = SCHEMAS[schema]
+            payload = json.dumps({'contents':[{'role':'user','parts':[{'text':prompt}]}],
+                                   'generationConfig':generation}, ensure_ascii=False).encode('utf-8')
+            req = Request(url, data=payload, method='POST', headers={
+                'Content-Type':'application/json', 'x-goog-api-key':key})
+            try:
+                with urlopen(req, timeout=150) as response:
+                    return _parse_gemini_response(json.loads(response.read()))
+            except HTTPError as e:
+                body = e.read(3000).decode('utf-8','replace')
+                status = (re.search(r'"status"\s*:\s*"([A-Z_]+)"',body) or [None, 'UNKNOWN'])[1]
+                print(f'[Gemini] model={model} HTTP {e.code} status={status} '
+                      f'attempt={attempt + 1}/3', file=sys.stderr, flush=True)
+                errors.append(f'{model}: HTTP {e.code} ({status})')
+                # Daily quota does not recover by waiting a minute; fall back to
+                # a different model with its own independent RPD allowance.
+                daily_exhausted = (e.code == 429 and (
+                    'quota_exceeded' in body.lower() or
+                    'perday' in body.lower() or
+                    'per_day' in body.lower() or
+                    'requestsperday' in body.lower()))
+                if daily_exhausted or e.code in (400,401,402,403,404):
+                    break
+                if e.code in (408,429,500,502,503,504) and attempt < 2:
+                    # Backoff helps with temporary server overload. Current
+                    # free-tier caps are model-specific, not key-specific.
+                    time.sleep([25, 90][attempt])
+                    continue
+                break
+            except (GeminiResponseError, json.JSONDecodeError) as e:
+                errors.append(f'{model}: {e}')
+                print(f'[Gemini] invalid answer from {model}, try={attempt + 1}/3: {e}',
+                      file=sys.stderr,flush=True)
+                if attempt < 2:
+                    time.sleep(8)
+                    continue
+            except (URLError, TimeoutError, OSError) as e:
+                errors.append(f'{model}: network error {type(e).__name__}')
+                if attempt < 2:
+                    time.sleep([25, 90][attempt]); continue
+    raise RuntimeError('All allowed free Gemini models failed: ' + '; '.join(errors[-6:]))
 
 
 def json_catalog(sources, max_n=48):

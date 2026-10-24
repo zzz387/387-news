@@ -45,8 +45,8 @@ class GeminiResponseTests(unittest.TestCase):
             result = news.gemini('Reply briefly', output_tokens=4500, schema='audit')
         self.assertTrue(result['ok'])
         self.assertEqual(len(seen), 2)
-        self.assertEqual(seen[0]['thinkingConfig']['thinkingLevel'], 'low')
-        self.assertTrue(seen[1]['maxOutputTokens'] > seen[0]['maxOutputTokens'])
+        self.assertEqual(seen[0]['thinkingConfig']['thinkingLevel'], 'minimal')
+        self.assertGreaterEqual(seen[1]['maxOutputTokens'], seen[0]['maxOutputTokens'])
         self.assertEqual(seen[0]['responseJsonSchema']['required'], ['ok', 'reasons'])
 
     def test_errors_fail_closed(self):
@@ -54,7 +54,7 @@ class GeminiResponseTests(unittest.TestCase):
         with patch.dict(news.os.environ, {'GEMINI_API_KEY':'test-private-key'}, clear=False), \
              patch.object(news,'urlopen',return_value=_FakeHTTPResponse(bad)), \
              patch.object(news.time, 'sleep'):
-            with self.assertRaisesRegex(RuntimeError, 'No edition published'):
+            with self.assertRaisesRegex(RuntimeError, 'All allowed free Gemini models failed'):
                 news.gemini('test', output_tokens=3500)
 
 
