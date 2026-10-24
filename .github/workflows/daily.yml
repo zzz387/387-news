@@ -1,0 +1,88 @@
+name: 387 News — daily newspaper
+
+on:
+  schedule:
+    # 05:17 Moscow; drafts remain inside the Action until at least 06:00 Moscow.
+    - cron: '17 2 * * *'
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to 387.su now (leave unchecked for a safe test)'
+        type: boolean
+        default: false
+        required: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: 387-news-daily
+  cancel-in-progress: false
+
+jobs:
+  newspaper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      GEMINI_MODEL: gemini-3.6-flash
+      RUN_MODE: ${{ github.event_name == 'schedule' && 'scheduled' || (inputs.publish && 'publish' || 'dry-run') }}
+    steps:
+      - name: Get existing site and full archive
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 1
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate program
+        run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Research, write, validate and prepare newspaper
+        run: python scripts/news.py --mode "$RUN_MODE"
+      - name: Attach local preview when testing
+        if: ${{ github.event_name == 'workflow_dispatch' && !inputs.publish }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 387-news-preview
+          path: |
+            index.html
+            archive/index.html
+            issues/
+          retention-days: 3
+      - name: Store issue in GitHub archive
+        id: store
+        if: ${{ github.event_name == 'schedule' || inputs.publish }}
+        run: |
+          git add index.html archive/index.html issues/ sitemap.xml
+          if git diff --cached --quiet; then
+            echo 'No new validated issue. Current website remains unchanged.'
+            exit 0
+          fi
+          git config user.name '387 News Bot'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m "387 News: verified issue $(TZ=Europe/Moscow date +%F)"
+          git push origin HEAD:main
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+      # A GITHUB_TOKEN push does NOT trigger Pages when its source is a branch.
+      # Therefore we publish explicitly within THIS workflow (Settings > Pages > GitHub Actions).
+      - name: Configure GitHub Pages
+        if: ${{ steps.store.outputs.ready == 'true' }}
+        uses: actions/configure-pages@v5
+      - name: Package website for hosting
+        if: ${{ steps.store.outputs.ready == 'true' }}
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: '.'
+      - name: Deploy new 387 News edition
+        id: deployment
+        if: ${{ steps.store.outputs.ready == 'true' }}
+        uses: actions/deploy-pages@v4
+        with:
+          token: ${{ github.token }}
