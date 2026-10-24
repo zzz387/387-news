@@ -19,7 +19,7 @@ on:
       phase:
         description: 'Safe phase to test: plan → write (repeat) → audit → publish'
         type: choice
-        options: [plan, write, audit, publish]
+        options: [check, plan, write, audit, publish]
         default: plan
         required: true
       preview:
@@ -93,12 +93,29 @@ jobs:
           echo "preview=$preview" >> "$GITHUB_OUTPUT"
           echo "target_date=$MANUAL_DATE" >> "$GITHUB_OUTPUT"
           echo "phase=$phase preview=$preview"
+      - name: Find previously saved encrypted checkpoint
+        id: checkpoint
+        env:
+          PHASE: ${{ steps.context.outputs.phase }}
+          PREVIEW: ${{ steps.context.outputs.preview }}
+          TARGET_DATE: ${{ steps.context.outputs.target_date }}
+        run: python scripts/locate_checkpoint.py
+      - name: Download existing encrypted checkpoint (official GitHub action)
+        if: ${{ steps.checkpoint.outputs.found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.artifact_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/checkpoint
       - name: Prepare encrypted draft checkpoint or release
         id: stage
         env:
           PHASE: ${{ steps.context.outputs.phase }}
           PREVIEW: ${{ steps.context.outputs.preview }}
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
+          NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
+          NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
         shell: bash
         run: |
           arguments=(--phase "$PHASE")
