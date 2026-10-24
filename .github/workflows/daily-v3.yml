@@ -111,6 +111,7 @@ jobs:
           github-token: ${{ github.token }}
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/checkpoint
+          merge-multiple: true  # v4: artifact-ids otherwise nests under its name
       - name: Prepare encrypted draft checkpoint or release
         id: stage
         env:
