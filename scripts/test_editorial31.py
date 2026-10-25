@@ -68,13 +68,23 @@ class Editorial31Tests(unittest.TestCase):
             score=25 if i<8 else 21
             candidates.append(dict(title=f'Оригинальный сюжет номер {i+1}',
                 category=cat,kind='очерк',source_ids=[sid],hook='Конкретная интрига',
-                long=(i in (0,1,15,19,21)),score=score))
-            sources.append(dict(id=sid,recent=True,evidence='данные '*400))
+                long=(i in (0,1,15,19,21)),score=score,
+                # The v3.2 commissioning gate checks source depth and the
+                # candidate's five independent editorial ratings. This fixture
+                # models strong, SOURCE-BACKED candidates rather than bare labels.
+                novelty=5,reader_interest=5,specificity=5,evidence=5,fit=5))
+            sources.append(dict(
+                id=sid,
+                url=f'https://original{i}.example.org/documented-story',
+                abstract_only=False, recent=True,
+                evidence=('Подробные проверяемые обстоятельства истории, '
+                          'с хронологией, героями и подтверждающими документами. ')*100))
         return candidates,sources
 
     def test_deterministic_plan_repairs_life_rubrics_without_llm_second_call(self):
         candidates, sources=self.candidates_fixture()
-        with patch.object(e,'shortlist',return_value=candidates), \
+        with patch.object(e,'extend_family_evidence',return_value=0), \
+             patch.object(e,'shortlist',return_value=candidates), \
              patch.object(e.news,'gemini',side_effect=AssertionError('no second LLM call')):
             plan,_=e.choose_plan(sources,'2026-10-26')
         self.assertEqual(len(plan),8)
