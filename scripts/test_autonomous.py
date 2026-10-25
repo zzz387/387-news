@@ -174,6 +174,32 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
         with patch.dict(os.environ,{'GITHUB_REF_NAME':'codex/test'}): branch=stage.artifact_label('2026-10-26',True)
         self.assertNotEqual(main,branch)
 
+    def test_infeasible_plan_reselects_and_retains_accepted_candidates(self):
+        try:
+            from scripts.test_editorial31 import Editorial31Tests
+        except ImportError:
+            from test_editorial31 import Editorial31Tests
+        candidates, sources = Editorial31Tests.candidates_fixture()
+        bad = [c for c in candidates if c['category'] != 'Семья']
+        progress = {}
+        with patch.object(ed, 'extend_family_evidence', return_value=0), patch.object(ed, 'shortlist', side_effect=[bad, candidates]) as select:
+            plan, pool = ed.choose_plan(sources, '2026-10-26', progress)
+        self.assertEqual(len(plan), 8)
+        self.assertEqual(select.call_count, 2)
+        self.assertEqual(select.call_args.kwargs['prior'], bad)
+        self.assertIn('missing life rubrics', select.call_args.kwargs['feedback'])
+        self.assertEqual(progress['selection_repairs'], 1)
+
+    def test_repetitive_short_article_rejected(self):
+        try:
+            from scripts.test_editorial31 import article
+        except ImportError:
+            from test_editorial31 import article
+        draft = article()
+        draft['paragraphs'][1] = copy.deepcopy(draft['paragraphs'][0])
+        with self.assertRaisesRegex(ValueError, 'repeats'):
+            ed.article_form(draft, {'long':False})
+
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()
         self.assertIn("success() && github.ref == 'refs/heads/main'",workflow)

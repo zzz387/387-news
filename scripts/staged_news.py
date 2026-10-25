@@ -13,6 +13,8 @@ from datetime import datetime, timedelta, timezone
 import gzip
 import hashlib
 import signal
+import shutil
+import tempfile
 import json
 import os
 from pathlib import Path
@@ -330,9 +332,30 @@ def render(state: dict, preview: bool):
         print('[release] issue already exists in repository; no duplicate',flush=True)
         return False
     if preview:
-        # Can test build correctness without writing any public files.
-        print(f'[preview] approved issue for {date}; render disabled (encrypted draft only)',flush=True)
+        # Build and validate in a temporary private directory, never in Pages files.
+        with tempfile.TemporaryDirectory(prefix='387news-preview-') as directory:
+            root = Path(directory)
+            for name in ('assets', 'archive', 'issues'):
+                if (ROOT / name).is_dir():
+                    shutil.copytree(ROOT / name, root / name)
+            _assemble(state, release, root)
+        print('[preview] full HTML build and local links validated; private files removed', flush=True)
         return False
+    return _assemble(state, release, ROOT)
+
+
+def _assemble(state, release, root):
+    previous_root = news.ROOT
+    news.ROOT = root
+    try:
+        return _assemble_files(state, release, root)
+    finally:
+        news.ROOT = previous_root
+
+
+def _assemble_files(state, release, root):
+    date = state['date']
+    issue_dir = root / 'issues' / date
     source_map = {x['id']:x for x in state['sources']}
     ordered = [state['articles'][str(i)] for i in range(8)]
     no = news.get_next_number()
@@ -344,11 +367,11 @@ def render(state: dict, preview: bool):
         path.write_text(news.render_article(release,no,item,source_map),encoding='utf-8')
         files.append(path)
     (issue_dir/'issue.json').write_text(json.dumps({'date':date,'number':no,'articles':ordered},ensure_ascii=False,indent=2),encoding='utf-8')
-    paths=[issue_dir/'index.html', ROOT/'index.html', ROOT/'archive/index.html']
+    paths=[issue_dir/'index.html', root/'index.html', root/'archive/index.html']
     paths[0].write_text(news.render_overview(release,no,ordered,permanent=True),encoding='utf-8')
     paths[1].write_text(news.render_overview(release,no,ordered),encoding='utf-8')
     paths[2].write_text(news.render_archive(),encoding='utf-8')
-    (ROOT/'sitemap.xml').write_text(news.sitemap(),encoding='utf-8')
+    (root/'sitemap.xml').write_text(news.sitemap(),encoding='utf-8')
     news.validate_local_links(files+paths)
     print(f'[release] validated site, issue №{no:03d}, date {date}',flush=True)
     return True
@@ -406,7 +429,7 @@ def main():
     previous_handler = signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(RUNTIME.GenerationPaused('Runner stopped; checkpoint retained')))
     try:
         persist()  # arm always() upload BEFORE any generation
-        if args.phase in ('plan', 'auto') and (not state or not state.get('plan')):
+        if (args.phase in ('plan', 'auto') or (state and args.phase in ('research', 'write'))) and (not state or not state.get('plan')):
             if state is None:
                 state = {'version':31, 'date':date, 'articles':{}, 'dossiers':{},
                          'rejections':{}, 'stage':'planning', 'audit_passed':False}

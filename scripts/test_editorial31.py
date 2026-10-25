@@ -9,7 +9,8 @@ except ImportError:
 
 def article(long=False, category='Наука', idx=1, words=None):
     n = words or (1120 if long else 580)
-    arr = ['Модель']*n
+    # Distinct paragraph vocabulary; a repeated word is not an editorial fixture.
+    arr = [f'наблюдение{j}раздел{j // max(1,n//9)}' for j in range(n)]
     paragraphs=[]
     length=max(1,n//9)
     for i in range(9):

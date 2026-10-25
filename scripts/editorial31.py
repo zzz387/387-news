@@ -221,7 +221,7 @@ def _reference_quality(s):
     return not weak
 
 
-def shortlist(sources, date):
+def shortlist(sources, date, prior=(), feedback=""):
     """Stage 1: grade 20+ concrete stories, not 8 titles from press-release RSS."""
     if len(sources)<16:
         raise RuntimeError('Fewer than 16 sources; editorial selection would be weak')
@@ -255,6 +255,14 @@ specificity, evidence, fit. Низкая оценка у скучных прес
 в последние 72 часа. Старый научный результат при свежей перепубликации — НЕ новость.
 Не выдумывай источники, даты и факты. Вывод только JSON candidates с полями
 из схемы; выдуманную сенсацию оценивать низко. Чем меньше фактов — тем ниже evidence.'''
+    if feedback:
+        prompt += ('\nПРЕДЫДУЩИЙ ПУЛ НЕ ПОЗВОЛИЛ СОБРАТЬ НОМЕР: ' + feedback[:900]
+                   + '\nДобавь прежде всего НОВЫЕ документированные сюжеты недостающих рубрик, '
+                   'разные исходные документы и ненаучные интеллектуальные темы. '
+                   'Для каждой жизненной рубрики нужно несколько альтернатив. '
+                   'Не предлагай заново эти заголовки: '
+                   + json.dumps([c['title'] for c in prior], ensure_ascii=False)
+                   + '\nВсе прежние пороги качества обязательны. Если фактов нет, не выдумывай.')
     answer=news.gemini(prompt,output_tokens=13500,schema='candidate31')
     original=_read_sources(sources)
     chosen=[]; seen=[]
@@ -285,6 +293,7 @@ specificity, evidence, fit. Низкая оценка у скучных прес
         c['score']=candidate_score(c)
         c['long_topic_id']=normalized_topic_id(c)
         chosen.append(c)
+    accept_pool(prior)
     accept_pool(answer.get('candidates',[]))
     # Second, focused pass only when a generic news cycle omitted the family
     # section. It has its OWN document-backed source IDs and the same score
@@ -548,10 +557,21 @@ def choose_plan(sources,date, progress=None):
     if not progress.get("candidates"):
         progress["candidates"] = shortlist(sources,date)
         news.runtime.checkpoint()
-    candidates = progress["candidates"]
-    candidates=commission_evidence_backed_longforms(candidates,sources)
-    canonical=select_balanced_plan(candidates,sources)
-    return canonical,candidates
+    while True:
+        candidates = commission_evidence_backed_longforms(progress['candidates'], sources)
+        try:
+            canonical = select_balanced_plan(candidates, sources)
+            return canonical, candidates
+        except RuntimeError as exc:
+            progress['plan_note'] = str(exc)[:900]
+            rounds = progress.get('selection_repairs', 0)
+            if rounds >= 3:
+                raise RuntimeError('Editorial plan still infeasible after 3 source-backed reselections; no fabricated filler. ' + str(exc)) from None
+            repaired = shortlist(sources, date, prior=progress['candidates'], feedback=progress['plan_note'])
+            progress['candidates'] = repaired
+            progress['selection_repairs'] = rounds + 1
+            news.runtime.checkpoint()
+
 
 
 
@@ -749,11 +769,23 @@ def article_form(a, plan):
     minimum=MIN_LONG if plan['long'] else MIN_SHORT
     if n<minimum or n>MAX_WORDS:
         raise ValueError(f'{n} words; required {minimum}–{MAX_WORDS}')
+    prose_quality(a)
     if len(style_flags(a))>=2:
         raise ValueError('Banal/promotional writing: '+', '.join(style_flags(a)[:3]))
     if not 20<=len(a.get('title',''))<=185 or wc(a.get('teaser',''))<25:
         raise ValueError('Title or teaser is incomplete')
     return n
+
+
+def prose_quality(article):
+    texts = [normalized(p['text']) for p in article['paragraphs']]
+    tokens = re.findall(r'\w+', ' '.join(texts))
+    if len(set(tokens)) / max(1, len(tokens)) < .12:
+        raise ValueError('Text lacks substantive vocabulary')
+    for i, text in enumerate(texts):
+        if any(text == previous or SequenceMatcher(None, text[:2400], previous[:2400]).ratio() > .80
+               for previous in texts[:i]):
+            raise ValueError('Text repeats substantially identical paragraphs')
 
 
 def validate_segment(part, previous, index):
