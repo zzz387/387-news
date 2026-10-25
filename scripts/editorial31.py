@@ -8,6 +8,7 @@ signals, NOT guaranteed independent fact-checks. Fail closed on weak evidence.
 from __future__ import annotations
 
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from difflib import SequenceMatcher
 from html.parser import HTMLParser
@@ -37,6 +38,61 @@ STYLE_RED_FLAGS = ('современный мир', 'в современном �
                    'сложно переоценить', 'не секрет, что', 'каждый человек,',
                    'играет ключевую роль в современном', 'выдающийся пример',
                    'свидетельствует о важности', 'полностью отвечает стратегическим')
+
+
+# Curated SPECIFIC article pages, not generic parenting landing pages. Sources
+# were checked against their published URLs when preparing this patch. Whether
+# they are accessible to GitHub Actions is verified at each plan run. These are
+# evergreen references, not fabricated fresh news. Pages below must supply
+# >=1100 characters of actual retrievable evidence to count.
+FAMILY_FEATURES = (
+    ('Семья: отношения родителей с подростками', 'https://raisingchildren.net.au/pre-teens/communicating-relationships/family-relationships/relationships-with-parents-teens'),
+    ('Семья: занятия всей семьёй с подростками', 'https://raisingchildren.net.au/pre-teens/entertainment-technology/free-time-activities/free-time'),
+    ('Семья: разговоры и связь с подростками', 'https://www.cdc.gov/healthy-youth/connecting-conversations/index.html'),
+    ('Семья: положительный опыт для подростков', 'https://www.healthychildren.org/English/healthy-living/emotional-wellness/Building-Resilience/Pages/Creating-Positive-Experiences-for-Teens.aspx'),
+    ('Семья: роль игры в развитии ребёнка', 'https://www.healthychildren.org/English/family-life/power-of-play/Pages/The-Power-of-Play-How-Fun-and-Games-Help-Children-Thrive.aspx'),
+    ('Семья: как поддерживать дружбу детей', 'https://www.healthychildren.org/English/family-life/power-of-play/Pages/What-Parents-Can-Do-to-Support-Friendships.aspx'),
+    ('Семья: совместная игра с младенцем', 'https://raisingchildren.net.au/babies/play-learning/play-baby-development/thinking-play-babies'),
+    ('Семья: физическое развитие малыша в игре', 'https://raisingchildren.net.au/babies/play-learning/play-baby-development/movement-play-babies'),
+    ('Семья: первые игры и воображение малыша', 'https://raisingchildren.net.au/babies/play-learning/play-baby-development/imagining-play-babies'),
+    ('Семья: знакомство детей с новорождённым', 'https://www.unicef.org/parenting/child-care/preparing-for-a-new-sibling'),
+    ('Семья: занятия с малышом до двух лет', 'https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers'),
+    ('Семья: занятия с ребёнком первого года', 'https://www.unicef.org/parenting/child-development/baby-tips'),
+    ('Семья: открытый разговор с подростком', 'https://www.cdc.gov/free-mind/parents/talk-to-your-teen.html'),
+    ('Семья: навыки внимательного слушания', 'https://www.cdc.gov/parenting-toddlers/communication/active-listening.html'),
+    ('Семья: исследование времени супругов вместе', 'https://pmc.ncbi.nlm.nih.gov/articles/PMC5798465/'),
+    ('Семья: совместные привычки супругов', 'https://www.gottman.com/blog/5-rituals-reconnect-relationship/'),
+    ('Семья: новые совместные занятия пары', 'https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship'),
+)
+
+
+def extend_family_evidence(sources: list[dict]) -> int:
+    """Add real original parenting, marriage and family articles; NEVER assume a URL is accessible.
+
+    Mutates original list so stage checkpoint retains newly fetched evidence.
+    Family URLs go FIRST so the capped editorial catalog actually sees them.
+    """
+    known={x.get('url','').rstrip('/') for x in sources}
+    tasks=[(label,url) for label,url in FAMILY_FEATURES if url.rstrip('/') not in known]
+    def fetch(task):
+        label,url=task
+        item={'title':label, 'url':url, 'feed':'Семья — экспертный материал',
+              'published':'Вне новостной повестки', 'summary':'',
+              'evergreen':True, 'recent':False, 'category_hint':'Семья'}
+        return news.fetch_page(item)
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        fetched=list(pool.map(fetch,tasks))
+    vetted=[x for x in fetched if x and _reference_quality(x)]
+    existing_numbers=[int(x['id'][1:]) for x in sources if re.fullmatch(r'S\d+',str(x.get('id','')))]
+    next_id=max(existing_numbers,default=0)+1
+    for source in vetted:
+        source['id']=f'S{next_id:03d}'
+        next_id+=1
+    # Prioritize only actually fetched, source-backed pages for model context.
+    sources[:0]=vetted
+    print(f'[source audit] family leaf articles verified={len(vetted)}/{len(tasks)}, '
+          f'total documented sources={len(sources)}',flush=True)
+    return len(vetted)
 
 
 def _schema(properties: dict, required: list[str]):
@@ -130,7 +186,8 @@ specificity, evidence, fit. Низкая оценка у скучных прес
     answer=news.gemini(prompt,output_tokens=13500,schema='candidate31')
     original=_read_sources(sources)
     chosen=[]; seen=[]
-    for c in answer.get('candidates',[]):
+    def accept_pool(pool):
+      for c in pool:
         if not isinstance(c,dict) or c.get('category') not in news.VALID_CATEGORIES:
             continue
         ids=c.get('source_ids') or []
@@ -155,6 +212,41 @@ specificity, evidence, fit. Низкая оценка у скучных прес
         seen.append(c.get('title',''))
         c['score']=candidate_score(c)
         chosen.append(c)
+    accept_pool(answer.get('candidates',[]))
+    # Second, focused pass only when a generic news cycle omitted the family
+    # section. It has its OWN document-backed source IDs and the same score
+    # and evidence threshold; no filler or synthetic stories are accepted.
+    family_count=sum(c['category']=='Семья' for c in chosen)
+    family_references=[s for s in sources if s.get('category_hint')=='Семья'
+        or s.get('feed','').startswith('Дети и образование')]
+    if family_count < 2 and family_references:
+        family_catalog=news.json_catalog(family_references,max_n=30)
+        targeted_prompt=f'''387 News, отдельный строго документальный отбор тем рубрики «Семья».
+Планируемая дата {date}. Только конкретные факты из материалов ниже:
+{json.dumps(family_catalog,ensure_ascii=False)}
+Предложи 5–9 РАЗНЫХ подходящих тем (совместное время супругов,
+подросток 14 лет, школьники 10 и 7, младенец 6 месяцев; отношения взрослых
+и детей, игры, чтение, совместное время). Категория каждого кандидата СТРОГО «Семья». Тип — «очерк» или
+«практический материал» для старых страниц; НЕ называй их свежей новостью.
+Каждая тема должна иметь реальную сюжетную интригу, возрастной контекст
+и подробные факты из указанного источника. Одна обзорная страница
+не заменяет подробный исходный материал. Оцени novelty (новизна УГЛА,
+не дата), reader_interest, specificity, evidence, fit: по 0–5.
+source_ids указывай только существующие идентификаторы. Статьи без
+подтверждения НЕ ПРИДУМЫВАЙ. Формат candidates, JSON по схеме.
+Запрет: общие рекомендации без конкретного содержания и  ложные даты.'''
+        targeted=news.gemini(targeted_prompt, output_tokens=8000,schema='candidate31')
+        # Candidate must be family and must rely at least in part on
+        # family/child materials, even if a model misclassified it.
+        referenced={x['id'] for x in family_references}
+        vetted=[c for c in targeted.get('candidates',[])
+                if isinstance(c,dict) and c.get('category')=='Семья'
+                and any(i in referenced for i in (c.get('source_ids') or []))]
+        accept_pool(vetted)
+    print('[candidate audit] '+', '.join(
+        f'{cat}={sum(c["category"]==cat for c in chosen)}'
+        for cat in news.VALID_CATEGORIES)+'; family source pages='+str(len(family_references)),
+        flush=True)
     chosen.sort(key=lambda x:x['score'],reverse=True)
     if len(chosen)<12:
         raise RuntimeError(f'Only {len(chosen)} editorially plausible candidates; refuse to pad issue')
@@ -277,6 +369,7 @@ def choose_plan(sources,date):
     # shortlist, then rejected the output if it omitted mandatory rubrics.
     # That was an unreliable prompt-following/counting step. Keep Gemini for
     # suggesting & scoring candidates; enforce selection deterministically.
+    extend_family_evidence(sources)
     candidates=shortlist(sources,date)
     canonical=select_balanced_plan(candidates,sources)
     return canonical,candidates
