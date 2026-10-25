@@ -746,35 +746,107 @@ def article_form(a, plan):
     return n
 
 
+def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) -> dict:
+    """Draft a documented longform feature in smaller, non-overlapping sections.
+
+    Small free-tier models sometimes return 450–650 words despite a 1250-word
+    instruction. Focused sections prevent one truncated short response from
+    stopping the entire edition. Source and length requirements stay intact.
+    """
+    claims = dossier['claims']
+    if len(claims) < 8:
+        raise ValueError('Longform needs at least 8 verified source excerpts')
+    chunks = [claims[(i * len(claims)) // 3:((i+1) * len(claims)) // 3]
+              for i in range(3)]
+    stages = (
+        'Завязка и происхождение сюжета: конкретный человек, предмет, дата '
+        'или наблюдение, затем проблема и необходимый контекст.',
+        'Развитие сюжета: методы и механизмы, трудности, проверенные примеры, '
+        'точные обстоятельства или сопоставление подтверждённых данных.',
+        'Что получилось и что осталось неизвестным: последствия, ограничения '
+        'исследования, содержательная развязка, без морализаторства.',
+    )
+    all_paragraphs = []
+    title = ''
+    teaser = ''
+    prior_tail = ''
+    for index, stage in enumerate(stages):
+        focus = [{'source_id':cl['source_id'], 'source_quote':cl['quote'],
+                  'verified_point':cl['explanation']} for cl in chunks[index]]
+        prev = ('Конец предыдущей части (продолжай сюжет без повтора): '+prior_tail)
+        prompt = f'''Ты работаешь над БОЛЬШИМ журналистским очерком «387 News».
+Это ЧАСТЬ {index+1} ИЗ 3. Пиши ТОЛЬКО новую часть единого материала.
+Сюжет: {json.dumps(plan, ensure_ascii=False)}. Дата номера {date}.
+Тон: живой интеллектуальный русский язык без рекламы и пустых подводок.
+Редакторская браковка, если была: {revision_reason[:600]}
+Общий угол: {dossier.get('angle','')}.
+Хронология: {dossier.get('chronology','')}.
+Смысл истории: {dossier.get('stakes','')}.
+ЗАДАНИЕ ЭТОЙ ЧАСТИ: {stage}
+ПРОВЕРЕННЫЕ ДОСЛОВНЫЕ СВИДЕТЕЛЬСТВА ДЛЯ ЭТОЙ ЧАСТИ:
+{json.dumps(focus, ensure_ascii=False)}
+{prev}
+Напиши связную САМОСТОЯТЕЛЬНУЮ ЧАСТЬ на 450–600 РУССКИХ СЛОВ.
+Только 3–5 содержательных абзацев с короткими подзаголовками.
+В каждой части должны быть новые факты или содержательное объяснение из
+приведённых цитат. Можно объяснять факты, но НЕЛЬЗЯ добавлять непроверенные
+имена, даты, цифры, оценки, цитаты и обещания. Если фактов недостаточно,
+не выдумывай и не повторяй уже написанное: редактор отклонит материал.
+НЕ подводи общий итог и НЕ пересказывай предыдущие части, если это не
+третья часть. НЕ создавай искусственные «Часть 1/2/3» как заголовки.
+Первые слова — сразу конкретика. Ни одной пустой вводной фразы.
+Для науки отделяй наблюдения на клетках, животных и людях и не считай дату
+новостного пересказа датой исследования. Для событий избегай ложных дат.
+Ответ в JSON: title (одно название всего очерка), teaser (30–65 слов
+для всего очерка, лучше подготовь в первой части), paragraphs (heading,text).'''
+        part = news.gemini(prompt, output_tokens=10500, schema='article')
+        para = part.get('paragraphs') or []
+        if not isinstance(para,list) or len(para)<3 or len(para)>7 or any(
+            not isinstance(x,dict) or not isinstance(x.get('text'),str) or
+            len(x['text'].strip())<100 for x in para):
+            raise ValueError(f'Longform section {index+1}/3 incomplete; no padding allowed')
+        section_words = wc(article_body(part))
+        if section_words < 300 or section_words > 850:
+            raise ValueError(f'Longform section {index+1}/3 has {section_words} words; '
+                             'needs 300–850 supported words')
+        if index == 0:
+            title = part.get('title','')
+            teaser = part.get('teaser','')
+        all_paragraphs.extend(para)
+        prior_tail = article_body(part)[-950:]
+        print(f'[longform] section {index+1}/3 accepted, {section_words} words', flush=True)
+    article = {'title':title, 'teaser':teaser, 'paragraphs':all_paragraphs}
+    n = article_form(article,plan)
+    # Distinct source excerpts alone do not guarantee non-repetitive prose.
+    texts = [normalized(x['text']) for x in all_paragraphs]
+    for i, a in enumerate(texts):
+        for b in texts[i+1:]:
+            if SequenceMatcher(None,a[:1500],b[:1500]).ratio()>0.80:
+                raise ValueError('Longform repeats substantially identical paragraphs')
+    print(f'[longform] combined source-grounded narrative, {n} words; '
+          'individual fact-check still required', flush=True)
+    return article
+
+
 def write_from_dossier(plan, dossier, date, revision_reason=''):
-    """Stage 3: narrative from vetted quotations, never freeform ungrounded recap."""
-    facts=[{'source_id':x['source_id'],'source_quote':x['quote'],
-            'verified_point':x['explanation']} for x in dossier['claims']]
-    goal='1250–1550' if plan['long'] else '570–720'
-    prompt=f'''Ты автор 387 News, сделай законченную СТАТЬЮ на русском языке.
-Задание: {json.dumps(plan,ensure_ascii=False)}. Выпуск {date}.
-ДОСЬЕ с ТОЧНО ПРОВЕРЕННЫМИ цитатами: {json.dumps(facts,ensure_ascii=False)}
-Хронология: {dossier.get('chronology','')}. Что на кону: {dossier.get('stakes','')}.
-Причина прежней редакторской браковки (если есть): {revision_reason[:1400]}
-Нужен объём {goal} РУССКИХ СЛОВ В ОСНОВНОМ ТЕКСТЕ (не в анонсе).
-Пиши связной прозой, НЕ списком, как интеллектуальный журналистский очерк.
-Сильное конкретное первое предложение; сюжет — завязка, перипетии, детали,
-точные объяснения и содержательный финал. Интеллект читателя уважай. НИКАКИХ
-клише 'современный мир', 'богатейшее наследие', 'уникальные возможности',
-общих похвал проектам, пресс-релизного тона, рекламных превосходных степеней.
-Для московской афиши конкретная польза возможна только при наличии фактов
-в досье, иначе пиши как очерк об истории места, не как анонс текущих дат.
-Для науки: отделяй работу на клетках, на мышах и клинические результаты.
-Не приписывай исходной статье новизну по дате перепубликации в СМИ.
-Каждое конкретное имя, цифра, дата, место и утверждение о результатах
-должно прямо следовать из досье. Не добавляй фантастических цитат и фактов.
-Если данных не хватает для длинного текста, не раздувай текст — редактор
-отклонит слабый результат. Расширенный список приоритетных тем — НЕ разрешение
-на рекламный, водянистый или недостоверный текст. Приоритет №19 для истории
-книг отменён, однако исключительные истории о литературе могут присутствовать
-в обычных материалах на общих основаниях. Верни JSON: title, teaser (50–90 слов),
-paragraphs (не менее 8 объектов heading,text с естественной прозой).'''
-    a=news.gemini(prompt,output_tokens=18000 if plan['long'] else 10500,schema='article')
+    """Draft source-backed prose. Long features use focused smaller requests."""
+    if plan['long']:
+        a = _longform_parts(plan, dossier, date, revision_reason)
+    else:
+        facts=[{'source_id':x['source_id'],'source_quote':x['quote'],
+                'verified_point':x['explanation']} for x in dossier['claims']]
+        prompt=f'''Ты автор 387 News. Напиши КОМПАКТНЫЙ ЗАКОНЧЕННЫЙ ОЧЕРК на русском.
+Сюжет: {json.dumps(plan,ensure_ascii=False)}. Дата {date}.
+ДОСЬЕ с ТОЧНО ПРОВЕРЕННЫМИ цитатами: {json.dumps(facts,ensure_ascii=False)}.
+Хронология: {dossier.get('chronology','')}. Смысл истории: {dossier.get('stakes','')}.
+Прежняя браковка (если была): {revision_reason[:700]}
+Напиши примерно 570–720 русских слов связной прозой, 7–10 абзацев.
+Начни конкретно, приведи детали, объясни механизм/историю и закончи мыслью.
+Никаких общих вступлений, штампов, рекламы, домыслов и вымышленных дат.
+Для науки различай результаты на клетках, животных и людях; дату СМИ и
+дату исследования. Всё конкретное подтверждай цитатами из досье.
+Верни JSON: title, teaser (не менее 25 слов), paragraphs (heading,text).'''
+        a=news.gemini(prompt,output_tokens=10500,schema='article')
     n=article_form(a,plan)
     a.update(category=plan['category'],kind=plan['kind'],long=bool(plan['long']),
              source_ids=list(plan['source_ids']),word_count=n,
