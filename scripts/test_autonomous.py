@@ -371,10 +371,11 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
             state['dossiers'][str(i)] = {'claims':[]}
         with patch.object(ed,'verify_article',side_effect=[True,True,True,ValueError('unsupported teaser')]), patch.object(ed,'audit_issue') as issue_review:
             stage.audit(state)
-        self.assertNotIn('3',state['articles'])
+        self.assertIn('3',state['articles'])
         self.assertIn('0',state['articles'])
-        self.assertEqual(len(state['articles']),7)
-        self.assertIn('3',state['rejections'])
+        self.assertEqual(len(state['articles']),8)
+        self.assertEqual(set(state['audit_repairs']),{'3'})
+        self.assertEqual(state['audit_repairs']['3']['action'],'revise_article')
         issue_review.assert_not_called()
 
     def test_audit_quota_pause_never_invalidates_accepted_articles(self):
