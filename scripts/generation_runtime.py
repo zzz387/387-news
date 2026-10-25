@@ -17,6 +17,13 @@ class EvidenceRejected(ValueError, RuntimeError):
 class RequestBudget:
     def __init__(self, ledger, persist=lambda: None, *, run_limit=None, day_limit=None,
                  gap=None, seconds=None):
+        if not isinstance(ledger, dict):
+            raise ValueError('Invalid request ledger')
+        if ledger.get('day') and (type(ledger.get('requests')) is not int
+                                  or ledger['requests'] < 0
+                                  or not isinstance(ledger.get('models'), dict)
+                                  or not isinstance(ledger.get('cooldowns', {}), dict)):
+            raise ValueError('Invalid persisted request accounting; refusing API calls')
         self.ledger = ledger
         self.persist = persist
         self.run_limit = int(run_limit if run_limit is not None else os.getenv('NEWS_MAX_REQUESTS_PER_RUN', '24'))

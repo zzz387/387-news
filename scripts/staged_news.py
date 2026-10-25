@@ -209,8 +209,12 @@ def replace_rejected_stories(state):
         for plan in other:
             for sid in plan['source_ids']:
                 usage[sid] = usage.get(sid, 0) + 1
-        for c in state.get('candidates', []):
-            if (c['category'] != old['category'] or bool(c.get('long')) != bool(old['long'])
+        candidates = sorted(state.get('candidates', []), key=lambda c: c['category'] != old['category'])
+        for c in candidates:
+            categories = [p['category'] for p in other] + [c['category']]
+            if (not editorial31.LIFE.issubset(set(categories))
+                    or sum(cat in editorial31.LIFE for cat in categories) < 4
+                    or any(categories.count(cat) > (3 if cat in editorial31.LIFE else 2) for cat in set(categories))
                     or editorial31.candidate_score(c) < 19
                     or any(editorial31.meaningfully_same(c['title'], t) for t in forbidden)):
                 continue
@@ -219,12 +223,12 @@ def replace_rejected_stories(state):
                 continue
             if not any(editorial31._reference_quality(lookup[sid]) for sid in ids):
                 continue
-            if c.get('long') and not editorial31._longform_evidence(c, lookup)[0]:
+            if old['long'] and not editorial31._longform_evidence(c, lookup)[0]:
                 continue
             if c.get('kind', '').lower() == 'новость' and not any(lookup[sid].get('recent') and not lookup[sid].get('evergreen') for sid in ids):
                 continue
             replacement = {'title':c['title'], 'category':c['category'], 'kind':c['kind'],
-                           'source_ids':list(ids), 'long':bool(c.get('long')),
+                           'source_ids':list(ids), 'long':bool(old['long']),
                            'editorial_score':editorial31.candidate_score(c),
                            'angle':c.get('hook', ''), 'hook':c.get('hook', ''),
                            'long_topic_id':editorial31.normalized_topic_id(c)}
@@ -455,6 +459,7 @@ def main():
                   or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
     if state:
+        state.pop('pause_reason', None)
         count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[resume] {len(state.get("articles", {}))}/8 verified articles; {count} accepted segments; '
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)

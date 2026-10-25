@@ -237,9 +237,13 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
 
     def test_replace_only_rejected_slot_and_archive_its_dossier(self):
         sources = [{'id':f'S{i:03d}', 'url':f'https://example.org/{i}',
-                    'evidence':'Подробный проверенный документ. '*100, 'recent':False} for i in range(1,10)]
+                    'evidence':'Подробный проверенный документ. '*300, 'recent':False} for i in range(1,10)]
         plan = [{'title':f'Old commissioned story {i}', 'category':'Семья',
                  'kind':'очерк', 'long':False, 'source_ids':[f'S{i+1:03d}']} for i in range(8)]
+        for i, category in enumerate(['Семья','Семья','Москва и путешествия','Москва и путешествия','Здоровье и движение','Здоровье и движение','Наука','Технологии']):
+            plan[i]['category'] = category
+        plan[0]['long'] = plan[2]['long'] = True
+        # A depth-qualified pitch demoted by the five-pitch cap is still eligible.
         candidate = {'title':'Почему совместная игра меняет развитие младенца', 'category':'Семья',
                      'kind':'очерк', 'long':False, 'source_ids':['S009'], 'novelty':5,
                      'reader_interest':5, 'specificity':5, 'evidence':5, 'fit':5}
@@ -249,11 +253,28 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
         with patch.object(news, 'gemini', side_effect=AssertionError('replacement must not generate facts')):
             stage.replace_rejected_stories(state)
         self.assertEqual(state['plan'][0]['title'], candidate['title'])
+        self.assertTrue(state['plan'][0]['long'])
         self.assertEqual(state['plan'][1:], plan[1:])
         self.assertEqual(state['articles'], {'1':{'title':'accepted article'}})
         self.assertEqual(state['dossiers']['1'], {'private':'keep'})
         self.assertEqual(state['rejected_stories'][0]['dossier'], {'private':'old'})
         self.assertEqual(state['rejected'], {})
+
+    def test_incomplete_metadata_repaired_before_accepting_prose(self):
+        plan, dossier, response = self.fixture()
+        incomplete = response(0)
+        incomplete['title'] = ''
+        with patch.object(news, 'gemini', side_effect=[incomplete] + [response(i) for i in range(8)]) as api:
+            result = ed.write_from_dossier(plan, dossier, '2026-10-26')
+        self.assertEqual(api.call_count, 9)
+        self.assertIn('title or teaser incomplete', api.call_args_list[1].args[0])
+        self.assertGreaterEqual(result['word_count'], 1050)
+
+    def test_corrupt_quota_cannot_reset_api_budget(self):
+        for ledger in ({'day':'2026-10-25','requests':-1,'models':{}},
+                       {'day':'2026-10-25','requests':'0','models':{}}, []):
+            with self.subTest(ledger=ledger), self.assertRaises(ValueError):
+                rt.RequestBudget(ledger)
 
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()

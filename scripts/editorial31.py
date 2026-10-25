@@ -789,6 +789,9 @@ def prose_quality(article):
 
 
 def validate_segment(part, previous, index):
+    if index == 0 and (not 20 <= len(part.get('title', '')) <= 185
+                       or wc(part.get('teaser', '')) < 25):
+        raise ValueError('Segment 1 title or teaser incomplete')
     para = part.get('paragraphs') or []
     if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
         not isinstance(p, dict) or not isinstance(p.get('text'), str)
@@ -893,7 +896,7 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
     if len(claims) < minimum_claims:
         raise news.runtime.EvidenceRejected(f'Story needs at least {minimum_claims} verified source excerpts')
     minimum_parts = 8 if long else 4
-    minimum_words = MIN_LONG if long else MIN_SHORT
+    minimum_words = MIN_LONG if long else 600  # drafting target; editorial floor remains 440
     beats = _LONGFORM_BEATS if long else (
         'Конкретная завязка: подтверждённый факт и главный вопрос истории.',
         'Механизм и объяснение главного факта с проверенными подробностями.',
