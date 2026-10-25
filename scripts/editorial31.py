@@ -555,7 +555,7 @@ class _StudyLinks(HTMLParser):
             if href:self.hrefs.append(href)
 
 
-def enrich_originals(sources, plan):
+def enrich_originals(sources, plan, *, strict=True):
     """Find actual study links from selected aggregator stories where possible.
 
     Never invent an original paper or treat the date of a secondary report as
@@ -612,8 +612,68 @@ def enrich_originals(sources, plan):
         if (item['category'] in ('Наука','Здоровье и движение')
                 and item['kind'].lower()=='новость'
                 and not item.get('original_study_found',False)):
-            raise RuntimeError('New scientific result has no original accessible study or official release; veto')
+            if strict:
+                raise RuntimeError('New scientific result has no original accessible study or official release; veto')
+            item['original_unverified'] = True
     return sources, plan
+
+
+def select_plan_with_verified_science(sources, candidates, initial_plan=None, *, max_rounds=12):
+    """Replace one unsupported scientific NEWS candidate rather than veto the issue.
+
+    Candidate titles, sources, editorial ratings and longform approval must already
+    have passed the regular shortlist/commissioning checks. Never manufacture new
+    stories, downgrade a news claim to an evergreen item, or waive the primary-source
+    rule. Remaining candidates are rebalanced by the same deterministic selector.
+    """
+    def identity(p):
+        return (normalized(p.get('title', '')), p.get('category', ''))
+
+    rejected = set()
+    verified = {}  # reuse earlier verified scientific sources across reselections
+    attempted = 0
+    limit = max(1, min(int(max_rounds), len(candidates) + 1))
+    while attempted < limit:
+        pool = [c for c in candidates if identity(c) not in rejected]
+        if attempted == 0 and initial_plan is not None:
+            plan = initial_plan
+        else:
+            try:
+                plan = select_balanced_plan(pool, sources)
+            except RuntimeError as exc:
+                raise RuntimeError(
+                    'No balanced issue after excluding scientific news without '
+                    'accessible original studies or official releases; '
+                    f'excluded={len(rejected)}. {exc}'
+                ) from exc
+        unverified = []
+        for item in plan:
+            cached = verified.get(identity(item))
+            if cached is not None:
+                item['source_ids'] = cached[:]
+                item['original_study_found'] = True
+                item.pop('original_unverified', None)
+            else:
+                unverified.append(item)
+        if unverified:
+            sources, _ = enrich_originals(sources, unverified, strict=False)
+        failed = [item for item in plan if item.get('original_unverified')]
+        if not failed:
+            print(f'[original source audit] verified plan: {len(plan)} stories; '
+                  f'{len(rejected)} unsupported science pitches replaced',flush=True)
+            return sources, plan
+        for item in plan:
+            if (item.get('original_study_found') and
+                    item['category'] in ('Наука', 'Здоровье и движение') and
+                    item['kind'].lower() == 'новость'):
+                verified[identity(item)] = list(item['source_ids'])
+        for item in failed:
+            rejected.add(identity(item))
+            print(f'[original source audit] reject unsupported scientific NEWS '
+                  f'candidate (not published): {item["title"][:120]}',flush=True)
+        attempted += 1
+    raise RuntimeError('Not enough supported scientific reports to build an issue '
+                       f'after {limit} verifications. No unsupported science will be published.')
 
 
 def make_dossier(plan, source_map, date):

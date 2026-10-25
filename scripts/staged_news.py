@@ -133,7 +133,11 @@ def build_plan(state: dict | None, date: str):
     if len(sources) < 12:
         raise RuntimeError(f'Only {len(sources)} retrieved sources; at least 12 required')
     planned, candidates = editorial31.choose_plan(sources, date)
-    sources, planned = editorial31.enrich_originals(sources, planned)
+    # An unverifiable "fresh scientific discovery" is excluded and the plan is
+    # recomputed from the already vetted candidate pool; all quality and rubric
+    # restrictions still apply. No new LLM research request is needed.
+    sources, planned = editorial31.select_plan_with_verified_science(
+        sources, candidates, initial_plan=planned)
     return {'version':31, 'date':date, 'sources':sources, 'plan':planned,
             'articles':{}, 'dossiers':{}, 'rejections':{}, 'candidates':candidates, 'stage':'planned', 'audit_passed':False,
             'created_at':datetime.now(TZ).isoformat()}

@@ -177,7 +177,7 @@ class Editorial31Tests(unittest.TestCase):
         dossiers={'claims':[{'source_id':'S001','quote':'A fact verified','explanation':'X'}]}
         with patch.object(s.news,'gather_sources',return_value=sources), \
              patch.object(e,'choose_plan',return_value=(plan,[])), \
-             patch.object(e,'enrich_originals',side_effect=lambda ss,pp:(ss,pp)), \
+             patch.object(e,'enrich_originals',side_effect=lambda ss,pp,**kwargs:(ss,pp)), \
              patch.object(e,'make_dossier',return_value=dossiers), \
              patch.object(e,'write_from_dossier',side_effect=lambda p,d,dt,rr='':
                  dict(title=p['title'],word_count=1250 if p['long'] else 580,
