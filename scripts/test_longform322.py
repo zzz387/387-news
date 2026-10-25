@@ -10,6 +10,9 @@ except ImportError:
 
 class Longform323Tests(unittest.TestCase):
     def setUp(self):
+        single = patch.dict(ed.os.environ, {"NEWS_FRAGMENT_ATTEMPTS":"1"})
+        single.start()
+        self.addCleanup(single.stop)
         self.plan = {
             'title':'Почему древний артефакт изменил представления об истории',
             'category':'История и культура','kind':'очерк','long':True,

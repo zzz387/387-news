@@ -24,15 +24,28 @@ def newest_artifact(records: list, label: str) -> dict | None:
 
 def main():
     phase = os.environ.get('PHASE','').strip()
-    if phase not in ('plan','write','audit','publish','check'):
+    if phase not in ('auto','plan','research','write','audit','publish','check'):
         raise RuntimeError('Unknown requested phase')
     raw_date = os.environ.get('TARGET_DATE','').strip() or None
     date = staged_news.phase_date(phase,datetime.now(staged_news.TZ),raw_date)
     preview = os.environ.get('PREVIEW','false').lower() == 'true'
     label = staged_news.artifact_label(date,preview)
     repo = os.environ['GITHUB_REPOSITORY']
-    api = f'https://api.github.com/repos/{repo}/actions/artifacts?per_page=100&name={quote(label)}'
-    records = staged_news.request_json(api).get('artifacts', [])
+    def records_for(name):
+        result = []
+        for page in range(1, 11):
+            api = f'https://api.github.com/repos/{repo}/actions/artifacts?per_page=100&name={quote(name)}&page={page}'
+            batch = staged_news.request_json(api).get('artifacts')
+            if not isinstance(batch, list):
+                raise RuntimeError('Invalid GitHub Artifacts response; refusing empty restore')
+            result.extend(batch)
+            if len(batch) < 100:
+                return result
+        raise RuntimeError('Artifact listing exceeded pagination bound; refusing uncertain restore')
+
+    records = records_for(label)
+    if any(x.get('name') == label and x.get('expired') for x in records) and not newest_artifact(records, label):
+        raise RuntimeError('Saved checkpoint expired; cannot safely restart this issue')
     newest = newest_artifact(records,label)
     outputs = {'found': 'true' if newest else 'false'}
     if newest:
@@ -48,6 +61,13 @@ def main():
               f'from previous workflow run {source_run}', flush=True)
     else:
         print('[checkpoint] no existing encrypted checkpoint for this date/mode',flush=True)
+    # Global daily ledger prevents resetting quota when issue date/mode changes.
+    quota = newest_artifact(records_for(staged_news.quota_label()), staged_news.quota_label())
+    if quota:
+        run = (quota.get('workflow_run') or {}).get('id')
+        if type(run) is not int or run <= 0:
+            raise RuntimeError('Quota artifact has no valid source workflow run ID')
+        outputs.update(quota_found='true', quota_id=str(quota['id']), quota_run_id=str(run))
     out = os.environ.get('GITHUB_OUTPUT')
     if not out:
         raise RuntimeError('GITHUB_OUTPUT not set')

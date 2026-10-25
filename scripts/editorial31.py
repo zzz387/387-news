@@ -535,13 +535,20 @@ def select_balanced_plan(candidates: list[dict], sources: list[dict]) -> list[di
     return plan
 
 
-def choose_plan(sources,date):
+def choose_plan(sources,date, progress=None):
     # Version 3.1 originally asked Gemini to choose exactly 8 from its own
     # shortlist, then rejected the output if it omitted mandatory rubrics.
     # That was an unreliable prompt-following/counting step. Keep Gemini for
     # suggesting & scoring candidates; enforce selection deterministically.
-    extend_family_evidence(sources)
-    candidates=shortlist(sources,date)
+    progress = progress if progress is not None else {}
+    if not progress.get("family_researched"):
+        extend_family_evidence(sources)
+        progress["family_researched"] = True
+        news.runtime.checkpoint()
+    if not progress.get("candidates"):
+        progress["candidates"] = shortlist(sources,date)
+        news.runtime.checkpoint()
+    candidates = progress["candidates"]
     candidates=commission_evidence_backed_longforms(candidates,sources)
     canonical=select_balanced_plan(candidates,sources)
     return canonical,candidates
@@ -716,7 +723,7 @@ quote — ТОЧНЫЙ НЕПРЕРЫВНЫЙ фрагмент текста ис
         clean.append({'source_id':sid,'quote':quote,'explanation':claim.get('explanation','')[:450]})
     min_claims=8 if plan['long'] else 5
     if len(clean)<min_claims:
-        raise RuntimeError(f'Insufficient exact source evidence ({len(clean)}/{min_claims}); no invented facts')
+        raise news.runtime.EvidenceRejected(f'Insufficient exact source evidence ({len(clean)}/{min_claims}); no invented facts')
     result['claims']=clean
     return result
 
@@ -747,6 +754,63 @@ def article_form(a, plan):
     if not 20<=len(a.get('title',''))<=185 or wc(a.get('teaser',''))<25:
         raise ValueError('Title or teaser is incomplete')
     return n
+
+
+def validate_segment(part, previous, index):
+    para = part.get('paragraphs') or []
+    if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
+        not isinstance(p, dict) or not isinstance(p.get('text'), str)
+        or len(p['text'].strip()) < 65 for p in para):
+        raise ValueError(f'Longform segment {index+1} incomplete')
+    words = wc(article_body(part))
+    if not 105 <= words <= 400:
+        raise ValueError(f'Longform segment {index+1} has {words} words; requires 105–400 meaningful, supported words')
+    if len(style_flags(part)) >= 2:
+        raise ValueError(f'Longform segment {index+1} contains generic/promotional filler')
+    tokens = re.findall(r'\w+', normalized(article_body(part)))
+    if len(set(tokens)) / max(1, len(tokens)) < .12:
+        raise ValueError(f'Longform segment {index+1} lacks substantive vocabulary')
+    prior = [normalized(p['text']) for old in previous for p in old['paragraphs']]
+    for p in para:
+        text = normalized(p['text'])
+        if any(text == old or SequenceMatcher(None, text[:2400], old[:2400]).ratio() > .80
+               for old in prior):
+            raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        # Check the whole paragraph, including copied tails outside the fuzzy window.
+        shingles = lambda v: set(zip(*(v.split()[j:] for j in range(5))))
+        new = shingles(text)
+        if any(new and len(new & shingles(old)) / len(new) > .55 for old in prior):
+            raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        prior.append(text)
+    return words
+
+
+def request_segment(prompt, parts, progress, index):
+    attempts = max(1, min(3, int(os.getenv('NEWS_FRAGMENT_ATTEMPTS', '3'))))
+    failures = progress.setdefault('failures', {})
+    feedback = progress.setdefault('feedback', {})
+    slot = str(index)
+    if failures.get(slot, 0) >= 9:
+        raise news.runtime.EvidenceRejected(f'Segment {index+1} rejected after 9 attempts; source depth or prose insufficient')
+    for attempt in range(attempts):
+        message = feedback.get(slot, '')
+        repair = (f'\nДиагностика предыдущей попытки: {message}. '
+                  'Перепиши только текущий фрагмент. Цель 180–240 слов, '
+                  'минимум 105. Добавь подтверждённый механизм или подробности '
+                  'из цитат, не повторяй тезисы и не добавляй факты из памяти.') if message else ''
+        try:
+            part = _paced_section_request(prompt + repair)
+            words = validate_segment(part, parts, index)
+            return part, words
+        except (ValueError, news.GeminiResponseError) as exc:
+            failures[slot] = failures.get(slot, 0) + 1
+            feedback[slot] = str(exc)[:450]
+            news.runtime.checkpoint()
+            print(f'[repair] segment={index+1} rejected attempt={failures[slot]}/9: {exc}', flush=True)
+            if failures[slot] >= 9:
+                raise news.runtime.EvidenceRejected(f'Segment {index+1}: insufficient supported prose after 9 attempts') from None
+            if attempt + 1 == attempts:
+                raise ValueError(f'{exc}; accepted sections preserved; retry next run') from None
 
 
 # Editorial pacing applies only to the live run (not to unit tests). On GitHub
@@ -793,7 +857,7 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
     """
     claims = dossier['claims']
     if len(claims) < 8:
-        raise ValueError('Longform needs at least 8 verified source excerpts')
+        raise news.runtime.EvidenceRejected('Longform needs at least 8 verified source excerpts')
 
     basis = json.dumps({
         'date':date, 'title':plan['title'], 'category':plan['category'],
@@ -812,10 +876,15 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
 
     # A passage is useful only if it advances the already researched story.
     # Reuse of the source ID is allowed, but duplicate prose is checked below.
+    # Revalidate persisted counts and prose; never trust cached word totals.
+    for i, part in enumerate(parts):
+        part['words'] = validate_segment(part, parts[:i], i)
     while len(parts) < len(_LONGFORM_BEATS):
         index = len(parts)
         current_total = sum(int(p.get('words', 0)) for p in parts)
         if index >= 8 and current_total >= MIN_LONG:
+            break
+        if current_total + 400 > MAX_WORDS:
             break
 
         focus_indices = sorted({index % len(claims),
@@ -849,28 +918,12 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
 Верни JSON-объект title, teaser (30–65 слов), paragraphs (heading,text).
 Нужны точные подробности, а не лозунги и искусственные «части» очерка.
 Прежние замечания редактора: {revision_reason[:400]}'''
-        part = _paced_section_request(prompt)
-        para = part.get('paragraphs') or []
-        if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
-            not isinstance(x,dict) or not isinstance(x.get('text'),str) or
-            len(x['text'].strip()) < 65 for x in para):
-            raise ValueError(f'Longform segment {index+1} incomplete; '
-                             f'{len(parts)} accepted sections preserved in encrypted checkpoint')
-        section_words = wc(article_body(part))
-        if not 105 <= section_words <= 400:
-            raise ValueError(f'Longform segment {index+1} has {section_words} words; '
-                             'requires 105–400 meaningful, supported words; '
-                             f'{len(parts)} accepted sections preserved')
-        # Check against already saved prose BEFORE adding to the checkpoint.
-        new_paragraphs = [normalized(x['text']) for x in para]
-        prior_paragraphs = [normalized(p['text']) for old in parts for p in old['paragraphs']]
-        for a in new_paragraphs:
-            if any(SequenceMatcher(None,a[:1200],b[:1200]).ratio() > 0.80
-                   for b in prior_paragraphs):
-                raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        part, section_words = request_segment(prompt, parts, progress, index)
+        para = part['paragraphs']
         parts.append({'title':str(part.get('title','')),
                       'teaser':str(part.get('teaser','')),
                       'paragraphs':para, 'words':section_words})
+        news.runtime.checkpoint()
         print(f'[longform] saved segment {index+1}/{len(_LONGFORM_BEATS)}, '
               f'{section_words} words; total={sum(p["words"] for p in parts)}; '
               'encrypted checkpoint on run completion', flush=True)
@@ -951,8 +1004,8 @@ def audit_issue(articles,plan,sources):
         raise ValueError('Mandatory rubrics missing')
     if sum(a['category'] in LIFE for a in articles)<4:
         raise ValueError('Not enough life / family / health content')
-    if sum(bool(a.get('long')) for a in articles)<2:
-        raise ValueError('Missing longform features')
+    if not 2 <= sum(bool(a.get('long')) for a in articles) <= 3:
+        raise ValueError('Issue requires 2–3 longform features')
     total=0; titles=[]
     for a,p in zip(articles,plan):
         if a.get('category')!=p['category'] or a.get('kind')!=p['kind']:

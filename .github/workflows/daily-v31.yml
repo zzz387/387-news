@@ -1,16 +1,30 @@
 name: 387 News — editorial v3.1 (SAFE / manual approval)
 
 on:
+  push:
+    branches: [codex/autonomous-editorial-recovery]
+    paths:
+      - 'scripts/**'
+      - '.github/workflows/daily-v31.yml'
+      - 'docs/**'
+  pull_request:
+    paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   schedule:
     # UTC; Moscow = UTC+3 all year.
     # 12:17 Moscow — select sources & create tomorrow's editorial plan
     - cron: '17 9 * * *'
-    # 16:17, 20:17, 00:17, 03:17 Moscow — two articles per batch
+    # Research at 14:17 Moscow, bounded writing windows every two hours.
+    - cron: '17 11 * * *'
+    - cron: '17 15 * * *'
+    - cron: '17 19 * * *'
+    - cron: '17 22 * * *'
     - cron: '17 13 * * *'
     - cron: '17 17 * * *'
     - cron: '17 21 * * *'
     - cron: '17 0 * * *'
-    # 04:17 Moscow — audit, with catch-up on missed article drafts
+    # 04:17 Moscow repair window; 05:17 final audit
+    - cron: '17 2 * * *'
+    # No generation is performed by the final audit
     - cron: '17 1 * * *'
     # 05:54 Moscow — wait until 06:00 then publish; GitHub Pages may lag
     - cron: '54 2 * * *'
@@ -19,7 +33,7 @@ on:
       phase:
         description: 'Safe phase to test: plan → write (repeat) → audit → publish'
         type: choice
-        options: [check, plan, write, audit, publish]
+        options: [check, plan, research, write, audit, publish]
         default: plan
         required: true
       preview:
@@ -43,17 +57,34 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  unit-tests:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - run: python -m unittest discover -s scripts -p 'test_*.py' -v
+
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ github.event_name == 'workflow_dispatch' || vars.NEWS_AUTOMATION_V31_ENABLED == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 100
+    timeout-minutes: 30
     env:
       GH_TOKEN: ${{ github.token }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
       NEWS_RELEASE_APPROVED: ${{ vars.NEWS_RELEASE_APPROVED }}
+      NEWS_MAX_REQUESTS_PER_RUN: "24"
+      NEWS_MAX_REQUESTS_PER_DAY: "180"
+      NEWS_REQUEST_GAP_SECONDS: "6"
+      NEWS_STAGE_SECONDS: "720"
       GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
     outputs:
       ready: ${{ steps.commit.outputs.ready }}
@@ -80,12 +111,17 @@ jobs:
           if [[ "$GITHUB_EVENT_NAME" == 'schedule' ]]; then
             case "$SCHEDULE" in
               '17 9 * * *')  phase=plan ;;
-              '17 13 * * *'|'17 17 * * *'|'17 21 * * *'|'17 0 * * *') phase=write ;;
-              '17 1 * * *') phase=audit ;;
+              '17 11 * * *') phase=research ;;
+              '17 13 * * *'|'17 15 * * *'|'17 17 * * *'|'17 19 * * *'|'17 21 * * *'|'17 22 * * *'|'17 0 * * *'|'17 1 * * *') phase=write ;;
+              '17 2 * * *') phase=audit ;;
               '54 2 * * *') phase=publish ;;
               *) echo 'Unexpected schedule'; exit 1 ;;
             esac
             preview=false
+          elif [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
+            phase=auto
+            preview=true
+            MANUAL_DATE=$(TZ=Europe/Moscow date -d tomorrow +%F)
           else
             phase="$MANUAL_PHASE"
             preview="$MANUAL_PREVIEW"
@@ -113,14 +149,27 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/checkpoint
           merge-multiple: true  # v4: artifact-ids otherwise nests under its name
+      - name: Download shared daily request ledger
+        if: ${{ steps.checkpoint.outputs.quota_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.quota_id }}
+          run-id: ${{ steps.checkpoint.outputs.quota_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/quota
+          merge-multiple: true
       - name: Prepare encrypted draft checkpoint or release
         id: stage
+        timeout-minutes: 20
         env:
           PHASE: ${{ steps.context.outputs.phase }}
           PREVIEW: ${{ steps.context.outputs.preview }}
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
           NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
+          NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
+          NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
           NEWS_LONGFORM_GAP_SECONDS: "6"  # stay below free-tier 15 RPM during longform drafting
         shell: bash
         run: |
@@ -136,9 +185,17 @@ jobs:
           path: ${{ runner.temp }}/news-draft.enc
           if-no-files-found: error
           retention-days: 7
+      - name: Save shared daily request ledger (counts only)
+        if: ${{ always() && steps.stage.outputs.quota == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.stage.outputs.quota_name }}
+          path: ${{ runner.temp }}/quota/quota.json
+          if-no-files-found: error
+          retention-days: 7
       - name: Commit fully audited and released issue
         id: commit
-        if: ${{ steps.stage.outputs.published == 'true' }}
+        if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}
         shell: bash
         run: |
           git add index.html archive/index.html issues/ sitemap.xml
@@ -156,7 +213,7 @@ jobs:
     # Only fully verified issues go to Pages. A separate job avoids GH Pages
     # environment restrictions applying to research/writing stages.
     needs: prepare
-    if: ${{ needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:

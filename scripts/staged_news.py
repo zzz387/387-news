@@ -9,8 +9,10 @@ from __future__ import annotations
 
 import argparse
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import gzip
+import hashlib
+import signal
 import json
 import os
 from pathlib import Path
@@ -30,6 +32,9 @@ except ImportError:
 
 TZ = news.TZ
 ROOT = news.ROOT
+RUNTIME = news.runtime
+PERSIST = None
+
 ARTIFACT_FILE = Path(os.environ.get('RUNNER_TEMP','/tmp')) / 'news-draft.enc'
 
 
@@ -101,7 +106,11 @@ def fetch_latest_checkpoint(label: str, key: bytes) -> dict | None:
 
 
 def save(state: dict, key: bytes):
-    ARTIFACT_FILE.write_bytes(cipher(state, key))
+    ARTIFACT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    temp = ARTIFACT_FILE.with_suffix('.tmp')
+    temp.write_bytes(cipher(state, key))
+    temp.chmod(0o600)
+    temp.replace(ARTIFACT_FILE)
     print(f'[checkpoint] AES-256-GCM encrypted; '
           f'{len(state.get("articles",{}))}/8 vetted article drafts', flush=True)
 
@@ -109,78 +118,142 @@ def save(state: dict, key: bytes):
 def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
     if manual_date:
         return datetime.strptime(manual_date, '%Y-%m-%d').date().isoformat()
-    if phase == 'plan':
+    if phase in ('plan', 'auto'):
         return (now.date()+timedelta(days=1)).isoformat()
-    if phase == 'write' and now.hour >= 11:
+    if phase in ('write', 'research') and now.hour >= 11:
         return (now.date()+timedelta(days=1)).isoformat()
     return now.date().isoformat()
 
 
 def artifact_label(date: str, preview: bool) -> str:
-    return f'387news31-{"test" if preview else "production"}-{date}'
+    label = f'387news31-{"test" if preview else "production"}-{date}'
+    branch = os.getenv('GITHUB_REF_NAME', 'main')
+    if branch != 'main':
+        label += '-' + hashlib.sha256(branch.encode()).hexdigest()[:12]
+    return label
 
 
 def build_plan(state: dict | None, date: str):
-    if state:
+    if state and state.get('plan'):
         print('[plan] checkpoint already exists; not regenerating.',flush=True)
         return state
+    if state is None:
+        state = {'version':31, 'date':date, 'articles':{}, 'dossiers':{},
+                 'rejections':{}, 'stage':'planning', 'audit_passed':False,
+                 'created_at':datetime.now(TZ).isoformat()}
     target = datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=TZ)
-    sources = news.gather_sources(datetime.now(TZ))
+    if not state.get('sources'):
+        state['sources'] = news.gather_sources(datetime.now(TZ))
+        persist_progress()
+    sources = state['sources']
     # News freshness is measured at PUBLICATION, not when sources are collected.
     for source in sources:
         source['recent'] = (not source.get('evergreen') and
                             news.is_recent(source.get('published', ''), target))
     if len(sources) < 12:
         raise RuntimeError(f'Only {len(sources)} retrieved sources; at least 12 required')
-    planned, candidates = editorial31.choose_plan(sources, date)
+    planned, candidates = editorial31.choose_plan(sources, date, progress=state)
     # An unverifiable "fresh scientific discovery" is excluded and the plan is
     # recomputed from the already vetted candidate pool; all quality and rubric
     # restrictions still apply. No new LLM research request is needed.
     sources, planned = editorial31.select_plan_with_verified_science(
         sources, candidates, initial_plan=planned)
-    return {'version':31, 'date':date, 'sources':sources, 'plan':planned,
-            'articles':{}, 'dossiers':{}, 'rejections':{}, 'candidates':candidates, 'stage':'planned', 'audit_passed':False,
-            'created_at':datetime.now(TZ).isoformat()}
+    state.update(sources=sources, plan=planned, candidates=candidates, stage='planned')
+    return state
+
+
+def persist_progress():
+    if PERSIST:
+        PERSIST()
+
+
+def research_batch(state, size=8):
+    lookup = {s['id']:s for s in state['sources']}
+    for i, plan in enumerate(state['plan']):
+        slot = str(i)
+        if slot in state.setdefault('dossiers', {}) or slot in state.setdefault('rejected', {}):
+            continue
+        try:
+            state['dossiers'][slot] = editorial31.make_dossier(plan, lookup, state['date'])
+        except RUNTIME.GenerationPaused:
+            raise
+        except RUNTIME.EvidenceRejected as exc:
+            state['rejected'][slot] = str(exc)[:600]
+        finally:
+            persist_progress()
+        size -= 1
+        if size <= 0:
+            break
+    state['stage'] = 'researched'
+    return state
 
 
 def write_batch(state: dict, size=2):
-    """Save only individually verified articles; failed slots can be retried later."""
+    """Fair revision queue; keep accepted parts and candidates awaiting review."""
     if state.get('audit_passed'):
-        print('[write] already audited; no edits allowed',flush=True)
         return state
     if not state.get('plan'):
         raise RuntimeError('Missing strong story plan; run plan first')
-    known={s['id']:s for s in state['sources']}
-    articles=state.setdefault('articles',{})
-    dossiers=state.setdefault('dossiers',{})
-    rejections=state.setdefault('rejections',{})
-    pending=[i for i in range(len(state['plan'])) if str(i) not in articles]
+    known = {s['id']:s for s in state['sources']}
+    articles = state.setdefault('articles', {})
+    dossiers = state.setdefault('dossiers', {})
+    rejections = state.setdefault('rejections', {})
+    rejected = state.setdefault('rejected', {})
+    revisions = state.setdefault('revisions', {})
+    cursor = state.get('write_cursor', 0) % len(state['plan'])
+    pending = [(cursor+j) % len(state['plan']) for j in range(len(state['plan']))]
+    pending = [i for i in pending if str(i) not in articles and str(i) not in rejected]
     for i in pending[:size]:
-        slot=str(i)
-        plan=state['plan'][i]
-        print(f'[write] source-grounded article {i+1}/8 category={plan["category"]}',flush=True)
+        slot = str(i)
+        plan = state['plan'][i]
+        # Rotate even when quota pauses this slot, so other stories get a turn.
+        state['write_cursor'] = (i+1) % len(state['plan'])
         try:
             if slot not in dossiers:
-                dossiers[slot]=editorial31.make_dossier(plan,known,state['date'])
-                print(f'[dossier] verified literal quotes: {len(dossiers[slot]["claims"])}',flush=True)
-            reason=rejections.get(slot,'')
-            article=editorial31.write_from_dossier(plan,dossiers[slot],state['date'],reason)
-            editorial31.verify_article(article,plan,dossiers[slot],known)
-            article['slug']=news.slugify(article['title'],i+1)
-            articles[slot]=article
-            rejections.pop(slot,None)
-            print(f'[write] VERIFIED and saved {i+1}/8, {article["word_count"]} words',flush=True)
-        except Exception as e:
-            # FAIL CLOSED: do not count or publish a failed article; retain dossier.
-            rejections[slot]=str(e)[:700]
-            print(f'[write] SLOT {i+1} REJECTED: {str(e)[:220]}; checkpoint preserved',
-                  file=sys.stderr,flush=True)
-    state['stage']='writing' if len(articles)<8 else 'ready_for_audit'
-    segments = sum(len(d.get('_longform_progress',{}).get('parts',[]))
-                   for d in dossiers.values() if isinstance(d,dict))
-    print(f'[write] CHECKPOINT STATUS: {len(articles)}/8 verified articles; '
-          f'{segments} provisional longform segments held in encrypted draft; '
-          'green workflow is not publication approval',flush=True)
+                dossiers[slot] = editorial31.make_dossier(plan, known, state['date'])
+                persist_progress()
+            dossier = dossiers[slot]
+            candidate = dossier.get('_draft_candidate')
+            if candidate is None:
+                candidate = editorial31.write_from_dossier(plan, dossier, state['date'], rejections.get(slot, ''))
+                dossier['_draft_candidate'] = candidate
+                persist_progress()
+            try:
+                editorial31.verify_article(candidate, plan, dossier, known)
+            except ValueError:
+                # Only an editorial veto invalidates prose, never an outage.
+                dossier.pop('_draft_candidate', None)
+                if '_longform_progress' in dossier:
+                    dossier['_longform_progress']['rebuild_required'] = True
+                revisions[slot] = revisions.get(slot, 0) + 1
+                if revisions[slot] >= 3:
+                    raise RUNTIME.EvidenceRejected('Three editorial reviews rejected this story')
+                raise
+            candidate['slug'] = news.slugify(candidate['title'], i+1)
+            articles[slot] = candidate
+            dossier.pop('_draft_candidate', None)
+            rejections.pop(slot, None)
+            print(f'[write] VERIFIED slot={i+1}/8 words={candidate["word_count"]}', flush=True)
+        except RUNTIME.GenerationPaused:
+            raise
+        except RUNTIME.EvidenceRejected as exc:
+            rejected[slot] = str(exc)[:600]
+            rejections[slot] = str(exc)[:600]
+            print(f'[write] slot={i+1} rejected: insufficient evidence or supported prose', flush=True)
+        except Exception as exc:
+            rejections[slot] = str(exc)[:700]
+            # Bound short article repair too; transport errors do not condemn sources.
+            if isinstance(exc, ValueError) and not plan.get('long'):
+                revisions[slot] = revisions.get(slot, 0) + 1
+                if revisions[slot] >= 9:
+                    rejected[slot] = 'Repeated editorial/structural rejection; manual source review required'
+            print(f'[write] slot={i+1} deferred ({type(exc).__name__}); progress preserved', flush=True)
+        finally:
+            persist_progress()
+    state['stage'] = 'writing' if len(articles) < 8 else 'ready_for_audit'
+    segments = sum(len(d.get('_longform_progress', {}).get('parts', [])) for d in dossiers.values())
+    print(f'[write] CHECKPOINT STATUS: {len(articles)}/8 verified articles; {segments} accepted segments; '
+          f'{len(rejected)} rejected stories; publication remains gated', flush=True)
     return state
 
 
@@ -215,6 +288,14 @@ def audit(state:dict):
                 state['plan'][i].get('editorial_score', 25)))
             state.setdefault('rejections',{})[str(index)]='Final issue audit: '+str(e)[:500]
             state['articles'].pop(str(index),None)
+            dossier = state.get('dossiers', {}).get(str(index), {})
+            dossier.pop('_draft_candidate', None)
+            if '_longform_progress' in dossier:
+                dossier['_longform_progress']['rebuild_required'] = True
+            revisions = state.setdefault('revisions', {})
+            revisions[str(index)] = revisions.get(str(index), 0) + 1
+            if revisions[str(index)] >= 3:
+                state.setdefault('rejected', {})[str(index)] = 'Repeated issue audit veto'
             print(f'[audit] returned slot {index+1}/8 to revision queue',flush=True)
         print('[AUDIT VETO] '+str(e)[:240]+' — website unchanged',flush=True)
         return state
@@ -240,6 +321,8 @@ def render(state: dict, preview: bool):
             raise RuntimeError('Too early to publish; refusing exposure of unreleased issue')
         print(f'[release] private until 06:00 MSK; waiting {int(seconds)} seconds',flush=True)
         time.sleep(seconds)
+    if not preview and os.environ.get('GITHUB_REF_NAME', 'main') != 'main':
+        raise RuntimeError('Release veto: only main may publish')
     if not preview and os.environ.get('NEWS_RELEASE_APPROVED', '').lower() != 'true':
         raise RuntimeError('Release veto: NEWS_RELEASE_APPROVED must be explicitly enabled')
     issue_dir = ROOT / 'issues' / date
@@ -272,50 +355,91 @@ def render(state: dict, preview: bool):
 
 
 def main():
-    p=argparse.ArgumentParser()
-    p.add_argument('--phase', choices=['plan','write','audit','publish','check'],required=True)
+    global PERSIST
+    p = argparse.ArgumentParser()
+    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check'], required=True)
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
-    args=p.parse_args()
-    key = validate_key(os.environ.get('DRAFT_ENCRYPTION_KEY',''))
-    date=phase_date(args.phase,datetime.now(TZ),args.target_date)
-    label=artifact_label(date,args.preview)
-    print(f'[387 News] phase={args.phase}, target={date}, '
-          f'mode={"TEST" if args.preview else "PRODUCTION"}',flush=True)
-    state=fetch_latest_checkpoint(label,key)
-    if state and (state.get('date')!=date or state.get('version')!=31):
+    args = p.parse_args()
+    key = validate_key(os.environ.get('DRAFT_ENCRYPTION_KEY', ''))
+    date = phase_date(args.phase, datetime.now(TZ), args.target_date)
+    label = artifact_label(date, args.preview)
+    state = fetch_latest_checkpoint(label, key)
+    branch = os.getenv('GITHUB_REF_NAME', 'main')
+    if state and (state.get('date') != date or state.get('version') != 31
+                  or state.get('branch', branch) != branch
+                  or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
-    if args.phase=='check':
+    if args.phase == 'check':
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')
-        print(f'[checkpoint-test] OK; encrypted draft restored; '
-              f'{len(state.get("articles",{}))}/8 articles; '
-              f'target={state.get("date")}',flush=True)
+        segments = sum(len(d.get('_longform_progress', {}).get('parts', [])) for d in state.get('dossiers', {}).values())
+        print(f'[checkpoint-test] restored {len(state.get("articles", {}))}/8 articles, {segments} segments', flush=True)
         return
-    if args.phase=='plan':
-        state=build_plan(state,date)
-    else:
-        if not state:
-            raise RuntimeError('Encrypted draft missing; plan stage has not completed')
-        if args.phase=='write':state=write_batch(state)
-        elif args.phase=='audit':
-            # Never generate unreviewed missing articles during the final audit.
-            state=audit(state)
-    if state:
-        # The artifact uploader will only see ciphertext, never plaintext.
-        save(state,key)
-        output=os.environ.get('GITHUB_OUTPUT')
+    quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
+    if os.getenv('NEWS_QUOTA_EXPECTED') == 'true' and not quota_path.is_file():
+        raise RuntimeError('Expected quota ledger download missing; refusing API calls')
+    ledger = json.loads(quota_path.read_text()) if quota_path.is_file() else {}
+    snapshot = (state or {}).get('_quota_snapshot', {})
+    if snapshot.get('day') == ledger.get('day'):
+        ledger['requests'] = max(ledger.get('requests', 0), snapshot.get('requests', 0))
+    elif snapshot.get('day', '') > ledger.get('day', ''):
+        ledger = snapshot.copy()
+    output = os.getenv('GITHUB_OUTPUT')
+
+    def persist():
+        quota_path.parent.mkdir(parents=True, exist_ok=True)
+        temp = quota_path.with_suffix('.tmp')
+        temp.write_text(json.dumps(ledger), encoding='utf-8')
+        temp.replace(quota_path)
+        if state:
+            state.update(branch=branch, preview=args.preview, _quota_snapshot=json.loads(json.dumps(ledger)))
+            save(state, key)
         if output:
-            with open(output,'a',encoding='utf-8') as f:
-                f.write('checkpoint=true\n')
-                f.write(f'artifact_name={label}\n')
-    if args.phase=='publish':
-        if not state or not state.get('audit_passed'):
-            raise RuntimeError('Unapproved issue: cannot publish or preview release')
-        ready=render(state,args.preview)
-        output=os.environ.get('GITHUB_OUTPUT')
-        if output and ready:
-            with open(output,'a',encoding='utf-8') as f:f.write('published=true\n')
+            with open(output, 'a', encoding='utf-8') as f:
+                f.write(f'quota=true\nquota_name={quota_label()}\n')
+                if state:
+                    f.write(f'checkpoint=true\nartifact_name={label}\n')
+
+    PERSIST = RUNTIME.CHECKPOINT = persist
+    RUNTIME.ACTIVE_BUDGET = RUNTIME.RequestBudget(ledger, persist)
+    previous_handler = signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(RUNTIME.GenerationPaused('Runner stopped; checkpoint retained')))
+    try:
+        persist()  # arm always() upload BEFORE any generation
+        if args.phase in ('plan', 'auto') and (not state or not state.get('plan')):
+            if state is None:
+                state = {'version':31, 'date':date, 'articles':{}, 'dossiers':{},
+                         'rejections':{}, 'stage':'planning', 'audit_passed':False}
+            state = build_plan(state, date)
+            persist()
+        elif state is None:
+            raise RuntimeError('Encrypted draft missing; run plan first')
+        if args.phase == 'research':
+            research_batch(state)
+        elif args.phase in ('write', 'auto'):
+            write_batch(state, size=8)
+        elif args.phase == 'audit':
+            audit(state)
+        elif args.phase == 'publish':
+            if not state.get('audit_passed'):
+                raise RuntimeError('Unapproved issue: cannot publish or preview release')
+            ready = render(state, args.preview)
+            if output and ready:
+                with open(output, 'a', encoding='utf-8') as f:
+                    f.write('published=true\n')
+    except RUNTIME.GenerationPaused as exc:
+        print(f'[paused] {exc}', flush=True)
+        if state:
+            state['pause_reason'] = str(exc)
+    finally:
+        persist()
+        RUNTIME.ACTIVE_BUDGET = RUNTIME.CHECKPOINT = PERSIST = None
+        signal.signal(signal.SIGTERM, previous_handler)
+
+
+def quota_label():
+    # Shared across issue dates and preview/production; concurrency serializes writers.
+    return '387news31-quota-' + datetime.now(timezone.utc).date().isoformat()
 
 
 if __name__=='__main__':
