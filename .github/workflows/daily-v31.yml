@@ -1,6 +1,9 @@
 name: 387 News — editorial v3.1 (SAFE / manual approval)
 
 on:
+  push:
+    branches: [main, codex/launch-production]
+    paths: ['scripts/restore_ready.py', '.github/workflows/daily-v31.yml']
   pull_request:
     paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   schedule:
@@ -51,6 +54,49 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  restore-prepared:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Run technical tests without API calls
+        run: python -m unittest discover -s scripts -p 'test_*.py' -q
+      - name: Restore the approved encrypted issue using the existing artifact mechanism
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: '12597026471'
+          run-id: '40187840185'
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/prepared
+          merge-multiple: true
+      - name: Validate or promote without exporting private data
+        id: restored
+        env:
+          DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
+          NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/prepared/news-draft.enc
+        shell: bash
+        run: |
+          arguments=()
+          if [[ "$GITHUB_REF_NAME" == 'main' ]]; then arguments+=(--promote); fi
+          python scripts/restore_ready.py "${arguments[@]}"
+      - name: Preserve the approved issue in the production artifact namespace
+        if: ${{ steps.restored.outputs.checkpoint == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.restored.outputs.artifact_name }}
+          path: ${{ runner.temp }}/news-draft.enc
+          if-no-files-found: error
+          retention-days: 90
+
   unit-tests:
     if: ${{ github.event_name == 'pull_request' }}
     runs-on: ubuntu-latest
@@ -174,7 +220,7 @@ jobs:
           name: ${{ steps.stage.outputs.artifact_name }}
           path: ${{ runner.temp }}/news-draft.enc
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 90
       - name: Save shared daily request ledger (counts only)
         if: ${{ always() && steps.stage.outputs.quota == 'true' }}
         uses: actions/upload-artifact@v4
@@ -182,7 +228,7 @@ jobs:
           name: ${{ steps.stage.outputs.quota_name }}
           path: ${{ runner.temp }}/quota/quota.json
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 90
       - name: Commit fully audited and released issue
         id: commit
         if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}

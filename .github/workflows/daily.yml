@@ -1,9 +1,6 @@
-name: 387 News — daily newspaper
+name: RETIRED — 387 News — daily newspaper
 
 on:
-  schedule:
-    # 05:17 Moscow; drafts remain inside the Action until at least 06:00 Moscow.
-    - cron: '17 2 * * *'
   workflow_dispatch:
     inputs:
       publish:
@@ -23,6 +20,7 @@ concurrency:
 
 jobs:
   newspaper:
+    if: ${{ false }} # Retired: daily-v31.yml is the sole production publisher.
     runs-on: ubuntu-latest
     timeout-minutes: 90
     environment:
