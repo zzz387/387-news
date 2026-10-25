@@ -356,6 +356,36 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
         self.assertIn(article['teaser'],api.call_args.args[0])
         self.assertEqual(article['_review_scope'],'title_teaser_body_v1')
 
+    def test_audit_returns_the_failed_article_to_revision(self):
+        try:
+            from scripts.test_editorial31 import article
+        except ImportError:
+            from test_editorial31 import article
+        categories = ['Семья','Москва и путешествия','Здоровье и движение','Семья','Наука','История и культура','Технологии','Экономика и бизнес']
+        state = {'date':'2030-01-01', 'articles':{}, 'plan':[], 'sources':[], 'dossiers':{}}
+        for i, category in enumerate(categories):
+            draft = article(long=i<2,category=category,idx=i+1)
+            state['articles'][str(i)] = draft
+            state['plan'].append({'category':category,'long':i<2,'kind':'очерк'})
+            state['sources'].append({'id':f'S{i+1:03d}'})
+            state['dossiers'][str(i)] = {'claims':[]}
+        with patch.object(ed,'verify_article',side_effect=[True,True,True,ValueError('unsupported teaser')]), patch.object(ed,'audit_issue') as issue_review:
+            stage.audit(state)
+        self.assertNotIn('3',state['articles'])
+        self.assertIn('0',state['articles'])
+        self.assertEqual(len(state['articles']),7)
+        self.assertIn('3',state['rejections'])
+        issue_review.assert_not_called()
+
+    def test_audit_quota_pause_never_invalidates_accepted_articles(self):
+        state = {'date':'2030-01-01','articles':{str(i):{'kind':'очерк'} for i in range(8)},
+                 'plan':[{} for _ in range(8)], 'sources':[],
+                 'dossiers':{str(i):{'claims':[]} for i in range(8)}}
+        with patch.object(ed,'verify_article',side_effect=rt.GenerationPaused('budget')):
+            with self.assertRaises(rt.GenerationPaused): stage.audit(state)
+        self.assertEqual(len(state['articles']),8)
+        self.assertFalse(state.get('audit_passed',False))
+
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()
         self.assertIn("success() && github.ref == 'refs/heads/main'",workflow)
