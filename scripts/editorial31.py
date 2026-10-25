@@ -812,11 +812,14 @@ def prose_quality(article):
 def validate_segment(part, previous, index):
     if not isinstance(part, dict):
         raise ValueError('Segment response is not an object')
-    if index == 0 and (not isinstance(part.get('title'), str)
-                       or not isinstance(part.get('teaser'), str)
-                       or not 20 <= len(part['title']) <= 185
-                       or wc(part['teaser']) < 25):
-        raise ValueError('Segment 1 title or teaser incomplete')
+    if index == 0:
+        title = part.get('title'); teaser = part.get('teaser')
+        if not isinstance(title, str) or not isinstance(teaser, str):
+            raise ValueError('Segment 1 title or teaser missing or not text')
+        if not 20 <= len(title) <= 185:
+            raise ValueError(f'Segment 1 title has {len(title)} characters; requires 20–185')
+        if wc(teaser) < 25:
+            raise ValueError(f'Segment 1 teaser has {wc(teaser)} words; requires at least 25 meaningful words')
     para = part.get('paragraphs') or []
     if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
         not isinstance(p, dict) or not isinstance(p.get('text'), str)
@@ -857,7 +860,8 @@ def request_segment(prompt, parts, progress, index):
         repair = (f'\nДиагностика предыдущей попытки: {message}. '
                   'Перепиши только текущий фрагмент. Цель 180–240 слов, '
                   'минимум 105. Добавь подтверждённый механизм или подробности '
-                  'из цитат, не повторяй тезисы и не добавляй факты из памяти.') if message else ''
+                  'из цитат, не повторяй тезисы и не добавляй факты из памяти. '
+                  'Верни title длиной 20–185 символов и полный teaser на 30–65 слов.') if message else ''
         try:
             part = _paced_section_request(prompt + repair)
             words = validate_segment(part, parts, index)
@@ -1043,7 +1047,7 @@ def verify_article(a,plan,dossier,lookup):
               for x in dossier['claims']]
     body=article_body(a)
     prompt=f'''Ты независимый от автора строгий фактчекер 387 News.
-Написанная статья: {a['title']}\n{body}
+Написанная статья: {a['title']}\nАнонс (тоже проверь каждое утверждение): {a.get('teaser','')}\n{body}
 Проверенные ДОСЛОВНЫЕ выдержки из источников: {json.dumps(snippets,ensure_ascii=False)}
 План: {json.dumps(plan,ensure_ascii=False)}
 Найди КОНКРЕТНЫЕ неподтвержденные имена, даты, цифры, медицинские обещания,
@@ -1057,6 +1061,7 @@ strength от 0 до 5. Ответ строго JSON.'''
     if result.get('approve') is not True or result.get('unsupported') or result.get('strength',0)<4:
         msgs=(result.get('unsupported') or [])+(result.get('reasons') or [])
         raise ValueError('Independent review veto: '+('; '.join(str(x)[:180] for x in msgs[:3]) or 'weak story'))
+    a['_review_scope'] = 'title_teaser_body_v1'
     return True
 
 

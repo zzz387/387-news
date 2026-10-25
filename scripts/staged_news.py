@@ -350,15 +350,25 @@ def audit(state:dict):
             state['stage']='audit_veto'
             print('[AUDIT VETO] stale news — website unchanged',flush=True)
             return state
+    review_index = None
     try:
+        for i, article in enumerate(ordered):
+            if article.get('_review_scope') != 'title_teaser_body_v1':
+                review_index = i
+                editorial31.verify_article(article, state['plan'][i], state['dossiers'][str(i)], lookup)
+                article['_review_scope'] = 'title_teaser_body_v1'
+                persist_progress()
+                review_index = None
         total=editorial31.audit_issue(ordered,state['plan'],lookup)
+    except RUNTIME.GenerationPaused:
+        raise
     except Exception as e:
         state['stage']='audit_veto'
         state['audit_note']=str(e)[:1200]
         # An editorial veto (not a temporary Gemini outage) must be repairable.
         # Keep dossiers & other approved drafts; rewrite just the weakest slot.
         if isinstance(e, ValueError):
-            index=min(range(8), key=lambda i: (
+            index=review_index if review_index is not None else min(range(8), key=lambda i: (
                 ordered[i]['word_count'] / (editorial31.MIN_LONG if state['plan'][i]['long']
                                            else editorial31.MIN_SHORT),
                 state['plan'][i].get('editorial_score', 25)))
@@ -374,7 +384,7 @@ def audit(state:dict):
             if revisions[str(index)] >= 3:
                 state.setdefault('rejected', {})[str(index)] = 'Repeated issue audit veto'
             print(f'[audit] returned slot {index+1}/8 to revision queue',flush=True)
-        print('[AUDIT VETO] '+str(e)[:240]+' — website unchanged',flush=True)
+        print(f'[AUDIT VETO] {type(e).__name__}; details retained in encrypted checkpoint; website unchanged',flush=True)
         return state
     state['audit_passed']=True
     state['stage']='audited'

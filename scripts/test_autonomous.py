@@ -1,9 +1,11 @@
 """Failure injection for repair, request limits and independent-process recovery."""
+import base64
 import copy
 import io
 import json
 import os
 from pathlib import Path
+import signal
 import subprocess
 import sys
 import tempfile
@@ -267,7 +269,7 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
         with patch.object(news, 'gemini', side_effect=[incomplete] + [response(i) for i in range(8)]) as api:
             result = ed.write_from_dossier(plan, dossier, '2026-10-26')
         self.assertEqual(api.call_count, 9)
-        self.assertIn('title or teaser incomplete', api.call_args_list[1].args[0])
+        self.assertIn('title has 0 characters', api.call_args_list[1].args[0])
         self.assertGreaterEqual(result['word_count'], 1050)
 
     def test_corrupt_quota_cannot_reset_api_budget(self):
@@ -319,6 +321,40 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
                 ed.make_dossier({'source_ids':['S001'],'long':True},source,'2026-10-26',progress)
         self.assertEqual(api.call_count,3)
         self.assertEqual(progress['claims'],[])
+
+    def test_sigterm_saves_dossier_and_restores_handler(self):
+        key = bytes(range(32))
+        state = {'version':31,'date':'2030-01-01','sources':[{'id':'S001'}],
+                 'plan':[{'category':'Семья','long':False,'source_ids':['S001']}],
+                 'articles':{}, 'dossiers':{}, 'audit_passed':False}
+        previous = signal.getsignal(signal.SIGTERM)
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            incoming = root / 'input.enc'; incoming.write_bytes(stage.cipher(state,key))
+            outgoing = root / 'news-draft.enc'
+            env = {'DRAFT_ENCRYPTION_KEY':base64.b64encode(key).decode(),
+                   'NEWS_CHECKPOINT_FILE':str(incoming),'NEWS_CHECKPOINT_EXPECTED':'true',
+                   'NEWS_QUOTA_FILE':str(root/'quota.json'),'GITHUB_OUTPUT':str(root/'output'),
+                   'GITHUB_REF_NAME':'codex/test'}
+            def stopped(*args, **kwargs):
+                os.kill(os.getpid(), signal.SIGTERM)
+            with patch.dict(os.environ,env,clear=True), patch.object(stage,'ARTIFACT_FILE',outgoing), patch.object(sys,'argv',['staged_news','--phase','write','--preview','--target-date','2030-01-01']), patch.object(ed,'make_dossier',return_value={'claims':[]}), patch.object(ed,'write_from_dossier',side_effect=stopped):
+                stage.main()
+            restored = stage.decipher(outgoing.read_bytes(),key)
+            self.assertIn('0',restored['dossiers'])
+            self.assertIn('Runner stopped',restored['pause_reason'])
+            self.assertIn('checkpoint=true',(root/'output').read_text())
+            self.assertTrue((root/'quota.json').exists())
+        self.assertEqual(signal.getsignal(signal.SIGTERM),previous)
+        self.assertIsNone(rt.ACTIVE_BUDGET)
+
+    def test_fact_review_includes_front_page_teaser(self):
+        article = {'title':'Проверенный заголовок', 'teaser':'Проверить все утверждения анонса',
+                   'paragraphs':[{'text':'Документированный текст статьи'}]}
+        with patch.object(news,'gemini',return_value={'approve':True,'strength':4,'unsupported':[],'reasons':[]}) as api:
+            self.assertTrue(ed.verify_article(article,{}, {'claims':[]}, {}))
+        self.assertIn(article['teaser'],api.call_args.args[0])
+        self.assertEqual(article['_review_scope'],'title_teaser_body_v1')
 
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()
