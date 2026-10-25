@@ -290,6 +290,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
     if not model_list or any(x not in SAFE_MODELS for x in model_list):
         raise RuntimeError('Invalid GEMINI_MODELS configuration; refusing unsupported model')
     errors = []
+    response_failed = False
     for model in model_list:
         url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
         for attempt in range(3):
@@ -310,6 +311,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                 with urlopen(req, timeout=150) as response:
                     return _parse_gemini_response(json.loads(response.read()))
             except HTTPError as e:
+                response_failed = False
                 body = e.read(3000).decode('utf-8','replace')
                 status = (re.search(r'"status"\s*:\s*"([A-Z_]+)"',body) or [None, 'UNKNOWN'])[1]
                 print(f'[Gemini] model={model} HTTP {e.code} status={status} '
@@ -334,6 +336,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                     continue
                 break
             except (GeminiResponseError, json.JSONDecodeError) as e:
+                response_failed = True
                 errors.append(f'{model}: {e}')
                 print(f'[Gemini] invalid answer from {model}, try={attempt + 1}/3: {e}',
                       file=sys.stderr,flush=True)
@@ -341,10 +344,12 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                     time.sleep(8)
                     continue
             except (URLError, TimeoutError, OSError) as e:
+                response_failed = False
                 errors.append(f'{model}: network error {type(e).__name__}')
                 if attempt < 2:
                     time.sleep([15, 45][attempt]); continue
-    raise RuntimeError('All allowed free Gemini models failed: ' + '; '.join(errors[-6:]))
+    error_type = GeminiResponseError if response_failed else RuntimeError
+    raise error_type('All allowed free Gemini models failed: ' + '; '.join(errors[-6:]))
 
 
 def json_catalog(sources, max_n=48):

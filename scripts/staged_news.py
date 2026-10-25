@@ -393,6 +393,10 @@ def main():
                   or state.get('branch', branch) != branch
                   or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
+    if state:
+        count = sum(len(d.get('_longform_progress', {}).get('parts', [])) for d in state.get('dossiers', {}).values())
+        print(f'[resume] {len(state.get("articles", {}))}/8 verified articles; {count} accepted segments; '
+              f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
     if args.phase == 'check':
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')

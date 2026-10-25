@@ -71,6 +71,14 @@ class AutonomousTests(unittest.TestCase):
         self.assertEqual(api.call_count, 9)
         self.assertEqual(dossier['_longform_progress']['parts'], [])
 
+    def test_incomplete_response_repaired_at_same_fragment(self):
+        plan, dossier, response = self.fixture()
+        with patch.object(news, 'gemini', side_effect=[news.GeminiResponseError('MAX_TOKENS')] + [response(i) for i in range(8)]) as api:
+            result = ed.write_from_dossier(plan, dossier, '2026-10-26')
+        self.assertEqual(api.call_count, 9)
+        self.assertIn('MAX_TOKENS', api.call_args_list[1].args[0])
+        self.assertGreaterEqual(result['word_count'], 1050)
+
     def test_fragment_persisted_before_next_request(self):
         plan, dossier, response = self.fixture()
         snapshots=[]
@@ -199,6 +207,23 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
         draft['paragraphs'][1] = copy.deepcopy(draft['paragraphs'][0])
         with self.assertRaisesRegex(ValueError, 'repeats'):
             ed.article_form(draft, {'long':False})
+
+    def test_full_preview_build_validates_links_without_site_mutation(self):
+        try:
+            from scripts.test_editorial31 import article
+        except ImportError:
+            from test_editorial31 import article
+        before = (stage.ROOT / 'index.html').read_bytes()
+        state = {'audit_passed':True, 'stage':'audited', 'date':'2030-01-01', 'articles':{}, 'sources':[]}
+        for i in range(8):
+            draft = article(long=i<2,idx=i+1)
+            draft['slug'] = 'test-story-' + str(i)
+            state['articles'][str(i)] = draft
+            state['sources'].append({'id':f'S{i+1:03d}', 'url':'https://example.org/document', 'title':'Document', 'published':'2026-10-25'})
+        self.assertFalse(stage.render(state, True))
+        self.assertEqual((stage.ROOT / 'index.html').read_bytes(), before)
+        self.assertFalse((stage.ROOT / 'issues/2030-01-01').exists())
+        self.assertEqual(news.ROOT, stage.ROOT)
 
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()

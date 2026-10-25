@@ -48,6 +48,8 @@ class RequestBudget:
         self.ledger['requests'] += 1
         models = self.ledger['models']
         models[model] = models.get(model, 0) + 1
+        print(f'[budget] request reserved run={self.used}/{self.run_limit} '
+              f'day={self.ledger["requests"]}/{self.day_limit} model={model}', flush=True)
         self.persist()  # reserve BEFORE the network call, including errors
 
     def defer(self, model, seconds):
