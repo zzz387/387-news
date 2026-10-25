@@ -214,6 +214,12 @@ def gather_sources(now):
     return verified
 
 
+try:
+    from scripts import generation_runtime as runtime
+except ImportError:
+    import generation_runtime as runtime
+
+
 class GeminiResponseError(RuntimeError):
     """A generation reached the API but did not return a valid JSON object."""
 
@@ -284,6 +290,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
     if not model_list or any(x not in SAFE_MODELS for x in model_list):
         raise RuntimeError('Invalid GEMINI_MODELS configuration; refusing unsupported model')
     errors = []
+    response_failed = False
     for model in model_list:
         url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
         for attempt in range(3):
@@ -298,31 +305,38 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                                    'generationConfig':generation}, ensure_ascii=False).encode('utf-8')
             req = Request(url, data=payload, method='POST', headers={
                 'Content-Type':'application/json', 'x-goog-api-key':key})
+            if runtime.ACTIVE_BUDGET:
+                runtime.ACTIVE_BUDGET.reserve(model)
             try:
                 with urlopen(req, timeout=150) as response:
                     return _parse_gemini_response(json.loads(response.read()))
             except HTTPError as e:
+                response_failed = False
                 body = e.read(3000).decode('utf-8','replace')
                 status = (re.search(r'"status"\s*:\s*"([A-Z_]+)"',body) or [None, 'UNKNOWN'])[1]
                 print(f'[Gemini] model={model} HTTP {e.code} status={status} '
                       f'attempt={attempt + 1}/3', file=sys.stderr, flush=True)
                 errors.append(f'{model}: HTTP {e.code} ({status})')
-                # Daily quota does not recover by waiting a minute; fall back to
-                # a different model with its own independent RPD allowance.
-                daily_exhausted = (e.code == 429 and (
-                    'quota_exceeded' in body.lower() or
-                    'perday' in body.lower() or
-                    'per_day' in body.lower() or
-                    'requestsperday' in body.lower()))
-                if daily_exhausted or e.code in (400,401,402,403,404):
+                if e.code in (429, 503):
+                    # Never multiply retries/fallbacks on quota or overload.
+                    # Retry-After is persisted rather than sleeping in the runner.
+                    delay = 900 if e.code == 429 else 120
+                    raw_retry = e.headers.get('Retry-After', '') if e.headers else ''
+                    try:
+                        delay = max(delay, int(raw_retry))
+                    except (ValueError, TypeError):
+                        pass
+                    if runtime.ACTIVE_BUDGET:
+                        runtime.ACTIVE_BUDGET.defer(model, delay)
+                    raise runtime.GenerationPaused(f'Gemini HTTP {e.code}; deferred without model fallback') from None
+                if e.code in (400,401,402,403,404):
                     break
-                if e.code in (408,429,500,502,503,504) and attempt < 2:
-                    # Backoff helps with temporary server overload. Current
-                    # free-tier caps are model-specific, not key-specific.
-                    time.sleep([25, 90][attempt])
+                if e.code in (408,500,502,504) and attempt < 2:
+                    time.sleep([15, 45][attempt])
                     continue
                 break
             except (GeminiResponseError, json.JSONDecodeError) as e:
+                response_failed = True
                 errors.append(f'{model}: {e}')
                 print(f'[Gemini] invalid answer from {model}, try={attempt + 1}/3: {e}',
                       file=sys.stderr,flush=True)
@@ -330,10 +344,12 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                     time.sleep(8)
                     continue
             except (URLError, TimeoutError, OSError) as e:
+                response_failed = False
                 errors.append(f'{model}: network error {type(e).__name__}')
                 if attempt < 2:
-                    time.sleep([25, 90][attempt]); continue
-    raise RuntimeError('All allowed free Gemini models failed: ' + '; '.join(errors[-6:]))
+                    time.sleep([15, 45][attempt]); continue
+    error_type = GeminiResponseError if response_failed else RuntimeError
+    raise error_type('All allowed free Gemini models failed: ' + '; '.join(errors[-6:]))
 
 
 def json_catalog(sources, max_n=48):

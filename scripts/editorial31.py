@@ -221,7 +221,7 @@ def _reference_quality(s):
     return not weak
 
 
-def shortlist(sources, date):
+def shortlist(sources, date, prior=(), feedback=""):
     """Stage 1: grade 20+ concrete stories, not 8 titles from press-release RSS."""
     if len(sources)<16:
         raise RuntimeError('Fewer than 16 sources; editorial selection would be weak')
@@ -255,6 +255,14 @@ specificity, evidence, fit. Низкая оценка у скучных прес
 в последние 72 часа. Старый научный результат при свежей перепубликации — НЕ новость.
 Не выдумывай источники, даты и факты. Вывод только JSON candidates с полями
 из схемы; выдуманную сенсацию оценивать низко. Чем меньше фактов — тем ниже evidence.'''
+    if feedback:
+        prompt += ('\nПРЕДЫДУЩИЙ ПУЛ НЕ ПОЗВОЛИЛ СОБРАТЬ НОМЕР: ' + feedback[:900]
+                   + '\nДобавь прежде всего НОВЫЕ документированные сюжеты недостающих рубрик, '
+                   'разные исходные документы и ненаучные интеллектуальные темы. '
+                   'Для каждой жизненной рубрики нужно несколько альтернатив. '
+                   'Не предлагай заново эти заголовки: '
+                   + json.dumps([c['title'] for c in prior], ensure_ascii=False)
+                   + '\nВсе прежние пороги качества обязательны. Если фактов нет, не выдумывай.')
     answer=news.gemini(prompt,output_tokens=13500,schema='candidate31')
     original=_read_sources(sources)
     chosen=[]; seen=[]
@@ -285,6 +293,7 @@ specificity, evidence, fit. Низкая оценка у скучных прес
         c['score']=candidate_score(c)
         c['long_topic_id']=normalized_topic_id(c)
         chosen.append(c)
+    accept_pool(prior)
     accept_pool(answer.get('candidates',[]))
     # Second, focused pass only when a generic news cycle omitted the family
     # section. It has its OWN document-backed source IDs and the same score
@@ -535,16 +544,34 @@ def select_balanced_plan(candidates: list[dict], sources: list[dict]) -> list[di
     return plan
 
 
-def choose_plan(sources,date):
+def choose_plan(sources,date, progress=None):
     # Version 3.1 originally asked Gemini to choose exactly 8 from its own
     # shortlist, then rejected the output if it omitted mandatory rubrics.
     # That was an unreliable prompt-following/counting step. Keep Gemini for
     # suggesting & scoring candidates; enforce selection deterministically.
-    extend_family_evidence(sources)
-    candidates=shortlist(sources,date)
-    candidates=commission_evidence_backed_longforms(candidates,sources)
-    canonical=select_balanced_plan(candidates,sources)
-    return canonical,candidates
+    progress = progress if progress is not None else {}
+    if not progress.get("family_researched"):
+        extend_family_evidence(sources)
+        progress["family_researched"] = True
+        news.runtime.checkpoint()
+    if not progress.get("candidates"):
+        progress["candidates"] = shortlist(sources,date)
+        news.runtime.checkpoint()
+    while True:
+        candidates = commission_evidence_backed_longforms(progress['candidates'], sources)
+        try:
+            canonical = select_balanced_plan(candidates, sources)
+            return canonical, candidates
+        except RuntimeError as exc:
+            progress['plan_note'] = str(exc)[:900]
+            rounds = progress.get('selection_repairs', 0)
+            if rounds >= 3:
+                raise RuntimeError('Editorial plan still infeasible after 3 source-backed reselections; no fabricated filler. ' + str(exc)) from None
+            repaired = shortlist(sources, date, prior=progress['candidates'], feedback=progress['plan_note'])
+            progress['candidates'] = repaired
+            progress['selection_repairs'] = rounds + 1
+            news.runtime.checkpoint()
+
 
 
 
@@ -679,7 +706,7 @@ def select_plan_with_verified_science(sources, candidates, initial_plan=None, *,
                        f'after {limit} verifications. No unsupported science will be published.')
 
 
-def make_dossier(plan, source_map, date):
+def make_dossier(plan, source_map, date, progress=None):
     """Stage 2: extract verifiable claims before drafting any prose."""
     sources=[source_map[sid] for sid in plan['source_ids']]
     bundle=[{'id':s['id'],'title':s['title'],'date':s['published'],
@@ -689,7 +716,7 @@ def make_dossier(plan, source_map, date):
 Утверждённый сюжет: {json.dumps(plan,ensure_ascii=False)}
 Редакционный приоритет большого очерка: {LONGFORM_TOPICS.get(plan.get('long_topic_id',0),'общая рубрика без привилегий')}
 ДОКАЗАТЕЛЬСТВА: {json.dumps(bundle,ensure_ascii=False)}
-Извлеки 7–13 НЕПОВТОРЯЮЩИХСЯ конкретных фактов, включая имена, числа,
+Извлеки {'10–13' if plan['long'] else '7–10'} НЕПОВТОРЯЮЩИХСЯ конкретных фактов, включая имена, числа,
 проверяемую хронологию, интересный механизм. Для каждого укажи source_id,
 quote — ТОЧНЫЙ НЕПРЕРЫВНЫЙ фрагмент текста источника длиной 20–220
 символов (можно на языке источника), и explanation — что именно подтверждает.
@@ -700,25 +727,46 @@ quote — ТОЧНЫЙ НЕПРЕРЫВНЫЙ фрагмент текста ис
 Если original_study_found=False, приписывать открытию дату свежего пересказа строго запрещено.
 Дай angle, chronology, stakes, claims как JSON. Цель — избежать растянутого
 пересказа, спекуляций и псевдонаучных сенсаций.'''
-    result=news.gemini(prompt,output_tokens=8500,schema='dossier31')
-    clean=[]; distinct=set()
-    for claim in result.get('claims',[]):
-        if not isinstance(claim,dict):continue
-        sid=claim.get('source_id'); quote=claim.get('quote','').strip()
-        if sid not in source_map or sid not in plan['source_ids'] or not 20<=len(quote)<=240:
-            continue
-        # Literal source grounding, not the model's word for it.
-        if normalized(quote) not in normalized(source_map[sid].get('evidence','')):
-            continue
-        tag=(sid,normalized(quote))
-        if tag in distinct:continue
-        distinct.add(tag)
-        clean.append({'source_id':sid,'quote':quote,'explanation':claim.get('explanation','')[:450]})
-    min_claims=8 if plan['long'] else 5
-    if len(clean)<min_claims:
-        raise RuntimeError(f'Insufficient exact source evidence ({len(clean)}/{min_claims}); no invented facts')
-    result['claims']=clean
-    return result
+    progress = progress if progress is not None else {}
+    min_claims = 8 if plan['long'] else 5
+    while progress.get('attempts', 0) < 3:
+        prior = progress.get('claims', [])
+        feedback = ''
+        if progress.get('attempts'):
+            feedback = (f'\nРедактор подтвердил только {len(prior)}/{min_claims} точных цитат. '
+                        'Найди дополнительные НЕПОВТОРЯЮЩИЕСЯ факты в исходном тексте, '
+                        'цитируй непрерывно, не меняй и не переводи цитату. '
+                        'Нельзя дополнять факты из памяти. Уже принятые свидетельства: '
+                        + json.dumps(prior, ensure_ascii=False))
+        result = news.gemini(prompt + feedback, output_tokens=8500, schema='dossier31')
+        progress['attempts'] = progress.get('attempts', 0) + 1
+        clean = []; distinct = set()
+        supplied = result.get('claims') or []
+        if not isinstance(supplied, list):
+            supplied = []
+        for claim in prior + supplied:
+            if not isinstance(claim, dict):
+                continue
+            sid = claim.get('source_id')
+            if not isinstance(claim.get('quote'), str):
+                continue
+            quote = claim['quote'].strip()
+            if sid not in source_map or sid not in plan['source_ids'] or not 20 <= len(quote) <= 240:
+                continue
+            if normalized(quote) not in normalized(source_map[sid].get('evidence', '')):
+                continue
+            tag = (sid, normalized(quote))
+            if tag in distinct:
+                continue
+            distinct.add(tag)
+            clean.append({'source_id':sid, 'quote':quote, 'explanation':str(claim.get('explanation', ''))[:450]})
+        progress['claims'] = clean
+        news.runtime.checkpoint()
+        print(f'[dossier] verified citations={len(clean)}/{min_claims} attempt={progress["attempts"]}/3', flush=True)
+        if len(clean) >= min_claims:
+            result['claims'] = clean
+            return result
+    raise news.runtime.EvidenceRejected(f'Insufficient exact source evidence ({len(progress.get("claims", []))}/{min_claims}) after 3 extractions; no invented facts')
 
 
 def article_body(a):
@@ -742,11 +790,91 @@ def article_form(a, plan):
     minimum=MIN_LONG if plan['long'] else MIN_SHORT
     if n<minimum or n>MAX_WORDS:
         raise ValueError(f'{n} words; required {minimum}–{MAX_WORDS}')
+    prose_quality(a)
     if len(style_flags(a))>=2:
         raise ValueError('Banal/promotional writing: '+', '.join(style_flags(a)[:3]))
     if not 20<=len(a.get('title',''))<=185 or wc(a.get('teaser',''))<25:
         raise ValueError('Title or teaser is incomplete')
     return n
+
+
+def prose_quality(article):
+    texts = [normalized(p['text']) for p in article['paragraphs']]
+    tokens = re.findall(r'\w+', ' '.join(texts))
+    if len(set(tokens)) / max(1, len(tokens)) < .12:
+        raise ValueError('Text lacks substantive vocabulary')
+    for i, text in enumerate(texts):
+        if any(text == previous or SequenceMatcher(None, text[:2400], previous[:2400]).ratio() > .80
+               for previous in texts[:i]):
+            raise ValueError('Text repeats substantially identical paragraphs')
+
+
+def validate_segment(part, previous, index):
+    if not isinstance(part, dict):
+        raise ValueError('Segment response is not an object')
+    if index == 0:
+        title = part.get('title'); teaser = part.get('teaser')
+        if not isinstance(title, str) or not isinstance(teaser, str):
+            raise ValueError('Segment 1 title or teaser missing or not text')
+        if not 20 <= len(title) <= 185:
+            raise ValueError(f'Segment 1 title has {len(title)} characters; requires 20–185')
+        if wc(teaser) < 25:
+            raise ValueError(f'Segment 1 teaser has {wc(teaser)} words; requires at least 25 meaningful words')
+    para = part.get('paragraphs') or []
+    if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
+        not isinstance(p, dict) or not isinstance(p.get('text'), str)
+        or len(p['text'].strip()) < 65 for p in para):
+        raise ValueError(f'Longform segment {index+1} incomplete')
+    words = wc(article_body(part))
+    if not 105 <= words <= 400:
+        raise ValueError(f'Longform segment {index+1} has {words} words; requires 105–400 meaningful, supported words')
+    if len(style_flags(part)) >= 2:
+        raise ValueError(f'Longform segment {index+1} contains generic/promotional filler')
+    tokens = re.findall(r'\w+', normalized(article_body(part)))
+    if len(set(tokens)) / max(1, len(tokens)) < .12:
+        raise ValueError(f'Longform segment {index+1} lacks substantive vocabulary')
+    prior = [normalized(p['text']) for old in previous for p in old['paragraphs']]
+    for p in para:
+        text = normalized(p['text'])
+        if any(text == old or SequenceMatcher(None, text[:2400], old[:2400]).ratio() > .80
+               for old in prior):
+            raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        # Check the whole paragraph, including copied tails outside the fuzzy window.
+        shingles = lambda v: set(zip(*(v.split()[j:] for j in range(5))))
+        new = shingles(text)
+        if any(new and len(new & shingles(old)) / len(new) > .55 for old in prior):
+            raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        prior.append(text)
+    return words
+
+
+def request_segment(prompt, parts, progress, index):
+    attempts = max(1, min(3, int(os.getenv('NEWS_FRAGMENT_ATTEMPTS', '3'))))
+    failures = progress.setdefault('failures', {})
+    feedback = progress.setdefault('feedback', {})
+    slot = str(index)
+    if failures.get(slot, 0) >= 9:
+        raise news.runtime.EvidenceRejected(f'Segment {index+1} rejected after 9 attempts; source depth or prose insufficient')
+    for attempt in range(attempts):
+        message = feedback.get(slot, '')
+        repair = (f'\nДиагностика предыдущей попытки: {message}. '
+                  'Перепиши только текущий фрагмент: три абзаца по 60–85 слов. Цель 180–255 слов, '
+                  'минимум 105. Добавь подтверждённый механизм или подробности '
+                  'из цитат, не повторяй тезисы и не добавляй факты из памяти. '
+                  'Верни title длиной 20–185 символов и полный teaser на 30–65 слов.') if message else ''
+        try:
+            part = _paced_section_request(prompt + repair)
+            words = validate_segment(part, parts, index)
+            return part, words
+        except (ValueError, news.GeminiResponseError) as exc:
+            failures[slot] = failures.get(slot, 0) + 1
+            feedback[slot] = str(exc)[:450]
+            news.runtime.checkpoint()
+            print(f'[repair] segment={index+1} rejected attempt={failures[slot]}/9: {exc}', flush=True)
+            if failures[slot] >= 9:
+                raise news.runtime.EvidenceRejected(f'Segment {index+1}: insufficient supported prose after 9 attempts') from None
+            if attempt + 1 == attempts:
+                raise ValueError(f'{exc}; accepted sections preserved; retry next run') from None
 
 
 # Editorial pacing applies only to the live run (not to unit tests). On GitHub
@@ -782,7 +910,7 @@ _LONGFORM_BEATS = (
 
 
 def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) -> dict:
-    """Write and preserve eight short, evidence-backed segments.
+    """Preserve evidence-backed segments for both long and compact articles.
 
     Gemini Flash-Lite empirically supplied 150-185 words for a requested
     450-600. Demand manageable ~170-250-word segments, never pad them, and
@@ -792,8 +920,21 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
     dossier. Nothing in this method can publish or accept an unverified article.
     """
     claims = dossier['claims']
-    if len(claims) < 8:
-        raise ValueError('Longform needs at least 8 verified source excerpts')
+    long = bool(plan['long'])
+    minimum_claims = 8 if long else 5
+    if len(claims) < minimum_claims:
+        raise news.runtime.EvidenceRejected(f'Story needs at least {minimum_claims} verified source excerpts')
+    minimum_parts = 8 if long else 4
+    minimum_words = MIN_LONG if long else 600  # drafting target; editorial floor remains 440
+    beats = _LONGFORM_BEATS if long else (
+        'Конкретная завязка: подтверждённый факт и главный вопрос истории.',
+        'Механизм и объяснение главного факта с проверенными подробностями.',
+        'Контекст, ограничения и существенные детали, которых ещё не было.',
+        'Развязка: ответ на главный вопрос и границы установленного знания.',
+        'Дополнительные подтверждённые нюансы; без повторения сказанного.',
+        'Заверши историю конкретным выводом из ещё не разобранных свидетельств.',
+    )
+    progress_key = '_longform_progress' if long else '_shortform_progress'
 
     basis = json.dumps({
         'date':date, 'title':plan['title'], 'category':plan['category'],
@@ -801,21 +942,29 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
         'claims':[(c['source_id'],c['quote']) for c in claims],
     }, ensure_ascii=False, sort_keys=True)
     signature = hashlib.sha256(basis.encode('utf-8')).hexdigest()
-    progress = dossier.get('_longform_progress')
+    progress = dossier.get(progress_key)
+    rebuilds = progress.get('assembly_failures', 0) if isinstance(progress, dict) and progress.get('signature') == signature else 0
+    if rebuilds >= 3:
+        raise news.runtime.EvidenceRejected('Three complete assemblies failed editorial form; reject story')
     if (not isinstance(progress, dict) or progress.get('signature') != signature
             or progress.get('rebuild_required')):
-        progress = {'signature':signature, 'parts':[]}
-        dossier['_longform_progress'] = progress
+        progress = {'signature':signature, 'parts':[], 'assembly_failures':rebuilds}
+        dossier[progress_key] = progress
     parts = progress['parts']
-    if not isinstance(parts, list) or len(parts) > len(_LONGFORM_BEATS):
+    if not isinstance(parts, list) or len(parts) > len(beats):
         raise ValueError('Invalid longform checkpoint, refusing to reuse')
 
     # A passage is useful only if it advances the already researched story.
     # Reuse of the source ID is allowed, but duplicate prose is checked below.
-    while len(parts) < len(_LONGFORM_BEATS):
+    # Revalidate persisted counts and prose; never trust cached word totals.
+    for i, part in enumerate(parts):
+        part['words'] = validate_segment(part, parts[:i], i)
+    while len(parts) < len(beats):
         index = len(parts)
         current_total = sum(int(p.get('words', 0)) for p in parts)
-        if index >= 8 and current_total >= MIN_LONG:
+        if index >= minimum_parts and current_total >= minimum_words:
+            break
+        if current_total + 400 > MAX_WORDS:
             break
 
         focus_indices = sorted({index % len(claims),
@@ -829,16 +978,25 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
         if parts:
             tail = article_body({'paragraphs':parts[-1]['paragraphs']})
             prior = 'Последняя фраза предыдущего фрагмента (не повторяй): '+tail[-420:]
+        covered = [{'headings':[p.get('heading','') for p in old['paragraphs']],
+                    'opening':article_body(old)[:180]} for old in parts]
         prompt = f'''Ты пишешь ОДИН из небольших фрагментов большого очерка «387 News».
 Дата номера: {date}. Сюжет: {json.dumps(plan, ensure_ascii=False)}
 Угол материала: {dossier.get('angle','')}; хронология: {dossier.get('chronology','')}.
 Ставки и смысл: {dossier.get('stakes','')}.
-Фрагмент {index+1}/8 (дополнительные фрагменты возможны при недостаточном объёме).
-ТВОЙ САМОДОСТАТОЧНЫЙ ВОПРОС: {_LONGFORM_BEATS[index]}
+Фрагмент {index+1}/{minimum_parts} (дополнительные фрагменты возможны при недостаточном объёме).
+ТВОЙ САМОДОСТАТОЧНЫЙ ВОПРОС: {beats[index]}
 Подтверждённые ДОСЛОВНЫЕ фрагменты источников:
 {json.dumps(focus, ensure_ascii=False)}
+Полное проверенное досье для контекста (можно использовать дополнительные факты,
+только если они помогают текущему вопросу): {json.dumps(claims, ensure_ascii=False)}
+Уже раскрытые темы (не повторяй ни выводы, ни объяснения): {json.dumps(covered, ensure_ascii=False)}
 {prior}
-Пиши 170–250 РУССКИХ СЛОВ: 2–4 содержательных абзаца.
+Напиши ТРИ содержательных абзаца по 60–85 РУССКИХ СЛОВ в каждом,
+всего 180–255 слов основного текста, не считая title и teaser.
+Каждый абзац раскрывает отдельную подтверждённую подробность: факт,
+объяснение механизма или осторожное сопоставление свидетельств.
+Короткая подпись из 20–30 слов не заменяет полноценного абзаца.
 Нужны только подтверждённые этими цитатами факты, их прозрачное объяснение
 и осторожные выводы. Не подменяй недостаток фактов художественным вымыслом,
 эмоциями, повторениями, общеизвестными формулами или рекламой.
@@ -849,29 +1007,14 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
 Верни JSON-объект title, teaser (30–65 слов), paragraphs (heading,text).
 Нужны точные подробности, а не лозунги и искусственные «части» очерка.
 Прежние замечания редактора: {revision_reason[:400]}'''
-        part = _paced_section_request(prompt)
-        para = part.get('paragraphs') or []
-        if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
-            not isinstance(x,dict) or not isinstance(x.get('text'),str) or
-            len(x['text'].strip()) < 65 for x in para):
-            raise ValueError(f'Longform segment {index+1} incomplete; '
-                             f'{len(parts)} accepted sections preserved in encrypted checkpoint')
-        section_words = wc(article_body(part))
-        if not 105 <= section_words <= 400:
-            raise ValueError(f'Longform segment {index+1} has {section_words} words; '
-                             'requires 105–400 meaningful, supported words; '
-                             f'{len(parts)} accepted sections preserved')
-        # Check against already saved prose BEFORE adding to the checkpoint.
-        new_paragraphs = [normalized(x['text']) for x in para]
-        prior_paragraphs = [normalized(p['text']) for old in parts for p in old['paragraphs']]
-        for a in new_paragraphs:
-            if any(SequenceMatcher(None,a[:1200],b[:1200]).ratio() > 0.80
-                   for b in prior_paragraphs):
-                raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        part, section_words = request_segment(prompt, parts, progress, index)
+        para = part['paragraphs']
         parts.append({'title':str(part.get('title','')),
                       'teaser':str(part.get('teaser','')),
                       'paragraphs':para, 'words':section_words})
-        print(f'[longform] saved segment {index+1}/{len(_LONGFORM_BEATS)}, '
+        news.runtime.checkpoint()
+        tag = 'longform' if long else 'shortform'
+        print(f'[{tag}] saved segment {index+1}/{len(beats)}, '
               f'{section_words} words; total={sum(p["words"] for p in parts)}; '
               'encrypted checkpoint on run completion', flush=True)
 
@@ -886,6 +1029,7 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
         # An already complete but unacceptable article must not loop forever
         # on the same rejected set of segments in the next scheduled run.
         progress['rebuild_required'] = str(exc)[:250]
+        progress['assembly_failures'] = progress.get('assembly_failures', 0) + 1
         raise
     texts = [normalized(x['text']) for x in all_paragraphs]
     for i, a in enumerate(texts):
@@ -899,23 +1043,7 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
 
 def write_from_dossier(plan, dossier, date, revision_reason=''):
     """Draft source-backed prose. Long features use focused smaller requests."""
-    if plan['long']:
-        a = _longform_parts(plan, dossier, date, revision_reason)
-    else:
-        facts=[{'source_id':x['source_id'],'source_quote':x['quote'],
-                'verified_point':x['explanation']} for x in dossier['claims']]
-        prompt=f'''Ты автор 387 News. Напиши КОМПАКТНЫЙ ЗАКОНЧЕННЫЙ ОЧЕРК на русском.
-Сюжет: {json.dumps(plan,ensure_ascii=False)}. Дата {date}.
-ДОСЬЕ с ТОЧНО ПРОВЕРЕННЫМИ цитатами: {json.dumps(facts,ensure_ascii=False)}.
-Хронология: {dossier.get('chronology','')}. Смысл истории: {dossier.get('stakes','')}.
-Прежняя браковка (если была): {revision_reason[:700]}
-Напиши примерно 570–720 русских слов связной прозой, 7–10 абзацев.
-Начни конкретно, приведи детали, объясни механизм/историю и закончи мыслью.
-Никаких общих вступлений, штампов, рекламы, домыслов и вымышленных дат.
-Для науки различай результаты на клетках, животных и людях; дату СМИ и
-дату исследования. Всё конкретное подтверждай цитатами из досье.
-Верни JSON: title, teaser (не менее 25 слов), paragraphs (heading,text).'''
-        a=news.gemini(prompt,output_tokens=10500,schema='article')
+    a = _longform_parts(plan, dossier, date, revision_reason)
     n=article_form(a,plan)
     a.update(category=plan['category'],kind=plan['kind'],long=bool(plan['long']),
              source_ids=list(plan['source_ids']),word_count=n,
@@ -928,7 +1056,7 @@ def verify_article(a,plan,dossier,lookup):
               for x in dossier['claims']]
     body=article_body(a)
     prompt=f'''Ты независимый от автора строгий фактчекер 387 News.
-Написанная статья: {a['title']}\n{body}
+Написанная статья: {a['title']}\nАнонс (тоже проверь каждое утверждение): {a.get('teaser','')}\n{body}
 Проверенные ДОСЛОВНЫЕ выдержки из источников: {json.dumps(snippets,ensure_ascii=False)}
 План: {json.dumps(plan,ensure_ascii=False)}
 Найди КОНКРЕТНЫЕ неподтвержденные имена, даты, цифры, медицинские обещания,
@@ -942,6 +1070,7 @@ strength от 0 до 5. Ответ строго JSON.'''
     if result.get('approve') is not True or result.get('unsupported') or result.get('strength',0)<4:
         msgs=(result.get('unsupported') or [])+(result.get('reasons') or [])
         raise ValueError('Independent review veto: '+('; '.join(str(x)[:180] for x in msgs[:3]) or 'weak story'))
+    a['_review_scope'] = 'title_teaser_body_v1'
     return True
 
 
@@ -951,8 +1080,8 @@ def audit_issue(articles,plan,sources):
         raise ValueError('Mandatory rubrics missing')
     if sum(a['category'] in LIFE for a in articles)<4:
         raise ValueError('Not enough life / family / health content')
-    if sum(bool(a.get('long')) for a in articles)<2:
-        raise ValueError('Missing longform features')
+    if not 2 <= sum(bool(a.get('long')) for a in articles) <= 3:
+        raise ValueError('Issue requires 2–3 longform features')
     total=0; titles=[]
     for a,p in zip(articles,plan):
         if a.get('category')!=p['category'] or a.get('kind')!=p['kind']:
