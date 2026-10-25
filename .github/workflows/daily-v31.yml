@@ -1,12 +1,6 @@
 name: 387 News — editorial v3.1 (SAFE / manual approval)
 
 on:
-  push:
-    branches: [codex/autonomous-editorial-recovery]
-    paths:
-      - 'scripts/**'
-      - '.github/workflows/daily-v31.yml'
-      - 'docs/**'
   pull_request:
     paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   schedule:
@@ -73,7 +67,7 @@ jobs:
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -118,10 +112,6 @@ jobs:
               *) echo 'Unexpected schedule'; exit 1 ;;
             esac
             preview=false
-          elif [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
-            phase=auto
-            preview=true
-            MANUAL_DATE=$(TZ=Europe/Moscow date -d tomorrow +%F)
           else
             phase="$MANUAL_PHASE"
             preview="$MANUAL_PREVIEW"
