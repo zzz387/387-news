@@ -878,7 +878,7 @@ _LONGFORM_BEATS = (
 
 
 def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) -> dict:
-    """Write and preserve eight short, evidence-backed segments.
+    """Preserve evidence-backed segments for both long and compact articles.
 
     Gemini Flash-Lite empirically supplied 150-185 words for a requested
     450-600. Demand manageable ~170-250-word segments, never pad them, and
@@ -888,8 +888,21 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
     dossier. Nothing in this method can publish or accept an unverified article.
     """
     claims = dossier['claims']
-    if len(claims) < 8:
-        raise news.runtime.EvidenceRejected('Longform needs at least 8 verified source excerpts')
+    long = bool(plan['long'])
+    minimum_claims = 8 if long else 5
+    if len(claims) < minimum_claims:
+        raise news.runtime.EvidenceRejected(f'Story needs at least {minimum_claims} verified source excerpts')
+    minimum_parts = 8 if long else 4
+    minimum_words = MIN_LONG if long else MIN_SHORT
+    beats = _LONGFORM_BEATS if long else (
+        'Конкретная завязка: подтверждённый факт и главный вопрос истории.',
+        'Механизм и объяснение главного факта с проверенными подробностями.',
+        'Контекст, ограничения и существенные детали, которых ещё не было.',
+        'Развязка: ответ на главный вопрос и границы установленного знания.',
+        'Дополнительные подтверждённые нюансы; без повторения сказанного.',
+        'Заверши историю конкретным выводом из ещё не разобранных свидетельств.',
+    )
+    progress_key = '_longform_progress' if long else '_shortform_progress'
 
     basis = json.dumps({
         'date':date, 'title':plan['title'], 'category':plan['category'],
@@ -897,13 +910,13 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
         'claims':[(c['source_id'],c['quote']) for c in claims],
     }, ensure_ascii=False, sort_keys=True)
     signature = hashlib.sha256(basis.encode('utf-8')).hexdigest()
-    progress = dossier.get('_longform_progress')
+    progress = dossier.get(progress_key)
     if (not isinstance(progress, dict) or progress.get('signature') != signature
             or progress.get('rebuild_required')):
         progress = {'signature':signature, 'parts':[]}
-        dossier['_longform_progress'] = progress
+        dossier[progress_key] = progress
     parts = progress['parts']
-    if not isinstance(parts, list) or len(parts) > len(_LONGFORM_BEATS):
+    if not isinstance(parts, list) or len(parts) > len(beats):
         raise ValueError('Invalid longform checkpoint, refusing to reuse')
 
     # A passage is useful only if it advances the already researched story.
@@ -911,10 +924,10 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
     # Revalidate persisted counts and prose; never trust cached word totals.
     for i, part in enumerate(parts):
         part['words'] = validate_segment(part, parts[:i], i)
-    while len(parts) < len(_LONGFORM_BEATS):
+    while len(parts) < len(beats):
         index = len(parts)
         current_total = sum(int(p.get('words', 0)) for p in parts)
-        if index >= 8 and current_total >= MIN_LONG:
+        if index >= minimum_parts and current_total >= minimum_words:
             break
         if current_total + 400 > MAX_WORDS:
             break
@@ -934,8 +947,8 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
 Дата номера: {date}. Сюжет: {json.dumps(plan, ensure_ascii=False)}
 Угол материала: {dossier.get('angle','')}; хронология: {dossier.get('chronology','')}.
 Ставки и смысл: {dossier.get('stakes','')}.
-Фрагмент {index+1}/8 (дополнительные фрагменты возможны при недостаточном объёме).
-ТВОЙ САМОДОСТАТОЧНЫЙ ВОПРОС: {_LONGFORM_BEATS[index]}
+Фрагмент {index+1}/{minimum_parts} (дополнительные фрагменты возможны при недостаточном объёме).
+ТВОЙ САМОДОСТАТОЧНЫЙ ВОПРОС: {beats[index]}
 Подтверждённые ДОСЛОВНЫЕ фрагменты источников:
 {json.dumps(focus, ensure_ascii=False)}
 {prior}
@@ -956,7 +969,8 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
                       'teaser':str(part.get('teaser','')),
                       'paragraphs':para, 'words':section_words})
         news.runtime.checkpoint()
-        print(f'[longform] saved segment {index+1}/{len(_LONGFORM_BEATS)}, '
+        tag = 'longform' if long else 'shortform'
+        print(f'[{tag}] saved segment {index+1}/{len(beats)}, '
               f'{section_words} words; total={sum(p["words"] for p in parts)}; '
               'encrypted checkpoint on run completion', flush=True)
 
@@ -984,23 +998,7 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
 
 def write_from_dossier(plan, dossier, date, revision_reason=''):
     """Draft source-backed prose. Long features use focused smaller requests."""
-    if plan['long']:
-        a = _longform_parts(plan, dossier, date, revision_reason)
-    else:
-        facts=[{'source_id':x['source_id'],'source_quote':x['quote'],
-                'verified_point':x['explanation']} for x in dossier['claims']]
-        prompt=f'''Ты автор 387 News. Напиши КОМПАКТНЫЙ ЗАКОНЧЕННЫЙ ОЧЕРК на русском.
-Сюжет: {json.dumps(plan,ensure_ascii=False)}. Дата {date}.
-ДОСЬЕ с ТОЧНО ПРОВЕРЕННЫМИ цитатами: {json.dumps(facts,ensure_ascii=False)}.
-Хронология: {dossier.get('chronology','')}. Смысл истории: {dossier.get('stakes','')}.
-Прежняя браковка (если была): {revision_reason[:700]}
-Напиши примерно 570–720 русских слов связной прозой, 7–10 абзацев.
-Начни конкретно, приведи детали, объясни механизм/историю и закончи мыслью.
-Никаких общих вступлений, штампов, рекламы, домыслов и вымышленных дат.
-Для науки различай результаты на клетках, животных и людях; дату СМИ и
-дату исследования. Всё конкретное подтверждай цитатами из досье.
-Верни JSON: title, teaser (не менее 25 слов), paragraphs (heading,text).'''
-        a=news.gemini(prompt,output_tokens=10500,schema='article')
+    a = _longform_parts(plan, dossier, date, revision_reason)
     n=article_form(a,plan)
     a.update(category=plan['category'],kind=plan['kind'],long=bool(plan['long']),
              source_ids=list(plan['source_ids']),word_count=n,

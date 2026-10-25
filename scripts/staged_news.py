@@ -190,12 +190,69 @@ def research_batch(state, size=8):
     return state
 
 
+def replace_rejected_stories(state):
+    """Replace only failed slots, preserving every other commission and draft."""
+    rejected = state.setdefault('rejected', {})
+    archived = state.setdefault('rejected_stories', [])
+    lookup = {s['id']:s for s in state['sources']}
+    for slot in list(rejected):
+        if slot in state.get('articles', {}):
+            continue
+        i = int(slot)
+        old = state['plan'][i]
+        attempts = sum(entry['slot'] == slot for entry in archived)
+        if attempts >= 3:
+            continue
+        forbidden = [p['title'] for p in state['plan']] + [x['plan']['title'] for x in archived]
+        other = [p for j,p in enumerate(state['plan']) if j != i]
+        usage = {}
+        for plan in other:
+            for sid in plan['source_ids']:
+                usage[sid] = usage.get(sid, 0) + 1
+        for c in state.get('candidates', []):
+            if (c['category'] != old['category'] or bool(c.get('long')) != bool(old['long'])
+                    or editorial31.candidate_score(c) < 19
+                    or any(editorial31.meaningfully_same(c['title'], t) for t in forbidden)):
+                continue
+            ids = c.get('source_ids') or []
+            if not 1 <= len(ids) <= 3 or not all(sid in lookup and usage.get(sid, 0) < 2 for sid in ids):
+                continue
+            if not any(editorial31._reference_quality(lookup[sid]) for sid in ids):
+                continue
+            if c.get('long') and not editorial31._longform_evidence(c, lookup)[0]:
+                continue
+            if c.get('kind', '').lower() == 'новость' and not any(lookup[sid].get('recent') and not lookup[sid].get('evergreen') for sid in ids):
+                continue
+            replacement = {'title':c['title'], 'category':c['category'], 'kind':c['kind'],
+                           'source_ids':list(ids), 'long':bool(c.get('long')),
+                           'editorial_score':editorial31.candidate_score(c),
+                           'angle':c.get('hook', ''), 'hook':c.get('hook', ''),
+                           'long_topic_id':editorial31.normalized_topic_id(c)}
+            try:
+                editorial31.enrich_originals(state['sources'], [replacement])
+            except RuntimeError:
+                continue
+            # The preserved commissions plus replacement must still obey source reuse.
+            if any(usage.get(sid, 0) >= 2 for sid in replacement['source_ids']):
+                continue
+            archived.append({'slot':slot, 'plan':old, 'reason':rejected[slot],
+                             'dossier':state.setdefault('dossiers', {}).pop(slot, None)})
+            state['plan'][i] = replacement
+            rejected.pop(slot)
+            state.setdefault('rejections', {}).pop(slot, None)
+            state.setdefault('revisions', {}).pop(slot, None)
+            persist_progress()
+            print(f'[replace] rejected slot={i+1} assigned a different vetted source-backed story', flush=True)
+            break
+
+
 def write_batch(state: dict, size=2):
     """Fair revision queue; keep accepted parts and candidates awaiting review."""
     if state.get('audit_passed'):
         return state
     if not state.get('plan'):
         raise RuntimeError('Missing strong story plan; run plan first')
+    replace_rejected_stories(state)
     known = {s['id']:s for s in state['sources']}
     articles = state.setdefault('articles', {})
     dossiers = state.setdefault('dossiers', {})
@@ -225,8 +282,9 @@ def write_batch(state: dict, size=2):
             except ValueError:
                 # Only an editorial veto invalidates prose, never an outage.
                 dossier.pop('_draft_candidate', None)
-                if '_longform_progress' in dossier:
-                    dossier['_longform_progress']['rebuild_required'] = True
+                for name in ('_longform_progress', '_shortform_progress'):
+                    if name in dossier:
+                        dossier[name]['rebuild_required'] = True
                 revisions[slot] = revisions.get(slot, 0) + 1
                 if revisions[slot] >= 3:
                     raise RUNTIME.EvidenceRejected('Three editorial reviews rejected this story')
@@ -253,7 +311,7 @@ def write_batch(state: dict, size=2):
         finally:
             persist_progress()
     state['stage'] = 'writing' if len(articles) < 8 else 'ready_for_audit'
-    segments = sum(len(d.get('_longform_progress', {}).get('parts', [])) for d in dossiers.values())
+    segments = sum(len(d.get(k, {}).get('parts', [])) for d in dossiers.values() for k in ('_longform_progress', '_shortform_progress'))
     print(f'[write] CHECKPOINT STATUS: {len(articles)}/8 verified articles; {segments} accepted segments; '
           f'{len(rejected)} rejected stories; publication remains gated', flush=True)
     return state
@@ -292,8 +350,9 @@ def audit(state:dict):
             state['articles'].pop(str(index),None)
             dossier = state.get('dossiers', {}).get(str(index), {})
             dossier.pop('_draft_candidate', None)
-            if '_longform_progress' in dossier:
-                dossier['_longform_progress']['rebuild_required'] = True
+            for name in ('_longform_progress', '_shortform_progress'):
+                if name in dossier:
+                    dossier[name]['rebuild_required'] = True
             revisions = state.setdefault('revisions', {})
             revisions[str(index)] = revisions.get(str(index), 0) + 1
             if revisions[str(index)] >= 3:
@@ -384,6 +443,8 @@ def main():
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
     args = p.parse_args()
+    if args.phase == 'auto' and not args.preview:
+        raise RuntimeError('auto is a preview-only integration phase')
     key = validate_key(os.environ.get('DRAFT_ENCRYPTION_KEY', ''))
     date = phase_date(args.phase, datetime.now(TZ), args.target_date)
     label = artifact_label(date, args.preview)
@@ -394,13 +455,13 @@ def main():
                   or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
     if state:
-        count = sum(len(d.get('_longform_progress', {}).get('parts', [])) for d in state.get('dossiers', {}).values())
+        count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[resume] {len(state.get("articles", {}))}/8 verified articles; {count} accepted segments; '
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
     if args.phase == 'check':
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')
-        segments = sum(len(d.get('_longform_progress', {}).get('parts', [])) for d in state.get('dossiers', {}).values())
+        segments = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[checkpoint-test] restored {len(state.get("articles", {}))}/8 articles, {segments} segments', flush=True)
         return
     quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
@@ -445,6 +506,10 @@ def main():
             research_batch(state)
         elif args.phase in ('write', 'auto'):
             write_batch(state, size=8)
+            if args.phase == 'auto' and len(state.get('articles', {})) == 8:
+                audit(state)
+                if state.get('audit_passed'):
+                    render(state, True)
         elif args.phase == 'audit':
             audit(state)
         elif args.phase == 'publish':
