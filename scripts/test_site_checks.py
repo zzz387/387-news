@@ -61,6 +61,12 @@ class PublicSiteTests(unittest.TestCase):
         self.assertEqual(result['articles'],8)
         self.assertEqual(request.call_count,12)
 
+    def test_monitor_accepts_existing_relative_article_links(self):
+        pages=self.website()
+        pages['https://387.su/']=pages['https://387.su/'].replace('href="/issues/','href="issues/')
+        with patch.object(check,'fetch',side_effect=pages.__getitem__):
+            self.assertEqual(check.check_site()['articles'],8)
+
     def test_https_monitor_refuses_stale_or_truncated_issue(self):
         pages=self.website()
         with patch.object(check,'fetch',side_effect=pages.__getitem__):

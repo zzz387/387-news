@@ -58,7 +58,7 @@ def check_site(base='https://387.su', expected_date=None):
         raise RuntimeError('Public health check requires verified HTTPS')
     base = base.rstrip('/')
     home = fetch(base+'/')
-    links = set(re.findall(r'/issues/(\d{4}-\d{2}-\d{2})/articles/([a-z0-9-]+)/',home))
+    links = set(re.findall(r"href=[\"']/?issues/(\d{4}-\d{2}-\d{2})/articles/([a-z0-9-]+)/",home))
     if not links:
         raise RuntimeError('Homepage has no complete issue article links')
     date = max(d for d,_ in links)
