@@ -27,10 +27,11 @@ from urllib.request import Request, urlopen
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:
-    from scripts import news, editorial31
+    from scripts import news, editorial31, publication
 except ImportError:
     import news
     import editorial31
+    import publication
 
 TZ = news.TZ
 ROOT = news.ROOT
@@ -414,8 +415,15 @@ def render(state: dict, preview: bool):
         raise RuntimeError('Release veto: NEWS_RELEASE_APPROVED must be explicitly enabled')
     issue_dir = ROOT / 'issues' / date
     if issue_dir.exists():
-        print('[release] issue already exists in repository; no duplicate',flush=True)
-        return False
+        if preview:
+            return False
+        saved = json.loads((issue_dir / 'issue.json').read_text(encoding='utf-8'))
+        expected = publication.public_issue(state, saved['number'])
+        if publication.content_digest(saved) != publication.content_digest(expected):
+            raise RuntimeError('Existing archive differs from approved issue; refusing overwrite')
+        news.validate_local_links(list(issue_dir.rglob('*.html')) + [ROOT/'index.html', ROOT/'archive/index.html'])
+        print('[release] approved issue already committed; safe deployment retry, archive unchanged', flush=True)
+        return True
     if preview:
         # Build and validate in a temporary private directory, never in Pages files.
         with tempfile.TemporaryDirectory(prefix='387news-preview-') as directory:
@@ -451,7 +459,9 @@ def _assemble_files(state, release, root):
         path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(news.render_article(release,no,item,source_map),encoding='utf-8')
         files.append(path)
-    (issue_dir/'issue.json').write_text(json.dumps({'date':date,'number':no,'articles':ordered},ensure_ascii=False,indent=2),encoding='utf-8')
+    public = publication.public_issue(state, no)
+    (issue_dir/'issue.json').write_text(json.dumps(public,ensure_ascii=False,indent=2),encoding='utf-8')
+    (issue_dir/'issue.md').write_text(publication.markdown(public),encoding='utf-8')
     paths=[issue_dir/'index.html', root/'index.html', root/'archive/index.html']
     paths[0].write_text(news.render_overview(release,no,ordered,permanent=True),encoding='utf-8')
     paths[1].write_text(news.render_overview(release,no,ordered),encoding='utf-8')
@@ -545,7 +555,7 @@ def main():
             ready = render(state, args.preview)
             if output and ready:
                 with open(output, 'a', encoding='utf-8') as f:
-                    f.write('published=true\n')
+                    f.write(f'published=true\nissue_date={state["date"]}\n')
     except RUNTIME.GenerationPaused as exc:
         print(f'[paused] {exc}', flush=True)
         if state:
