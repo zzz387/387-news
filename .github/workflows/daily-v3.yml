@@ -1,19 +1,6 @@
-name: 387 News — staged edition v3 (encrypted drafts)
+name: RETIRED — 387 News — staged edition v3 (encrypted drafts)
 
 on:
-  schedule:
-    # UTC; Moscow = UTC+3 all year.
-    # 12:17 Moscow — select sources & create tomorrow's editorial plan
-    - cron: '17 9 * * *'
-    # 16:17, 20:17, 00:17, 03:17 Moscow — two articles per batch
-    - cron: '17 13 * * *'
-    - cron: '17 17 * * *'
-    - cron: '17 21 * * *'
-    - cron: '17 0 * * *'
-    # 04:17 Moscow — audit, with catch-up on missed article drafts
-    - cron: '17 1 * * *'
-    # 05:54 Moscow — wait until 06:00 then publish; GitHub Pages may lag
-    - cron: '54 2 * * *'
   workflow_dispatch:
     inputs:
       phase:
@@ -46,7 +33,7 @@ jobs:
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_ENABLED=true after test and editorial review.
-    if: ${{ github.event_name == 'workflow_dispatch' || vars.NEWS_AUTOMATION_ENABLED == 'true' }}
+    if: ${{ false }} # Retired: daily-v31.yml is the sole production publisher.
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
