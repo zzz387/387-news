@@ -27,11 +27,13 @@ from urllib.request import Request, urlopen
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:
-    from scripts import news, editorial31, publication
+    from scripts import news, editorial31, publication, audit_policy, audit_repair
 except ImportError:
     import news
     import editorial31
     import publication
+    import audit_policy
+    import audit_repair
 
 TZ = news.TZ
 ROOT = news.ROOT
@@ -259,6 +261,9 @@ def write_batch(state: dict, size=2):
         return state
     if not state.get('plan'):
         raise RuntimeError('Missing strong story plan; run plan first')
+    audit_repair.process_repairs(state,persist_progress)
+    if state.get('audit_blocked') or state.get('audit_repairs'):
+        return state
     if not state.get('dossier_repair_v2'):
         # Older code requested 7–13 facts but demanded eight for a feature.
         # Recheck those prematurely rejected extractions once with the bounded extractor.
@@ -341,52 +346,59 @@ def audit(state:dict):
     articles=state.get('articles',{})
     if len(articles)!=8:
         raise RuntimeError(f'Incomplete issue: {len(articles)}/8; site unchanged')
-    ordered=[articles[str(i)] for i in range(8)]
+    if state.get('audit_blocked') or state.get('audit_repairs'):
+        print('[audit] pending attributed repair or bounded hold; no audit API request',flush=True)
+        return state
+    digest = audit_policy.fingerprint(state)
+    if (digest in state.get('audit_failed_fingerprints',{})
+            or state.get('audit_rounds',0)>=audit_policy.MAX_AUDITS):
+        state['audit_blocked'] = 'Unchanged rejected issue or audit round limit; no automatic retry'
+        persist_progress()
+        print('[audit] unchanged rejected input or audit limit; accepted articles retained',flush=True)
+        return state
+    order = state.get('article_order',list(range(8)))
+    if sorted(order)!=list(range(8)):
+        raise RuntimeError('Invalid issue composition order')
+    ordered=[articles[str(i)] for i in order]
+    plans=[state['plan'][i] for i in order]
     lookup={s['id']:s for s in state['sources']}
     release=datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=TZ)
-    for a in ordered:
-        if a['kind'].lower()=='новость' and not any(news.is_recent(lookup[i]['published'],release)
-                                                   for i in a['source_ids']):
-            state['audit_note']='News item stale at scheduled release'
-            state['stage']='audit_veto'
-            print('[AUDIT VETO] stale news — website unchanged',flush=True)
-            return state
     review_index = None
     try:
-        for i, article in enumerate(ordered):
-            if article.get('_review_scope') != 'title_teaser_body_v1':
+        for i, a in zip(order,ordered):
+            if a['kind'].lower()=='новость' and not any(news.is_recent(lookup[s]['published'],release)
+                                                        for s in a['source_ids']):
+                raise audit_policy.AuditRejected([audit_policy.issue('stale_news',scope='article',
+                    article_ids=[i+1],repair_ids=[i+1],action='replace_story',
+                    reason='News item stale at scheduled release',instruction='Select a different verified fresh story')])
+            if a.get('_review_scope') != 'title_teaser_body_v1':
                 review_index = i
-                editorial31.verify_article(article, state['plan'][i], state['dossiers'][str(i)], lookup)
-                article['_review_scope'] = 'title_teaser_body_v1'
+                editorial31.verify_article(a,state['plan'][i],state['dossiers'][str(i)],lookup)
+                a['_review_scope'] = 'title_teaser_body_v1'
                 persist_progress()
                 review_index = None
-        total=editorial31.audit_issue(ordered,state['plan'],lookup)
+        total=editorial31.audit_issue(ordered,plans,lookup,article_ids=[i+1 for i in order])
     except RUNTIME.GenerationPaused:
         raise
-    except Exception as e:
-        state['stage']='audit_veto'
-        state['audit_note']=str(e)[:1200]
-        # An editorial veto (not a temporary Gemini outage) must be repairable.
-        # Keep dossiers & other approved drafts; rewrite just the weakest slot.
-        if isinstance(e, ValueError):
-            index=review_index if review_index is not None else min(range(8), key=lambda i: (
-                ordered[i]['word_count'] / (editorial31.MIN_LONG if state['plan'][i]['long']
-                                           else editorial31.MIN_SHORT),
-                state['plan'][i].get('editorial_score', 25)))
-            state.setdefault('rejections',{})[str(index)]='Final issue audit: '+str(e)[:500]
-            state['articles'].pop(str(index),None)
-            dossier = state.get('dossiers', {}).get(str(index), {})
-            dossier.pop('_draft_candidate', None)
-            for name in ('_longform_progress', '_shortform_progress'):
-                if name in dossier:
-                    dossier[name]['rebuild_required'] = True
-            revisions = state.setdefault('revisions', {})
-            revisions[str(index)] = revisions.get(str(index), 0) + 1
-            if revisions[str(index)] >= 3:
-                state.setdefault('rejected', {})[str(index)] = 'Repeated issue audit veto'
-            print(f'[audit] returned slot {index+1}/8 to revision queue',flush=True)
-        print(f'[AUDIT VETO] {type(e).__name__}; details retained in encrypted checkpoint; website unchanged',flush=True)
+    except ValueError as exc:
+        state['audit_rounds'] = state.get('audit_rounds',0)+1
+        if isinstance(exc,audit_policy.AuditRejected):
+            findings = exc.issues
+        elif review_index is not None:
+            findings = [audit_policy.issue('unsupported_claim',scope='article',
+                article_ids=[review_index+1],repair_ids=[review_index+1],action='revise_article',
+                reason=str(exc),instruction=str(exc))]
+        else:
+            findings = [audit_policy.issue('unattributed',reason=str(exc))]
+        audit_repair.record_veto(state,findings,persist_progress)
         return state
+    except Exception as exc:
+        state['stage']='audit_veto'
+        state['audit_note']='Operational audit failure: '+type(exc).__name__
+        persist_progress()
+        print(f'[audit] operational error={type(exc).__name__}; no article invalidated',flush=True)
+        return state
+    state['audit_rounds'] = state.get('audit_rounds',0)+1
     state['audit_passed']=True
     state['stage']='audited'
     state['word_count']=total
@@ -450,7 +462,7 @@ def _assemble_files(state, release, root):
     date = state['date']
     issue_dir = root / 'issues' / date
     source_map = {x['id']:x for x in state['sources']}
-    ordered = [state['articles'][str(i)] for i in range(8)]
+    ordered = [state['articles'][str(i)] for i in state.get('article_order',range(8))]
     no = news.get_next_number()
     issue_dir.mkdir(parents=True,exist_ok=False)
     files=[]
@@ -475,7 +487,7 @@ def _assemble_files(state, release, root):
 def main():
     global PERSIST
     p = argparse.ArgumentParser()
-    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check'], required=True)
+    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume'], required=True)
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
     args = p.parse_args()
@@ -549,6 +561,32 @@ def main():
                     render(state, True)
         elif args.phase == 'audit':
             audit(state)
+        elif args.phase == 'resume':
+            prior_path = os.getenv('NEWS_PRIOR_CHECKPOINT_FILE')
+            if (prior_path and len(state.get('articles',{}))==7
+                    and not state.get('legacy_audit_recovered')
+                    and state.get('audit_note','').startswith('Issue editorial veto: ')):
+                prior = decipher(Path(prior_path).read_bytes(),key)
+                audit_repair.recover_legacy_article(state,prior)
+                persist()
+            for _ in range(audit_policy.MAX_AUDITS):
+                if state.get('audit_blocked') or state.get('audit_passed'):
+                    break
+                before = audit_policy.fingerprint(state)
+                write_batch(state,size=8)
+                if len(state.get('articles',{}))<8 or state.get('audit_repairs'):
+                    break
+                audit(state)
+                persist()
+                if state.get('audit_passed') or audit_policy.fingerprint(state)==before and not state.get('audit_repairs'):
+                    break
+            if state.get('audit_passed'):
+                ready = render(state,args.preview)
+                if output and ready:
+                    with open(output,'a',encoding='utf-8') as f:
+                        f.write(f'published=true\nissue_date={state["date"]}\n')
+            else:
+                print('[resume] incomplete or withheld issue checkpointed; publication remains gated',flush=True)
         elif args.phase == 'publish':
             if not state.get('audit_passed'):
                 raise RuntimeError('Unapproved issue: cannot publish or preview release')

@@ -2,8 +2,8 @@ name: 387 News — editorial v3.1 (SAFE / manual approval)
 
 on:
   push:
-    branches: [main, codex/release-health]
-    paths: ['scripts/site_checks.py', 'scripts/publication.py', '.github/workflows/daily-v31.yml']
+    branches: [main, codex/structured-audit-recovery]
+    paths: ['scripts/site_checks.py', 'scripts/publication.py', 'scripts/audit_policy.py', 'scripts/audit_repair.py', 'scripts/release_queue.py', '.github/workflows/daily-v31.yml']
   pull_request:
     paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   schedule:
@@ -36,7 +36,7 @@ on:
       phase:
         description: 'Safe phase to test: plan → write (repeat) → audit → publish'
         type: choice
-        options: [check, plan, research, write, audit, publish, status]
+        options: [check, plan, research, write, audit, publish, resume, status]
         default: plan
         required: true
       preview:
@@ -85,7 +85,7 @@ jobs:
           python scripts/site_checks.py "${arguments[@]}"
 
   unit-tests:
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -100,7 +100,7 @@ jobs:
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && github.event.schedule != '30 4 * * *' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.NEWS_RELEASE_APPROVED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && github.event.schedule != '30 4 * * *' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -146,14 +146,14 @@ jobs:
               *) echo 'Unexpected schedule'; exit 1 ;;
             esac
             preview=false
+          elif [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
+            phase=resume
+            preview=false
           else
             phase="$MANUAL_PHASE"
             preview="$MANUAL_PREVIEW"
           fi
-          echo "phase=$phase" >> "$GITHUB_OUTPUT"
-          echo "preview=$preview" >> "$GITHUB_OUTPUT"
-          echo "target_date=$MANUAL_DATE" >> "$GITHUB_OUTPUT"
-          echo "phase=$phase preview=$preview"
+          PHASE="$phase" PREVIEW="$preview" TARGET_DATE="$MANUAL_DATE" python scripts/release_queue.py
       - name: Find previously saved encrypted checkpoint
         id: checkpoint
         env:
@@ -173,6 +173,16 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/checkpoint
           merge-multiple: true  # v4: artifact-ids otherwise nests under its name
+      - name: Recover prior accepted article only inside protected Actions infrastructure
+        if: ${{ steps.context.outputs.legacy_recovery == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.context.outputs.prior_artifact_id }}
+          run-id: ${{ steps.context.outputs.prior_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/prior-accepted
+          merge-multiple: true
       - name: Download shared daily request ledger
         if: ${{ steps.checkpoint.outputs.quota_found == 'true' }}
         uses: actions/download-artifact@v4
@@ -192,6 +202,7 @@ jobs:
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
           NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
+          NEWS_PRIOR_CHECKPOINT_FILE: ${{ steps.context.outputs.legacy_recovery == 'true' && format('{0}/prior-accepted/news-draft.enc', runner.temp) || '' }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
           NEWS_LONGFORM_GAP_SECONDS: "6"  # stay below free-tier 15 RPM during longform drafting

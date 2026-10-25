@@ -21,9 +21,10 @@ import time
 from urllib.parse import urlparse
 
 try:
-    from scripts import news
+    from scripts import news, audit_policy
 except ImportError:
     import news
+    import audit_policy
 
 MIN_SHORT = 440
 MIN_LONG = 1050
@@ -183,8 +184,15 @@ news.SCHEMAS.update({
     'review31': _schema({'approve':B,'reasons':{'type':'array','items':S},
          'unsupported':{'type':'array','items':S}, 'strength':I},
          ['approve','reasons','unsupported','strength']),
-    'issue31': _schema({'approve':B,'reasons':{'type':'array','items':S}},
-                        ['approve','reasons']),
+    'issue31': _schema({'approve':B,'issues':{'type':'array','items':_schema({
+        'scope':{'type':'string','enum':['article','issue']},
+        'code':{'type':'string','enum':list(audit_policy.CODES)},
+        'article_ids':{'type':'array','items':I},
+        'repair_ids':{'type':'array','items':I},
+        'action':{'type':'string','enum':list(audit_policy.ACTIONS)},
+        'reason':S,'instruction':S,'order':{'type':'array','items':I}},
+        ['scope','code','article_ids','repair_ids','action','reason','instruction','order'])}},
+        ['approve','issues']),
 })
 
 
@@ -1074,34 +1082,79 @@ strength от 0 до 5. Ответ строго JSON.'''
     return True
 
 
-def audit_issue(articles,plan,sources):
-    if len(articles)!=8 or len(plan)!=8:raise ValueError('Incomplete issue')
+def revise_after_audit(article, plan, dossier, findings):
+    """One targeted revision; acceptance still requires form and factual review."""
+    prompt = ('Исправь только конкретные замечания редакционного аудита 387 News. '
+        'Сохрани подтвержденные факты, авторский замысел и весь текст, не затронутый '
+        'замечаниями. Не добавляй неподтвержденных сведений и не сокращай объём. '
+        'Не заменяй весь материал новым сюжетом. Верни полную исправленную статью '
+        'JSON title,teaser,paragraphs (heading,text). Большой очерк: 1050–2200 слов; '
+        'короткий материал: 440–2200; минимум 7 содержательных абзацев. '
+        'Замечания: '+json.dumps(findings,ensure_ascii=False)+
+        '\nПринятая ранее статья: '+json.dumps({k:article[k] for k in ('title','teaser','paragraphs')},ensure_ascii=False)+
+        '\nПлан: '+json.dumps(plan,ensure_ascii=False)+
+        '\nПроверенные буквальные свидетельства: '+json.dumps(dossier['claims'],ensure_ascii=False))
+    revised = news.gemini(prompt,output_tokens=16000 if plan['long'] else 10000,schema='article')
+    count = article_form(revised,plan)
+    revised.update(category=plan['category'],kind=plan['kind'],long=bool(plan['long']),
+                   source_ids=list(plan['source_ids']),word_count=count,
+                   character_count=len(article_body(revised)),editorial_score=plan.get('editorial_score',25))
+    return revised
+
+
+def audit_issue(articles,plan,sources,article_ids=None):
+    article_ids = article_ids or list(range(1,9))
+    fail = lambda code,**kw: audit_policy.AuditRejected([audit_policy.issue(code,**kw)])
+    if len(articles)!=8 or len(plan)!=8:
+        raise fail('category_balance',reason='Incomplete issue')
     if not LIFE.issubset({a['category'] for a in articles}):
-        raise ValueError('Mandatory rubrics missing')
+        raise fail('category_balance',reason='Mandatory rubrics missing')
     if sum(a['category'] in LIFE for a in articles)<4:
-        raise ValueError('Not enough life / family / health content')
+        raise fail('category_balance',reason='Not enough life / family / health content')
     if not 2 <= sum(bool(a.get('long')) for a in articles) <= 3:
-        raise ValueError('Issue requires 2–3 longform features')
-    total=0; titles=[]
-    for a,p in zip(articles,plan):
+        raise fail('category_balance',reason='Issue requires 2–3 longform features')
+    total=0
+    for index,(a,p) in enumerate(zip(articles,plan)):
+        slot = article_ids[index]
         if a.get('category')!=p['category'] or a.get('kind')!=p['kind']:
-            raise ValueError('Article mismatched planned category/genre')
-        total+=article_form(a,p)
-        if any(meaningfully_same(a['title'],t) for t in titles):
-            raise ValueError('Near-duplicate headlines')
-        titles.append(a['title'])
-    if total<TARGET_TOTAL:raise ValueError(f'Total {total} words < {TARGET_TOTAL}')
-    summaries=[{'title':a['title'],'category':a['category'],
-                'opening':a['paragraphs'][0]['text'][:340],
-                'last':a['paragraphs'][-1]['text'][:260],
-                'evidence_sources':[sources[s]['url'] for s in a['source_ids']]}
-               for a in articles]
-    result=news.gemini('Проведи финальную проверку разнообразия и литературного уровня номера 387 News. '
-        'Бракуй повторяющиеся сюжеты, банальные зачины, пресс-релизы, сюжетно '
-        'не связанные факты, рутинную рекламу и неинтересные материалы. '
-        'Ни один вторичный пересказ не должен выдавать старое событие за новое. '
-        'Верни JSON approve:boolean,reasons:string[]. Номер: '+
-        json.dumps(summaries,ensure_ascii=False),output_tokens=4000,schema='issue31')
-    if result.get('approve') is not True:
-        raise ValueError('Issue editorial veto: '+'; '.join(result.get('reasons',[])[:4]))
+            raise fail('article_form',scope='article',article_ids=[slot],repair_ids=[slot],
+                       action='revise_article',reason='Article mismatched planned category/genre',
+                       instruction='Restore the commissioned category/genre without inventing facts')
+        try:
+            total+=article_form(a,p)
+        except ValueError as exc:
+            raise fail('article_form',scope='article',article_ids=[slot],repair_ids=[slot],
+                       action='revise_article',reason=str(exc),instruction=str(exc)) from exc
+        for previous_index,previous in enumerate(articles[:index]):
+            if meaningfully_same(a['title'],previous['title']):
+                raise fail('duplicate_topic',article_ids=[article_ids[previous_index],slot],
+                           repair_ids=[slot],action='replace_story',reason='Near-duplicate headlines',
+                           instruction='Replace this overlapping commission with a different vetted story')
+    if total<TARGET_TOTAL:
+        raise fail('issue_volume',reason=f'Total {total} words < {TARGET_TOTAL}')
+    texts=[{'article_id':article_ids[i],'title':a['title'],'teaser':a.get('teaser',''),
+            'category':a['category'],'kind':a['kind'],'long':bool(a.get('long')),
+            'body':article_body(a),
+            'evidence_sources':[sources[s]['url'] for s in a['source_ids']]}
+           for i,a in enumerate(articles)]
+    result=news.gemini('Проведи финальную строгую редакционную проверку разнообразия, композиции '
+        'и литературного уровня номера 387 News. Представлены ПОЛНЫЕ тексты, а не обрывки. '
+        'Проверка утверждений по закрытым досье уже выполнялась отдельно; '
+        'не объявляй факт выдуманным только из-за отсутствия досье в этом запросе. '
+        'Бракуй повторяющиеся сюжеты, банальные зачины, пресс-релизы, сюжетно не связанные '
+        'факты, рутинную рекламу и неинтересные материалы. Старые события нельзя выдавать за новые. '
+        'Каждое замечание должно объяснять конкретный дефект на основе полного текста. '
+        'Верни approve и issues. При approve=true issues=[]; при отказе issues не пуст. '
+        'scope=article: article_ids=[точный article_id], repair_ids=[тот же id], '
+        'action=revise_article для литературной правки или replace_story для неподходящего сюжета. '
+        'scope=issue для разнообразия, композиции и совпадения сюжетов: article_ids содержит '
+        'ТОЛЬКО связанные с дефектом статьи, repair_ids — минимальный явно выбранный набор '
+        'для исправления. Не выбирай статьи по минимальному объёму. Не трогай прочие статьи. '
+        'Для исправления порядка: code=composition, action=reorder_issue, repair_ids=[], '
+        'order=перестановка всех 8 article_id. Для иных действий order=[]. '
+        'Если конкретное исправление определить нельзя, action=hold, repair_ids=[]. '
+        'В каждом issues укажи scope,code,article_ids,repair_ids,action,reason,instruction,order. '
+        'instruction — конкретное действие без новых неподтверждённых фактов. Номер: '+
+        json.dumps(texts,ensure_ascii=False),output_tokens=6500,schema='issue31')
+    audit_policy.validate_response(result)
     return total

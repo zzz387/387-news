@@ -14,7 +14,7 @@ def public_article(article):
 
 
 def public_issue(state, number):
-    articles = [public_article(state['articles'][str(i)]) for i in range(8)]
+    articles = [public_article(state['articles'][str(i)]) for i in state.get('article_order',range(8))]
     used = {sid for a in articles for sid in a['source_ids']}
     sources = {s['id']:{k:s[k] for k in SOURCE_FIELDS if k in s}
                for s in state['sources'] if s['id'] in used}
