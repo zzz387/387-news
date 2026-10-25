@@ -706,7 +706,7 @@ def select_plan_with_verified_science(sources, candidates, initial_plan=None, *,
                        f'after {limit} verifications. No unsupported science will be published.')
 
 
-def make_dossier(plan, source_map, date):
+def make_dossier(plan, source_map, date, progress=None):
     """Stage 2: extract verifiable claims before drafting any prose."""
     sources=[source_map[sid] for sid in plan['source_ids']]
     bundle=[{'id':s['id'],'title':s['title'],'date':s['published'],
@@ -716,7 +716,7 @@ def make_dossier(plan, source_map, date):
 Утверждённый сюжет: {json.dumps(plan,ensure_ascii=False)}
 Редакционный приоритет большого очерка: {LONGFORM_TOPICS.get(plan.get('long_topic_id',0),'общая рубрика без привилегий')}
 ДОКАЗАТЕЛЬСТВА: {json.dumps(bundle,ensure_ascii=False)}
-Извлеки 7–13 НЕПОВТОРЯЮЩИХСЯ конкретных фактов, включая имена, числа,
+Извлеки {'10–13' if plan['long'] else '7–10'} НЕПОВТОРЯЮЩИХСЯ конкретных фактов, включая имена, числа,
 проверяемую хронологию, интересный механизм. Для каждого укажи source_id,
 quote — ТОЧНЫЙ НЕПРЕРЫВНЫЙ фрагмент текста источника длиной 20–220
 символов (можно на языке источника), и explanation — что именно подтверждает.
@@ -727,25 +727,46 @@ quote — ТОЧНЫЙ НЕПРЕРЫВНЫЙ фрагмент текста ис
 Если original_study_found=False, приписывать открытию дату свежего пересказа строго запрещено.
 Дай angle, chronology, stakes, claims как JSON. Цель — избежать растянутого
 пересказа, спекуляций и псевдонаучных сенсаций.'''
-    result=news.gemini(prompt,output_tokens=8500,schema='dossier31')
-    clean=[]; distinct=set()
-    for claim in result.get('claims',[]):
-        if not isinstance(claim,dict):continue
-        sid=claim.get('source_id'); quote=claim.get('quote','').strip()
-        if sid not in source_map or sid not in plan['source_ids'] or not 20<=len(quote)<=240:
-            continue
-        # Literal source grounding, not the model's word for it.
-        if normalized(quote) not in normalized(source_map[sid].get('evidence','')):
-            continue
-        tag=(sid,normalized(quote))
-        if tag in distinct:continue
-        distinct.add(tag)
-        clean.append({'source_id':sid,'quote':quote,'explanation':claim.get('explanation','')[:450]})
-    min_claims=8 if plan['long'] else 5
-    if len(clean)<min_claims:
-        raise news.runtime.EvidenceRejected(f'Insufficient exact source evidence ({len(clean)}/{min_claims}); no invented facts')
-    result['claims']=clean
-    return result
+    progress = progress if progress is not None else {}
+    min_claims = 8 if plan['long'] else 5
+    while progress.get('attempts', 0) < 3:
+        prior = progress.get('claims', [])
+        feedback = ''
+        if progress.get('attempts'):
+            feedback = (f'\nРедактор подтвердил только {len(prior)}/{min_claims} точных цитат. '
+                        'Найди дополнительные НЕПОВТОРЯЮЩИЕСЯ факты в исходном тексте, '
+                        'цитируй непрерывно, не меняй и не переводи цитату. '
+                        'Нельзя дополнять факты из памяти. Уже принятые свидетельства: '
+                        + json.dumps(prior, ensure_ascii=False))
+        result = news.gemini(prompt + feedback, output_tokens=8500, schema='dossier31')
+        progress['attempts'] = progress.get('attempts', 0) + 1
+        clean = []; distinct = set()
+        supplied = result.get('claims') or []
+        if not isinstance(supplied, list):
+            supplied = []
+        for claim in prior + supplied:
+            if not isinstance(claim, dict):
+                continue
+            sid = claim.get('source_id')
+            if not isinstance(claim.get('quote'), str):
+                continue
+            quote = claim['quote'].strip()
+            if sid not in source_map or sid not in plan['source_ids'] or not 20 <= len(quote) <= 240:
+                continue
+            if normalized(quote) not in normalized(source_map[sid].get('evidence', '')):
+                continue
+            tag = (sid, normalized(quote))
+            if tag in distinct:
+                continue
+            distinct.add(tag)
+            clean.append({'source_id':sid, 'quote':quote, 'explanation':str(claim.get('explanation', ''))[:450]})
+        progress['claims'] = clean
+        news.runtime.checkpoint()
+        print(f'[dossier] verified citations={len(clean)}/{min_claims} attempt={progress["attempts"]}/3', flush=True)
+        if len(clean) >= min_claims:
+            result['claims'] = clean
+            return result
+    raise news.runtime.EvidenceRejected(f'Insufficient exact source evidence ({len(progress.get("claims", []))}/{min_claims}) after 3 extractions; no invented facts')
 
 
 def article_body(a):
@@ -789,8 +810,12 @@ def prose_quality(article):
 
 
 def validate_segment(part, previous, index):
-    if index == 0 and (not 20 <= len(part.get('title', '')) <= 185
-                       or wc(part.get('teaser', '')) < 25):
+    if not isinstance(part, dict):
+        raise ValueError('Segment response is not an object')
+    if index == 0 and (not isinstance(part.get('title'), str)
+                       or not isinstance(part.get('teaser'), str)
+                       or not 20 <= len(part['title']) <= 185
+                       or wc(part['teaser']) < 25):
         raise ValueError('Segment 1 title or teaser incomplete')
     para = part.get('paragraphs') or []
     if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
@@ -914,9 +939,12 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
     }, ensure_ascii=False, sort_keys=True)
     signature = hashlib.sha256(basis.encode('utf-8')).hexdigest()
     progress = dossier.get(progress_key)
+    rebuilds = progress.get('assembly_failures', 0) if isinstance(progress, dict) and progress.get('signature') == signature else 0
+    if rebuilds >= 3:
+        raise news.runtime.EvidenceRejected('Three complete assemblies failed editorial form; reject story')
     if (not isinstance(progress, dict) or progress.get('signature') != signature
             or progress.get('rebuild_required')):
-        progress = {'signature':signature, 'parts':[]}
+        progress = {'signature':signature, 'parts':[], 'assembly_failures':rebuilds}
         dossier[progress_key] = progress
     parts = progress['parts']
     if not isinstance(parts, list) or len(parts) > len(beats):
@@ -988,6 +1016,7 @@ def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) 
         # An already complete but unacceptable article must not loop forever
         # on the same rejected set of segments in the next scheduled run.
         progress['rebuild_required'] = str(exc)[:250]
+        progress['assembly_failures'] = progress.get('assembly_failures', 0) + 1
         raise
     texts = [normalized(x['text']) for x in all_paragraphs]
     for i, a in enumerate(texts):

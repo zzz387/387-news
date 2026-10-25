@@ -276,6 +276,50 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
             with self.subTest(ledger=ledger), self.assertRaises(ValueError):
                 rt.RequestBudget(ledger)
 
+    def test_review_rejections_count_once_per_actual_review(self):
+        state = {'date':'2026-10-26','sources':[{'id':'S001'}],
+                 'plan':[{'category':'Семья','long':False,'source_ids':['S001']}],
+                 'articles':{},'dossiers':{'0':{'claims':[]}}}
+        candidate = {'title':'A sufficiently long headline', 'word_count':580}
+        with patch.object(ed,'write_from_dossier',return_value=candidate), patch.object(ed,'verify_article',side_effect=ValueError('unsupported')) as review:
+            for _ in range(2):
+                stage.write_batch(state)
+                self.assertEqual(state['rejected'], {})
+            stage.write_batch(state)
+        self.assertEqual(review.call_count, 3)
+        self.assertIn('0', state['rejected'])
+        self.assertEqual(state['review_failures']['0'], 3)
+
+    def test_dossier_accumulates_literal_quotes_after_pause(self):
+        quotes = [f'Проверенный самостоятельный факт номер {i} из документа.' for i in range(8)]
+        source = {'S001':{'id':'S001','title':'Document','url':'https://example.org/doc',
+                          'published':'2026-10-25','evidence':' '.join(quotes)}}
+        plan = {'source_ids':['S001'],'long':True}
+        def answer(items):
+            return {'angle':'a','chronology':'c','stakes':'s','claims':[
+                {'source_id':'S001','quote':q,'explanation':'Verified'} for q in items]}
+        progress = {}
+        with patch.object(news,'gemini',side_effect=[answer(quotes[:7]),rt.GenerationPaused('quota')]):
+            with self.assertRaises(rt.GenerationPaused): ed.make_dossier(plan,source,'2026-10-26',progress)
+        saved = stage.decipher(stage.cipher({'progress':progress},bytes(range(32))),bytes(range(32)))['progress']
+        with patch.object(news,'gemini',return_value=answer(quotes[7:])) as api:
+            result = ed.make_dossier(plan,source,'2026-10-26',saved)
+        self.assertEqual(api.call_count,1)
+        self.assertEqual(len(result['claims']),8)
+        self.assertIn('7/8',api.call_args.args[0])
+
+    def test_malformed_dossier_is_bounded_and_never_invents_evidence(self):
+        source = {'S001':{'id':'S001','title':'Document','url':'https://example.org/doc',
+                          'published':'2026-10-25','evidence':'A verified document'}}
+        progress = {}
+        with patch.object(news,'gemini',return_value={'claims':None}) as api:
+            with self.assertRaises(rt.EvidenceRejected):
+                ed.make_dossier({'source_ids':['S001'],'long':True},source,'2026-10-26',progress)
+            with self.assertRaises(rt.EvidenceRejected):
+                ed.make_dossier({'source_ids':['S001'],'long':True},source,'2026-10-26',progress)
+        self.assertEqual(api.call_count,3)
+        self.assertEqual(progress['claims'],[])
+
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()
         self.assertIn("success() && github.ref == 'refs/heads/main'",workflow)

@@ -176,7 +176,7 @@ def research_batch(state, size=8):
         if slot in state.setdefault('dossiers', {}) or slot in state.setdefault('rejected', {}):
             continue
         try:
-            state['dossiers'][slot] = editorial31.make_dossier(plan, lookup, state['date'])
+            state['dossiers'][slot] = editorial31.make_dossier(plan, lookup, state['date'], state.setdefault('dossier_builds', {}).setdefault(slot, {}))
         except RUNTIME.GenerationPaused:
             raise
         except RUNTIME.EvidenceRejected as exc:
@@ -245,6 +245,8 @@ def replace_rejected_stories(state):
             rejected.pop(slot)
             state.setdefault('rejections', {}).pop(slot, None)
             state.setdefault('revisions', {}).pop(slot, None)
+            state.setdefault('review_failures', {}).pop(slot, None)
+            state.setdefault('dossier_builds', {}).pop(slot, None)
             persist_progress()
             print(f'[replace] rejected slot={i+1} assigned a different vetted source-backed story', flush=True)
             break
@@ -256,6 +258,13 @@ def write_batch(state: dict, size=2):
         return state
     if not state.get('plan'):
         raise RuntimeError('Missing strong story plan; run plan first')
+    if not state.get('dossier_repair_v2'):
+        # Older code requested 7–13 facts but demanded eight for a feature.
+        # Recheck those prematurely rejected extractions once with the bounded extractor.
+        for slot, reason in list(state.setdefault('rejected', {}).items()):
+            if reason.startswith('Insufficient exact source evidence') and 'after 3 extractions' not in reason:
+                state['rejected'].pop(slot)
+        state['dossier_repair_v2'] = True
     replace_rejected_stories(state)
     known = {s['id']:s for s in state['sources']}
     articles = state.setdefault('articles', {})
@@ -263,6 +272,7 @@ def write_batch(state: dict, size=2):
     rejections = state.setdefault('rejections', {})
     rejected = state.setdefault('rejected', {})
     revisions = state.setdefault('revisions', {})
+    reviews = state.setdefault('review_failures', {})
     cursor = state.get('write_cursor', 0) % len(state['plan'])
     pending = [(cursor+j) % len(state['plan']) for j in range(len(state['plan']))]
     pending = [i for i in pending if str(i) not in articles and str(i) not in rejected]
@@ -271,9 +281,10 @@ def write_batch(state: dict, size=2):
         plan = state['plan'][i]
         # Rotate even when quota pauses this slot, so other stories get a turn.
         state['write_cursor'] = (i+1) % len(state['plan'])
+        under_review = False
         try:
             if slot not in dossiers:
-                dossiers[slot] = editorial31.make_dossier(plan, known, state['date'])
+                dossiers[slot] = editorial31.make_dossier(plan, known, state['date'], state.setdefault('dossier_builds', {}).setdefault(slot, {}))
                 persist_progress()
             dossier = dossiers[slot]
             candidate = dossier.get('_draft_candidate')
@@ -282,6 +293,7 @@ def write_batch(state: dict, size=2):
                 dossier['_draft_candidate'] = candidate
                 persist_progress()
             try:
+                under_review = True
                 editorial31.verify_article(candidate, plan, dossier, known)
             except ValueError:
                 # Only an editorial veto invalidates prose, never an outage.
@@ -289,8 +301,8 @@ def write_batch(state: dict, size=2):
                 for name in ('_longform_progress', '_shortform_progress'):
                     if name in dossier:
                         dossier[name]['rebuild_required'] = True
-                revisions[slot] = revisions.get(slot, 0) + 1
-                if revisions[slot] >= 3:
+                reviews[slot] = reviews.get(slot, 0) + 1
+                if reviews[slot] >= 3:
                     raise RUNTIME.EvidenceRejected('Three editorial reviews rejected this story')
                 raise
             candidate['slug'] = news.slugify(candidate['title'], i+1)
@@ -307,7 +319,7 @@ def write_batch(state: dict, size=2):
         except Exception as exc:
             rejections[slot] = str(exc)[:700]
             # Bound short article repair too; transport errors do not condemn sources.
-            if isinstance(exc, ValueError) and not plan.get('long'):
+            if isinstance(exc, ValueError) and not under_review:
                 revisions[slot] = revisions.get(slot, 0) + 1
                 if revisions[slot] >= 9:
                     rejected[slot] = 'Repeated editorial/structural rejection; manual source review required'
