@@ -110,6 +110,11 @@ def shortlist(sources, date):
 Источники с реальными выдержками: {json.dumps(catalog,ensure_ascii=False)}
 Уже использованные ранее заголовки: {json.dumps(news.previous_titles(),ensure_ascii=False)}
 Выбери 20–30 действительно разных КОНКРЕТНЫХ сюжетов-кандидатов; для каждого 1–3 реально существующих source_ids.
+Критично: при наличии подходящих материалов постарайся представить не менее 3
+сильных разных кандидатов для каждой из рубрик «Семья», «Москва и путешествия»,
+«Здоровье и движение». Если оригинальные источники не подтверждают нужную тему —
+НЕ ПРИДУМЫВАЙ её ради соблюдения квоты. Если есть достаточно материала, предложи
+не менее 3 тем для больших очерков; также не выдумывай содержание ради нормы.
 Ставь каждой теме ПЯТЬ ОТДЕЛЬНЫХ оценок от 0 до 5: novelty, reader_interest,
 specificity, evidence, fit. Низкая оценка у скучных пресс-релизов, обзоров главных
 страниц сайтов, общих советов без открытия, рутинного строительства, сплетен, спорта.
@@ -153,55 +158,128 @@ specificity, evidence, fit. Низкая оценка у скучных прес
     chosen.sort(key=lambda x:x['score'],reverse=True)
     if len(chosen)<12:
         raise RuntimeError(f'Only {len(chosen)} editorially plausible candidates; refuse to pad issue')
-    return chosen[:30]
+    # Preserve strong life candidates in the top 30 even when a large science
+    # news cycle would otherwise crowd them out. Still use exactly the same
+    # pre-vetted threshold and evidence checks — never pad with weak candidates.
+    anchors=[]
+    for category in news.VALID_CATEGORIES[:3]:
+        anchors += [x for x in chosen if x['category']==category][:4]
+    anchors += [x for x in chosen if x.get('long')][:4]
+    prioritized=[]; seen_titles=set()
+    for c in anchors+chosen:
+        tag=normalized(c['title'])
+        if tag not in seen_titles:
+            seen_titles.add(tag)
+            prioritized.append(c)
+        if len(prioritized)==30:
+            break
+    return sorted(prioritized,key=lambda x:(-x['score'],normalized(x['title'])))
+
+
+def select_balanced_plan(candidates: list[dict], sources: list[dict]) -> list[dict]:
+    """Choose a source-backed, category-balanced issue without trusting an LLM's
+    ability to count rubrics. The model only suggests and scores candidates.
+
+    Fail closed if eligible sources cannot support the promised editorial mix.
+    Never add invented items or lower the candidate-quality threshold.
+    """
+    candidates=sorted(candidates, key=lambda c:(-c['score'], normalized(c['title'])))
+    cat_avail=Counter(c['category'] for c in candidates)
+    long_avail=sum(bool(c.get('long')) for c in candidates)
+    life_avail=sum(c['category'] in LIFE for c in candidates)
+    missing=[c for c in news.VALID_CATEGORIES[:3] if cat_avail[c]==0]
+    if missing or life_avail<4 or long_avail<2 or len(candidates)<8:
+        available=', '.join(f'{cat}: {cat_avail[cat]}' for cat in news.VALID_CATEGORIES[:3])
+        raise RuntimeError(
+            'Insufficient eligible editorial candidates; missing life rubrics: '
+            +(', '.join(missing) if missing else 'none')+'; '+available
+            +f'; life {life_avail}/4, long {long_avail}/2, total {len(candidates)}/8. '
+            'Do not invent stories; improve source discovery and rerun plan.'
+        )
+    lookup=_read_sources(sources)
+    n=len(candidates)
+    # Upper bounds help stop infeasible searches early without relaxing rules.
+    suffix_life=[0]*(n+1); suffix_long=[0]*(n+1)
+    suffix_cats={c:[0]*(n+1) for c in LIFE}
+    for pos in range(n-1,-1,-1):
+        c=candidates[pos]
+        suffix_life[pos]=suffix_life[pos+1]+int(c['category'] in LIFE)
+        suffix_long[pos]=suffix_long[pos+1]+int(bool(c.get('long')))
+        for cat in LIFE:
+            suffix_cats[cat][pos]=suffix_cats[cat][pos+1]+int(c['category']==cat)
+    counts=Counter(); source_use=Counter(); names=set()
+    picked=[]; result=None; explored=0
+
+    def recurse(pos:int, life_count:int, long_count:int):
+        nonlocal result,explored
+        explored+=1
+        if explored>750_000:
+            raise RuntimeError('Balanced issue search exceeded computational budget; '
+                               'inspect sources and category constraints')
+        slots=8-len(picked)
+        if slots==0:
+            if life_count>=4 and long_count>=2 and all(counts[cat]>=1 for cat in LIFE):
+                result=picked.copy()
+                return True
+            return False
+        if n-pos<slots or life_count+suffix_life[pos]<4 or long_count+suffix_long[pos]<2:
+            return False
+        if any(counts[cat]==0 and suffix_cats[cat][pos]==0 for cat in LIFE):
+            return False
+        missing_count=sum(counts[cat]==0 for cat in LIFE)
+        if missing_count>slots:
+            return False
+        if pos>=n:
+            return False
+        c=candidates[pos]
+        cat=c['category']; title=normalized(c['title'])
+        source_ids=c['source_ids']
+        eligible=(counts[cat]<(3 if cat in LIFE else 2) and title not in names
+                  and all(source_use[sid]<2 for sid in source_ids)
+                  and all(sid in lookup for sid in source_ids)
+                  and (long_count+int(bool(c.get('long')))<=3)
+                  and (cat in LIFE or life_count+slots-1+suffix_life[pos+1]>=4))
+        if eligible:
+            counts[cat]+=1; names.add(title)
+            for sid in source_ids:source_use[sid]+=1
+            picked.append(c)
+            if recurse(pos+1, life_count+int(cat in LIFE),long_count+int(bool(c.get('long')))):
+                return True
+            picked.pop(); names.remove(title); counts[cat]-=1
+            for sid in source_ids:source_use[sid]-=1
+        return recurse(pos+1,life_count,long_count)
+
+    if not recurse(0,0,0):
+        available=', '.join(f'{cat}: {cat_avail[cat]}' for cat in news.VALID_CATEGORIES[:3])
+        raise RuntimeError('No feasible eight-story editorial plan with mandatory rubrics, '
+                           '2-3 source-supported longforms, diverse topics, and <=2 uses of '
+                           'any source; '+available+'. Revise source pool; never pad.')
+    assert result is not None
+    # Reuse only candidates already admitted by shortlist; no additional
+    # synthetic titles, new sources, events or invented journalist claims.
+    plan=[]
+    for c in result:
+        plan.append({'title':c['title'],'category':c['category'],'kind':c['kind'],
+                     'source_ids':list(c['source_ids']),
+                     'angle':c.get('hook') or c.get('why_now') or c['title'],
+                     'long':bool(c.get('long')),'editorial_score':c['score'],
+                     'hook':c.get('hook','')})
+    print('[plan] balanced source-backed selection: '
+          +', '.join(f'{cat}={sum(q["category"]==cat for q in plan)}'
+                      for cat in news.VALID_CATEGORIES)
+          +f'; long={sum(q["long"] for q in plan)}; reviewed={len(candidates)}',
+          flush=True)
+    return plan
 
 
 def choose_plan(sources,date):
+    # Version 3.1 originally asked Gemini to choose exactly 8 from its own
+    # shortlist, then rejected the output if it omitted mandatory rubrics.
+    # That was an unreliable prompt-following/counting step. Keep Gemini for
+    # suggesting & scoring candidates; enforce selection deterministically.
     candidates=shortlist(sources,date)
-    lookup=_read_sources(sources)
-    compact=[{k:c[k] for k in ('title','category','kind','source_ids','hook','score','long')}
-             for c in candidates]
-    prompt=f'''Отбери из КАНДИДАТОВ ровно 8 публикаций для 387 News за {date}.
-Кандидаты уже предварительно проверены: {json.dumps(compact,ensure_ascii=False)}
-КРИТИЧНО: не добавляй тем, которых нет выше. Дословно используй названия и source_ids
-отобранных кандидатов, не объединяй сюжеты. Напиши собственный чёткий angle.
-Обязательно 1 Семья, 1 Москва и путешествия, 1 Здоровье и движение, всего
-не менее 4 из 8 жизненных рубрик, остальные разнообразные выдающиеся истории.
-Не менее 2 действительно глубоких длинных очерков с достаточным материалом.
-Не более 2 материалов из одной категории, кроме жизненных рубрик суммарно.
-Меньше обычного негатива, рекламных и чиновничьих текстов, никакого шоу-бизнеса
-как сплетен или спортивных результатов. История — не обязанность свежести.
-Новости — только recent из данных. Не выдумывай факты, цены, даты мероприятий.
-Верни articles: title,category,kind,source_ids,angle,long (ровно 8).'''
-    result=news.gemini(prompt,output_tokens=6500,schema='plan31')
-    plan=result.get('articles',[])
-    if len(plan)!=8:raise RuntimeError('Plan is not 8 strong stories; publishing veto')
-    candidate_by_title={normalized(c['title']):c for c in candidates}
-    cats=Counter(); source_reuse=Counter(); canonical=[]
-    for p in plan:
-        c=candidate_by_title.get(normalized(p.get('title','')))
-        if c is None:raise RuntimeError('Plan contains a story not in approved shortlist')
-        if (p.get('category') != c['category'] or p.get('kind') != c['kind']
-                or set(p.get('source_ids',[]))!=set(c['source_ids'])):
-            raise RuntimeError('Plan modified evidence or category of approved candidate')
-        if c['kind'].lower()=='новость' and not any(lookup[s]['recent'] for s in c['source_ids']):
-            raise RuntimeError('False freshness in selected news story')
-        for sid in c['source_ids']:source_reuse[sid]+=1
-        cats[p['category']]+=1
-        q={**p,'long':bool(p.get('long') and c.get('long')),'editorial_score':c['score'],
-           'hook':c['hook']}
-        canonical.append(q)
-    if len({normalized(p['title']) for p in canonical})!=8:
-        raise RuntimeError('Repeated stories in plan')
-    if not LIFE.issubset(set(cats)) or sum(cats[x] for x in LIFE)<4:
-        raise RuntimeError('Mandatory life rubrics not meaningfully represented')
-    if sum(p['long'] for p in canonical)<2:
-        raise RuntimeError('Missing two source-supported longform features')
-    if max(source_reuse.values())>2:
-        raise RuntimeError('Too many articles depend on one underlying source')
-    if any(n>3 for n in cats.values()):
-        raise RuntimeError('Issue has an excessive single-category cluster')
-    return canonical, candidates
+    canonical=select_balanced_plan(candidates,sources)
+    return canonical,candidates
 
 
 

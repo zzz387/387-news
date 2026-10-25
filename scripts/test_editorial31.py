@@ -55,6 +55,61 @@ class Editorial31Tests(unittest.TestCase):
              patch.object(e.news,'previous_titles',return_value=[]):
             with self.assertRaisesRegex(RuntimeError,'refuse to pad'):
                 e.shortlist(src,'2026-10-25')
+    @staticmethod
+    def candidates_fixture():
+        cats=(['Наука']*8 + ['История и культура']*4 + ['Экономика и бизнес']*3
+              + ['Семья']*3 + ['Москва и путешествия']*3
+              + ['Здоровье и движение']*3 + ['Технологии']*2)
+        candidates=[]; sources=[]
+        for i,cat in enumerate(cats):
+            sid=f'S{i+1:03d}'
+            # The highest-scoring 8 are all science. A model-driven selection
+            # could miss all three mandatory life categories.
+            score=25 if i<8 else 21
+            candidates.append(dict(title=f'Оригинальный сюжет номер {i+1}',
+                category=cat,kind='очерк',source_ids=[sid],hook='Конкретная интрига',
+                long=(i in (0,1,15,19,21)),score=score))
+            sources.append(dict(id=sid,recent=True,evidence='данные '*400))
+        return candidates,sources
+
+    def test_deterministic_plan_repairs_life_rubrics_without_llm_second_call(self):
+        candidates, sources=self.candidates_fixture()
+        with patch.object(e,'shortlist',return_value=candidates), \
+             patch.object(e.news,'gemini',side_effect=AssertionError('no second LLM call')):
+            plan,_=e.choose_plan(sources,'2026-10-26')
+        self.assertEqual(len(plan),8)
+        self.assertTrue(e.LIFE.issubset({p['category'] for p in plan}))
+        self.assertGreaterEqual(sum(p['category'] in e.LIFE for p in plan),4)
+        self.assertGreaterEqual(sum(bool(p['long']) for p in plan),2)
+        self.assertLessEqual(sum(bool(p['long']) for p in plan),3)
+        self.assertTrue(all(sum(x['category']==cat for x in plan)<=2 for cat in e.news.VALID_CATEGORIES if cat not in e.LIFE))
+        self.assertEqual(len({tuple(p['source_ids']) for p in plan}),8)
+
+    def test_missing_life_category_is_diagnostic_not_silent_padding(self):
+        candidates,sources=self.candidates_fixture()
+        candidates=[c for c in candidates if c['category']!='Семья']
+        with self.assertRaisesRegex(RuntimeError,'missing life rubrics: Семья'):
+            e.select_balanced_plan(candidates,sources)
+
+    def test_overused_underlying_source_must_fail(self):
+        candidates,sources=self.candidates_fixture()
+        # All health candidates depend on the same source, but a one-title
+        # selection can still satisfy the rubric. Make EVERY story from life
+        # categories depend on one shared source, so 4 life items are impossible
+        # with the per-source reuse ceiling of 2.
+        for c in candidates:
+            if c['category'] in e.LIFE:
+                c['source_ids']=['S002']
+        with self.assertRaisesRegex(RuntimeError,'No feasible eight-story'):
+            e.select_balanced_plan(candidates,sources)
+
+    def test_strict_plan_does_not_duplicate_source_or_title(self):
+        candidates,sources=self.candidates_fixture()
+        plan=e.select_balanced_plan(candidates,sources)
+        ids=[s for p in plan for s in p['source_ids']]
+        self.assertLessEqual(max(ids.count(x) for x in set(ids)),2)
+        self.assertEqual(len({e.normalized(p['title']) for p in plan}),8)
+
     def test_dossier_requires_verbatim_quotes(self):
         src={'S001':{'id':'S001','url':'https://one.org/one',
              'evidence':'Эксперимент показал существенное отличие наблюдений и вызвал вопросы. '*10,
