@@ -121,6 +121,7 @@ jobs:
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
           NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
+          NEWS_LONGFORM_GAP_SECONDS: "6"  # stay below free-tier 15 RPM during longform drafting
         shell: bash
         run: |
           arguments=(--phase "$PHASE")
