@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""387 News 3.1 — source-grounded editor with a strict publication veto.
+"""387 News 3.2 — 20 approved longform priorities and an evidence-based veto.
 
 Keeps existing news.py scraping, free Gemini client and HTML templates, and
 staged_news.py's AES-GCM checkpoint format. External model reviews are useful
@@ -32,6 +32,66 @@ GENERIC_URLS = {'https://www.unicef.org/parenting', 'https://www.mos.ru/afisha/'
                 'https://www.who.int/news-room/fact-sheets/detail/healthy-diet'}
 SOFT_PRESS_RELEASE = ('подписала соглашения', 'началось строительство', 'построят',
                       'состоялось совещание', 'открывает партнерство', 'сотрудничестве с регионами')
+# User-approved priorities for full-length (roughly 1200–1800 word) features.
+# Original topic numbering is preserved for traceability. Topic 19 (book
+# histories) is NOT a longform priority. Ordinary coverage is not banned.
+LONGFORM_TOPICS = {
+    1: 'Воспитание и развитие детей',
+    2: 'Семейные занятия и совместный досуг',
+    3: 'Супружеские отношения',
+    6: 'Московские усадьбы и дворцы',
+    7: 'Необычные места Москвы и Подмосковья',
+    8: 'Путешествия выходного дня',
+    9: 'История Москвы',
+    10: 'Музеи и выставки',
+    11: 'Архитектура и дизайн интерьеров',
+    12: 'Питание и долголетие',
+    13: 'Кардиотренировки и физиология',
+    14: 'Велосипедные путешествия (20–60 км)',
+    15: 'Йога, подвижность и восстановление',
+    16: 'Современная медицина',
+    17: 'Исторические загадки и открытия',
+    18: 'Выдающиеся люди и необычные судьбы',
+    21: 'Христианская история и философия',
+    22: 'Научные открытия и загадки природы',
+    23: 'Экономика, предпринимательство и право (включая банкротство)',
+    24: 'Инженерия, производство и технологии (включая 3D-печать)',
+}
+
+# An LLM may propose a priority topic; verify it also fits the real rubric.
+_TOPIC_CATEGORIES = {
+    1: ('Семья',), 2: ('Семья',), 3: ('Семья',),
+    6: ('Москва и путешествия', 'История и культура'),
+    7: ('Москва и путешествия',),
+    8: ('Москва и путешествия',),
+    9: ('Москва и путешествия', 'История и культура'),
+    10: ('Москва и путешествия', 'История и культура'),
+    11: ('Москва и путешествия', 'История и культура', 'Технологии'),
+    12: ('Здоровье и движение', 'Наука'),
+    13: ('Здоровье и движение', 'Наука'),
+    14: ('Здоровье и движение', 'Москва и путешествия'),
+    15: ('Здоровье и движение',),
+    16: ('Здоровье и движение', 'Наука'),
+    17: ('История и культура', 'Наука'),
+    18: ('История и культура', 'Наука', 'Экономика и бизнес'),
+    21: ('История и культура',),
+    22: ('Наука',),
+    23: ('Экономика и бизнес',),
+    24: ('Технологии', 'Наука', 'Экономика и бизнес'),
+}
+
+LONGFORM_POLICY_BRIEF = '\n'.join(f'{n}. {t}' for n, t in LONGFORM_TOPICS.items())
+
+
+def normalized_topic_id(candidate: dict) -> int:
+    """Priorities are not a license to invent a topic or skip source checks."""
+    try:
+        n = int(candidate.get('long_topic_id', 0))
+    except (ValueError, TypeError, OverflowError):
+        return 0
+    return n if candidate.get('category') in _TOPIC_CATEGORIES.get(n, ()) else 0
+
+
 STYLE_RED_FLAGS = ('современный мир', 'в современном мире', 'богатейшее наследие',
                    'динамично развивающ', 'уникальная возможность', 'масштабные проекты',
                    'знаковый проект', 'в условиях стремительно меняющегося',
@@ -107,7 +167,8 @@ news.SCHEMAS.update({
         'title': S, 'category':{'type':'string','enum':list(news.VALID_CATEGORIES)},
         'kind': S, 'source_ids':{'type':'array','items':S}, 'hook': S,
         'why_now': S, 'novelty':I, 'reader_interest':I,
-        'specificity':I, 'evidence':I, 'fit':I, 'long':B},
+        'specificity':I, 'evidence':I, 'fit':I, 'long':B,
+        'long_topic_id':I},
         ['title','category','kind','source_ids','hook','why_now','novelty',
          'reader_interest','specificity','evidence','fit','long'])},
     },['candidates']),
@@ -171,6 +232,14 @@ def shortlist(sources, date):
 «Здоровье и движение». Если оригинальные источники не подтверждают нужную тему —
 НЕ ПРИДУМЫВАЙ её ради соблюдения квоты. Если есть достаточно материала, предложи
 не менее 3 тем для больших очерков; также не выдумывай содержание ради нормы.
+Приоритетный круг БОЛЬШИХ очерков (номера фиксированы редакцией):
+{LONGFORM_POLICY_BRIEF}
+Для каждого кандидата укажи long_topic_id: номер ОДНОЙ наиболее подходящей темы
+из списка; если не подходит ни одна — 0. Не подменяй реальный предмет сюжета
+ради попадания в приоритет. Тема №19 «Литература и история книг» ИСКЛЮЧЕНА
+из списка приоритетных больших очерков: не ставь для неё long_topic_id=19.
+Метка long — лишь редакторская гипотеза, НЕ решение о возможности очерка:
+для большого текста нужны подробные реальными проверяемыми источники.
 Ставь каждой теме ПЯТЬ ОТДЕЛЬНЫХ оценок от 0 до 5: novelty, reader_interest,
 specificity, evidence, fit. Низкая оценка у скучных пресс-релизов, обзоров главных
 страниц сайтов, общих советов без открытия, рутинного строительства, сплетен, спорта.
@@ -211,6 +280,7 @@ specificity, evidence, fit. Низкая оценка у скучных прес
             continue
         seen.append(c.get('title',''))
         c['score']=candidate_score(c)
+        c['long_topic_id']=normalized_topic_id(c)
         chosen.append(c)
     accept_pool(answer.get('candidates',[]))
     # Second, focused pass only when a generic news cycle omitted the family
@@ -232,8 +302,11 @@ specificity, evidence, fit. Низкая оценка у скучных прес
 и подробные факты из указанного источника. Одна обзорная страница
 не заменяет подробный исходный материал. Оцени novelty (новизна УГЛА,
 не дата), reader_interest, specificity, evidence, fit: по 0–5.
-source_ids указывай только существующие идентификаторы. Статьи без
-подтверждения НЕ ПРИДУМЫВАЙ. Формат candidates, JSON по схеме.
+source_ids указывай только существующие идентификаторы. Для поля
+long_topic_id поставь 1 (воспитание), 2 (семейные занятия), 3 (супружеские
+отношения), только если сюжет точно подходит; иначе 0. long=true только
+при проверяемой документальной глубине; не растягивай общий совет.
+Статьи без подтверждения НЕ ПРИДУМЫВАЙ. Формат candidates, JSON по схеме.
 Запрет: общие рекомендации без конкретного содержания и  ложные даты.'''
         targeted=news.gemini(targeted_prompt, output_tokens=8000,schema='candidate31')
         # Candidate must be family and must rely at least in part on
@@ -257,6 +330,7 @@ source_ids указывай только существующие идентиф
     for category in news.VALID_CATEGORIES[:3]:
         anchors += [x for x in chosen if x['category']==category][:4]
     anchors += [x for x in chosen if x.get('long')][:4]
+    anchors += [x for x in chosen if normalized_topic_id(x)][:8]
     prioritized=[]; seen_titles=set()
     for c in anchors+chosen:
         tag=normalized(c['title'])
@@ -268,6 +342,99 @@ source_ids указывай только существующие идентиф
     return sorted(prioritized,key=lambda x:(-x['score'],normalized(x['title'])))
 
 
+
+
+def _longform_evidence(c: dict, source_map: dict) -> tuple[bool, int, int]:
+    """Is there *retrieved* documentary depth to commission a long feature?
+
+    An LLM's `long` boolean is only a proposal, not a factual measurement.
+    Require either one substantial original article or independent detailed
+    documents; no synthetically expanded, generic landing or abstract pages.
+    This is a commissioning screen, not a guarantee the eventual feature is good:
+    the dossier, word count and independent review must still succeed.
+    """
+    if (candidate_score(c) < 20 or
+            int(c.get('evidence', 0)) < 4 or
+            int(c.get('specificity', 0)) < 4 or
+            int(c.get('reader_interest', 0)) < 4):
+        return False, 0, 0
+    headline = normalized(c.get('title', ''))
+    if any(marker in headline for marker in SOFT_PRESS_RELEASE):
+        return False, 0, 0
+    seen = set()
+    pages = []
+    for sid in c.get('source_ids', []):
+        src = source_map.get(sid)
+        if not src or not _reference_quality(src):
+            continue
+        url = src.get('url', '').rstrip('/')
+        if url in seen:
+            continue
+        seen.add(url)
+        pages.append(src)
+    if not pages:
+        return False, 0, 0
+    sizes = [len(p.get('evidence', '').strip()) for p in pages]
+    total = sum(sizes)
+    domain_count = len(domains(pages))
+    strong_single = max(sizes) >= 5400
+    independent_sources = (len(pages) >= 2 and domain_count >= 2 and
+                           min(sorted(sizes, reverse=True)[:2]) >= 1800 and
+                           total >= 5000)
+    return strong_single or independent_sources, total, domain_count
+
+
+def commission_evidence_backed_longforms(candidates: list[dict], sources: list[dict]) -> list[dict]:
+    """Evaluate *every* longform pitch against primary source depth.
+
+    Priority topics improve commissioning rank but NEVER replace source evidence.
+    Model flags without enough evidence are demoted to regular articles. Work
+    from copies to avoid corrupting the candidate audit and past checkpoints.
+    """
+    pool = [dict(c) for c in candidates]
+    source_map = _read_sources(sources)
+    original_flags = sum(bool(c.get('long')) for c in pool)
+    qualified = []
+    for c in pool:
+        c['long_topic_id'] = normalized_topic_id(c)
+        good, chars, independent_domains = _longform_evidence(c, source_map)
+        c['long'] = bool(good)
+        if good:
+            # Both yes/no calls remain auditable. No source → no long feature.
+            c['longform_basis'] = 'source-depth-qualified; further dossier audit required'
+            qualified.append((c, chars, independent_domains))
+    # Selectable plan must contain at least two long features, preferably one
+    # family/health/city story and one intellectual story. Preserve up to five
+    # pitches and a balanced range of rubrics, with source depth decisive.
+    qualified.sort(key=lambda item: (
+        -int(bool(item[0]['long_topic_id'])), -int(item[0].get('score', 0)),
+        -item[1], normalized(item[0]['title'])))
+    favoured = []
+    used_cats = set()
+    for different_cat in (True, False):
+        for c, chars, independent_domains in qualified:
+            if c in favoured or (different_cat and c['category'] in used_cats):
+                continue
+            favoured.append(c)
+            used_cats.add(c['category'])
+            if len(favoured) >= 5:
+                break
+        if len(favoured) >= 5:
+            break
+    selected_ids = {id(c) for c in favoured}
+    for c, _, _ in qualified:
+        if id(c) not in selected_ids:
+            c['long'] = False
+            c.pop('longform_basis', None)
+    life_long = sum(bool(c.get('long')) and c['category'] in LIFE for c in pool)
+    intellectual_long = sum(bool(c.get('long')) and c['category'] not in LIFE for c in pool)
+    print(f'[longform audit v3.2] model-flagged={original_flags}, '
+          f'evidence-qualified={len(qualified)}, kept={len(favoured)}, '
+          f'priority={sum(bool(c.get("long_topic_id")) for c in favoured)}, '
+          f'life={life_long}, intellectual={intellectual_long}; target=2–3', flush=True)
+    return pool
+
+
 def select_balanced_plan(candidates: list[dict], sources: list[dict]) -> list[dict]:
     """Choose a source-backed, category-balanced issue without trusting an LLM's
     ability to count rubrics. The model only suggests and scores candidates.
@@ -275,7 +442,7 @@ def select_balanced_plan(candidates: list[dict], sources: list[dict]) -> list[di
     Fail closed if eligible sources cannot support the promised editorial mix.
     Never add invented items or lower the candidate-quality threshold.
     """
-    candidates=sorted(candidates, key=lambda c:(-c['score'], normalized(c['title'])))
+    candidates=sorted(candidates, key=lambda c:(-c['score'], -int(bool(c.get('long') and normalized_topic_id(c))), normalized(c['title'])))
     cat_avail=Counter(c['category'] for c in candidates)
     long_avail=sum(bool(c.get('long')) for c in candidates)
     life_avail=sum(c['category'] in LIFE for c in candidates)
@@ -355,7 +522,8 @@ def select_balanced_plan(candidates: list[dict], sources: list[dict]) -> list[di
                      'source_ids':list(c['source_ids']),
                      'angle':c.get('hook') or c.get('why_now') or c['title'],
                      'long':bool(c.get('long')),'editorial_score':c['score'],
-                     'hook':c.get('hook','')})
+                     'hook':c.get('hook',''),
+                     'long_topic_id':normalized_topic_id(c)})
     print('[plan] balanced source-backed selection: '
           +', '.join(f'{cat}={sum(q["category"]==cat for q in plan)}'
                       for cat in news.VALID_CATEGORIES)
@@ -371,6 +539,7 @@ def choose_plan(sources,date):
     # suggesting & scoring candidates; enforce selection deterministically.
     extend_family_evidence(sources)
     candidates=shortlist(sources,date)
+    candidates=commission_evidence_backed_longforms(candidates,sources)
     canonical=select_balanced_plan(candidates,sources)
     return canonical,candidates
 
@@ -455,6 +624,7 @@ def make_dossier(plan, source_map, date):
              'abstract_only':bool(s.get('abstract_only'))} for s in sources]
     prompt=f'''Создай закрытое журналистское досье, НЕ статью, на {date}.
 Утверждённый сюжет: {json.dumps(plan,ensure_ascii=False)}
+Редакционный приоритет большого очерка: {LONGFORM_TOPICS.get(plan.get('long_topic_id',0),'общая рубрика без привилегий')}
 ДОКАЗАТЕЛЬСТВА: {json.dumps(bundle,ensure_ascii=False)}
 Извлеки 7–13 НЕПОВТОРЯЮЩИХСЯ конкретных фактов, включая имена, числа,
 проверяемую хронологию, интересный механизм. Для каждого укажи source_id,
@@ -539,7 +709,10 @@ def write_from_dossier(plan, dossier, date, revision_reason=''):
 Каждое конкретное имя, цифра, дата, место и утверждение о результатах
 должно прямо следовать из досье. Не добавляй фантастических цитат и фактов.
 Если данных не хватает для длинного текста, не раздувай текст — редактор
-отклонит слабый результат. Верни JSON: title, teaser (50–90 слов),
+отклонит слабый результат. Расширенный список приоритетных тем — НЕ разрешение
+на рекламный, водянистый или недостоверный текст. Приоритет №19 для истории
+книг отменён, однако исключительные истории о литературе могут присутствовать
+в обычных материалах на общих основаниях. Верни JSON: title, teaser (50–90 слов),
 paragraphs (не менее 8 объектов heading,text с естественной прозой).'''
     a=news.gemini(prompt,output_tokens=18000 if plan['long'] else 10500,schema='article')
     n=article_form(a,plan)
