@@ -14,7 +14,10 @@ from difflib import SequenceMatcher
 from html.parser import HTMLParser
 from urllib.parse import urljoin
 import json
+import hashlib
 import re
+import os
+import time
 from urllib.parse import urlparse
 
 try:
@@ -746,85 +749,151 @@ def article_form(a, plan):
     return n
 
 
-def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) -> dict:
-    """Draft a documented longform feature in smaller, non-overlapping sections.
+# Editorial pacing applies only to the live run (not to unit tests). On GitHub
+# set NEWS_LONGFORM_GAP_SECONDS in the prepare step to stay safely below the
+# model's RPM quota; no job runs continuously for hours.
+_LONGFORM_LAST_CALL = 0.0
 
-    Small free-tier models sometimes return 450–650 words despite a 1250-word
-    instruction. Focused sections prevent one truncated short response from
-    stopping the entire edition. Source and length requirements stay intact.
+
+def _paced_section_request(prompt: str) -> dict:
+    global _LONGFORM_LAST_CALL
+    gap = min(30.0, max(0.0, float(os.getenv('NEWS_LONGFORM_GAP_SECONDS', '0'))))
+    now = time.monotonic()
+    if gap and _LONGFORM_LAST_CALL:
+        remaining = gap - (now - _LONGFORM_LAST_CALL)
+        if remaining > 0:
+            time.sleep(remaining)
+    _LONGFORM_LAST_CALL = time.monotonic()
+    return news.gemini(prompt, output_tokens=8500, schema='article')
+
+
+_LONGFORM_BEATS = (
+    'Завязка: конкретный факт, вопрос или парадокс; почему история началась именно так.',
+    'Действующие лица, место и исторический либо научный контекст; только проверенные сведения.',
+    'Хронология и первые наблюдения: какие факты предшествовали основному событию.',
+    'Основное свидетельство: как его получили, обнаружили или зафиксировали, без домыслов.',
+    'Механизм или причинно-следственная связь: что действительно следует из источников.',
+    'Иная перспектива: конкретные ограничения данных, расхождения или неопределённость.',
+    'Изменение понимания: сопоставление с контекстом, основанное только на свидетельствах.',
+    'Развязка: что установленное знание объясняет и что остаётся открытым.',
+    'Углубление: подтверждённые технические или исторические нюансы, не рассмотренные выше.',
+    'Эпилог: аккуратное развитие главного вопроса без общих фраз и повторов.',
+)
+
+
+def _longform_parts(plan: dict, dossier: dict, date: str, revision_reason: str) -> dict:
+    """Write and preserve eight short, evidence-backed segments.
+
+    Gemini Flash-Lite empirically supplied 150-185 words for a requested
+    450-600. Demand manageable ~170-250-word segments, never pad them, and
+    reject the COMPLETE feature if it is still below MIN_LONG.
+
+    Intermediate sections are stored only inside the encrypted checkpoint's
+    dossier. Nothing in this method can publish or accept an unverified article.
     """
     claims = dossier['claims']
     if len(claims) < 8:
         raise ValueError('Longform needs at least 8 verified source excerpts')
-    chunks = [claims[(i * len(claims)) // 3:((i+1) * len(claims)) // 3]
-              for i in range(3)]
-    stages = (
-        'Завязка и происхождение сюжета: конкретный человек, предмет, дата '
-        'или наблюдение, затем проблема и необходимый контекст.',
-        'Развитие сюжета: методы и механизмы, трудности, проверенные примеры, '
-        'точные обстоятельства или сопоставление подтверждённых данных.',
-        'Что получилось и что осталось неизвестным: последствия, ограничения '
-        'исследования, содержательная развязка, без морализаторства.',
-    )
-    all_paragraphs = []
-    title = ''
-    teaser = ''
-    prior_tail = ''
-    for index, stage in enumerate(stages):
-        focus = [{'source_id':cl['source_id'], 'source_quote':cl['quote'],
-                  'verified_point':cl['explanation']} for cl in chunks[index]]
-        prev = ('Конец предыдущей части (продолжай сюжет без повтора): '+prior_tail)
-        prompt = f'''Ты работаешь над БОЛЬШИМ журналистским очерком «387 News».
-Это ЧАСТЬ {index+1} ИЗ 3. Пиши ТОЛЬКО новую часть единого материала.
-Сюжет: {json.dumps(plan, ensure_ascii=False)}. Дата номера {date}.
-Тон: живой интеллектуальный русский язык без рекламы и пустых подводок.
-Редакторская браковка, если была: {revision_reason[:600]}
-Общий угол: {dossier.get('angle','')}.
-Хронология: {dossier.get('chronology','')}.
-Смысл истории: {dossier.get('stakes','')}.
-ЗАДАНИЕ ЭТОЙ ЧАСТИ: {stage}
-ПРОВЕРЕННЫЕ ДОСЛОВНЫЕ СВИДЕТЕЛЬСТВА ДЛЯ ЭТОЙ ЧАСТИ:
+
+    basis = json.dumps({
+        'date':date, 'title':plan['title'], 'category':plan['category'],
+        'sources':plan['source_ids'],
+        'claims':[(c['source_id'],c['quote']) for c in claims],
+    }, ensure_ascii=False, sort_keys=True)
+    signature = hashlib.sha256(basis.encode('utf-8')).hexdigest()
+    progress = dossier.get('_longform_progress')
+    if (not isinstance(progress, dict) or progress.get('signature') != signature
+            or progress.get('rebuild_required')):
+        progress = {'signature':signature, 'parts':[]}
+        dossier['_longform_progress'] = progress
+    parts = progress['parts']
+    if not isinstance(parts, list) or len(parts) > len(_LONGFORM_BEATS):
+        raise ValueError('Invalid longform checkpoint, refusing to reuse')
+
+    # A passage is useful only if it advances the already researched story.
+    # Reuse of the source ID is allowed, but duplicate prose is checked below.
+    while len(parts) < len(_LONGFORM_BEATS):
+        index = len(parts)
+        current_total = sum(int(p.get('words', 0)) for p in parts)
+        if index >= 8 and current_total >= MIN_LONG:
+            break
+
+        focus_indices = sorted({index % len(claims),
+                                (index+1) % len(claims),
+                                (index+3) % len(claims)})
+        focus = [{'source_id':claims[j]['source_id'],
+                  'source_quote':claims[j]['quote'],
+                  'verified_point':claims[j]['explanation']}
+                 for j in focus_indices]
+        prior = ''
+        if parts:
+            tail = article_body({'paragraphs':parts[-1]['paragraphs']})
+            prior = 'Последняя фраза предыдущего фрагмента (не повторяй): '+tail[-420:]
+        prompt = f'''Ты пишешь ОДИН из небольших фрагментов большого очерка «387 News».
+Дата номера: {date}. Сюжет: {json.dumps(plan, ensure_ascii=False)}
+Угол материала: {dossier.get('angle','')}; хронология: {dossier.get('chronology','')}.
+Ставки и смысл: {dossier.get('stakes','')}.
+Фрагмент {index+1}/8 (дополнительные фрагменты возможны при недостаточном объёме).
+ТВОЙ САМОДОСТАТОЧНЫЙ ВОПРОС: {_LONGFORM_BEATS[index]}
+Подтверждённые ДОСЛОВНЫЕ фрагменты источников:
 {json.dumps(focus, ensure_ascii=False)}
-{prev}
-Напиши связную САМОСТОЯТЕЛЬНУЮ ЧАСТЬ на 450–600 РУССКИХ СЛОВ.
-Только 3–5 содержательных абзацев с короткими подзаголовками.
-В каждой части должны быть новые факты или содержательное объяснение из
-приведённых цитат. Можно объяснять факты, но НЕЛЬЗЯ добавлять непроверенные
-имена, даты, цифры, оценки, цитаты и обещания. Если фактов недостаточно,
-не выдумывай и не повторяй уже написанное: редактор отклонит материал.
-НЕ подводи общий итог и НЕ пересказывай предыдущие части, если это не
-третья часть. НЕ создавай искусственные «Часть 1/2/3» как заголовки.
-Первые слова — сразу конкретика. Ни одной пустой вводной фразы.
-Для науки отделяй наблюдения на клетках, животных и людях и не считай дату
-новостного пересказа датой исследования. Для событий избегай ложных дат.
-Ответ в JSON: title (одно название всего очерка), teaser (30–65 слов
-для всего очерка, лучше подготовь в первой части), paragraphs (heading,text).'''
-        part = news.gemini(prompt, output_tokens=10500, schema='article')
+{prior}
+Пиши 170–250 РУССКИХ СЛОВ: 2–4 содержательных абзаца.
+Нужны только подтверждённые этими цитатами факты, их прозрачное объяснение
+и осторожные выводы. Не подменяй недостаток фактов художественным вымыслом,
+эмоциями, повторениями, общеизвестными формулами или рекламой.
+Не дублируй уже написанные части. Дата новости не равна дате исследования.
+Для семейных и практических тем не придумывай цены, время работы, условия.
+Если проверенных подробностей не хватает на заданную глубину, отвечай
+короче: это приведёт к честному редакционному отказу.
+Верни JSON-объект title, teaser (30–65 слов), paragraphs (heading,text).
+Нужны точные подробности, а не лозунги и искусственные «части» очерка.
+Прежние замечания редактора: {revision_reason[:400]}'''
+        part = _paced_section_request(prompt)
         para = part.get('paragraphs') or []
-        if not isinstance(para,list) or len(para)<3 or len(para)>7 or any(
+        if not isinstance(para, list) or not 2 <= len(para) <= 7 or any(
             not isinstance(x,dict) or not isinstance(x.get('text'),str) or
-            len(x['text'].strip())<100 for x in para):
-            raise ValueError(f'Longform section {index+1}/3 incomplete; no padding allowed')
+            len(x['text'].strip()) < 65 for x in para):
+            raise ValueError(f'Longform segment {index+1} incomplete; '
+                             f'{len(parts)} accepted sections preserved in encrypted checkpoint')
         section_words = wc(article_body(part))
-        if section_words < 300 or section_words > 850:
-            raise ValueError(f'Longform section {index+1}/3 has {section_words} words; '
-                             'needs 300–850 supported words')
-        if index == 0:
-            title = part.get('title','')
-            teaser = part.get('teaser','')
-        all_paragraphs.extend(para)
-        prior_tail = article_body(part)[-950:]
-        print(f'[longform] section {index+1}/3 accepted, {section_words} words', flush=True)
-    article = {'title':title, 'teaser':teaser, 'paragraphs':all_paragraphs}
-    n = article_form(article,plan)
-    # Distinct source excerpts alone do not guarantee non-repetitive prose.
+        if not 105 <= section_words <= 400:
+            raise ValueError(f'Longform segment {index+1} has {section_words} words; '
+                             'requires 105–400 meaningful, supported words; '
+                             f'{len(parts)} accepted sections preserved')
+        # Check against already saved prose BEFORE adding to the checkpoint.
+        new_paragraphs = [normalized(x['text']) for x in para]
+        prior_paragraphs = [normalized(p['text']) for old in parts for p in old['paragraphs']]
+        for a in new_paragraphs:
+            if any(SequenceMatcher(None,a[:1200],b[:1200]).ratio() > 0.80
+                   for b in prior_paragraphs):
+                raise ValueError(f'Longform segment {index+1} repeats earlier prose')
+        parts.append({'title':str(part.get('title','')),
+                      'teaser':str(part.get('teaser','')),
+                      'paragraphs':para, 'words':section_words})
+        print(f'[longform] saved segment {index+1}/{len(_LONGFORM_BEATS)}, '
+              f'{section_words} words; total={sum(p["words"] for p in parts)}; '
+              'encrypted checkpoint on run completion', flush=True)
+
+    # Assemble only from accepted, immutable segments. The complete article's
+    # structural, repetition, and length gates remain mandatory.
+    all_paragraphs = [p for segment in parts for p in segment['paragraphs']]
+    article = {'title':parts[0]['title'], 'teaser':parts[0]['teaser'],
+               'paragraphs':all_paragraphs}
+    try:
+        n = article_form(article, plan)
+    except ValueError as exc:
+        # An already complete but unacceptable article must not loop forever
+        # on the same rejected set of segments in the next scheduled run.
+        progress['rebuild_required'] = str(exc)[:250]
+        raise
     texts = [normalized(x['text']) for x in all_paragraphs]
     for i, a in enumerate(texts):
         for b in texts[i+1:]:
-            if SequenceMatcher(None,a[:1500],b[:1500]).ratio()>0.80:
+            if SequenceMatcher(None,a[:1200],b[:1200]).ratio() > 0.80:
                 raise ValueError('Longform repeats substantially identical paragraphs')
-    print(f'[longform] combined source-grounded narrative, {n} words; '
-          'individual fact-check still required', flush=True)
+    print(f'[longform] source-grounded narrative assembled, {n} words; '
+          'independent editorial review still required', flush=True)
     return article
 
 

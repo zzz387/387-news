@@ -176,6 +176,11 @@ def write_batch(state: dict, size=2):
             print(f'[write] SLOT {i+1} REJECTED: {str(e)[:220]}; checkpoint preserved',
                   file=sys.stderr,flush=True)
     state['stage']='writing' if len(articles)<8 else 'ready_for_audit'
+    segments = sum(len(d.get('_longform_progress',{}).get('parts',[]))
+                   for d in dossiers.values() if isinstance(d,dict))
+    print(f'[write] CHECKPOINT STATUS: {len(articles)}/8 verified articles; '
+          f'{segments} provisional longform segments held in encrypted draft; '
+          'green workflow is not publication approval',flush=True)
     return state
 
 
