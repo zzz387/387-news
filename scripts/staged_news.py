@@ -458,7 +458,7 @@ def _assemble_files(state, release, root):
     paths[2].write_text(news.render_archive(),encoding='utf-8')
     (root/'sitemap.xml').write_text(news.sitemap(),encoding='utf-8')
     news.validate_local_links(files+paths)
-    print(f'[release] validated site, issue №{no:03d}, date {date}',flush=True)
+    print(f'[build] validated site, issue №{no:03d}, date {date}',flush=True)
     return True
 
 
