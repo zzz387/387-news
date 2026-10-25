@@ -2,8 +2,8 @@ name: 387 News — editorial v3.1 (SAFE / manual approval)
 
 on:
   push:
-    branches: [main, codex/launch-production]
-    paths: ['scripts/restore_ready.py', '.github/workflows/daily-v31.yml']
+    branches: [main, codex/release-health]
+    paths: ['scripts/site_checks.py', 'scripts/publication.py', '.github/workflows/daily-v31.yml']
   pull_request:
     paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   schedule:
@@ -25,12 +25,18 @@ on:
     - cron: '17 1 * * *'
     # 05:54 Moscow — wait until 06:00 then publish; GitHub Pages may lag
     - cron: '54 2 * * *'
+    # Bounded recovery if the 06:00 issue was incomplete or deployment failed.
+    - cron: '17 3 * * *'
+    - cron: '37 3 * * *'
+    - cron: '54 3 * * *'
+    # 07:30 Moscow: public HTTPS and edition freshness monitor.
+    - cron: '30 4 * * *'
   workflow_dispatch:
     inputs:
       phase:
         description: 'Safe phase to test: plan → write (repeat) → audit → publish'
         type: choice
-        options: [check, plan, research, write, audit, publish]
+        options: [check, plan, research, write, audit, publish, status]
         default: plan
         required: true
       preview:
@@ -54,48 +60,29 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  restore-prepared:
-    if: ${{ github.event_name == 'push' }}
+  public-health:
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'status') || (github.event_name == 'schedule' && github.event.schedule == '30 4 * * *' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: read
-      actions: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49'
-      - name: Run technical tests without API calls
-        run: python -m unittest discover -s scripts -p 'test_*.py' -q
-      - name: Restore the approved encrypted issue using the existing artifact mechanism
-        uses: actions/download-artifact@v4
-        with:
-          artifact-ids: '12597026471'
-          run-id: '40187840185'
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          path: ${{ runner.temp }}/prepared
-          merge-multiple: true
-      - name: Validate or promote without exporting private data
-        id: restored
+      - name: Check only the public website over verified HTTPS
         env:
-          DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
-          NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/prepared/news-draft.enc
+          MANUAL_DATE: ${{ inputs.target_date }}
         shell: bash
         run: |
           arguments=()
-          if [[ "$GITHUB_REF_NAME" == 'main' ]]; then arguments+=(--promote); fi
-          python scripts/restore_ready.py "${arguments[@]}"
-      - name: Preserve the approved issue in the production artifact namespace
-        if: ${{ steps.restored.outputs.checkpoint == 'true' }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.restored.outputs.artifact_name }}
-          path: ${{ runner.temp }}/news-draft.enc
-          if-no-files-found: error
-          retention-days: 90
+          if [[ "$GITHUB_EVENT_NAME" == 'schedule' ]]; then
+            arguments+=(--expected-date "$(TZ=Europe/Moscow date +%F)")
+          elif [[ -n "$MANUAL_DATE" ]]; then
+            arguments+=(--expected-date "$MANUAL_DATE")
+          fi
+          python scripts/site_checks.py "${arguments[@]}"
 
   unit-tests:
     if: ${{ github.event_name == 'pull_request' }}
@@ -113,7 +100,7 @@ jobs:
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && github.event.schedule != '30 4 * * *' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -128,6 +115,7 @@ jobs:
       GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
     outputs:
       ready: ${{ steps.commit.outputs.ready }}
+      issue_date: ${{ steps.stage.outputs.issue_date }}
     steps:
       - name: Read website repository
         uses: actions/checkout@v4
@@ -152,9 +140,9 @@ jobs:
             case "$SCHEDULE" in
               '17 9 * * *')  phase=plan ;;
               '17 11 * * *') phase=research ;;
-              '17 13 * * *'|'17 15 * * *'|'17 17 * * *'|'17 19 * * *'|'17 21 * * *'|'17 22 * * *'|'17 0 * * *'|'17 1 * * *') phase=write ;;
-              '17 2 * * *') phase=audit ;;
-              '54 2 * * *') phase=publish ;;
+              '17 13 * * *'|'17 15 * * *'|'17 17 * * *'|'17 19 * * *'|'17 21 * * *'|'17 22 * * *'|'17 0 * * *'|'17 1 * * *'|'17 3 * * *') phase=write ;;
+              '17 2 * * *'|'37 3 * * *') phase=audit ;;
+              '54 2 * * *'|'54 3 * * *') phase=publish ;;
               *) echo 'Unexpected schedule'; exit 1 ;;
             esac
             preview=false
@@ -236,7 +224,8 @@ jobs:
         run: |
           git add index.html archive/index.html issues/ sitemap.xml
           if git diff --cached --quiet; then
-            echo 'No changes; existing published issue unchanged.'
+            echo 'Approved issue already committed; retry deployment without changing the archive.'
+            echo 'ready=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi
           git config user.name '387 News Bot'
@@ -271,14 +260,23 @@ jobs:
           test -f archive/index.html
           test -f CNAME
           ls -lah issues/
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Package only final public site files
+        run: python scripts/site_checks.py --package '${{ runner.temp }}/public-site'
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Package published site
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: ${{ runner.temp }}/public-site
       - name: Deploy published edition
         id: deployment
         uses: actions/deploy-pages@v4
         with:
           token: ${{ github.token }}
+      - name: Verify the released issue on the public HTTPS site
+        env:
+          EXPECTED_DATE: ${{ needs.prepare.outputs.issue_date }}
+        run: python scripts/site_checks.py --expected-date "$EXPECTED_DATE" --attempts 5
