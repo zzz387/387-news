@@ -258,6 +258,16 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/quota
           merge-multiple: true
+      - name: Restore special checkpoint for shared quota recovery only
+        if: ${{ steps.checkpoint.outputs.special_quota_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.special_quota_id }}
+          run-id: ${{ steps.checkpoint.outputs.special_quota_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/special-quota-backup
+          merge-multiple: true
       - name: Restore upcoming production checkpoint for read-only quota priority
         if: ${{ steps.checkpoint.outputs.production_found == 'true' }}
         uses: actions/download-artifact@v4
@@ -278,6 +288,8 @@ jobs:
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
+          NEWS_SPECIAL_QUOTA_FILE: ${{ runner.temp }}/special-quota-backup/special-003-r.enc
+          NEWS_SPECIAL_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.special_quota_found }}
           NEWS_PRODUCTION_ROOT: ${{ github.workspace }}/.trial-production-readonly
           NEWS_PRODUCTION_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.production_found }}
           NEWS_PRODUCTION_CHECKPOINT_FILE: ${{ runner.temp }}/production-checkpoint/news-draft.enc
@@ -401,6 +413,16 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/quota
           merge-multiple: true
+      - name: Restore special checkpoint for shared quota recovery only
+        if: ${{ steps.checkpoint.outputs.special_quota_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.special_quota_id }}
+          run-id: ${{ steps.checkpoint.outputs.special_quota_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/special-quota-backup
+          merge-multiple: true
       - name: Prepare encrypted draft checkpoint or release
         id: stage
         timeout-minutes: 20
@@ -412,6 +434,8 @@ jobs:
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
+          NEWS_SPECIAL_QUOTA_FILE: ${{ runner.temp }}/special-quota-backup/special-003-r.enc
+          NEWS_SPECIAL_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.special_quota_found }}
           NEWS_LONGFORM_GAP_SECONDS: "6"  # stay below free-tier 15 RPM during longform drafting
         shell: bash
         run: |

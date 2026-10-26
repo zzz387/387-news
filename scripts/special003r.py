@@ -229,11 +229,12 @@ def select_artifacts():
     output={}
     for kind,label in labels.items():
         records=[]
-        for page in range(1,101):
-            batch=stage.request_json('https://api.github.com/repos/zzz387/387-news/actions/artifacts?per_page=100&name='+quote(label)+'&page='+str(page))['artifacts']
-            records.extend(r for r in batch if r['name']==label)
-            if len(batch)<100:break
-        else:raise RuntimeError('SPECIAL_ARTIFACT_LIST_INCOMPLETE')
+        for candidate_label in (news.runtime.quota_labels(day) if kind=='quota' else (label,)):
+            for page in range(1,101):
+                batch=stage.request_json('https://api.github.com/repos/zzz387/387-news/actions/artifacts?per_page=100&name='+quote(candidate_label)+'&page='+str(page))['artifacts']
+                records.extend(r for r in batch if r['name']==candidate_label)
+                if len(batch)<100:break
+            else:raise RuntimeError('SPECIAL_ARTIFACT_LIST_INCOMPLETE')
         valid=[r for r in records if not r['expired']]
         if records and not valid:raise RuntimeError('SPECIAL_RESTORE_EXPIRED')
         if valid:
@@ -282,7 +283,7 @@ def run():
         if budget is not None:
             path=files['quota'];path.parent.mkdir(parents=True,exist_ok=True);temp=path.with_suffix('.tmp')
             temp.write_text(json.dumps(ledger));temp.replace(path)
-            with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('quota=true\nquota_name='+stage.quota_label()+'\n')
+            with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('quota=true\nquota_name='+stage.quota_label()+'-special-003-r\n')
     if (root/'issues'/sc.SLUG/'index.html').is_file() and os.getenv('SPECIAL_INITIALIZE_ONLY')!='true':
         publication.validate(root)
         if recover_delivery(state,persist):

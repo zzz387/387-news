@@ -4,6 +4,37 @@ from __future__ import annotations
 from datetime import datetime, timezone
 import os
 import time
+import copy
+
+
+def quota_labels(day):
+    """Immutable snapshots of ONE shared ledger, including the same-run special tail."""
+    return ('387news31-quota-'+day, '387news31-quota-'+day+'-special-003-r')
+
+
+def merge_snapshot(ledger, snapshot):
+    """Recover reservations conservatively; cooldowns survive UTC day rollover."""
+    if not snapshot:
+        return ledger
+    for item in (ledger, snapshot):
+        if item and (not isinstance(item.get('day'), str) or type(item.get('requests')) is not int
+                     or item['requests'] < 0 or not isinstance(item.get('models'), dict)
+                     or not isinstance(item.get('cooldowns', {}), dict)):
+            raise ValueError('Invalid quota recovery snapshot; refusing API calls')
+        for value in item.get('models', {}).values():
+            if type(value) is not int or value < 0: raise ValueError('Invalid model accounting')
+        for value in item.get('cooldowns', {}).values():
+            if type(value) not in (int, float) or value < 0: raise ValueError('Invalid model cooldown')
+    cooldowns={model:max(ledger.get('cooldowns',{}).get(model,0),snapshot.get('cooldowns',{}).get(model,0))
+               for model in set(ledger.get('cooldowns',{})) | set(snapshot.get('cooldowns',{}))}
+    if snapshot['day'] > ledger.get('day',''):
+        ledger.clear();ledger.update(copy.deepcopy(snapshot))
+    elif snapshot['day'] == ledger.get('day'):
+        ledger['requests']=max(ledger['requests'],snapshot['requests'])
+        models=ledger.setdefault('models',{})
+        for model,count in snapshot['models'].items():models[model]=max(models.get(model,0),count)
+    ledger['cooldowns']=cooldowns
+    return ledger
 
 
 class GenerationPaused(RuntimeError):

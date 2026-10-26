@@ -62,12 +62,22 @@ def main():
     else:
         print('[checkpoint] no existing encrypted checkpoint for this date/mode',flush=True)
     # Global daily ledger prevents resetting quota when issue date/mode changes.
-    quota = newest_artifact(records_for(staged_news.quota_label()), staged_news.quota_label())
+    quota_candidates=[newest_artifact(records_for(name), name)
+                      for name in staged_news.RUNTIME.quota_labels(datetime.now(staged_news.timezone.utc).date().isoformat())]
+    quota = max((x for x in quota_candidates if x),key=lambda x:(x.get('created_at',''),x['id']),default=None)
     if quota:
         run = (quota.get('workflow_run') or {}).get('id')
         if type(run) is not int or run <= 0:
             raise RuntimeError('Quota artifact has no valid source workflow run ID')
         outputs.update(quota_found='true', quota_id=str(quota['id']), quota_run_id=str(run))
+    # Read-only reservation backup if the special ledger upload failed. No prose is imported.
+    backup_label='387news41-special-003-r'
+    backup=newest_artifact(records_for(backup_label),backup_label)
+    if backup:
+        run=backup.get('workflow_run',{})
+        if run.get('head_branch')!='main' or type(run.get('id')) is not int:
+            raise RuntimeError('Special quota backup has invalid origin')
+        outputs.update(special_quota_found='true',special_quota_id=str(backup['id']),special_quota_run_id=str(run['id']))
     if os.getenv('NEWS_V41_TRIAL')=='true' and os.getenv('TRIAL_INSPECT')!='true':
         production_date=(datetime.now(staged_news.TZ).date()+timedelta(days=1)).isoformat()
         production=newest_artifact(records_for('387news31-production-'+production_date),'387news31-production-'+production_date)

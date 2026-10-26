@@ -42,6 +42,52 @@ def complete_special():
 
 
 class SpecialTests(unittest.TestCase):
+    def test_shared_ledger_merges_reservations_models_and_cooldowns_without_reset(self):
+        from scripts import generation_runtime as rt
+        ledger={'day':'2026-10-26','requests':207,'models':{'lite':207},'cooldowns':{'lite':200}}
+        backup={'day':'2026-10-26','requests':210,'models':{'lite':209,'flash':1},'cooldowns':{'lite':100,'flash':300}}
+        original=copy.deepcopy(backup);rt.merge_snapshot(ledger,backup)
+        self.assertEqual(ledger['requests'],210);self.assertEqual(ledger['models'],{'lite':209,'flash':1})
+        self.assertEqual(ledger['cooldowns'],{'lite':200,'flash':300});self.assertEqual(backup,original)
+        rt.merge_snapshot(ledger,{'day':'2026-10-27','requests':2,'models':{'flash':2},'cooldowns':{'lite':150}})
+        self.assertEqual(ledger['requests'],2);self.assertEqual(ledger['models'],{'flash':2})
+        self.assertEqual(ledger['cooldowns']['flash'],300)
+        rt.merge_snapshot(ledger,backup);self.assertEqual(ledger['requests'],2)
+
+    def test_daily_recovers_only_quota_from_synthetic_special_ciphertext(self):
+        from scripts import staged_news as stage
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'special-003-r.enc';key=bytes(range(32));state=runner.new_state()
+            state['_quota_snapshot']={'day':'2026-10-26','requests':210,'models':{'lite':210},'cooldowns':{'lite':9999999999}}
+            path.write_bytes(stage.cipher(state,key))
+            env={'GITHUB_ACTIONS':'true','NEWS_SPECIAL_QUOTA_FILE':str(path),'NEWS_SPECIAL_QUOTA_EXPECTED':'true'}
+            ledger={'day':'2026-10-26','requests':207,'models':{'lite':207}}
+            with patch.dict('os.environ',env):stage.recover_special_quota(ledger,key)
+            self.assertEqual(ledger['requests'],210);self.assertNotIn('candidates',ledger)
+            self.assertEqual(ledger['cooldowns']['lite'],9999999999)
+            state['preview']=True;path.write_bytes(stage.cipher(state,key))
+            with patch.dict('os.environ',env),self.assertRaisesRegex(RuntimeError,'provenance'):
+                stage.recover_special_quota(ledger,key)
+            path.unlink()
+            with patch.dict('os.environ',env),self.assertRaisesRegex(RuntimeError,'missing'):
+                stage.recover_special_quota(ledger,key)
+
+    def test_latest_shared_snapshot_alias_is_selected_without_overwriting_artifacts(self):
+        from scripts import locate_checkpoint as locator,staged_news as stage
+        from datetime import timezone
+        day=datetime.now(timezone.utc).date().isoformat();label=stage.quota_label()
+        records=[{'name':label,'id':10,'created_at':day+'T15:00:00Z','expired':False,'workflow_run':{'id':100,'head_branch':'main'}},
+                 {'name':label+'-special-003-r','id':11,'created_at':day+'T15:01:00Z','expired':False,'workflow_run':{'id':100,'head_branch':'main'}}]
+        with tempfile.TemporaryDirectory() as directory:
+            output=Path(directory)/'output'
+            env={'PHASE':'check','PREVIEW':'true','TARGET_DATE':'2026-10-26','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_OUTPUT':str(output)}
+            with patch.dict('os.environ',env,clear=True),patch.object(stage,'request_json',return_value={'artifacts':records}):locator.main()
+            self.assertIn('quota_id=11',output.read_text())
+        workflow=(p.ROOT/'.github/workflows/special-003-r.yml').read_text()
+        self.assertNotIn('overwrite: true',workflow)
+        daily=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
+        self.assertIn('NEWS_SPECIAL_QUOTA_EXPECTED:',daily)
+
     def test_daily_twelve_is_unchanged_and_narrow_special_requires_exact_eight(self):
         self.assertEqual(p.ARTICLE_COUNT,12);daily=issue();self.assertTrue(e.validate_issue(daily))
         daily['selected_ids']=daily['selected_ids'][:8]

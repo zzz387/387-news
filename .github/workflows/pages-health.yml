@@ -103,7 +103,8 @@ jobs:
               'run_id':checkpoint['workflow_run']['id'],'expired':checkpoint['expired'],
               'created_at':checkpoint['created_at'],'content_downloaded':False})
           day=datetime.now(timezone.utc).date().isoformat()
-          ledger=select('387news31-quota-'+day)
+          ledger=max((row for row in [select('387news31-quota-'+day),select('387news31-quota-'+day+'-special-003-r')] if row),
+              key=lambda row:(row['created_at'],row['id']),default=None)
           if not ledger:raise RuntimeError('CURRENT_DAY_LEDGER_NOT_FOUND')
           with open(os.environ['GITHUB_OUTPUT'],'a') as stream:
               stream.write('quota_id='+str(ledger['id'])+'\nquota_run='+str(ledger['workflow_run']['id'])+'\nquota_day='+day+'\n')
