@@ -537,6 +537,9 @@ def render_article(date_obj,no,article,source_map):
 
 def get_next_number():
     nums = []
+    for index in (ROOT/'issues').glob('*/index.html'):
+        match=re.search(r'data-issue-number="(\d+)"',index.read_text(encoding='utf-8'))
+        if match: nums.append(int(match.group(1)))
     for fn in (ROOT/'issues').glob('*/issue.json'):
         try:
             nums.append(int(json.loads(fn.read_text(encoding='utf-8'))['number']))
@@ -557,7 +560,13 @@ def render_archive():
             title = escape(issue['articles'][0]['title'])
             desc = f'{len(issue["articles"])} материалов'
         except (FileNotFoundError, KeyError, ValueError):
-            no, title, desc = 1, 'Пилотный выпуск 387 News', '10 материалов'
+            text=(directory/'index.html').read_text(encoding='utf-8')
+            number=re.search(r'data-issue-number="(\d+)"',text)
+            count=re.search(r'data-article-count="(\d+)"',text)
+            if number and count:
+                no=int(number.group(1)); title='Выпуск 387 News'; desc=count.group(1)+' материалов'
+            else:
+                no, title, desc = 1, 'Пилотный выпуск 387 News', '10 материалов'
         entries.append((directory.name,no,title,desc))
     entries.sort(reverse=True)
     latest_date = datetime.fromisoformat(entries[0][0]) if entries else datetime.now(TZ)
@@ -602,6 +611,7 @@ def wait_until_release():
 
 
 def run(mode):
+    raise RuntimeError("Legacy generator retired; use staged_news.py --phase run (policy v4.1)")
     now = datetime.now(TZ)
     ds = now.date().isoformat()
     issue_dir = ROOT/'issues'/ds

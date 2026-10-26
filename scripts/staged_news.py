@@ -27,7 +27,7 @@ from urllib.request import Request, urlopen
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:
-    from scripts import news, editorial31, publication, audit_policy, audit_repair, pipeline, release_queue
+    from scripts import news, editorial31, publication, audit_policy, audit_repair, pipeline, release_queue, policy41, editorial41, publication41
 except ImportError:
     import news
     import editorial31
@@ -36,6 +36,9 @@ except ImportError:
     import audit_repair
     import pipeline
     import release_queue
+    import policy41
+    import editorial41
+    import publication41
 
 TZ = news.TZ
 ROOT = news.ROOT
@@ -118,8 +121,8 @@ def save(state: dict, key: bytes):
     temp.write_bytes(cipher(state, key))
     temp.chmod(0o600)
     temp.replace(ARTIFACT_FILE)
-    print(f'[checkpoint] AES-256-GCM encrypted; '
-          f'{len(state.get("articles",{}))}/8 vetted article drafts', flush=True)
+    target=policy41.ARTICLE_COUNT if state.get('version')==41 else 8  # historical schema v31 only
+    print(f'[checkpoint] AES-256-GCM encrypted; {len(state.get("articles",{}))}/{target} vetted article drafts',flush=True)
 
 
 def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
@@ -147,7 +150,7 @@ def build_plan(state: dict | None, date: str):
         state = {'version':31, 'date':date, 'articles':{}, 'dossiers':{},
                  'rejections':{}, 'stage':'planning', 'audit_passed':False,
                  'created_at':datetime.now(TZ).isoformat()}
-    target = datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=TZ)
+    target = datetime.fromisoformat(date+'T'+policy41.RELEASE_TIME).replace(tzinfo=TZ)
     if not state.get('sources'):
         state['sources'] = news.gather_sources(datetime.now(TZ))
         persist_progress()
@@ -414,7 +417,7 @@ def render(state: dict, preview: bool):
     if not state.get('audit_passed') or state.get('stage') != 'audited':
         raise RuntimeError('No approved draft; not publishing')
     date = state['date']
-    release = datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=TZ)
+    release = datetime.fromisoformat(date+'T'+policy41.RELEASE_TIME+':00').replace(tzinfo=TZ)
     now = datetime.now(TZ)
     if not preview and now < release:
         seconds = (release - now).total_seconds()
@@ -427,6 +430,12 @@ def render(state: dict, preview: bool):
     if not preview and os.environ.get('NEWS_RELEASE_APPROVED', '').lower() != 'true':
         raise RuntimeError('Release veto: NEWS_RELEASE_APPROVED must be explicitly enabled')
     issue_dir = ROOT / 'issues' / date
+    if state.get('version')==41:
+        if not preview:
+            editorial41.verify_publication_sources(state,persist=PERSIST or (lambda:None))
+        return publication41.build(state,ROOT,preview)
+    if not preview and not issue_dir.exists():
+        raise RuntimeError('V41_REVALIDATION_REQUIRED: historical approval cannot publish a new issue')
     if issue_dir.exists():
         if preview:
             return False
@@ -460,6 +469,7 @@ def _assemble(state, release, root):
 
 
 def _assemble_files(state, release, root):
+    if state.get('version')==41: return publication41.build(state,root,False)
     date = state['date']
     issue_dir = root / 'issues' / date
     source_map = {x['id']:x for x in state['sources']}
@@ -499,23 +509,26 @@ def main():
     label = artifact_label(date, args.preview)
     state = fetch_latest_checkpoint(label, key)
     branch = os.getenv('GITHUB_REF_NAME', 'main')
-    if state and (state.get('date') != date or state.get('version') != 31
+    if state and (state.get('date') != date or state.get('version') not in (31,41)
                   or state.get('branch', branch) != branch
                   or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
+    target_count=policy41.ARTICLE_COUNT if state and state.get('version')==41 else 8
     if state:
         state.pop('pause_reason', None)
         count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
-        print(f'[resume] {len(state.get("articles", {}))}/8 verified articles; {count} accepted segments; '
+        print(f'[resume] {len(state.get("articles", {}))}/{target_count} verified articles; {count} accepted segments; '
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
+    if args.phase not in ('check','inspect') and not release_queue.edition_exists(ROOT,date):
+        state=editorial41.migrate(state,date)
     if args.phase in ('check','inspect'):
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')
         segments = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
-        print(f'[checkpoint-test] restored {len(state.get("articles", {}))}/8 articles, {segments} segments', flush=True)
+        print(f'[checkpoint-test] restored {len(state.get("articles", {}))}/{target_count} articles, {segments} segments', flush=True)
         if args.phase=='inspect':
-            action='publish_when_due' if state.get('audit_passed') else 'audit' if len(state.get('articles',{}))==8 else 'continue_saved_writing'
-            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if len(state.get('articles',{}))==8 else 'RETRY_PENDING',action)
+            action='publish_when_due' if state.get('audit_passed') else 'audit' if len(state.get('articles',{}))==(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'continue_saved_writing'
+            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if len(state.get('articles',{}))==(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'RETRY_PENDING',action)
             pipeline.emit_report(state,state.get('_quota_snapshot',{}),os.getenv('GITHUB_OUTPUT'))
         return
     quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
@@ -544,8 +557,7 @@ def main():
                     f.write(f'checkpoint=true\nartifact_name={label}\n')
 
     if state is None and args.phase in ('run','resume','write','audit','auto','plan'):
-        state={'version':31,'date':date,'articles':{},'dossiers':{},'rejections':{},
-               'audit_passed':False,'stage':'planning','created_at':datetime.now(TZ).isoformat()}
+        state=editorial41.new_state(date)
 
     PERSIST = RUNTIME.CHECKPOINT = persist
     RUNTIME.ACTIVE_BUDGET = RUNTIME.RequestBudget(ledger, persist)
@@ -555,7 +567,9 @@ def main():
         if state is None:
             raise RuntimeError('Encrypted draft missing; run plan first')
         ready=False
-        if args.phase=='plan':
+        if state.get('version')==41:
+            ready=pipeline.advance(state,date,args.preview,sys.modules[__name__],persist)
+        elif args.phase=='plan':
             pipeline.status(state,'PLANNING','research')
             build_plan(state,date)
         elif args.phase=='research':
@@ -574,9 +588,13 @@ def main():
         print(f'[paused] {exc}', flush=True)
         if state:
             state['pause_reason']=str(exc)
-            pipeline.pause(state,ready=len(state.get('articles',{}))==8 and not state.get('audit_passed'))
+            pipeline.pause(state,ready=len(state.get('articles',{}))==(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) and not state.get('audit_passed'))
             if any(marker in str(exc) for marker in ('429','503','cooldown')):
                 pipeline.status(state,'RETRY_PENDING','resume_after_cooldown','API_COOLDOWN')
+    except policy41.Blocked as exc:
+        if state:
+            pipeline.status(state,'BLOCKED','review_editorial_diagnosis',exc.code)
+            print(f'[editorial41] stage=release decision=blocked code={exc.code}',flush=True)
     except Exception:
         if state: pipeline.status(state,'RETRY_PENDING','retry_saved_stage','INFRASTRUCTURE_ERROR')
         raise

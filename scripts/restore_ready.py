@@ -8,16 +8,26 @@ import argparse
 import os
 from pathlib import Path
 try:
-    from scripts import staged_news as stage, editorial31 as ed
+    from scripts import staged_news as stage, editorial31 as ed, editorial41, policy41, release_queue
 except ImportError:
     import staged_news as stage
     import editorial31 as ed
+    import editorial41
+    import policy41
+    import release_queue
 
 EXPECTED_DATE = '2026-10-26'
 EXPECTED_BRANCH = 'codex/autonomous-editorial-recovery'
 
 
 def validate_prepared(state):
+    if state.get('version')==41:
+        if state.get('preview') is not True or not state.get('branch') or state.get('stage')!='audited':
+            raise RuntimeError('Unexpected prepared checkpoint provenance or approval state')
+        from datetime import datetime
+        datetime.strptime(state['date'],'%Y-%m-%d')
+        editorial41.validate_issue(state)
+        return policy41.ARTICLE_COUNT
     if (state.get('version') != 31 or state.get('date') != EXPECTED_DATE
             or state.get('branch') != EXPECTED_BRANCH or state.get('preview') is not True
             or state.get('stage') != 'audited' or state.get('audit_passed') is not True):
@@ -58,11 +68,14 @@ def main():
     state = stage.decipher(Path(os.environ['NEWS_CHECKPOINT_FILE']).read_bytes(), key)
     total = validate_prepared(state)
     stage.render(state, True)  # full private temporary HTML build and link validation
-    print(f'[prepared] validated 8/8 articles, {total} words; no Gemini calls or private exports')
+    count=policy41.ARTICLE_COUNT if state.get('version')==41 else 8
+    print(f'[prepared] validated {count}/{count} articles; no Gemini calls or private exports')
     if not args.promote:
         return
     if os.getenv('GITHUB_REF_NAME') != 'main':
         raise RuntimeError('Only main may promote the audited checkpoint to production')
+    if state.get('version')!=41 and not release_queue.edition_exists(stage.ROOT,state['date']):
+        raise RuntimeError('V41_REVALIDATION_REQUIRED: legacy approval cannot promote an unpublished issue')
     state.update(branch='main', preview=False)
     stage.save(state, key)
     output = os.environ['GITHUB_OUTPUT']

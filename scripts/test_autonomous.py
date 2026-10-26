@@ -324,7 +324,7 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
 
     def test_sigterm_saves_dossier_and_restores_handler(self):
         key = bytes(range(32))
-        state = {'version':31,'date':'2030-01-01','sources':[{'id':f'S{i+1:03d}'} for i in range(8)],
+        state = {'version':41,'policy_version':'4.1','date':'2030-01-01','sources':[{'id':f'S{i+1:03d}'} for i in range(8)],
                  'plan':[{'category':'Семья','long':False,'source_ids':[f'S{i+1:03d}']} for i in range(8)],
                  'articles':{}, 'dossiers':{}, 'audit_passed':False}
         previous = signal.getsignal(signal.SIGTERM)
@@ -336,9 +336,10 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
                    'NEWS_CHECKPOINT_FILE':str(incoming),'NEWS_CHECKPOINT_EXPECTED':'true',
                    'NEWS_QUOTA_FILE':str(root/'quota.json'),'GITHUB_OUTPUT':str(root/'output'),
                    'GITHUB_REF_NAME':'codex/test'}
-            def stopped(*args, **kwargs):
+            def stopped(active,*args, **kwargs):
+                active['dossiers']['0']={'claims':[{'source_id':'S001','quote':'Synthetic retained evidence'}]}
                 os.kill(os.getpid(), signal.SIGTERM)
-            with patch.dict(os.environ,env,clear=True), patch.object(stage,'ARTIFACT_FILE',outgoing), patch.object(sys,'argv',['staged_news','--phase','write','--preview','--target-date','2030-01-01']), patch.object(ed,'make_dossier',return_value={'claims':[]}), patch.object(ed,'write_from_dossier',side_effect=stopped):
+            with patch.dict(os.environ,env,clear=True), patch.object(stage,'ARTIFACT_FILE',outgoing), patch.object(sys,'argv',['staged_news','--phase','write','--preview','--target-date','2030-01-01']), patch.object(stage.pipeline,'advance',side_effect=stopped):
                 stage.main()
             restored = stage.decipher(outgoing.read_bytes(),key)
             self.assertIn('0',restored['dossiers'])

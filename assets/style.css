@@ -9,3 +9,12 @@
 @media(max-width:950px){.front-grid{grid-template-columns:1.4fr 1fr}.tiny{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.tiny article{border-top:1px solid var(--rule)!important}.mid{border:0}.front-details{grid-template-columns:1fr}.sidebar{display:none}.contents{grid-template-columns:1fr 1fr}}
 @media(max-width:600px){.wrap{width:min(92%,1240px)}.top .wrap{font-size:9px}.mast{padding:16px 0 13px}.mast-top{font-size:9px}.logo{font-size:clamp(49px,13vw,72px)}.motto{font-size:12px}.topics{gap:11px;font-size:10px;padding:10px 0;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap;white-space:nowrap}.front-intro{margin:20px 0 19px}.front-intro h1{font-size:25px}.front-intro .right{display:none}.front-grid{display:block;padding-top:16px}.lead,.mid{border:0;padding:0 0 18px}.lead{border-bottom:1px solid var(--rule);margin-bottom:18px}.lead h2{font-size:37px}.mid img{height:175px;object-fit:cover}.mid h3{font-size:28px}.tiny{display:block}.tiny h3{font-size:24px}.front-details{margin-top:24px}.contents{grid-template-columns:1fr}.toc{padding:16px 0}.toc h3{font-size:23px}.article-shell h1{font-size:clamp(35px,8.6vw,43px)}.article-shell .dek{font-size:18px}.article-body{font-size:18px;line-height:1.67;margin-top:28px}.article-body h2{font-size:27px}.caption{font-size:11px}.sources{padding:20px}.archive h1{font-size:35px}}
 @media print{.topics,.bookmark,.readingprogress,.footnav,.top{display:none}body{background:#fff}.wrap{width:100%}.article-body{font-size:12pt}}
+
+/* v4.1 full reader text: no height/line clamp, including practical lists. */
+[data-policy-version="4.1"] .article-body{overflow-wrap:anywhere;min-width:0}
+.source-primary{max-width:730px;margin:44px auto 0;padding:20px 24px;background:var(--tint);font:14px/1.65 Arial,sans-serif;overflow-wrap:anywhere}
+.source-primary a{text-decoration:underline;text-underline-offset:3px}
+.practical-activities{padding-left:1.6em}.practical-activities>li{padding-left:.3em;margin-bottom:32px}
+.practical-activities ol{padding-left:1.5em}.practical-activities li{margin-bottom:12px}
+main[data-policy-version="4.1"] .front-grid{grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)}
+@media(max-width:600px){main[data-policy-version="4.1"] .front-grid{display:block}.source-primary{padding:18px}.practical-activities{padding-left:1.2em}}

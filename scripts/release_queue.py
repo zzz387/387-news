@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 import os
 from pathlib import Path
 try:
-    from scripts import news, site_checks
+    from scripts import news, site_checks, policy41
 except ImportError:
     import news
     import site_checks
+    import policy41
 
 
 def moscow(now=None):
@@ -14,9 +15,16 @@ def moscow(now=None):
     return now.replace(tzinfo=news.TZ) if now.tzinfo is None else now.astimezone(news.TZ)
 
 
+def edition_exists(root,date):
+    root=Path(root)
+    if (root/'issues'/date/'issue.json').is_file(): return True  # immutable legacy edition
+    path=root/'issues'/date/'index.html'
+    return path.is_file() and 'data-policy-version="4.1"' in path.read_text(encoding='utf-8')
+
+
 def pending_date(root, now):
     today = moscow(now).date().isoformat()
-    return today if not (Path(root)/'issues'/today/'issue.json').is_file() else None
+    return today if not edition_exists(root,today) else None
 
 
 def target_date(root, now=None, check_public=None):
@@ -25,7 +33,7 @@ def target_date(root, now=None, check_public=None):
     if pending_date(root,now):
         return today
     # A committed edition with stale Pages remains today's recovery task.
-    if now.hour>=6 and check_public is not None:
+    if now.strftime('%H:%M')>=policy41.RELEASE_TIME and check_public is not None:
         try:
             check_public(expected_date=today)
         except Exception:
