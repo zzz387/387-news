@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import copy
 import json
+import os
 from pathlib import Path
 import re
 from urllib.parse import urlparse
@@ -47,6 +48,14 @@ def event(state,record,stage,decision,code='',detail=''):
 def discover(state):
     if state.get('discovered'): return
     urls=[]
+    if os.getenv('NEWS_V41_TRIAL')=='true':
+        if os.getenv('GITHUB_ACTIONS')!='true': raise policy.Blocked('TRIAL_ACTIONS_REQUIRED')
+        configured=json.loads((policy.ROOT/'config/trial-sources.json').read_text())
+        for item in configured['candidates']:
+            if item.get('trial_eligible'):
+                state['candidates'].append(dict(item,id=policy.digest(item['url']),status='discovered',checks={},progress={}))
+        state['discovered']=True
+        return
     configured=policy.ROOT/'config/candidates.json'
     if configured.is_file(): urls.extend(json.loads(configured.read_text()).get('candidates',[]))
     # RSS descriptions are discovery hints only. They never become source evidence.
@@ -315,8 +324,7 @@ class Editor:
         progress=record['progress'].setdefault('reviews',{}).setdefault(stage,{})
         if progress.get('input_hash')!=fp: progress.clear(); progress.update(input_hash=fp,parts={})
         pending=[part for part in parts if part['id'] not in progress['parts']]
-        boundary=(lambda part:part.get('section_id') or part['block_id'].split('/')[0]) if record['mode']=='INDEPENDENT_ARTICLE' else None
-        for group in content.operation_groups(pending,boundary):
+        for group in content.operation_groups(pending,limit=policy.CONFIG['technical']['review_operation_characters']):
             part=group[0]; part_index=parts.index(part)
             references=[]
             if record['mode'] in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION'):
@@ -324,9 +332,7 @@ class Editor:
                     reference=member.get('source_piece') or next((b for b in content.chunks(source['blocks']) if b['id']==member['id']),None)
                     references.extend([reference] if reference else record['claims'])
             else:
-                section=next((s for s in record['progress'].get('outline',{}).get('sections',[])
-                              if part['block_id'].startswith(s['id']+'/')),None)
-                references=[fact for fact in record['claims'] if not section or fact['id'] in section['fact_ids']]
+                references=record['claims']
             instructions={
               'fact_checked':'Отдельный фактчекинг: имена, даты события, числа, цитаты, научные/медицинские/правовые сведения, безопасность. Непроверяемое существенное утверждение — unresolved, а не approve. Ошибку чужого оригинала не исправлять молча.',
               'completeness_checked':'Проверь смысловую полноту: все обещания заголовка, инструкции, примеры, числа, оговорки и выводы. Для A/B сравни полный оригинал с данной частью, не допускай сокращение. Для C оцени полноту самостоятельной темы и применимость действий, а не копирование чужой композиции.',
@@ -339,10 +345,15 @@ class Editor:
                 '\nОбязательные вопросы: '+json.dumps(record['requirements'],ensure_ascii=False)+
                 '\nСоседние части для проверки связности: '+json.dumps(parts[max(0,part_index-1):part_index]+parts[part_index+1:part_index+2],ensure_ascii=False)+
                 '\nПроверяй локальные факты/полноту именно этой части; другие вопросы могут быть раскрыты в других разделах. Не требуй всей статьи внутри одной технической части.'+
+                '\nПри отказе affected_ids — только точные id частей с доказанной проблемой; при общей проблеме без адресного основания оставь пустой список. Не выбирай случайный раздел.'+
                 '\nВерни approve,issues,unresolved,covered_ids=[точные id ВСЕХ проверенных pieces или одной части].',output_tokens=5000,schema='v41_review')
             try: content.approved_review(result,[member['id'] for member in group])
             except policy.Blocked:
-                record['rejected_part']={'stage':stage,'block_id':(part['section_id']+'/activities') if part.get('section_id') else part['block_id'],'result':result}
+                affected=result.get('affected_ids',[]) if isinstance(result,dict) else []
+                scoped=[member for member in group if member['id'] in affected]
+                scopes={member.get('section_id') or member['block_id'].split('/')[0] for member in scoped}
+                block_id=(next(iter(scopes))+'/repair') if len(scopes)==1 and set(affected)<={m['id'] for m in group} else ''
+                record['rejected_part']={'stage':stage,'block_id':block_id,'result':result}
                 self.persist()
                 raise
             for member in group: progress['parts'][member['id']]=result

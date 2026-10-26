@@ -53,6 +53,7 @@ def extract(html,url):
         raise policy.Blocked('SOURCE_ACCESS_RESTRICTED')
     if meta.get('next'): raise policy.Blocked('SOURCE_PAGINATED_NEEDS_REVIEW')
     regions,method=dom.choose_region(document)
+    if method=='abstract_only': raise policy.Blocked('SOURCE_ABSTRACT_ONLY')
     if not regions or any(not region.closed for region in regions):
         raise policy.Blocked('SOURCE_EXTRACTION_PARTIAL')
     blocks,images=dom.blocks(regions)

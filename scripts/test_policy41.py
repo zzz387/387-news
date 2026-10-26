@@ -296,7 +296,8 @@ class IssueTests(unittest.TestCase):
             reject=any(member['block_id']=='s1/0' for member in members) and not failed
             if reject: failed.append(True)
             return {'approve':not reject,'issues':['Исправить конкретную мысль'] if reject else [],
-                    'unresolved':[],'covered_ids':[member['id'] for member in members]}
+                    'unresolved':[],'covered_ids':[member['id'] for member in members],
+                    'affected_ids':[member['id'] for member in members if member['block_id']=='s1/0'] if reject else []}
         e.Editor(call=model).finish(e.new_state('2026-10-27'),r)
         self.assertEqual(generated.count('s1'),2); self.assertEqual(generated.count('s2'),1)
         self.assertEqual(r['status'],'ready'); self.assertEqual(r['progress']['repair_count'],1)

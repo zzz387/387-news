@@ -3,6 +3,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime,timezone
 import json
+import re
 from pathlib import Path
 try:
     from scripts import policy41 as p, source41, rights41, content41
@@ -23,12 +24,15 @@ def probe(item,fetch=source41.fetch):
             technical_characters=sum(len(b['text']) for b in source['blocks']),
             old_analysis_operations=len(pieces),analysis_operations=len(content41.operation_groups(pieces)),
             source_sections=sum(b['kind']=='heading' for b in source['blocks']),
+            reader_body_has_urls=any(re.search(r'https?://|www\.',b['text']) for b in source['blocks']),
             declared_license=source.get('declared_license'),rights_verification=decision.get('verification'))
         if item['test_id']=='unicef-21':
             # This is structure evidence only, never a claim that Gemini produced 21 safe games.
             row['original_activity_headings']=sum(b['kind']=='heading' and b.get('heading_level')==4 for b in source['blocks'])
     except p.Blocked as exc:
         row.update(status='rejected',code=exc.code)
+        cause=exc.__cause__
+        if isinstance(getattr(cause,'code',None),int): row['http_status']=cause.code
         if exc.code=='SOURCE_EXTRACTION_PARTIAL' and fetch is source41.fetch:
             # Robots already passed in fetch. Public DOM labels only, never prose or a dossier.
             try:
@@ -41,7 +45,9 @@ def probe(item,fetch=source41.fetch):
                         for n in nodes if n.tag in ('div','section') and any(w in (n.attrs.get('class','')+' '+n.attrs.get('id','')).lower() for w in ('article','body','content'))][:50],
                     'paragraphs':sum(n.tag=='p' for n in nodes)}
             except Exception as error: row['diagnostic_code']=type(error).__name__
-    except Exception as exc: row.update(status='unavailable',code=type(exc).__name__)
+    except Exception as exc:
+        row.update(status='unavailable',code=type(exc).__name__)
+        if isinstance(getattr(exc,'code',None),int): row['http_status']=exc.code
     return row
 
 

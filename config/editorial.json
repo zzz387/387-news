@@ -55,7 +55,8 @@
     "content_attempts": 3,
     "repair_attempts": 2,
     "run_steps": 20,
-    "context_characters": 120000
+    "context_characters": 120000,
+    "review_operation_characters": 24000
   },
   "modes": [
     "ORIGINAL_REPUBLICATION",

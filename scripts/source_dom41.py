@@ -7,7 +7,7 @@ VOID={'area','base','br','col','embed','hr','img','input','link','meta','param',
 BLOCK={'h1','h2','h3','h4','h5','h6','p','li','blockquote','tr','pre','dt','dd','figcaption'}
 IGNORE={'script','style','nav','noscript','svg','footer','form','button','template'}
 UTILITY=re.compile(r'(?:^|[-_\s])(?:breadcrumb|social|share|sharing|related|recommendations|cookie|newsletter|pagination|toc|editsection|reflist|mw-editsection)(?:$|[-_\s])',re.I)
-BODY_NAMES={'article-body','article-content','entry-content','post-content','story-body','field--name-body','mw-parser-output','bodyContent','content-body','article__body'}
+BODY_NAMES={'article-body','article-content','entry-content','post-content','story-body','field--name-body','mw-parser-output','bodyContent','content-body','article__body','fulltext-content','n-single__content'}
 
 
 class Node:
@@ -67,7 +67,7 @@ def metadata(document):
         if node.tag=='script' and a.get('type','').split(';')[0]=='application/ld+json':
             try: schemas.append(json.loads(node.text()))
             except (ValueError,TypeError): pass
-        if node.tag=='time' and a.get('datetime') and not result.get('datePublished'): result['datePublished']=a['datetime']
+        if node.tag=='time' and a.get('itemprop')=='datePublished' and a.get('datetime') and not result.get('datePublished'): result['datePublished']=a['datetime']
     def visit(value):
         if isinstance(value,list):
             for v in value: yield from visit(v)
@@ -111,6 +111,9 @@ def choose_region(document):
             ancestor=ancestor.parent
     if len(owners)>1: return [],'ambiguous'
     if outer: return outer,'explicit_body'
+    abstracts=[n for n in nodes if 'abstract' in (n.attrs.get('class','')+' '+n.attrs.get('id','')).lower().split()]
+    full_sections=[n for n in nodes if n.tag in ('h2','h3') and n.text().strip().lower() not in ('abstract','authors','keywords','references','article information')]
+    if abstracts and not full_sections: return [],'abstract_only'
     articles=[n for n in nodes if n.tag=='article']
     if len(articles)==1: return articles,'article'
     if articles: return [],'ambiguous'

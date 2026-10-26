@@ -28,6 +28,10 @@ news.SCHEMAS.update({
                      'covered_ids':{'type':'array','items':S}}),
 })
 
+# Required in real model responses; legacy accepted checkpoints retain their original covered IDs.
+news.SCHEMAS['v41_review']['properties']['affected_ids']={'type':'array','items':S}
+news.SCHEMAS['v41_review']['required'].append('affected_ids')
+
 
 def chunks(blocks):
     """Technical operation size only; all offsets and all blocks are retained."""
@@ -42,7 +46,7 @@ def chunks(blocks):
     return result
 
 
-def operation_groups(pieces,boundary=None):
+def operation_groups(pieces,boundary=None,limit=None):
     """Pack complete short pieces into a technical request; retain every id/offset.
 
     Three-piece operations keep the legacy single-piece protocol for restored
@@ -52,7 +56,7 @@ def operation_groups(pieces,boundary=None):
     groups=[]; current=[]; size=0; key=None
     for piece in pieces:
         next_key=boundary(piece) if boundary else None
-        if current and (size+len(piece['text'])>policy.CONFIG['technical']['operation_characters'] or next_key!=key):
+        if current and (size+len(piece['text'])>(limit or policy.CONFIG['technical']['operation_characters']) or next_key!=key):
             groups.append(current); current=[]; size=0
         current.append(piece); size+=len(piece['text']); key=next_key
     if current: groups.append(current)

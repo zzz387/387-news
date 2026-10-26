@@ -136,6 +136,9 @@ def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
 
 def artifact_label(date: str, preview: bool) -> str:
     label = f'387news31-{"test" if preview else "production"}-{date}'
+    if os.getenv('NEWS_V41_TRIAL')=='true':
+        if not preview: raise RuntimeError('Trial checkpoints must remain preview-only')
+        label=f'387news41-trial-{date}'
     branch = os.getenv('GITHUB_REF_NAME', 'main')
     if branch != 'main':
         label += '-' + hashlib.sha256(branch.encode()).hexdigest()[:12]
