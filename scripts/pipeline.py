@@ -5,12 +5,13 @@ import json
 import os
 from pathlib import Path
 try:
-    from scripts import audit_policy, editorial31 as editorial, news, site_checks
+    from scripts import audit_policy, editorial31 as editorial, news, site_checks, policy41
 except ImportError:
     import audit_policy
     import editorial31 as editorial
     import news
     import site_checks
+    import policy41
 
 WAKE_TIMES=('00:17','01:17','03:17','04:17','05:17','05:54','06:17','06:37','06:54',
             '07:15','07:30','08:15','12:17','14:17','16:17','18:17','20:17','22:17')
@@ -51,6 +52,10 @@ def pause(state, ready=False):
 
 
 def validate_ready(state, require_review=False):
+    if state.get('version')==41:
+        try: from scripts import editorial41
+        except ImportError: import editorial41
+        return editorial41.validate_issue(state)
     """Unchanged form/factual provenance gates, without an API request."""
     if len(state.get('plan',[]))!=8 or set(state.get('articles',{}))!={str(i) for i in range(8)}:
         raise ValueError('Incomplete issue')
@@ -81,8 +86,8 @@ def validate_ready(state, require_review=False):
 
 
 def published_delivery(state, date, ops, preview, now, check_public):
-    site_checks.validate_local_release(ops.ROOT,date)
-    state['public_article_count']=8
+    metadata=site_checks.validate_local_release(ops.ROOT,date)
+    state['public_article_count']=metadata.get('count',len(metadata.get('articles',[])))
     if preview:
         status(state,'APPROVED','preview_archive_validated')
         return False
@@ -114,6 +119,10 @@ def reserve_delivery(state, now):
 
 
 def advance(state, date, preview, ops, persist=lambda:None, now=None, check_public=None):
+    if state.get('version')==41:
+        try: from scripts import editorial41
+        except ImportError: import editorial41
+        return editorial41.advance(state,date,preview,ops,persist,now,check_public)
     clock=now_moscow if now is None else lambda: now
     now=clock()
     check_public=check_public or site_checks.check_site
@@ -193,18 +202,22 @@ def report(state,ledger,now=None):
     now=now or now_moscow()
     segments=sum(len(d.get(k,{}).get('parts',[])) for d in state.get('dossiers',{}).values()
                  for k in ('_longform_progress','_shortform_progress'))
+    if state.get('version')==41:
+        segments=sum(len(r.get('progress',{}).get('translated',{}))+len(r.get('progress',{}).get('sections',{})) for r in state.get('candidates',[]))
     retry=next_wake(now)
     if state.get('block_code')=='DAILY_QUOTA':
         tomorrow_utc=datetime.combine(datetime.now(timezone.utc).date()+timedelta(days=1),datetime.min.time(),tzinfo=timezone.utc)
         retry=next_wake(tomorrow_utc.astimezone(news.TZ))
-    return dict(date=state['date'],articles=max(len(state.get('articles',{})),state.get('public_article_count',0)),
+    ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version')==41 else len(state.get('articles',{}))
+    return dict(date=state['date'],policy_version=state.get('policy_version','3.2'),
+                article_target=policy41.ARTICLE_COUNT if state.get('version')==41 else 8,articles=max(ready_count,state.get('public_article_count',0)),
                 segments=segments,dossiers=len(state.get('dossiers',{})),audit_passed=bool(state.get('audit_passed')),
                 quota_day=ledger.get('day'),requests_used=ledger.get('requests',0),
                 requests_used_today=ledger.get('requests',0) if ledger.get('day')==datetime.now(timezone.utc).date().isoformat() else 0,
                 day_limit=news.runtime.ACTIVE_BUDGET.day_limit if news.runtime.ACTIVE_BUDGET else int(os.getenv('NEWS_MAX_REQUESTS_PER_DAY','220')),
                 run_used=news.runtime.ACTIVE_BUDGET.used if news.runtime.ACTIVE_BUDGET else 0,
                 stage=state.get('pipeline_status','RETRY_PENDING'),next_action=state.get('next_action','resume'),
-                next_attempt=retry,release_at=state['date']+'T06:00:00+03:00',
+                next_attempt=retry,release_at=state['date']+'T'+policy41.RELEASE_TIME+':00+03:00',
                 publication_verified=state.get('pipeline_status')=='PUBLISHED',
                 block_code=state.get('block_code'),delivery_attempts=state.get('delivery_attempts',0))
 

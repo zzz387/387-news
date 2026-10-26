@@ -7,10 +7,11 @@ import re
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 try:
-    from scripts import news, site_checks
+    from scripts import news, site_checks, release_queue
 except ImportError:
     import news
     import site_checks
+    import release_queue
 
 CODES={'NOT_PREPARED','READY_NOT_PUBLISHED','SITE_NOT_CURRENT','EXTERNAL_SERVICE',
        'QUOTA_EXHAUSTED','EDITORIAL_HOLD','DELIVERY_RETRY_LIMIT','SETTINGS_BLOCKED','VERIFIED'}
@@ -45,7 +46,7 @@ def incident(date,code,healthy,request=github):
     if healthy:
         if existing and existing.get('state')!='closed':
             request('PATCH',f'issues/{existing["number"]}',{'state':'closed',
-                'body':marker+f'\n\nRelease {date}: VERIFIED over HTTPS; eight complete articles match the public manifest.\n'})
+                'body':marker+f'\n\nRelease {date}: VERIFIED over HTTPS; complete articles match the applicable policy and public overview.\n'})
         return 'resolved' if existing else 'none'
     body=(marker+f'\n\nRelease {date}: **{code}**.\n\n'
           'The controller retains checkpoints and approved articles. Existing wake-up windows retry within API and delivery limits. '
@@ -70,7 +71,7 @@ def evaluate(root,status,now=None,check_public=site_checks.check_site):
         external=True
     except Exception:
         external=False
-    exists=(Path(root)/'issues'/today/'issue.json').is_file()
+    exists=release_queue.edition_exists(root,today)
     code='EXTERNAL_SERVICE' if external else 'SITE_NOT_CURRENT' if exists else 'NOT_PREPARED'
     if status.get('date')==today:
         block=status.get('block_code')

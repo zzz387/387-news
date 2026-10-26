@@ -1,4 +1,4 @@
-name: 387 News — Gemini endurance test (NO publishing)
+name: RETIRED — 387 News — Gemini endurance test (NO publishing)
 
 on:
   workflow_dispatch:
@@ -25,6 +25,7 @@ concurrency:
 
 jobs:
   measure:
+    if: ${{ false }} # Retired: never compete with the production ledger/quota.
     runs-on: ubuntu-latest
     timeout-minutes: 330
     env:

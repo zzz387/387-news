@@ -2,10 +2,10 @@ name: 387 News — autonomous daily edition
 
 on:
   push:
-    branches: [main, codex/state-driven-daily]
-    paths: ['scripts/**', '.github/workflows/daily-v31.yml']
+    branches: [main, codex/editorial-policy-v41]
+    paths: ['scripts/**', 'config/**', 'assets/**', 'docs/editorial-policy-v4.1.md', '.github/workflows/daily-v31.yml']
   pull_request:
-    paths: ['scripts/**', '.github/workflows/daily-v31.yml']
+    paths: ['scripts/**', 'config/**', 'assets/**', 'docs/editorial-policy-v4.1.md', '.github/workflows/daily-v31.yml']
   schedule:
     # Every cron wakes the same state-driven controller. UTC = Moscow minus 3h.
     - cron: '17 9,11,13,15,17,19,21,22 * * *'
@@ -21,7 +21,7 @@ on:
       phase:
         description: 'run: automatic next action; inspect: restore only; preview prevents publication'
         type: choice
-        options: [run, inspect, check, plan, research, write, audit, publish, resume, status]
+        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, trial, trial-inspect, trial-route]
         default: run
         required: true
       preview:
@@ -34,6 +34,20 @@ on:
         type: string
         required: false
 
+      trial_approved_sha:
+        description: 'Trial only: exact reviewed 40-character commit SHA'
+        type: string
+        required: false
+      trial_confirmation:
+        description: 'Trial only: RUN_V41_TRIAL_WITH_GEMINI after separate owner permission'
+        type: string
+        required: false
+
+      trial_review_public_key:
+        description: 'Optional owner PUBLIC RSA SPKI base64, generated on the owner PC; never a private or production key'
+        type: string
+        required: false
+
 permissions:
   contents: write
   actions: read
@@ -41,10 +55,58 @@ permissions:
   id-token: write
 
 concurrency:
-  group: ${{ (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}', github.event_name, github.ref) || '387-news-stage-v31' }}
+  group: ${{ (github.event_name == 'workflow_dispatch' && startsWith(inputs.phase, 'trial')) && format('387-news-trial-review-{0}', github.run_id) || (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}-{2}', github.event_name, github.ref, github.sha) || '387-news-stage-v31' }}
   cancel-in-progress: false
 
 jobs:
+  browser-smoke:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49' playwright
+      - name: Use preinstalled runner Chromium or install bundled fallback
+        shell: bash
+        run: |
+          if command -v google-chrome >/dev/null; then
+            google-chrome --version
+            echo 'NEWS_BROWSER_CHANNEL=chrome' >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Check 12 synthetic pages at mobile and desktop widths (no Secrets or Gemini)
+        run: python -m scripts.browser41 --synthetic --output '${{ runner.temp }}/browser-report.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v41-synthetic-browser-diagnostics
+          path: ${{ runner.temp }}/browser-report.json
+          retention-days: 7
+
+  source-smoke:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect public originals only (no Secrets, no Gemini, no drafts)
+        run: python scripts/source_probe41.py --output '${{ runner.temp }}/source-report.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v41-public-source-diagnostics
+          path: ${{ runner.temp }}/source-report.json
+          retention-days: 7
+
   public-health:
     if: ${{ (github.event_name == 'push' && github.ref != 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.phase == 'status') }}
     runs-on: ubuntu-latest
@@ -82,10 +144,186 @@ jobs:
       - run: python -m pip install 'cryptography>=44,<49'
       - run: python -m unittest discover -s scripts -p 'test_*.py' -v
 
+
+
+  trial-route:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/editorial-policy-v41' && inputs.phase == 'trial-route' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Verify real owner dispatch routing with no Secrets or Gemini
+        env:
+          TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
+          TRIAL_PREVIEW: ${{ inputs.preview }}
+        run: python scripts/trial41.py --route-only
+
+  trial-approval:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/editorial-policy-v41' && (inputs.phase == 'trial' || inputs.phase == 'trial-inspect') }}
+    runs-on: ubuntu-latest
+    environment: 387-news-v41-trial
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Verify owner permission, pinned commit and required environment reviewers
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
+          TRIAL_CONFIRMATION: ${{ inputs.trial_confirmation }}
+          TRIAL_REVIEW_PUBLIC_KEY: ${{ inputs.trial_review_public_key }}
+          TRIAL_PREVIEW: ${{ inputs.preview }}
+          TARGET_DATE: ${{ inputs.target_date }}
+          TRIAL_INSPECT: ${{ inputs.phase == 'trial-inspect' }}
+        shell: bash
+        run: |
+          arguments=(--preflight)
+          if [[ "$TRIAL_INSPECT" == 'true' ]]; then arguments+=(--inspect); fi
+          python scripts/trial41.py "${arguments[@]}"
+
+  trial:
+    needs: trial-approval
+    if: ${{ needs.trial-approval.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Acquire the SAME quota lock as production only after the owner review.
+    concurrency:
+      group: 387-news-stage-v31
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      actions: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NEWS_RELEASE_APPROVED: 'false'
+      NEWS_V41_TRIAL: 'true'
+      NEWS_MAX_REQUESTS_PER_RUN: '24'
+      NEWS_MAX_REQUESTS_PER_DAY: '220'
+      NEWS_REQUEST_GAP_SECONDS: '6'
+      NEWS_STAGE_SECONDS: '720'
+      GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
+      TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
+      TRIAL_CONFIRMATION: ${{ inputs.trial_confirmation }}
+      TRIAL_REVIEW_PUBLIC_KEY: ${{ inputs.trial_review_public_key }}
+      TRIAL_PREVIEW: ${{ inputs.preview }}
+      TRIAL_INSPECT: ${{ inputs.phase == 'trial-inspect' }}
+      TARGET_DATE: ${{ inputs.target_date }}
+      PHASE: run
+      PREVIEW: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read current main for production priority and archive checks only
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: .trial-production-readonly
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49' playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Select trial checkpoint and shared daily ledger
+        id: checkpoint
+        run: python scripts/locate_checkpoint.py
+      - name: Restore encrypted trial checkpoint using the official action
+        if: ${{ steps.checkpoint.outputs.found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.artifact_id }}
+          run-id: ${{ steps.checkpoint.outputs.run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/checkpoint
+          merge-multiple: true
+      - name: Restore the production-shared quota ledger
+        if: ${{ steps.checkpoint.outputs.quota_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.quota_id }}
+          run-id: ${{ steps.checkpoint.outputs.quota_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/quota
+          merge-multiple: true
+      - name: Restore upcoming production checkpoint for read-only quota priority
+        if: ${{ steps.checkpoint.outputs.production_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.production_id }}
+          run-id: ${{ steps.checkpoint.outputs.production_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/production-checkpoint
+          merge-multiple: true
+      - name: Prepare or inspect the private full edition; never publish
+        id: trial
+        timeout-minutes: 20
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
+          NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
+          NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
+          NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
+          NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
+          NEWS_PRODUCTION_ROOT: ${{ github.workspace }}/.trial-production-readonly
+          NEWS_PRODUCTION_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.production_found }}
+          NEWS_PRODUCTION_CHECKPOINT_FILE: ${{ runner.temp }}/production-checkpoint/news-draft.enc
+        shell: bash
+        run: |
+          arguments=()
+          if [[ "$TRIAL_INSPECT" == 'true' ]]; then arguments+=(--inspect); fi
+          python scripts/trial41.py "${arguments[@]}"
+      - name: Retain encrypted trial progress only
+        if: ${{ always() && steps.trial.outputs.checkpoint == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.trial.outputs.artifact_name }}
+          path: ${{ runner.temp }}/news-draft.enc
+          retention-days: 7
+          if-no-files-found: error
+      - name: Retain shared request reservations even on failure
+        if: ${{ always() && steps.trial.outputs.quota == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.trial.outputs.quota_name }}
+          path: ${{ runner.temp }}/quota/quota.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Retain encrypted HTML Markdown screenshots and checks
+        if: ${{ success() && steps.trial.outputs.trial_complete == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: v41-private-review-${{ inputs.target_date }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/trial-review.enc
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Retain independently encrypted owner reader bundle
+        if: ${{ success() && steps.trial.outputs.owner_review_ready == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: v41-owner-review-${{ inputs.target_date }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/owner-review.enc
+          retention-days: 7
+          if-no-files-found: error
+
   prepare:
-    # This is deliberately OFF by default. Enable with repository variable
-    # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
+    # Owner authorized direct v4.1 production rollout on 2026-10-26.
+    # Repository variables and all technical/editorial publication gates remain mandatory.
+    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -111,8 +349,12 @@ jobs:
           python-version: '3.12'
       - name: Install encryption library
         run: python -m pip install 'cryptography>=44,<49'
-      - name: Run editorial 3.1 unit tests (no API calls)
+      - name: Run editorial policy and recovery unit tests (no API calls)
         run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Verify existing production configuration without revealing values
+        env:
+          NEWS_AUTOMATION_V31_ENABLED: ${{ vars.NEWS_AUTOMATION_V31_ENABLED }}
+        run: python scripts/production_preflight41.py
       - name: Resolve phase and release date
         id: context
         shell: bash
@@ -193,6 +435,21 @@ jobs:
           path: ${{ runner.temp }}/quota/quota.json
           if-no-files-found: error
           retention-days: 90
+      - name: Install browser only for a fully audited release
+        if: ${{ success() && steps.stage.outputs.published == 'true' }}
+        run: |
+          python -m pip install playwright
+          if command -v google-chrome >/dev/null; then
+            google-chrome --version
+            echo 'NEWS_BROWSER_CHANNEL=chrome' >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
+      - name: Verify full release at phone tablet and desktop widths before Git commit
+        if: ${{ success() && steps.stage.outputs.published == 'true' }}
+        env:
+          ISSUE_DATE: ${{ steps.stage.outputs.issue_date }}
+        run: python scripts/release_browser41.py
       - name: Commit fully audited and released issue
         id: commit
         if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}
@@ -214,7 +471,7 @@ jobs:
     # Only fully verified issues go to Pages. A separate job avoids GH Pages
     # environment restrictions applying to research/writing stages.
     needs: prepare
-    if: ${{ github.ref == 'refs/heads/main' && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -259,7 +516,7 @@ jobs:
 
   monitor:
     needs: [prepare, deploy]
-    if: ${{ always() && github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     permissions:

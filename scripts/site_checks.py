@@ -50,7 +50,14 @@ def fetch(url):
     with urlopen(request,timeout=20) as response:
         if response.status != 200:
             raise RuntimeError(f'Public URL returned HTTP {response.status}')
-        return response.read(2_000_001).decode('utf-8')
+        # A technical transfer ceiling must fail closed, never validate a clipped page.
+        try:
+            from scripts import policy41
+        except ImportError: import policy41
+        limit=policy41.CONFIG['technical']['source_byte_limit']
+        data=response.read(limit+1)
+        if len(data)>limit: raise RuntimeError('Public page transport limit exceeded; no truncation allowed')
+        return data.decode('utf-8')
 
 
 def check_site(base='https://387.su', expected_date=None):
@@ -65,10 +72,19 @@ def check_site(base='https://387.su', expected_date=None):
     if expected_date and date != expected_date:
         raise RuntimeError(f'Expected issue {expected_date}; public homepage still shows {date}')
     slugs = sorted(slug for d,slug in links if d == date)
-    if expected_date and len(slugs) != 8:
-        raise RuntimeError(f'Expected eight public articles, found {len(slugs)}')
-    fetch(base+'/archive/')
-    fetch(f'{base}/issues/{date}/')
+    archive=fetch(base+'/archive/')
+    overview=fetch(f'{base}/issues/{date}/')
+    if 'data-policy-version="4.1"' in overview:
+        try: from scripts import policy41, publication41
+        except ImportError:
+            import policy41
+            import publication41
+        if len(slugs)!=policy41.ARTICLE_COUNT or f'/issues/{date}/' not in archive:
+            raise RuntimeError('Public v4.1 issue is incomplete')
+        for slug in slugs: publication41.validate_page(fetch(f'{base}/issues/{date}/articles/{slug}/'))
+        return {'https':'verified','issue_date':date,'articles':len(slugs),'expected_date':expected_date,'policy_version':'4.1','status':'ok'}
+    if expected_date and len(slugs)!=8: # published v31 compatibility, never a v4.1 production gate
+        raise RuntimeError(f'Expected historical article count, found {len(slugs)}')
     issue = json.loads(fetch(f'{base}/issues/{date}/issue.json')) if expected_date else None
     if issue and (issue['date'] != date or len(issue['articles']) != 8):
         raise RuntimeError('Public release manifest is incomplete')
@@ -122,6 +138,10 @@ def main():
 def validate_local_release(root, date):
     """Validate the immutable public archive without opening a private checkpoint."""
     root=Path(root)
+    if (root/'issues'/date/'index.html').is_file() and 'data-policy-version="4.1"' in (root/'issues'/date/'index.html').read_text(encoding='utf-8'):
+        try: from scripts import publication41
+        except ImportError: import publication41
+        return publication41.validate_local_release(root,date)
     issue=json.loads((root/'issues'/date/'issue.json').read_text(encoding='utf-8'))
     if issue.get('date')!=date or len(issue.get('articles',[]))!=8:
         raise RuntimeError('Public archive date or article count mismatch')

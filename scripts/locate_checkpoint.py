@@ -5,7 +5,7 @@ The official actions/download-artifact step handles cross-run artifact ZIP
 retrieval, avoiding intermittent HTTP 401 errors from the direct REST redirect.
 """
 from __future__ import annotations
-from datetime import datetime
+from datetime import datetime,timedelta
 import os
 from urllib.parse import quote
 try:
@@ -68,6 +68,14 @@ def main():
         if type(run) is not int or run <= 0:
             raise RuntimeError('Quota artifact has no valid source workflow run ID')
         outputs.update(quota_found='true', quota_id=str(quota['id']), quota_run_id=str(run))
+    if os.getenv('NEWS_V41_TRIAL')=='true' and os.getenv('TRIAL_INSPECT')!='true':
+        production_date=(datetime.now(staged_news.TZ).date()+timedelta(days=1)).isoformat()
+        production=newest_artifact(records_for('387news31-production-'+production_date),'387news31-production-'+production_date)
+        outputs.update(production_found='true' if production else 'false',production_date=production_date)
+        if production:
+            run=(production.get('workflow_run') or {}).get('id')
+            if type(run) is not int or run<=0: raise RuntimeError('Production artifact has no valid source run ID')
+            outputs.update(production_id=str(production['id']),production_run_id=str(run))
     out = os.environ.get('GITHUB_OUTPUT')
     if not out:
         raise RuntimeError('GITHUB_OUTPUT not set')

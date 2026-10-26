@@ -1,0 +1,7 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {"label": "387 News: открыть панель", "type": "process", "command": "${workspaceFolder}/.venv/bin/python", "args": ["-m", "scripts.codespace41", "--open"], "problemMatcher": []},
+    {"label": "387 News: запустить закрытую панель", "type": "process", "command": "${workspaceFolder}/.venv/bin/python", "args": ["-m", "scripts.codespace41", "--serve"], "problemMatcher": []}
+  ]
+}

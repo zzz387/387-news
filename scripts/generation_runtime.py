@@ -33,6 +33,7 @@ class RequestBudget:
         if not 1 <= self.run_limit <= 40 or not 1 <= self.day_limit <= 300 or not 0 <= self.gap <= 60:
             raise ValueError('Unsafe request budget configuration')
         self.used = 0
+        self.usage_counter = None  # optional v4.1 stage telemetry, saved with the reservation
         self.last = None
 
     def remaining_requests(self):
@@ -66,6 +67,8 @@ class RequestBudget:
         self.last = time.monotonic()
         self.used += 1
         self.ledger['requests'] += 1
+        if self.usage_counter is not None:
+            self.usage_counter['http_requests'] = self.usage_counter.get('http_requests',0)+1
         models = self.ledger['models']
         models[model] = models.get(model, 0) + 1
         print(f'[budget] request reserved run={self.used}/{self.run_limit} '

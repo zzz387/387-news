@@ -1,0 +1,71 @@
+{
+  "candidates": [
+    {
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ]
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ]
+    },
+    {
+      "url": "https://www.unicef.org/parenting/mental-health/how-reduce-stress-parents",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ]
+    },
+    {
+      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "url": "https://science.nasa.gov/solar-system/",
+      "category_hint": "Наука"
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1045912/full",
+      "category_hint": "Наука"
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "category_hint": "Технологии"
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1137068",
+      "category_hint": "Наука"
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "category_hint": "Технологии"
+    },
+    {
+      "url": "https://science.nasa.gov/mars/",
+      "category_hint": "Наука"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
+      "category_hint": "Москва и путешествия"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "category_hint": "Москва и путешествия"
+    }
+  ]
+}
