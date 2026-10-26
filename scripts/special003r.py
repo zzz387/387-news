@@ -248,7 +248,11 @@ def advance(state,editor,root,persist):
             editor.finish(state,record);state['articles'][record['id']]=record['article'];persist()
         except news.runtime.GenerationPaused:raise
         except p.Blocked as exc:
-            record['status']='needs_review';e.event(state,record,'special_gate','needs_review',exc.code);persist()
+            transient=exc.code in {'SOURCE_EXTRACTION_PARTIAL','ROBOTS_UNVERIFIED','SOURCE_UNAVAILABLE'} and not record['checks'].get('source_verified',{}).get('special_evidence_complete')
+            if transient:record['source_attempts']=record.get('source_attempts',0)+1
+            record['status']='retryable_error' if transient and record['source_attempts']<3 else 'needs_review'
+            e.event(state,record,'special_gate',record['status'],exc.code);persist()
+            if transient:return False
         except Exception as exc:
             record['source_attempts']=record.get('source_attempts',0)+1
             record['status']='needs_review' if record['source_attempts']>=3 else 'retryable_error'

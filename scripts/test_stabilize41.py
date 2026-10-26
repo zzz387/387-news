@@ -87,6 +87,15 @@ class StabilizeTests(unittest.TestCase):
         other=source41.extract(html.replace('Устойчивый рост цен изменяет покупательную способность денег.','A complete English looking sentence with Latin letters but no declared language.'),'https://www.cbr.ru/eng/example')
         self.assertEqual(other['language'],'');self.assertEqual(other['metadata_status'],'needs_review')
 
+    def test_nist_complete_body_is_domain_scoped_and_partial_body_stays_blocked(self):
+        from scripts import source41
+        html='<html lang="en"><head><title>Manufacturing</title></head><body><div class="nist-page__region--content-top-full">Header</div><div class="nist-page__region--content"><h1>Manufacturing</h1><p>Complete synthetic original.</p></div></body></html>'
+        source=source41.extract(html,'https://www.nist.gov/additive-manufacturing/what-additive-manufacturing')
+        self.assertEqual(source['extraction_method'],'nist_complete_body')
+        self.assertNotIn('Header',' '.join(b['text'] for b in source['blocks']))
+        with self.assertRaises(p.Blocked):source41.extract(html,'https://example.org/ambiguous')
+        with self.assertRaises(p.Blocked):source41.extract(html.split('</div></body>')[0],'https://www.nist.gov/partial')
+
     def test_read_only_monitor_has_no_pinned_dates_and_merge_does_not_wake_production(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)

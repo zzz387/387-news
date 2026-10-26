@@ -84,7 +84,12 @@ def extract(html,url):
             re.search(r'(?:class|id)=["\'][^"\']*\bpaywall|data-paywall=["\']true',html,re.I)):
         raise policy.Blocked('SOURCE_ACCESS_RESTRICTED')
     if meta.get('next'): raise policy.Blocked('SOURCE_PAGINATED_NEEDS_REVIEW')
-    regions,method=dom.choose_region(document)
+    # NIST's documented Drupal content region is the complete publication body,
+    # distinct from its content-top header and the government's navigation banner.
+    if base.startswith('https://www.nist.gov/'):
+        explicit=[n for n in document.root.all() if 'nist-page__region--content' in n.attrs.get('class','').split()]
+        regions,method=(explicit,'nist_complete_body') if len(explicit)==1 else dom.choose_region(document)
+    else:regions,method=dom.choose_region(document)
     if method=='abstract_only': raise policy.Blocked('SOURCE_ABSTRACT_ONLY')
     if not regions or any(not region.closed for region in regions):
         raise policy.Blocked('SOURCE_EXTRACTION_PARTIAL')

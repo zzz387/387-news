@@ -37,11 +37,13 @@ def run(catalog,fetch=source41.fetch):
         failures=[{'url':u,'code':by_url[u].get('code')} for u in urls if by_url[u]['status']!='eligible']
         if not failures:eligible.append(candidate)
         else:rejected.append({'url':candidate['url'],'topic_id':candidate['topic_id'],'failures':failures})
+    published={r.get('source_url') for r in e.archive_entries(p.ROOT)}
+    fresh=[r for r in eligible if r['url'] not in published]
     topics={key:{'topic':title,'eligible_candidates':len({r['url'] for r in eligible if r['topic_id']==key})}
             for key,title in p.CONFIG['priority_topics'].items()}
     return {'checked_at':datetime.now(timezone.utc).isoformat(),'gemini_requests':0,'sources':sources,
         'eligible_candidates':eligible,'rejected_candidates':rejected,'topics':topics,
-        'unique_eligible':len({r['url'] for r in eligible}),'required_reserve':p.ARTICLE_COUNT+p.CONFIG['reserve_articles'],
+        'unique_eligible':len({r['url'] for r in eligible}),'not_previously_published':len({r['url'] for r in fresh}),'required_reserve':p.ARTICLE_COUNT+p.CONFIG['reserve_articles'],
         'all_twenty_topics_covered':all(t['eligible_candidates'] for t in topics.values()),
         'editorial_or_factual_approval':False}
 
