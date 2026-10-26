@@ -255,6 +255,14 @@ class PipelineTests(unittest.TestCase):
         self.assertFalse(p.advance(self.state,DATE,True,self.ops,now=at('07:15:00')))
         self.assertTrue(self.state['audit_passed']); self.assertNotIn('publish',self.ops.calls)
 
+    def test_preview_of_existing_archive_does_not_claim_verified_delivery(self):
+        public_files(self.root,self.state)
+        self.assertFalse(p.advance(self.state,DATE,True,self.ops,now=at('07:15:00')))
+        result=p.report(self.state,{})
+        self.assertFalse(result['publication_verified'])
+        self.assertEqual(result['stage'],'APPROVED')
+        self.assertFalse(self.ops.calls)
+
     def test_release_variable_is_required(self):
         with patch.dict(os.environ,{'NEWS_RELEASE_APPROVED':'false'}):
             self.assertFalse(self.advance(at('07:15:00')))

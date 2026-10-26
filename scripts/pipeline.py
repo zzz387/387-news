@@ -84,7 +84,7 @@ def published_delivery(state, date, ops, preview, now, check_public):
     site_checks.validate_local_release(ops.ROOT,date)
     state['public_article_count']=8
     if preview:
-        status(state,'PUBLISHED','none')
+        status(state,'APPROVED','preview_archive_validated')
         return False
     try:
         check_public(expected_date=date)
