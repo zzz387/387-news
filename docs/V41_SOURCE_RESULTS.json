@@ -1,0 +1,472 @@
+{
+  "run_url": "https://github.com/zzz387/387-news/actions/runs/40300272598",
+  "commit": "aa1903fa8851daa35cd2e592ac4e65175b5f5ec2",
+  "checked_at": "2026-10-26T09:32:25.348028+00:00",
+  "gemini_requests": 0,
+  "sources": [
+    {
+      "test_id": "unicef-21",
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "tags": [
+        "child-development",
+        "independent",
+        "21-activities"
+      ],
+      "category_hint": "Семья",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "994cfa7267c0c2f296add394e912d2eee6346769f30fcbd9f3d0f716ea15ad27",
+      "blocks": 67,
+      "technical_characters": 8660,
+      "old_analysis_operations": 67,
+      "analysis_operations": 2,
+      "source_sections": 29,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2",
+      "original_activity_headings": 22,
+      "original_activity_groups": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ]
+    },
+    {
+      "test_id": "unicef-play",
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "tags": [
+        "family"
+      ],
+      "category_hint": "Семья",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "a57d93fcb7ace6dfbdce075a8ca92c1bdb5aab56ff07150c9f580812dec536d2",
+      "blocks": 30,
+      "technical_characters": 3758,
+      "old_analysis_operations": 30,
+      "analysis_operations": 1,
+      "source_sections": 4,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "unicef-parents",
+      "url": "https://www.unicef.org/parenting/mental-health/how-reduce-stress-parents",
+      "tags": [
+        "family"
+      ],
+      "category_hint": "Семья",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "bfcf8a1a8626db83a758a56fccfb0b4620f0002bbfa9a5219293be138af298c3",
+      "blocks": 58,
+      "technical_characters": 7706,
+      "old_analysis_operations": 58,
+      "analysis_operations": 2,
+      "source_sections": 10,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "culture-estates",
+      "url": "https://www.culture.ru/materials/141277/magiya-russkoi-usadby",
+      "tags": [
+        "russian",
+        "long-complex"
+      ],
+      "category_hint": "Москва и путешествия",
+      "trial_eligible": false,
+      "status": "rejected",
+      "code": "ROBOTS_UNVERIFIED",
+      "cause_code": "URLError"
+    },
+    {
+      "test_id": "culture-literature",
+      "url": "https://www.culture.ru/materials/209589/usadby-i-dachi-v-proizvedeniyakh-russkikh-klassikov",
+      "tags": [
+        "russian",
+        "culture"
+      ],
+      "category_hint": "Москва и путешествия",
+      "trial_eligible": false,
+      "status": "rejected",
+      "code": "ROBOTS_UNVERIFIED",
+      "cause_code": "URLError"
+    },
+    {
+      "test_id": "who-activity",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "tags": [
+        "health"
+      ],
+      "category_hint": "Здоровье и движение",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "bfa41c474493f6e94789beb881b0e44170bda48471ff210f748151ac893ba205",
+      "blocks": 47,
+      "technical_characters": 10066,
+      "old_analysis_operations": 47,
+      "analysis_operations": 2,
+      "source_sections": 7,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "who-diet",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      "tags": [
+        "health"
+      ],
+      "category_hint": "Здоровье и движение",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "2f0c23b0c98eb38ab5fd2fe263a84e409e3f7cff5c3cc78637d495fc15ea2639",
+      "blocks": 98,
+      "technical_characters": 19885,
+      "old_analysis_operations": 98,
+      "analysis_operations": 4,
+      "source_sections": 13,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "nasa-blue",
+      "url": "https://science.nasa.gov/earth/atmosphere/why-is-the-sky-blue/",
+      "tags": [
+        "popular-science"
+      ],
+      "category_hint": "Наука",
+      "trial_eligible": false,
+      "status": "unavailable",
+      "code": "HTTPError",
+      "http_status": 404
+    },
+    {
+      "test_id": "nasa-solar",
+      "url": "https://science.nasa.gov/solar-system/",
+      "tags": [
+        "popular-science"
+      ],
+      "category_hint": "Наука",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [],
+      "source_hash": "b6a9a5e7b492480f4ac21d95a112404b78bef2a8abafb37a2f9377403e115394",
+      "blocks": 108,
+      "technical_characters": 3531,
+      "old_analysis_operations": 108,
+      "analysis_operations": 1,
+      "source_sections": 39,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "frontiers-clouds",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1045912/full",
+      "tags": [
+        "licensed-translation",
+        "long-complex"
+      ],
+      "category_hint": "Наука",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "e5cc9ad190d2fe6fd221502f80779809d292559289b2d23dd038ce8dbba4cdf1",
+      "blocks": 54,
+      "technical_characters": 13964,
+      "old_analysis_operations": 54,
+      "analysis_operations": 3,
+      "source_sections": 11,
+      "reader_body_has_urls": false,
+      "declared_license": "https://creativecommons.org/licenses/by/4.0/",
+      "rights_verification": "declared_page_license"
+    },
+    {
+      "test_id": "frontiers-optics",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "tags": [
+        "licensed-translation"
+      ],
+      "category_hint": "Технологии",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "78e31260100d2f7f2e93169b78f06a84775daca7981fcbb2d7cfefc64188e103",
+      "blocks": 61,
+      "technical_characters": 15710,
+      "old_analysis_operations": 61,
+      "analysis_operations": 3,
+      "source_sections": 12,
+      "reader_body_has_urls": false,
+      "declared_license": "https://creativecommons.org/licenses/by/4.0/",
+      "rights_verification": "declared_page_license"
+    },
+    {
+      "test_id": "frontiers-pollution",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1137068",
+      "tags": [
+        "licensed-translation"
+      ],
+      "category_hint": "Наука",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "2b53f1a6d7a26985362c57edfb55fb6d57e37f9619d18fd4736b7e93778b7340",
+      "blocks": 50,
+      "technical_characters": 12609,
+      "old_analysis_operations": 50,
+      "analysis_operations": 3,
+      "source_sections": 13,
+      "reader_body_has_urls": false,
+      "declared_license": "https://creativecommons.org/licenses/by/4.0/",
+      "rights_verification": "declared_page_license"
+    },
+    {
+      "test_id": "frontiers-water",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "tags": [
+        "reserve"
+      ],
+      "category_hint": "Технологии",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "1a159c2e1af13c28d83502ed778c713c24c70d3144131aaf27727516735af268",
+      "blocks": 41,
+      "technical_characters": 10724,
+      "old_analysis_operations": 41,
+      "analysis_operations": 2,
+      "source_sections": 10,
+      "reader_body_has_urls": true,
+      "declared_license": "https://creativecommons.org/licenses/by/4.0/",
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "nasa-mars",
+      "url": "https://science.nasa.gov/mars/",
+      "tags": [
+        "reserve"
+      ],
+      "category_hint": "Наука",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [],
+      "source_hash": "bef50f2c7e01905df9bc1b7dd56fffb7149623b7e5297567af49b48cdd44c94c",
+      "blocks": 132,
+      "technical_characters": 10401,
+      "old_analysis_operations": 132,
+      "analysis_operations": 2,
+      "source_sections": 41,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "openstax-negative",
+      "url": "https://openstax.org/books/astronomy-2e/pages/5-1-the-behavior-of-light",
+      "tags": [
+        "negative-ai-terms"
+      ],
+      "category_hint": "Наука",
+      "trial_eligible": false,
+      "status": "rejected",
+      "code": "RIGHTS_NEEDS_REVIEW"
+    },
+    {
+      "test_id": "tsaritsyno-history",
+      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
+      "tags": [
+        "russian",
+        "history"
+      ],
+      "category_hint": "Москва и путешествия",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "dc5ac5864ca9b0bc52bea61126fbca45f565b1ff3bb48d171c3e25e9a0dc8512",
+      "blocks": 103,
+      "technical_characters": 25674,
+      "old_analysis_operations": 103,
+      "analysis_operations": 5,
+      "source_sections": 0,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "tsaritsyno-restoration",
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "tags": [
+        "russian",
+        "architecture"
+      ],
+      "category_hint": "Москва и путешествия",
+      "trial_eligible": true,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "2f6cd77c2a547a549dabe5b94de1f1b3b8c082a1501853e9af83735531e72f47",
+      "blocks": 54,
+      "technical_characters": 17174,
+      "old_analysis_operations": 54,
+      "analysis_operations": 3,
+      "source_sections": 2,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "who-russian",
+      "url": "https://www.who.int/ru/news-room/fact-sheets/detail/healthy-diet",
+      "tags": [
+        "russian"
+      ],
+      "category_hint": "Здоровье и движение",
+      "trial_eligible": false,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "20996a97adb15c337f39a934718b28a2079341e4c915475c57bf77a09daadee5",
+      "blocks": 98,
+      "technical_characters": 23589,
+      "old_analysis_operations": 98,
+      "analysis_operations": 5,
+      "source_sections": 13,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "harvard-serve-return",
+      "url": "https://developingchild.harvard.edu/key-concept/serve-and-return/",
+      "tags": [
+        "verification"
+      ],
+      "category_hint": "Семья",
+      "trial_eligible": false,
+      "status": "rejected",
+      "code": "SOURCE_EXTRACTION_PARTIAL"
+    },
+    {
+      "test_id": "nih-adult-health",
+      "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+      "tags": [
+        "verification"
+      ],
+      "category_hint": "Здоровье и движение",
+      "trial_eligible": false,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author"
+      ],
+      "source_hash": "1e0581ad27048f0be5cf89435d5df41e6d78079f8969caeddfef8437e34ff952",
+      "blocks": 203,
+      "technical_characters": 25559,
+      "old_analysis_operations": 203,
+      "analysis_operations": 5,
+      "source_sections": 18,
+      "reader_body_has_urls": true,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    },
+    {
+      "test_id": "who-under-five",
+      "url": "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more",
+      "tags": [
+        "verification"
+      ],
+      "category_hint": "Семья",
+      "trial_eligible": false,
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "metadata_gaps": [
+        "author",
+        "published"
+      ],
+      "source_hash": "1914950d658e9204f5469cb42cd3164f83936b55d2410322a7697072902106ae",
+      "blocks": 25,
+      "technical_characters": 5005,
+      "old_analysis_operations": 25,
+      "analysis_operations": 1,
+      "source_sections": 1,
+      "reader_body_has_urls": false,
+      "declared_license": null,
+      "rights_verification": "unprotected_facts_rule_v2"
+    }
+  ],
+  "eligible": 16,
+  "trial_candidates": 13,
+  "coverage": {
+    "at_least_12_trial_candidates": true,
+    "required_category_hints": true,
+    "licensed_translation": true,
+    "russian_primary": true,
+    "unicef_21_original": true,
+    "independent_child_evidence": true,
+    "independent_health_evidence": true
+  },
+  "source_pool_sufficient": true
+}

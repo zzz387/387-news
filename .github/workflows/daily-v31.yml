@@ -174,8 +174,6 @@ jobs:
       actions: read
     env:
       GH_TOKEN: ${{ github.token }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
       NEWS_RELEASE_APPROVED: 'false'
       NEWS_V41_TRIAL: 'true'
       NEWS_MAX_REQUESTS_PER_RUN: '24'
@@ -224,6 +222,8 @@ jobs:
         id: trial
         timeout-minutes: 20
         env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
           NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
