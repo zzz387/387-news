@@ -27,13 +27,15 @@ from urllib.request import Request, urlopen
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 try:
-    from scripts import news, editorial31, publication, audit_policy, audit_repair
+    from scripts import news, editorial31, publication, audit_policy, audit_repair, pipeline, release_queue
 except ImportError:
     import news
     import editorial31
     import publication
     import audit_policy
     import audit_repair
+    import pipeline
+    import release_queue
 
 TZ = news.TZ
 ROOT = news.ROOT
@@ -122,12 +124,11 @@ def save(state: dict, key: bytes):
 
 def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
     if manual_date:
-        return datetime.strptime(manual_date, '%Y-%m-%d').date().isoformat()
-    if phase in ('plan', 'auto'):
+        return datetime.strptime(manual_date,'%Y-%m-%d').date().isoformat()
+    now=release_queue.moscow(now)
+    if phase in ('plan','auto'):
         return (now.date()+timedelta(days=1)).isoformat()
-    if phase in ('write', 'research') and now.hour >= 11:
-        return (now.date()+timedelta(days=1)).isoformat()
-    return now.date().isoformat()
+    return release_queue.target_date(ROOT,now)
 
 
 def artifact_label(date: str, preview: bool) -> str:
@@ -487,7 +488,7 @@ def _assemble_files(state, release, root):
 def main():
     global PERSIST
     p = argparse.ArgumentParser()
-    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume'], required=True)
+    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume','run','inspect'], required=True)
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
     args = p.parse_args()
@@ -507,11 +508,15 @@ def main():
         count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[resume] {len(state.get("articles", {}))}/8 verified articles; {count} accepted segments; '
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
-    if args.phase == 'check':
+    if args.phase in ('check','inspect'):
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')
         segments = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[checkpoint-test] restored {len(state.get("articles", {}))}/8 articles, {segments} segments', flush=True)
+        if args.phase=='inspect':
+            action='publish_when_due' if state.get('audit_passed') else 'audit' if len(state.get('articles',{}))==8 else 'continue_saved_writing'
+            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if len(state.get('articles',{}))==8 else 'RETRY_PENDING',action)
+            pipeline.emit_report(state,state.get('_quota_snapshot',{}),os.getenv('GITHUB_OUTPUT'))
         return
     quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
     if os.getenv('NEWS_QUOTA_EXPECTED') == 'true' and not quota_path.is_file():
@@ -538,68 +543,43 @@ def main():
                 if state:
                     f.write(f'checkpoint=true\nartifact_name={label}\n')
 
+    if state is None and args.phase in ('run','resume','write','audit','auto','plan'):
+        state={'version':31,'date':date,'articles':{},'dossiers':{},'rejections':{},
+               'audit_passed':False,'stage':'planning','created_at':datetime.now(TZ).isoformat()}
+
     PERSIST = RUNTIME.CHECKPOINT = persist
     RUNTIME.ACTIVE_BUDGET = RUNTIME.RequestBudget(ledger, persist)
     previous_handler = signal.signal(signal.SIGTERM, lambda *_: (_ for _ in ()).throw(RUNTIME.GenerationPaused('Runner stopped; checkpoint retained')))
     try:
         persist()  # arm always() upload BEFORE any generation
-        if (args.phase in ('plan', 'auto') or (state and args.phase in ('research', 'write'))) and (not state or not state.get('plan')):
-            if state is None:
-                state = {'version':31, 'date':date, 'articles':{}, 'dossiers':{},
-                         'rejections':{}, 'stage':'planning', 'audit_passed':False}
-            state = build_plan(state, date)
-            persist()
-        elif state is None:
+        if state is None:
             raise RuntimeError('Encrypted draft missing; run plan first')
-        if args.phase == 'research':
+        ready=False
+        if args.phase=='plan':
+            build_plan(state,date)
+        elif args.phase=='research':
+            if not state.get('plan'): build_plan(state,date)
             research_batch(state)
-        elif args.phase in ('write', 'auto'):
-            write_batch(state, size=8)
-            if args.phase == 'auto' and len(state.get('articles', {})) == 8:
-                audit(state)
-                if state.get('audit_passed'):
-                    render(state, True)
-        elif args.phase == 'audit':
-            audit(state)
-        elif args.phase == 'resume':
-            prior_path = os.getenv('NEWS_PRIOR_CHECKPOINT_FILE')
-            if (prior_path and len(state.get('articles',{}))==7
-                    and not state.get('legacy_audit_recovered')
-                    and state.get('audit_note','').startswith('Issue editorial veto: ')):
-                prior = decipher(Path(prior_path).read_bytes(),key)
-                audit_repair.recover_legacy_article(state,prior)
-                persist()
-            for _ in range(audit_policy.MAX_AUDITS):
-                if state.get('audit_blocked') or state.get('audit_passed'):
-                    break
-                before = audit_policy.fingerprint(state)
-                write_batch(state,size=8)
-                if len(state.get('articles',{}))<8 or state.get('audit_repairs'):
-                    break
-                audit(state)
-                persist()
-                if state.get('audit_passed') or audit_policy.fingerprint(state)==before and not state.get('audit_repairs'):
-                    break
-            if state.get('audit_passed'):
-                ready = render(state,args.preview)
-                if output and ready:
-                    with open(output,'a',encoding='utf-8') as f:
-                        f.write(f'published=true\nissue_date={state["date"]}\n')
-            else:
-                print('[resume] incomplete or withheld issue checkpointed; publication remains gated',flush=True)
-        elif args.phase == 'publish':
-            if not state.get('audit_passed'):
-                raise RuntimeError('Unapproved issue: cannot publish or preview release')
-            ready = render(state, args.preview)
-            if output and ready:
-                with open(output, 'a', encoding='utf-8') as f:
-                    f.write(f'published=true\nissue_date={state["date"]}\n')
+        elif args.phase in ('run','resume','write','audit','auto'):
+            ready=pipeline.advance(state,date,args.preview,sys.modules[__name__],persist)
+        elif args.phase=='publish':
+            ready=render(state,args.preview)
+        if output and ready:
+            with open(output,'a',encoding='utf-8') as stream:
+                stream.write(f'published=true\nissue_date={state["date"]}\n')
     except RUNTIME.GenerationPaused as exc:
         print(f'[paused] {exc}', flush=True)
         if state:
-            state['pause_reason'] = str(exc)
+            state['pause_reason']=str(exc)
+            pipeline.pause(state,ready=len(state.get('articles',{}))==8 and not state.get('audit_passed'))
+            if any(marker in str(exc) for marker in ('429','503','cooldown')):
+                pipeline.status(state,'RETRY_PENDING','resume_after_cooldown','API_COOLDOWN')
+    except Exception:
+        if state: pipeline.status(state,'RETRY_PENDING','retry_saved_stage','INFRASTRUCTURE_ERROR')
+        raise
     finally:
         persist()
+        if state: pipeline.emit_report(state,ledger,output)
         RUNTIME.ACTIVE_BUDGET = RUNTIME.CHECKPOINT = PERSIST = None
         signal.signal(signal.SIGTERM, previous_handler)
 
@@ -614,5 +594,5 @@ if __name__=='__main__':
         main()
     except Exception as e:
         # Never echo secrets, API responses, or unpublished draft contents.
-        print('STAGE FAILED; WEBSITE UNCHANGED: '+str(e)[:400],file=sys.stderr,flush=True)
+        print('STAGE FAILED; WEBSITE UNCHANGED: '+type(e).__name__+'; private diagnostics retained',file=sys.stderr,flush=True)
         sys.exit(1)

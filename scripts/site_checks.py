@@ -117,4 +117,39 @@ def main():
                 time.sleep(15)
     raise RuntimeError('Public HTTPS/issue verification failed; existing site was not modified')
 
+
+
+def validate_local_release(root, date):
+    """Validate the immutable public archive without opening a private checkpoint."""
+    root=Path(root)
+    issue=json.loads((root/'issues'/date/'issue.json').read_text(encoding='utf-8'))
+    if issue.get('date')!=date or len(issue.get('articles',[]))!=8:
+        raise RuntimeError('Public archive date or article count mismatch')
+    articles=issue['articles']
+    if (len({a['slug'] for a in articles})!=8
+            or not 2<=sum(bool(a.get('long')) for a in articles)<=3
+            or sum(a['word_count'] for a in articles)<5000
+            or any(not (1050 if a.get('long') else 440)<=a['word_count']<=2200 for a in articles)):
+        raise RuntimeError('Public archive fails editorial volume requirements')
+    files=[]
+    for article in articles:
+        path=root/'issues'/date/'articles'/article['slug']/'index.html'
+        page=path.read_text(encoding='utf-8'); files.append(path)
+        body=re.search(r'<div class="article-body">(.*?)</div>',page,re.S)
+        paragraphs=re.findall(r'<p>(.*?)</p>',body.group(1) if body else '',re.S)
+        text=unescape(' '.join(re.sub('<[^>]+>','',p) for p in paragraphs))
+        if '<meta name="viewport"' not in page or news.count_words(text)!=article['word_count']:
+            raise RuntimeError('Public archive contains truncated or invalid article HTML')
+    overview=root/'issues'/date/'index.html'; files.extend([overview,root/'index.html',root/'archive/index.html'])
+    if f'/issues/{date}/' not in (root/'archive/index.html').read_text(encoding='utf-8'):
+        raise RuntimeError('Public archive index has no link to the issue')
+    previous=news.ROOT
+    try:
+        news.ROOT=root
+        news.validate_local_links(files)
+    finally:
+        news.ROOT=previous
+    return issue
+
+
 if __name__=='__main__': main()
