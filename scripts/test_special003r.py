@@ -162,5 +162,15 @@ class SpecialTests(unittest.TestCase):
             self.assertEqual(json.loads(quota.read_text())['requests'],207)
 
 
+    def test_missing_full_companion_does_not_spend_a_model_request(self):
+        state=runner.new_state();r=state['candidates'][0]
+        primary=record(0)['source'];primary.update(url=r['url'],canonical=r['url'])
+        def fetch(url):
+            if url==r['url']:return primary
+            raise OSError('Synthetic unavailable original companion')
+        editor=runner.Editor(call=lambda *a,**k:(_ for _ in ()).throw(AssertionError('No Gemini before full originals')),fetch=fetch)
+        with self.assertRaises(OSError):editor.source_verified(state,r)
+
+
 
 if __name__=='__main__':unittest.main()

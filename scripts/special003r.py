@@ -99,12 +99,18 @@ def probe():
 
 class Editor(e.Editor):
     def source_verified(self,state,record):
-        super().source_verified(state,record)
-        record['requirements']=list(dict.fromkeys(record['requirements']+record['commission']['requirements']))
+        # Resolve full originals, rights and studies before spending a single model request.
+        if not record.get('source'):record['source']=self.cached_fetch(record['url']);self.persist()
+        mode,decision=rights41.select_mode(record['source']);rights41.require(record['source'],mode,decision)
         medical=record['category_hint']=='Здоровье и движение'
         studies=study_links(record['source']) if medical else []
         if medical and not studies:raise p.Blocked('SPECIAL_FULL_STUDY_REQUIRED')
         extra=list(dict.fromkeys(record['original_urls'][1:]+record['verification_urls']+studies))
+        for url in extra:
+            original=self.cached_fetch(url)
+            rights41.require(original,'INDEPENDENT_ARTICLE',rights41.decision(original,'INDEPENDENT_ARTICLE'))
+        super().source_verified(state,record)
+        record['requirements']=list(dict.fromkeys(record['requirements']+record['commission']['requirements']))
         evidence=record.setdefault('special_evidence',{})
         for url in extra:
             if url not in evidence:
