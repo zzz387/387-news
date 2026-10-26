@@ -119,7 +119,8 @@ def synthetic_browser_check(root,date):
     report={'pages':0,'viewports':[],'decryption':'RSA-OAEP-SHA256 + AES-256-GCM','production_key_used':False,'loopback_only':True}
     try:
         with sync_playwright() as playwright:
-            browser=playwright.chromium.launch()
+            from scripts.browser41 import launch_browser
+            browser=launch_browser(playwright)
             for width in (320,390,768,1440):
                 page=browser.new_page(viewport={'width':width,'height':900})
                 response=page.goto(server.url,wait_until='networkidle')

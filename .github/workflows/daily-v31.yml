@@ -55,7 +55,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: ${{ (github.event_name == 'workflow_dispatch' && startsWith(inputs.phase, 'trial')) && format('387-news-trial-review-{0}', github.run_id) || (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}', github.event_name, github.ref) || '387-news-stage-v31' }}
+  group: ${{ (github.event_name == 'workflow_dispatch' && startsWith(inputs.phase, 'trial')) && format('387-news-trial-review-{0}', github.run_id) || (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}-{2}', github.event_name, github.ref, github.sha) || '387-news-stage-v31' }}
   cancel-in-progress: false
 
 jobs:
@@ -71,7 +71,15 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install 'cryptography>=44,<49' playwright
-      - run: python -m playwright install --with-deps chromium
+      - name: Use preinstalled runner Chromium or install bundled fallback
+        shell: bash
+        run: |
+          if command -v google-chrome >/dev/null; then
+            google-chrome --version
+            echo 'NEWS_BROWSER_CHANNEL=chrome' >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
       - name: Check 12 synthetic pages at mobile and desktop widths (no Secrets or Gemini)
         run: python -m scripts.browser41 --synthetic --output '${{ runner.temp }}/browser-report.json'
       - uses: actions/upload-artifact@v4
@@ -431,7 +439,12 @@ jobs:
         if: ${{ success() && steps.stage.outputs.published == 'true' }}
         run: |
           python -m pip install playwright
-          python -m playwright install --with-deps chromium
+          if command -v google-chrome >/dev/null; then
+            google-chrome --version
+            echo 'NEWS_BROWSER_CHANNEL=chrome' >> "$GITHUB_ENV"
+          else
+            python -m playwright install --with-deps chromium
+          fi
       - name: Verify full release at phone tablet and desktop widths before Git commit
         if: ${{ success() && steps.stage.outputs.published == 'true' }}
         env:

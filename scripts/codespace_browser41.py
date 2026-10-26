@@ -51,7 +51,8 @@ def check(files,date):
             thread=Thread(target=server.serve_forever,daemon=True);thread.start();threads.append(thread)
         try:
             with sync_playwright() as playwright:
-                browser=playwright.chromium.launch()
+                from scripts.browser41 import launch_browser
+                browser=launch_browser(playwright)
                 # Only this synthetic self-signed loopback certificate is accepted for the test.
                 ctx=browser.new_context(ignore_https_errors=True)
                 for width in (320,390,768,1440):

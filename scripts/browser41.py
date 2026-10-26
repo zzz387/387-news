@@ -1,8 +1,17 @@
 """Desktop/mobile checks; screenshots remain inside the private review bundle."""
+import os
 from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
+
+
+def launch_browser(playwright):
+    # Hosted GitHub Ubuntu runners already include Chrome (Chromium engine).
+    # Other environments keep Playwright's bundled Chromium installation.
+    channel=os.getenv('NEWS_BROWSER_CHANNEL','')
+    if channel not in ('','chrome'): raise ValueError('BROWSER_CHANNEL_UNSUPPORTED')
+    return playwright.chromium.launch(**({'channel':channel} if channel else {}))
 
 
 def check(root,date,output):
@@ -15,7 +24,7 @@ def check(root,date,output):
     report={'viewports':[],'pages':0,'horizontal_overflow':False,'visible_overflow_pages':0}
     try:
         with sync_playwright() as playwright:
-            browser=playwright.chromium.launch()
+            browser=launch_browser(playwright)
             for width in (320,390,768,1440):
                 page=browser.new_page(viewport={'width':width,'height':900})
                 base=f'http://127.0.0.1:{server.server_port}'

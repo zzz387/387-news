@@ -40,3 +40,5 @@ GitHub connector позволяет стандартный merge, но не пр
 Успех rollout не равен готовому номеру. Только12/12 принятых статей, финальный аудит, проверенный HTML, успешный commit/Pages и подтверждённый публичный HTTPS допускают заявление о публикации v4.1. До этого используются реальные RETRY_PENDING/BLOCKED/WAITING_FOR_RELEASE_TIME, дата и ссылка run, фактический ledger.
 
 При критической ошибке сначала остановить новые production через существующие Variables, дождаться mutex, сохранить Artifacts/ledger, затем стандартный revert технических изменений. Не force-reset, не удалять новые статьи/исторический архив и не терять41 checkpoint при возврате31 кода. Полная [инструкция эксплуатации](POLICY_V41_OPERATIONS.md).
+
+Уточнение CI: установка bundled Chromium/system dependencies в GitHub runner затянулась. Для hosted Ubuntu используется уже установленный Google Chrome (движок Chromium) через официальный Playwright channel=chrome; при отсутствии бинарника остаётся bundled fallback. Полный объём HTML/browser-проверок сохранён. Старый ручной Gemini endurance workflow отключён job if=false, поскольку его отдельный mutex/счётчик не совместим с общим production ledger.
