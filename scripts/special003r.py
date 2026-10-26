@@ -85,7 +85,18 @@ def probe():
                 'verification':decision.get('verification'),'content_hash':source['content_hash'],
                 'metadata_status':source['metadata_status'],'study_urls':study_links(source)}
         except Exception as exc:
-            return {'url':url,'status':'blocked','code':getattr(exc,'code',None) if isinstance(exc,p.Blocked) else type(exc).__name__}
+            row={'url':url,'status':'blocked','code':getattr(exc,'code',None) if isinstance(exc,p.Blocked) else type(exc).__name__}
+            if 'source' in locals():
+                row['metadata']={key:source.get(key) for key in ('language','author','published','publisher','metadata_gaps','metadata_status')}
+                row['study_urls']=study_links(source)
+                if source.get('metadata_status')!='verified':
+                    from scripts import source_dom41 as dom
+                    document=dom.Document();document.feed(source41.transport(url));document.close()
+                    meta=dom.metadata(document)
+                    row['public_metadata_candidates']={key:value for key,value in meta.items()
+                        if any(part in key.lower() for part in ('language','lang','locale','date','author','creator','modified','pubdate'))
+                        and isinstance(value,str)}
+            return row
     with ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(inspect,urls))
     by_url={r['url']:r for r in rows}
     report={'id':sc.ID,'gemini_requests':0,'checked_at':datetime.now(p.TZ).isoformat(),'sources':rows,
