@@ -93,7 +93,7 @@ def probe():
                     row['study_urls']=study_links(source)
                     if source.get('metadata_status')!='verified':
                         try:from scripts import source_dom41 as dom
-                    except ImportError:import source_dom41 as dom
+                        except ImportError:import source_dom41 as dom
                         document=dom.Document();document.feed(source41.transport(url));document.close()
                         meta=dom.metadata(document)
                         row['public_metadata_candidates']={key:value for key,value in meta.items()
