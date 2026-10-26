@@ -55,7 +55,7 @@ def check(files,date):
                 # Only this synthetic self-signed loopback certificate is accepted for the test.
                 ctx=browser.new_context(ignore_https_errors=True)
                 for width in (320,390,768,1440):
-                    page=ctx.new_page(viewport={'width':width,'height':900});failures=[]
+                    page=ctx.new_page();page.set_viewport_size({'width':width,'height':900});failures=[]
                     page.on('response',lambda response:failures.append(response.status) if response.status>=400 else None)
                     page.goto(upstream.url,wait_until='networkidle')
                     urls=page.locator(f'a[href*="/issues/{date}/articles/"]').evaluate_all('(nodes)=>[...new Set(nodes.map(n=>n.getAttribute("href")))]')

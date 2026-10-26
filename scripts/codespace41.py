@@ -187,9 +187,14 @@ def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--serve',action='store_true'); parser.add_argument('--open',action='store_true')
     args=parser.parse_args(); directory=viewer.key_directory()
     if args.open: open_panel(directory); return
-    access=Access(); access.prepare()
+    access=Access(); access.identity()
     viewer.owner_key(directory)
+    # Bind before visibility verification so Codespaces can discover the port.
+    # Nothing is served until Private has been verified.
     server=Panel(directory,access)
+    try: access.prepare()
+    except Exception:
+        server.server_close(); raise
     file=directory/'panel.json'; file.write_text(json.dumps({'url':server.url+'control/'})); file.chmod(0o600)
     # Never print URL tokens or credentials, including to postStart logs.
     print('Приватная панель готова. Terminal → Run Task → 387 News: открыть панель.',flush=True)
