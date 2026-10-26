@@ -182,9 +182,15 @@ class ReviewHandler(BaseHTTPRequestHandler):
         if server.external_origin:
             hosts.add(urlsplit(server.external_origin).netloc)
             origins.add(server.external_origin)
+        site=self.headers.get('Sec-Fetch-Site')
+        # Opening a private URL from VS Code/GitHub is a top-level navigation.
+        # No cross-site subresources or POSTs; bearer token and Private checks still apply.
+        navigation=(server.external_origin and self.command=='GET' and site in ('same-site','cross-site')
+                    and self.headers.get('Sec-Fetch-Mode')=='navigate'
+                    and self.headers.get('Sec-Fetch-Dest')=='document' and self.headers.get('Origin') is None)
         if (self.headers.get('Host') not in hosts or
                 self.headers.get('Origin') not in (None,*origins) or
-                self.headers.get('Sec-Fetch-Site') not in (None,'none','same-origin')): return False
+                site not in (None,'none','same-origin') and not navigation): return False
         if server.access_check:
             try: server.access_check()
             except Exception: return False

@@ -45,6 +45,10 @@ class CodespaceTests(unittest.TestCase):
         try:
             with urlopen(Request(base,headers={'Host':origin[8:],'Origin':origin,'Sec-Fetch-Site':'same-origin'})) as r:
                 self.assertEqual(r.status,200);self.assertIn(('/'+server.access_token+'/assets/').encode(),r.read())
+            # A user opening the token URL from GitHub/VS Code may arrive cross-site.
+            with urlopen(Request(base,headers={'Host':origin[8:],'Sec-Fetch-Site':'cross-site',
+                        'Sec-Fetch-Mode':'navigate','Sec-Fetch-Dest':'document'})) as response:
+                self.assertEqual(response.status,200)
             for headers in ({'Host':'evil.app.github.dev'},{'Host':origin[8:],'Origin':'http://'+origin[8:]},
                             {'Host':origin[8:],'Origin':'https://evil.example'}, {'Host':origin[8:],'Sec-Fetch-Site':'cross-site'}):
                 with self.assertRaises(HTTPError):urlopen(Request(base,headers=headers))
