@@ -1,3 +1,5 @@
+> Актуальный статус автономного задания и owner-only просмотр: [V41_AUTO_TRIAL_STATUS.md](V41_AUTO_TRIAL_STATUS.md). Разрешение на один Gemini-cycle получено; реальные GitHub Required reviewers не обходятся.
+
 > Актуализация PR№7: [испытание, реальные источники, квота и права C](V41_TRIAL_READINESS.md). Реальные Gemini-запуски пока не разрешены.
 
 # Эксплуатация v4.1

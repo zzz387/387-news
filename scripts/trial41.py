@@ -114,13 +114,16 @@ def main():
         raise RuntimeError('TRIAL_NEW_RUN_REQUIRES_FUTURE_DATE')
     key=stage.validate_key(os.environ['DRAFT_ENCRYPTION_KEY'])
     if not args.inspect:
+        production_root=Path(os.environ['NEWS_PRODUCTION_ROOT'])
+        if not (production_root/'issues').is_dir() or not (production_root/'index.html').is_file():
+            raise RuntimeError('TRIAL_READ_ONLY_MAIN_CHECKOUT_REQUIRED')
         production=None
         if os.getenv('NEWS_PRODUCTION_CHECKPOINT_EXPECTED')=='true':
             production=stage.decipher(Path(os.environ['NEWS_PRODUCTION_CHECKPOINT_FILE']).read_bytes(),key)
         ledger_path=Path(os.environ['NEWS_QUOTA_FILE'])
         if os.getenv('NEWS_QUOTA_EXPECTED')=='true' and not ledger_path.is_file(): raise RuntimeError('SHARED_LEDGER_RESTORE_FAILED')
         ledger=json.loads(ledger_path.read_text()) if ledger_path.is_file() else {}
-        admitted,reason=trial_admission41.assess(p.ROOT,production,ledger)
+        admitted,reason=trial_admission41.assess(production_root,production,ledger)
         if admitted:
             try: site_checks.check_site(expected_date=datetime.now(p.TZ).date().isoformat())
             except Exception: admitted,reason=False,'CURRENT_PRODUCTION_HTTPS_UNVERIFIED'
@@ -136,7 +139,7 @@ def main():
             working=Path(temp)
             shutil.copytree(p.ROOT/'assets',working/'assets')
             (working/'issues').mkdir(); (working/'archive').mkdir()
-            for issue in (p.ROOT/'issues').iterdir():
+            for issue in (production_root/'issues').iterdir():
                 if issue.is_dir() and issue.name!=date: shutil.copytree(issue,working/'issues'/issue.name)
             try:
                 stage.ROOT=stage.news.ROOT=working

@@ -216,6 +216,12 @@ jobs:
       PREVIEW: 'true'
     steps:
       - uses: actions/checkout@v4
+      - name: Read current main for production priority and archive checks only
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          path: .trial-production-readonly
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -264,6 +270,7 @@ jobs:
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
+          NEWS_PRODUCTION_ROOT: ${{ github.workspace }}/.trial-production-readonly
           NEWS_PRODUCTION_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.production_found }}
           NEWS_PRODUCTION_CHECKPOINT_FILE: ${{ runner.temp }}/production-checkpoint/news-draft.enc
         shell: bash

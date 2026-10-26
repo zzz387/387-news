@@ -139,7 +139,23 @@ def synthetic_browser_check(root,date):
 
 class ReviewServer(ThreadingHTTPServer):
     def __init__(self,files,date):
-        self.files=files; self.date=date; self.access_token=secrets.token_urlsafe(32)
+        self.files=dict(files); self.date=date; self.access_token=secrets.token_urlsafe(32)
+        report=json.loads(files['review.json'])
+        rows=[]; notes={a.get('title'):a for a in report.get('articles',[])}
+        for path,data in files.items():
+            if not re.fullmatch(r'issues/'+re.escape(date)+r'/articles/[^/]+/index.html',path): continue
+            match=re.search(r'<h1[^>]*>(.*?)</h1>',data.decode(),re.S)
+            title=html.unescape(re.sub('<[^>]*>','',match[1])) if match else path
+            info=notes.get(title,{})
+            rows.append('<li><a href="/'+html.escape(path.removesuffix('index.html'),quote=True)+'">'+html.escape(title)+'</a><p>'+
+                html.escape(str(info.get('category','')))+' · '+html.escape(str(info.get('mode','')))+ '</p></li>')
+        panel=('<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+            '<title>Закрытый редакционный просмотр</title><style>body{max-width:850px;margin:24px auto;padding:16px;font:18px/1.6 Georgia,serif;overflow-wrap:anywhere}li{margin-bottom:20px}</style></head><body>'
+            '<h1>Закрытый просмотр · '+html.escape(date)+'</h1><p>Все 12 статей доступны целиком. '
+            'Автоматические шлюзы не заменяют ручную литературную оценку. Отметка владельца: ожидается.</p>'+
+            ('<p>Синтетическая проверка механизма, не выпуск Gemini.</p>' if report.get('synthetic') else '')+
+            '<p><a href="/">Главная номера</a> · <a href="/review.json">Технический редакционный протокол</a></p><ol>'+''.join(rows)+'</ol></body></html>')
+        self.files['_review/index.html']=panel.encode()
         super().__init__(('127.0.0.1',0),ReviewHandler)
     @property
     def url(self): return f'http://127.0.0.1:{self.server_port}/{self.access_token}/'
@@ -163,6 +179,8 @@ class ReviewHandler(BaseHTTPRequestHandler):
         if data is None: self.send_error(404); return
         if relative.endswith('.html'):
             text=data.decode('utf-8')
+            banner='<nav style="padding:12px;text-align:center;font:14px Arial,sans-serif"><a href="/_review/">Закрытый просмотр · протокол и все 12 статей</a></nav>'
+            text=re.sub(r'(<body[^>]*>)',lambda m:m[1]+banner,text,count=1,flags=re.I)
             text=re.sub(r'\b(href|src)=("|\')/(?!/)',lambda m:m[1]+'='+m[2]+prefix,text)
             data=text.encode('utf-8')
         elif relative.endswith('.css'):
@@ -201,7 +219,7 @@ def main():
     print('Ctrl+C завершает сервер. Этот loopback-адрес не доступен с телефона.')
     try: server.serve_forever()
     except KeyboardInterrupt: pass
-    finally: server.server_close(); files.clear()
+    finally: server.server_close(); server.files.clear(); files.clear()
 
 
 if __name__=='__main__': main()

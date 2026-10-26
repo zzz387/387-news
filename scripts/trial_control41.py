@@ -113,9 +113,15 @@ def main():
     if not re.fullmatch('[0-9a-f]{40}',sha): raise RuntimeError('TRIAL_HEAD_SHA_INVALID')
     today=datetime.now(ZoneInfo('Europe/Moscow')).date()
     session=json.loads(session_file.read_text()) if session_file.exists() else None
+    if session and args.command=='start': raise RuntimeError('TRIAL_CYCLE_ALREADY_EXISTS: use resume to retain its date and checkpoint')
     if args.command in ('resume','inspect'):
         if not session: raise RuntimeError('TRIAL_SAVED_SESSION_REQUIRED')
         date=session['date']
+        previous=api('GET',f'repos/{viewer.REPO}/actions/runs/{session["run_id"]}')
+        if previous.get('status')!='completed':
+            print('Существующий trial ещё не завершён: '+previous['html_url'])
+            print('При ожидании проверки: Review deployments → 387-news-v41-trial → Approve and deploy.')
+            return
     else:
         date=args.date or (today+timedelta(days=1)).isoformat()
         if datetime.strptime(date,'%Y-%m-%d').date()<=today: raise RuntimeError('TRIAL_FIRST_DATE_MUST_BE_FUTURE_IN_MOSCOW')

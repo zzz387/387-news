@@ -21,3 +21,5 @@ python -m unittest discover -s scripts -p 'test_*.py' -v
 Pages должен публиковаться через **GitHub Actions**, из пакета `site_checks.py --package`, содержащего только финальный сайт (`index.html`, `assets`, `archive`, `issues`, `CNAME`, `robots.txt`, `sitemap.xml`). Публикация всей ветки из корня не подходит. Настройка Pages Source требует владельца репозитория.
 
 Подготовлен [защищённый испытательный режим PR№7](docs/V41_TRIAL_READINESS.md): реальные источники, расчёт/учёт квоты,12 приватных HTML/Markdown и мобильные/desktop проверки. Реальные Gemini-вызовы требуют отдельного разрешения владельца; испытание не публикуется и не требует слияния PR.
+
+Текущий [статус автономного испытания и закрытый просмотр на ПК](docs/V41_AUTO_TRIAL_STATUS.md): owner-helper проверяет реальный dispatch, настраивает только trial-environment и шифрует reader bundle на отдельный ключ владельца. Production-ключ не экспортируется.
