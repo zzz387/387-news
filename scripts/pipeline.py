@@ -114,7 +114,8 @@ def reserve_delivery(state, now):
 
 
 def advance(state, date, preview, ops, persist=lambda:None, now=None, check_public=None):
-    now=now or now_moscow()
+    clock=now_moscow if now is None else lambda: now
+    now=clock()
     check_public=check_public or site_checks.check_site
     release=datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=news.TZ)
     if (ops.ROOT/'issues'/date/'issue.json').is_file():
@@ -122,6 +123,7 @@ def advance(state, date, preview, ops, persist=lambda:None, now=None, check_publ
         persist()
         return ready
     for _ in range(10):
+        now=clock()  # Generation may cross 06:00; use completion time, not start time.
         if state.get('audit_blocked'):
             status(state,'BLOCKED','review_editorial_diagnosis','EDITORIAL_HOLD'); break
         if state.get('audit_passed'):
@@ -134,6 +136,7 @@ def advance(state, date, preview, ops, persist=lambda:None, now=None, check_publ
                 ops.render(state,True)  # ephemeral private HTML; no public early files
                 state['validated_html_signature']=signature
                 persist()
+            now=clock()
             if preview:
                 status(state,'APPROVED','preview_complete'); break
             if now<release:

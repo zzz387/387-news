@@ -119,6 +119,18 @@ class PipelineTests(unittest.TestCase):
         for slot in before:
             if slot!='4': self.assertTrue(before[slot]==self.state['articles'][slot])
 
+    def test_completion_crossing_0600_publishes_in_the_same_run(self):
+        self.state['articles'].pop('4')
+        current=[at('05:20:00')]
+        original=self.ops.write_batch
+        def late_write(state,size):
+            original(state,size)
+            current[0]=at('06:05:00')
+        self.ops.write_batch=late_write
+        with patch.object(p,'now_moscow',side_effect=lambda:current[0]):
+            self.assertTrue(p.advance(self.state,DATE,False,self.ops,check_public=lambda **kw:{}))
+        self.assertIn('publish',self.ops.calls)
+
     def test_05_daily_quota_preserves_ready_state_and_rollover_resumes_normally(self):
         today=datetime.now(timezone.utc).date()
         ledger={'day':today.isoformat(),'requests':220,'models':{'lite':220}}
@@ -260,6 +272,18 @@ class PipelineTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'Bad checkpoint metadata'): stage.main()
             controller.assert_not_called()
         self.assertTrue(old==before)
+
+    def test_quota_day_rollover_preserves_external_retry_after(self):
+        import time
+        today=datetime.now(timezone.utc).date()
+        deadline=time.time()+900
+        ledger={'day':(today-timedelta(days=1)).isoformat(),'requests':220,
+                'models':{'lite':220},'cooldowns':{'lite':deadline}}
+        budget=runtime.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0,seconds=720)
+        with self.assertRaisesRegex(runtime.GenerationPaused,'cooldown'): budget.reserve('lite')
+        self.assertEqual(budget.used,0)
+        self.assertEqual(ledger['cooldowns']['lite'],deadline)
+        self.assertEqual(ledger['requests'],0)
 
     def test_budget_inspection_does_not_reset_old_counters(self):
         old={'day':'2000-01-01','requests':220,'models':{'lite':220}}

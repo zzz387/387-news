@@ -50,8 +50,9 @@ class RequestBudget:
     def reserve(self, model):
         day = datetime.now(timezone.utc).date().isoformat()
         if self.ledger.get('day') != day:
+            cooldowns=dict(self.ledger.get('cooldowns',{}))
             self.ledger.clear()
-            self.ledger.update(day=day, requests=0, models={})
+            self.ledger.update(day=day, requests=0, models={},cooldowns=cooldowns)
         now = time.monotonic()
         if self.used >= self.run_limit or self.ledger['requests'] >= self.day_limit:
             raise GenerationPaused('API request budget exhausted; encrypted progress retained')
