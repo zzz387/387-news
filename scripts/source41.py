@@ -105,10 +105,16 @@ def extract(html,url):
     published=publisher_fields.get('published') or meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
     language=meta.get('lang') or meta.get('schema_inLanguage') or meta.get('og:locale') or ''
     language=language.split('-')[0].split('_')[0] if isinstance(language,str) else ''
+    # Russian can be established from the full extracted text's Cyrillic script when a
+    # documented institution omits html lang. Latin script alone cannot establish English.
+    language_evidence='publisher_metadata' if language else None
+    letters=[c for block in blocks for c in block['text'] if c.isalpha()]
+    if not language and profile and letters and sum('А'<=c<='я' or c in 'Ёё' for c in letters)/len(letters)>0.7:
+        language='ru';language_evidence='extracted_cyrillic_script'
     license_url=meta.get('license') or meta.get('schema_license')
     source={'id':policy.digest(url),'url':url,'canonical':urljoin(base,meta.get('canonical') or base),
             'title':title,'publisher':meta.get('og:site_name') or (profile or {}).get('publisher') or host,
-            'author':author,'published':published,'event_date':None,'language':language,
+            'author':author,'published':published,'event_date':None,'language':language,'language_evidence':language_evidence,
             'blocks':blocks,'content_hash':policy.digest(blocks),'raw_hash':policy.digest(html),
             'full_text_verified':True,'extraction_status':'complete','extraction_method':method,
             'access_checked_at':datetime.now(timezone.utc).isoformat(),

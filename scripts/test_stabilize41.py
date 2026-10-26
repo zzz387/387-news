@@ -78,6 +78,15 @@ class StabilizeTests(unittest.TestCase):
         self.assertEqual(report['unique_eligible'],0);self.assertEqual(report['gemini_requests'],0)
         self.assertEqual(report['rejected_candidates'][0]['failures'][0]['code'],'ROBOTS_FORBIDDEN')
 
+    def test_russian_institution_can_omit_language_but_latin_text_is_not_assumed_english(self):
+        from scripts import source41
+        html='<html><head><title>Инфляция</title></head><body><main><h1>Инфляция</h1><p>Устойчивый рост цен изменяет покупательную способность денег.</p></main></body></html>'
+        source=source41.extract(html,'https://www.cbr.ru/dkp/about_inflation/')
+        self.assertEqual(source['language'],'ru');self.assertEqual(source['language_evidence'],'extracted_cyrillic_script')
+        self.assertEqual(source['metadata_status'],'verified');self.assertEqual(source['author'],'');self.assertEqual(source['published'],'')
+        other=source41.extract(html.replace('Устойчивый рост цен изменяет покупательную способность денег.','A complete English looking sentence with Latin letters but no declared language.'),'https://www.cbr.ru/eng/example')
+        self.assertEqual(other['language'],'');self.assertEqual(other['metadata_status'],'needs_review')
+
     def test_read_only_monitor_has_no_pinned_dates_and_merge_does_not_wake_production(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)

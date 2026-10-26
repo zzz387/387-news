@@ -54,17 +54,13 @@
       "topic_id": "6",
       "category_hint": "Москва и путешествия",
       "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
-      "verification_urls": [
-        "https://www.culture.ru/s/tsaritsyno-museum/"
-      ]
+      "verification_urls": []
     },
     {
       "topic_id": "6",
       "category_hint": "Москва и путешествия",
       "url": "https://tsaritsyno-museum.ru/park/architecture/",
-      "verification_urls": [
-        "https://www.culture.ru/institutes/13638/ansambl-usadby-caricyno"
-      ]
+      "verification_urls": []
     },
     {
       "topic_id": "7",
@@ -91,16 +87,14 @@
     {
       "topic_id": "8",
       "category_hint": "Москва и путешествия",
-      "url": "https://www.nps.gov/articles/trip-planning-guide.htm",
+      "url": "https://www.nps.gov/subjects/healthandsafety/trip-planning-guide.htm",
       "verification_urls": []
     },
     {
       "topic_id": "9",
       "category_hint": "Москва и путешествия",
       "url": "https://tsaritsyno-museum.ru/the_museum/about/",
-      "verification_urls": [
-        "https://www.culture.ru/s/tsaritsyno-museum/"
-      ]
+      "verification_urls": []
     },
     {
       "topic_id": "9",
@@ -219,7 +213,7 @@
     {
       "topic_id": "17",
       "category_hint": "История и культура",
-      "url": "https://science.nasa.gov/solar-system/asteroids/osiris-rex/",
+      "url": "https://science.nasa.gov/mission/osiris-rex/",
       "verification_urls": []
     },
     {
@@ -291,6 +285,44 @@
       "verification_urls": [
         "https://www.nasa.gov/technology/"
       ]
+    },
+    {
+      "topic_id": "7",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "7",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "8",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "10",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "24",
+      "category_hint": "Технологии",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "verification_urls": [
+        "https://science.nasa.gov/earth/"
+      ]
+    },
+    {
+      "topic_id": "24",
+      "category_hint": "Технологии",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "verification_urls": []
     }
   ]
 }

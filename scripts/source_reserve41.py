@@ -26,8 +26,8 @@ def run(catalog,fetch=source41.fetch):
                     regions,method=dom.choose_region(document)
                     row['structure']={'method':method,'selected':len(regions),'candidates':[
                         {'tag':n.tag,'id':n.attrs.get('id'),'class':n.attrs.get('class'),'itemprop':n.attrs.get('itemprop'),'closed':n.closed}
-                        for n in document.root.all() if n.tag in ('main','article') or n.attrs.get('itemprop')=='articleBody' or
-                        any(token in (n.attrs.get('class','')+' '+n.attrs.get('id','')) for token in ('field--name-body','fulltext','article-body','maincontent'))][:30]}
+                        for n in document.root.all() if n.tag in ('main','article','body','html') or n.attrs.get('itemprop')=='articleBody' or
+                        any(token in (n.attrs.get('class','')+' '+n.attrs.get('id','')) for token in ('body','fulltext','article','content','main'))][:30]}
                 except Exception as diagnostic:row['diagnostic_error']=type(diagnostic).__name__
             return row
     with ThreadPoolExecutor(max_workers=3) as pool:sources=list(pool.map(inspect,urls))
