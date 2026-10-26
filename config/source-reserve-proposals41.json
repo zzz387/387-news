@@ -335,6 +335,22 @@
       "category_hint": "Семья",
       "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
       "verification_urls": []
+    },
+    {
+      "topic_id": "3",
+      "category_hint": "Семья",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "topic_id": "16",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
     }
   ]
 }

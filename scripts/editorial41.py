@@ -20,6 +20,7 @@ except ImportError:
 TRUSTED={
     'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org','unicef.org',
     'publication.pravo.gov.ru','consultant.ru','cbr.ru','mos.ru','nasa.gov','esa.int',
+    'journals.plos.org',  # peer-reviewed primary research; health still requires WHO/NIH/etc.
 }
 
 

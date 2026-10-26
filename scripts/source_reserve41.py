@@ -7,9 +7,10 @@ from scripts import source41,rights41,policy41 as p,editorial41 as e
 
 
 def run(catalog,fetch=source41.fetch):
+    diagnostic_transport=None
     if fetch is source41.fetch:
         from scripts.public_sources41 import Session
-        fetch=Session().fetch
+        session=Session();fetch=session.fetch;diagnostic_transport=session.transport
     candidates=catalog['candidates'];urls=list(dict.fromkeys(u for r in candidates for u in [r['url']]+r.get('verification_urls',[])))
     def inspect(url):
         try:
@@ -19,10 +20,10 @@ def run(catalog,fetch=source41.fetch):
         except Exception as exc:
             row={'url':url,'status':'blocked','code':getattr(exc,'code',type(exc).__name__)}
             if 'source' in locals():row['metadata']={k:source.get(k) for k in ('language','author','published','metadata_gaps','extraction_method')}
-            if row['code']=='SOURCE_EXTRACTION_PARTIAL':
+            if row['code']=='SOURCE_EXTRACTION_PARTIAL' and diagnostic_transport is not None:
                 try:
                     from scripts import source_dom41 as dom
-                    document=dom.Document();document.feed(source41.transport(url));document.close()
+                    document=dom.Document();document.feed(diagnostic_transport(url));document.close()
                     regions,method=dom.choose_region(document)
                     row['structure']={'method':method,'selected':len(regions),'candidates':[
                         {'tag':n.tag,'id':n.attrs.get('id'),'class':n.attrs.get('class'),'itemprop':n.attrs.get('itemprop'),'closed':n.closed}

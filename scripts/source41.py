@@ -113,11 +113,11 @@ def extract(html,url):
     published=publisher_fields.get('published') or meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
     language=meta.get('lang') or meta.get('schema_inLanguage') or meta.get('og:locale') or ''
     language=language.split('-')[0].split('_')[0] if isinstance(language,str) else ''
-    # Russian can be established from the full extracted text's Cyrillic script when a
-    # documented institution omits html lang. Latin script alone cannot establish English.
+    # The verified Russian CBR /dkp/ publication omits html lang. Restrict this
+    # fallback to that publisher/path and Cyrillic text; script alone is not a language.
     language_evidence='publisher_metadata' if language else None
     letters=[c for block in blocks for c in block['text'] if c.isalpha()]
-    if not language and profile and letters and sum('А'<=c<='я' or c in 'Ёё' for c in letters)/len(letters)>0.7:
+    if not language and host in ('www.cbr.ru','cbr.ru') and urlparse(base).path.startswith('/dkp/') and profile and letters and sum('А'<=c<='я' or c in 'Ёё' for c in letters)/len(letters)>0.7:
         language='ru';language_evidence='extracted_cyrillic_script'
     license_url=meta.get('license') or meta.get('schema_license')
     source={'id':policy.digest(url),'url':url,'canonical':urljoin(base,meta.get('canonical') or base),

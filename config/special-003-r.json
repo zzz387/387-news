@@ -144,19 +144,20 @@
       ],
       "requirements": [
         "Описать проверенное исследование: дизайн, участники, результаты, ограничения и корректные выводы; не подменять исследование пресс-релизом.",
-        "Тема — добавки к кофе, калорийность и ограничения наблюдательных данных. Исследование 2023 года не выдавать за исходное исследование 2026 года; неподтверждённый рост 40% не повторять. Не рекомендовать сливки как средство похудения; различать калорийность и наблюдаемую связь с массой тела."
+        "Тема — добавки к кофе, калорийность и ограничения наблюдательных данных. Исследование 2025 года не выдавать за исходное исследование 2026 года; неподтверждённый рост 40% не повторять. Не рекомендовать сливки как средство похудения; различать калорийность и наблюдаемую связь с массой тела."
       ],
       "evidence_plan": {
-        "primary": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
+        "primary": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
         "support": [
           "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
           "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
         ],
         "studies": [
-          "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/"
+          "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full"
         ],
         "mode": "INDEPENDENT_ARTICLE"
-      }
+      },
+      "replacement_topic": "Калорийность добавок к кофе: сахар, сливки, состав тела и ограничения наблюдательных исследований"
     },
     {
       "slot": 8,
@@ -171,12 +172,13 @@
         "https://www.nia.nih.gov/health/loneliness-and-social-isolation/loneliness-and-social-isolation-tips-staying-connected"
       ],
       "requirements": [
-        "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект."
+        "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект.",
+        "Исследование PLOS о пожилых жителях Китая использовать только с его реальными ограничениями: поперечный дизайн, контекст страны и возраста; не считать описательные различия причинным эффектом и не переносить их автоматически на все семьи."
       ],
       "evidence_plan": {
         "primary": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
         "support": [
-          "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/"
+          "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231"
         ],
         "studies": [],
         "mode": "INDEPENDENT_ARTICLE"

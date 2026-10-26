@@ -335,7 +335,7 @@ jobs:
   prepare:
     # Owner authorized direct v4.1 production rollout on 2026-10-26.
     # Repository variables and all technical/editorial publication gates remain mandatory.
-    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && !contains(github.event.head_commit.message, '[maintenance only]') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
+    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -540,7 +540,7 @@ jobs:
 
   monitor:
     needs: [prepare, deploy]
-    if: ${{ always() && github.ref == 'refs/heads/main' && !(github.event_name == 'push' && (contains(github.event.head_commit.message, '[special setup]') || contains(github.event.head_commit.message, '[maintenance only]'))) && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && !(github.event_name == 'push' && contains(github.event.head_commit.message, '[special setup]')) && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     permissions:

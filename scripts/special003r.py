@@ -32,7 +32,7 @@ def new_state():
             'url':plan['primary'],'original_urls':slot['original_urls'],'category_hint':slot['category'],
             'verification_urls':plan['support'],'evidence_plan':copy.deepcopy(plan),
             'unused_original_urls':[url for url in slot['original_urls'] if url not in [plan['primary']]+plan['support']],'status':'discovered','checks':{},'progress':{},
-            'commission':{'original_topic':slot['original_title'],'category':slot['category'],
+            'commission':{'original_topic':slot.get('replacement_topic',slot['original_title']),'category':slot['category'],
                 'requirements':slot['requirements'],'kind':'Внеочередное переиздание: события 26 октября не выдавать за новые; контекст только по подтверждённым источникам. Неиспользованные исходные URL не считаются проверенными. Научная статья, использованная вместо исходной, должна быть явно отличима от исходного исследования.'}})
     return state
 

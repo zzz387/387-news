@@ -54,8 +54,9 @@ class StabilizeTests(unittest.TestCase):
     def test_special_alternative_migration_preserves_quota_and_unrelated_progress(self):
         from scripts import special003r as runner,special_contract41 as sc
         config=copy.deepcopy(sc.definition())
-        for slot in config['slots']:slot.pop('evidence_plan',None)
-        config['slots'][6]['requirements'].pop()
+        for slot in config['slots']:
+            slot.pop('evidence_plan',None);slot.pop('replacement_topic',None)
+        config['slots'][6]['requirements'].pop();config['slots'][7]['requirements'].pop()
         self.assertEqual(p.digest(config),runner.PREVIOUS_DEFINITION_HASH)
         with patch.object(sc,'definition',return_value=config):old=runner.new_state()
         accepted=old['candidates'][2];accepted['status']='ready';accepted['article']={'title':'Synthetic accepted article'}
@@ -86,6 +87,8 @@ class StabilizeTests(unittest.TestCase):
         self.assertEqual(source['metadata_status'],'verified');self.assertEqual(source['author'],'');self.assertEqual(source['published'],'')
         other=source41.extract(html.replace('Устойчивый рост цен изменяет покупательную способность денег.','A complete English looking sentence with Latin letters but no declared language.'),'https://www.cbr.ru/eng/example')
         self.assertEqual(other['language'],'');self.assertEqual(other['metadata_status'],'needs_review')
+        unrelated=source41.extract(html,'https://www.unicef.org/parenting/example')
+        self.assertEqual(unrelated['language'],'');self.assertEqual(unrelated['metadata_status'],'needs_review')
 
     def test_nist_complete_body_is_domain_scoped_and_partial_body_stays_blocked(self):
         from scripts import source41
@@ -138,9 +141,9 @@ class StabilizeTests(unittest.TestCase):
         self.assertTrue(all(r['status']=='discovered' for r in state['candidates'][1:]))
         self.assertEqual(state['_quota_snapshot'],{'requests':207})
 
-    def test_read_only_monitor_has_no_pinned_dates_and_merge_does_not_wake_production(self):
+    def test_read_only_monitor_has_no_pinned_dates_and_release_requirements_are_preserved(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)
         daily=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
-        self.assertIn("!contains(github.event.head_commit.message, '[maintenance only]')",daily)
+        self.assertIn("cron: '54 2 * * *'",daily);self.assertEqual(p.RELEASE_TIME,'06:00')
         self.assertEqual(p.ARTICLE_COUNT,12)
