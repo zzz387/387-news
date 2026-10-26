@@ -86,7 +86,7 @@ def study_links(source):
 
 
 def probe():
-    config=sc.definition();urls=list(dict.fromkeys(u for slot in config['slots'] for u in slot['original_urls']))
+    config=sc.definition();urls=list(dict.fromkeys(u for slot in config['slots'] for u in slot['original_urls']+slot['verification_urls']))
     def inspect(url):
         try:
             source=source41.fetch(url);mode,decision=rights41.select_mode(source)
@@ -117,7 +117,7 @@ def probe():
     with ThreadPoolExecutor(max_workers=3) as pool:research=list(pool.map(inspect,research_urls))
     research_by_url={r['url']:r for r in research}
     def slot_status(slot):
-        if not all(by_url[u]['status']=='eligible' for u in slot['original_urls']):return 'source_hold'
+        if not all(by_url[u]['status']=='eligible' for u in slot['original_urls']+slot['verification_urls']):return 'source_hold'
         if slot['category']=='Здоровье и движение':
             studies=by_url[slot['url']].get('study_urls',[])
             if not studies or not all(research_by_url[u]['status']=='eligible' for u in studies):return 'medical_evidence_hold'
