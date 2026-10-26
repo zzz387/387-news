@@ -49,6 +49,18 @@
     "nih.gov": {
       "publisher": "National Institutes of Health",
       "evidence_url": "https://www.nih.gov/about-nih"
+    },
+    "sciencedaily.com": {
+      "publisher": "ScienceDaily",
+      "evidence_url": "https://www.sciencedaily.com/about.htm"
+    },
+    "greatergood.berkeley.edu": {
+      "publisher": "Greater Good Science Center, UC Berkeley",
+      "evidence_url": "https://greatergood.berkeley.edu/about"
+    },
+    "mskagency.ru": {
+      "publisher": "Агентство городских новостей «Москва»",
+      "evidence_url": "https://www.mskagency.ru/about"
     }
   }
 }

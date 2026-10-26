@@ -1,0 +1,273 @@
+"""Special-only eight-slot exception, zero-production interference and final projections."""
+import copy
+from datetime import datetime
+import json
+from pathlib import Path
+import shutil
+import tempfile
+import unittest
+from unittest.mock import patch
+from scripts import special003r as runner,special_contract41 as sc,special_publication41 as pub
+from scripts import policy41 as p,editorial41 as e,rights41,news
+from scripts.test_policy41 import record,issue
+
+
+def complete_special():
+    config=sc.definition();state=runner.new_state()
+    records=[]
+    for index,slot in enumerate(config['slots']):
+        r=record(index);r['id']='003-R-'+str(slot['slot']);r['special_slot']=slot['slot']
+        r['url']=r['source']['url']=r['source']['canonical']=slot['url'];r['original_urls']=slot['original_urls']
+        r['mode']=r['article']['mode']='INDEPENDENT_ARTICLE'
+        r['article']['blocks']=[{'kind':'paragraph','text':'Самостоятельное вымышленное объяснение с подробностью '+str(index)}]
+        r['article']['category']=slot['category'];r['article']['activities']=[]
+        r['rights']=rights41.decision(r['source'],r['mode']);r['article']['attribution']=r['rights'].get('attribution',{})
+        r['supporting_sources']=[{'url':u,'full_text_verified':True} for u in slot['original_urls'][1:]]
+        if slot['category']=='Здоровье и движение':
+            r['special_study_urls']=['https://doi.org/10.synthetic/'+str(index)]
+            r['supporting_sources'] += [{'url':r['special_study_urls'][0],'full_text_verified':True}]
+        if slot['slot']==3:
+            r['article']['activities']=[{'id':str(i),'title':'Вымышленное занятие '+str(i),'age':'При готовности ребёнка',
+                'materials':['Безопасный учебный предмет'],'steps':['Взрослый показывает учебное действие '+str(i)],
+                'benefit':'Совместное внимание','safety':'Непрерывное наблюдение взрослого'} for i in range(21)]
+        for block in r['article']['blocks']:block.pop('source_block_id',None)
+        fingerprint=e.article_hash(r['article'],r['source'],r['rights'])
+        r['checks']={name:{'approved':True,'input_hash':fingerprint} for name in p.STAGES}
+        r['checks']['source_verified']={'approved':True,'special_evidence_complete':True,
+            'input_hash':p.digest({'source':r['source']['content_hash'],'rights':r['rights'],'images':[]})}
+        records.append(r)
+    state['candidates']=records;state['selected_ids']=[r['id'] for r in records];state['audit_passed']=True
+    state['issue_approval_hash']=p.digest([e.article_hash(r['article'],r['source'],r['rights']) for r in records])
+    return state
+
+
+class SpecialTests(unittest.TestCase):
+    def test_shared_ledger_merges_reservations_models_and_cooldowns_without_reset(self):
+        from scripts import generation_runtime as rt
+        ledger={'day':'2026-10-26','requests':207,'models':{'lite':207},'cooldowns':{'lite':200}}
+        backup={'day':'2026-10-26','requests':210,'models':{'lite':209,'flash':1},'cooldowns':{'lite':100,'flash':300}}
+        original=copy.deepcopy(backup);rt.merge_snapshot(ledger,backup)
+        self.assertEqual(ledger['requests'],210);self.assertEqual(ledger['models'],{'lite':209,'flash':1})
+        self.assertEqual(ledger['cooldowns'],{'lite':200,'flash':300});self.assertEqual(backup,original)
+        rt.merge_snapshot(ledger,{'day':'2026-10-27','requests':2,'models':{'flash':2},'cooldowns':{'lite':150}})
+        self.assertEqual(ledger['requests'],2);self.assertEqual(ledger['models'],{'flash':2})
+        self.assertEqual(ledger['cooldowns']['flash'],300)
+        rt.merge_snapshot(ledger,backup);self.assertEqual(ledger['requests'],2)
+
+    def test_daily_recovers_only_quota_from_synthetic_special_ciphertext(self):
+        from scripts import staged_news as stage
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'special-003-r.enc';key=bytes(range(32));state=runner.new_state()
+            state['_quota_snapshot']={'day':'2026-10-26','requests':210,'models':{'lite':210},'cooldowns':{'lite':9999999999}}
+            path.write_bytes(stage.cipher(state,key))
+            env={'GITHUB_ACTIONS':'true','NEWS_SPECIAL_QUOTA_FILE':str(path),'NEWS_SPECIAL_QUOTA_EXPECTED':'true'}
+            ledger={'day':'2026-10-26','requests':207,'models':{'lite':207}}
+            with patch.dict('os.environ',env):stage.recover_special_quota(ledger,key)
+            self.assertEqual(ledger['requests'],210);self.assertNotIn('candidates',ledger)
+            self.assertEqual(ledger['cooldowns']['lite'],9999999999)
+            state['preview']=True;path.write_bytes(stage.cipher(state,key))
+            with patch.dict('os.environ',env),self.assertRaisesRegex(RuntimeError,'provenance'):
+                stage.recover_special_quota(ledger,key)
+            path.unlink()
+            with patch.dict('os.environ',env),self.assertRaisesRegex(RuntimeError,'missing'):
+                stage.recover_special_quota(ledger,key)
+
+    def test_latest_shared_snapshot_alias_is_selected_without_overwriting_artifacts(self):
+        from scripts import locate_checkpoint as locator,staged_news as stage
+        from datetime import timezone
+        day=datetime.now(timezone.utc).date().isoformat();label=stage.quota_label()
+        records=[{'name':label,'id':10,'created_at':day+'T15:00:00Z','expired':False,'workflow_run':{'id':100,'head_branch':'main'}},
+                 {'name':label+'-special-003-r','id':11,'created_at':day+'T15:01:00Z','expired':False,'workflow_run':{'id':100,'head_branch':'main'}}]
+        with tempfile.TemporaryDirectory() as directory:
+            output=Path(directory)/'output'
+            env={'PHASE':'check','PREVIEW':'true','TARGET_DATE':'2026-10-26','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_OUTPUT':str(output)}
+            with patch.dict('os.environ',env,clear=True),patch.object(stage,'request_json',return_value={'artifacts':records}):locator.main()
+            self.assertIn('quota_id=11',output.read_text())
+        workflow=(p.ROOT/'.github/workflows/special-003-r.yml').read_text()
+        self.assertNotIn('overwrite: true',workflow)
+        daily=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
+        self.assertIn('NEWS_SPECIAL_QUOTA_EXPECTED:',daily)
+
+    def test_daily_twelve_is_unchanged_and_narrow_special_requires_exact_eight(self):
+        self.assertEqual(p.ARTICLE_COUNT,12);daily=issue();self.assertTrue(e.validate_issue(daily))
+        daily['selected_ids']=daily['selected_ids'][:8]
+        with self.assertRaises(p.Blocked):e.validate_issue(daily)
+        special=complete_special();self.assertTrue(e.validate_issue(special))
+        special['selected_ids']=special['selected_ids'][:7]
+        with self.assertRaises(p.Blocked):e.validate_issue(special)
+
+    def test_forged_contract_topic_and_primary_source_cannot_publish(self):
+        for mutation in ('definition','slot','source','category'):
+            state=complete_special()
+            if mutation=='definition':state['special_edition']['definition_hash']='wrong'
+            elif mutation=='slot':state['candidates'][0]['special_slot']=2
+            elif mutation=='source':state['candidates'][0]['source']['url']='https://example.org/other'
+            else:state['candidates'][0]['article']['category']='Наука'
+            with self.subTest(mutation=mutation),self.assertRaises(p.Blocked):e.validate_issue(state)
+
+    def test_21_instructions_study_and_all_companions_are_required(self):
+        for mutation in ('activities','study','companions'):
+            state=complete_special()
+            if mutation=='activities':state['candidates'][2]['article']['activities'].pop()
+            elif mutation=='study':state['candidates'][5]['special_study_urls']=[]
+            else:state['candidates'][0]['supporting_sources']=[]
+            with self.subTest(mutation=mutation),self.assertRaises(p.Blocked):e.validate_issue(state)
+
+    def test_daily_priority_quota_and_cooldown_are_read_only(self):
+        now=datetime(2026,10,26,15,30,tzinfo=p.TZ);daily=issue();daily.update(branch='main',preview=False)
+        ledger={'day':'2026-10-26','requests':194,'models':{},'cooldowns':{}}
+        before=copy.deepcopy((daily,ledger))
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);(root/'issues/2026-10-26').mkdir(parents=True)
+            (root/'issues/2026-10-26/issue.json').write_text('{}')
+            self.assertTrue(runner.admit(root,daily,ledger,now)[0])
+            self.assertEqual(runner.admit(root,None,ledger,now)[1],'DAILY_NOT_READY')
+            self.assertEqual(runner.admit(root,daily,dict(ledger,requests=196),now)[1],'NO_SPARE_QUOTA_WITH_DAILY_RESERVE')
+            self.assertEqual(runner.admit(root,daily,dict(ledger,cooldowns={'lite':now.timestamp()+60}),now)[1],'GEMINI_COOLDOWN')
+            self.assertEqual(runner.admit(root,daily,ledger,now.replace(hour=5))[1],'OUTSIDE_SPARE_DAYTIME_WINDOW')
+        self.assertEqual((daily,ledger),before)
+
+    def test_new_state_uses_fixed_slots_and_separate_identity_without_legacy_approval(self):
+        state=runner.new_state()
+        self.assertEqual(len(state['candidates']),8);self.assertFalse(state['audit_passed'])
+        self.assertTrue(sc.is_special(state));self.assertNotEqual(runner.LABEL,'387news31-production-2026-10-27')
+
+    def test_publication_keeps_original_and_home_bytes_and_uses_actual_publication_date(self):
+        state=complete_special();config=copy.deepcopy(sc.definition());original={'number':3,'date':sc.ORIGINAL,'articles':[{'title':'Исходная вымышленная тема '+str(i)} for i in range(8)]}
+        config['original_manifest_hash']=p.digest(original)
+        state['special_edition']['definition_hash']=p.digest(config)
+        state['published_at']='2026-10-28T13:22:00+03:00'
+        with tempfile.TemporaryDirectory() as temp,patch.object(sc,'definition',return_value=config):
+            root=Path(temp);shutil.copytree(p.ROOT/'assets',root/'assets')
+            (root/'archive').mkdir();(root/'issues'/sc.ORIGINAL).mkdir(parents=True)
+            (root/'issues'/sc.ORIGINAL/'issue.json').write_text(json.dumps(original))
+            # Fixture baseline pages only; real source/closed data is never loaded.
+            (root/'issues'/sc.ORIGINAL/'index.html').write_text('<html><body>Оригинал</body></html>')
+            (root/'index.html').write_text('<html><body>Ежедневная главная</body></html>')
+            original_bytes=(root/'issues'/sc.ORIGINAL/'index.html').read_bytes();home=(root/'index.html').read_bytes()
+            self.assertTrue(pub.build(state,root));self.assertEqual(pub.validate(root)['count'],8)
+            self.assertEqual((root/'index.html').read_bytes(),home)
+            self.assertEqual((root/'issues'/sc.ORIGINAL/'index.html').read_bytes(),original_bytes)
+            overview=(root/'issues'/sc.SLUG/'index.html').read_text()
+            self.assertIn('2026-10-28',overview);self.assertIn('№003-R',overview)
+            self.assertIn('/issues/'+sc.SLUG+'/',(root/'archive/index.html').read_text())
+            self.assertIn('/issues/'+sc.SLUG+'/',(root/'sitemap.xml').read_text())
+            self.assertFalse(pub.build(state,root));self.assertEqual(news.ROOT,p.ROOT)
+            self.assertEqual(len(list((root/'issues'/sc.SLUG/'articles').glob('*/article.md'))),8)
+
+    def test_shared_mutex_and_no_independent_cron_or_daily_checkpoint_upload(self):
+        text=(p.ROOT/'.github/workflows/special-003-r.yml').read_text()
+        self.assertNotIn('cron:',text);self.assertNotIn('workflow_dispatch:',text)
+        self.assertNotIn('path: ${{ runner.temp }}/read-only-daily/news-draft.enc',text)
+        main=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
+        self.assertIn('needs: [prepare, deploy, monitor]',main);self.assertIn("'387-news-stage-v31'",main)
+
+    def test_initialize_writes_only_independent_ciphertext_and_no_api_or_ledger_updates(self):
+        import base64,os
+        from scripts import staged_news as stage
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);(root/'incoming').mkdir();(root/'output').write_text('')
+            (root/'config').mkdir();shutil.copyfile(p.ROOT/'config/special-003-r.json',root/'config/special-003-r.json')
+            ledger={'day':datetime.now(__import__('datetime').timezone.utc).date().isoformat(),'requests':207,'models':{},'cooldowns':{}}
+            quota=root/'quota.json';quota.write_text(json.dumps(ledger));before=quota.read_bytes()
+            env={'GITHUB_ACTIONS':'true','GITHUB_REF_NAME':'main','GITHUB_REPOSITORY':'zzz387/387-news',
+                 'NEWS_SPECIAL_EDITION':'003-R','SPECIAL_INITIALIZE_ONLY':'true',
+                 'DRAFT_ENCRYPTION_KEY':base64.b64encode(b'x'*32).decode(),
+                 'SPECIAL_CHECKPOINT_FILE':str(root/'incoming/special-003-r.enc'),
+                 'DAILY_CHECKPOINT_FILE':str(root/'daily.enc'),'QUOTA_CHECKPOINT_FILE':str(quota),
+                 'SPECIAL_EXPECTED':'false','DAILY_EXPECTED':'false','QUOTA_EXPECTED':'true',
+                 'RUNNER_TEMP':str(root),'GITHUB_OUTPUT':str(root/'output')}
+            with patch.dict(os.environ,env),patch.object(runner.p,'ROOT',root),patch.object(sc,'check_original'),\
+                 patch.object(news.runtime,'RequestBudget',side_effect=AssertionError('No API budget in initialize')),\
+                 patch.object(stage,'request_json',side_effect=AssertionError('No new run dispatch')):
+                runner.run()
+            self.assertEqual(quota.read_bytes(),before);self.assertFalse((root/'daily.enc').exists())
+            state=stage.decipher((root/'special-003-r.enc').read_bytes(),b'x'*32)
+            self.assertEqual(state['_quota_snapshot']['requests'],207);self.assertEqual(len(state['candidates']),8)
+            self.assertNotIn('quota=true',(root/'output').read_text())
+
+    def test_stale_shared_ledger_cannot_erase_special_counter_snapshot(self):
+        import base64,os
+        from scripts import staged_news as stage
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp);(root/'output').write_text('')
+            (root/'config').mkdir();shutil.copyfile(p.ROOT/'config/special-003-r.json',root/'config/special-003-r.json')
+            day=datetime.now(__import__('datetime').timezone.utc).date().isoformat()
+            old=runner.new_state();old['_quota_snapshot']={'day':day,'requests':210,'models':{}}
+            (root/'special-input.enc').write_bytes(stage.cipher(old,b'x'*32))
+            quota=root/'quota.json';quota.write_text(json.dumps({'day':day,'requests':207,'models':{}}))
+            env={'GITHUB_ACTIONS':'true','GITHUB_REF_NAME':'main','GITHUB_REPOSITORY':'zzz387/387-news',
+                 'NEWS_SPECIAL_EDITION':'003-R','SPECIAL_INITIALIZE_ONLY':'true',
+                 'DRAFT_ENCRYPTION_KEY':base64.b64encode(b'x'*32).decode(),
+                 'SPECIAL_CHECKPOINT_FILE':str(root/'special-input.enc'),'DAILY_CHECKPOINT_FILE':str(root/'none'),
+                 'QUOTA_CHECKPOINT_FILE':str(quota),'RUNNER_TEMP':str(root),'GITHUB_OUTPUT':str(root/'output')}
+            with patch.dict(os.environ,env),patch.object(runner.p,'ROOT',root),patch.object(sc,'check_original'):
+                runner.run()
+            restored=stage.decipher((root/'special-003-r.enc').read_bytes(),b'x'*32)
+            self.assertEqual(restored['_quota_snapshot']['requests'],210)
+            self.assertEqual(json.loads(quota.read_text())['requests'],207)
+
+
+    def test_missing_full_companion_does_not_spend_a_model_request(self):
+        state=runner.new_state();r=state['candidates'][0]
+        primary=record(0)['source'];primary.update(url=r['url'],canonical=r['url'])
+        def fetch(url):
+            if url==r['url']:return primary
+            raise OSError('Synthetic unavailable original companion')
+        editor=runner.Editor(call=lambda *a,**k:(_ for _ in ()).throw(AssertionError('No Gemini before full originals')),fetch=fetch)
+        with self.assertRaises(OSError):editor.source_verified(state,r)
+
+
+    def test_existing_special_pages_redeploy_without_model_work_and_stop_after_five_attempts(self):
+        state={'_quota_snapshot':{'requests':207}};saved=[]
+        def unavailable():raise OSError('Synthetic Pages unavailable')
+        for _ in range(5):self.assertTrue(runner.recover_delivery(state,lambda:saved.append(copy.deepcopy(state)),unavailable))
+        self.assertFalse(runner.recover_delivery(state,lambda:None,unavailable))
+        self.assertEqual(state['delivery_attempts'],5);self.assertEqual(state['_quota_snapshot']['requests'],207)
+        self.assertFalse(runner.recover_delivery(state,lambda:None,lambda:{'status':'PUBLISHED','articles':8}))
+        self.assertTrue(state['publication_verified'])
+
+
+    def test_reissue_does_not_publish_stale_material_as_current_news(self):
+        state=complete_special();r=state['candidates'][0]
+        r['article']['kind']='новость';r['source']['event_date']='2020-01-01T12:00:00+03:00'
+        with patch.object(e,'verify_publication_sources',return_value=True),self.assertRaisesRegex(p.Blocked,'SPECIAL_NEWS_NO_LONGER_CURRENT'):
+            runner.verify_sources(state,lambda:None)
+
+
+    def test_shared_workflow_run_never_exceeds_daily_plus_special_twenty_four(self):
+        self.assertEqual(runner.remaining_run_limit(24,{'requests':100}),0)
+        self.assertEqual(runner.remaining_run_limit(22,{'requests':100}),2)
+        self.assertEqual(runner.remaining_run_limit(0,{'requests':194}),2)
+        self.assertEqual(runner.remaining_run_limit(0,{'requests':196}),0)
+        with self.assertRaises(RuntimeError):runner.remaining_run_limit(-1,{'requests':100})
+
+
+    def test_explicit_publication_labels_and_real_bylines_not_last_modified(self):
+        from scripts import source41
+        page='<html lang="en"><meta name="last-modified" content="today"><dl><dt>Date:</dt><dd>October 21, 2026</dd></dl><main><h1>Synthetic study</h1><p>Complete fictional publication.</p></main></html>'
+        source=source41.extract(page,'https://www.sciencedaily.com/releases/synthetic.htm')
+        self.assertEqual(source['published'],'2026-10-21');self.assertEqual(source['author'],'')
+        self.assertIn('author',source['metadata_gaps'])
+        other='<html lang="en"><p>By Fixture Author | February 13, 2025</p><article><h1>Synthetic relationship</h1><p>Complete fictional article.</p></article></html>'
+        source=source41.extract(other,'https://greatergood.berkeley.edu/article/item/synthetic')
+        self.assertEqual(source['author'],'Fixture Author');self.assertEqual(source['published'],'2025-02-13')
+
+    def test_cited_dx_doi_alias_is_resolved_securely_without_search_or_abstract_fallback(self):
+        source={'url':'https://www.sciencedaily.com/releases/synthetic.htm','blocks':[{'links':['http://dx.doi.org/10.1234/fixture']}]}
+        self.assertEqual(runner.study_links(source),['https://doi.org/10.1234/fixture'])
+
+
+    def test_redirected_full_study_resolves_links_on_publisher_not_doi_resolver(self):
+        from scripts import source41
+        text='<html lang="en"><meta name="author" content="Fixture author"><meta property="article:published_time" content="2026-10-01"><article><h1>Fixture study</h1><p>Complete fictional result <a href="/other">reference</a>.</p></article></html>'
+        html=source41.ResolvedHTML(text,'https://journal.example.org/paper')
+        source=source41.extract(html,'https://doi.org/10.1234/fixture')
+        self.assertEqual(source['url'],'https://doi.org/10.1234/fixture')
+        self.assertEqual(source['canonical'],'https://journal.example.org/paper')
+        self.assertEqual(source['blocks'][-1]['links'],['https://journal.example.org/other'])
+        self.assertEqual(runner.study_links({'url':'https://example.org/paper','blocks':[{'links':['https://doi.org/plosone/article?id=1']}]}),[])
+
+
+
+if __name__=='__main__':unittest.main()

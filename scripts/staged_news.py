@@ -502,6 +502,25 @@ def _assemble_files(state, release, root):
     return True
 
 
+def recover_special_quota(ledger, key):
+    """Actions-only decryption: recover accounting only, never special editorial state."""
+    location=os.getenv('NEWS_SPECIAL_QUOTA_FILE')
+    expected=os.getenv('NEWS_SPECIAL_QUOTA_EXPECTED')=='true'
+    if not location:
+        if expected: raise RuntimeError('Missing special quota backup path')
+        return
+    path=Path(location)
+    if not path.is_file():
+        if expected: raise RuntimeError('Expected special quota backup download missing')
+        return
+    if os.getenv('GITHUB_ACTIONS')!='true':raise RuntimeError('Special quota recovery requires Actions')
+    backup=decipher(path.read_bytes(),key)
+    if (backup.get('version')!=41 or backup.get('branch')!='main' or backup.get('preview') is not False
+            or backup.get('special_edition',{}).get('id')!='003-R'):
+        raise RuntimeError('Invalid special quota backup provenance')
+    RUNTIME.merge_snapshot(ledger,backup.get('_quota_snapshot',{}))
+
+
 def main():
     global PERSIST
     p = argparse.ArgumentParser()
@@ -542,11 +561,8 @@ def main():
     if os.getenv('NEWS_QUOTA_EXPECTED') == 'true' and not quota_path.is_file():
         raise RuntimeError('Expected quota ledger download missing; refusing API calls')
     ledger = json.loads(quota_path.read_text()) if quota_path.is_file() else {}
-    snapshot = (state or {}).get('_quota_snapshot', {})
-    if snapshot.get('day') == ledger.get('day'):
-        ledger['requests'] = max(ledger.get('requests', 0), snapshot.get('requests', 0))
-    elif snapshot.get('day', '') > ledger.get('day', ''):
-        ledger = snapshot.copy()
+    RUNTIME.merge_snapshot(ledger,(state or {}).get('_quota_snapshot', {}))
+    recover_special_quota(ledger,key)
     output = os.getenv('GITHUB_OUTPUT')
 
     def persist():

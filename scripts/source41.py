@@ -25,6 +25,11 @@ def safe_url(url):
     return url
 
 
+class ResolvedHTML(str):
+    def __new__(cls,text,resolved_url):
+        value=super().__new__(cls,text);value.resolved_url=resolved_url;return value
+
+
 def transport(url,limit=None):
     safe_url(url)
     limit=limit or policy.CONFIG['technical']['source_byte_limit']
@@ -33,11 +38,38 @@ def transport(url,limit=None):
         if response.status!=200: raise policy.Blocked('SOURCE_UNAVAILABLE')
         data=response.read(limit+1)
         if len(data)>limit: raise policy.Blocked('SOURCE_TRANSPORT_LIMIT','Source is not truncated; review a larger safe transport budget')
-        return data.decode(response.headers.get_content_charset() or 'utf-8',errors='strict')
+        return ResolvedHTML(data.decode(response.headers.get_content_charset() or 'utf-8',errors='strict'),response.geturl())
+
+
+def publisher_metadata(document,host):
+    """Explicit publisher bylines/publication labels, never last-modified or event dates."""
+    result={}
+    if host=='sciencedaily.com' or host.endswith('.sciencedaily.com'):
+        for node in document.root.all():
+            if node.tag!='dt' or node.text().strip().rstrip(':').casefold()!='date' or node.parent is None:continue
+            siblings=[child for child in node.parent.children if hasattr(child,'tag')]
+            index=siblings.index(node)
+            if index+1<len(siblings) and siblings[index+1].tag=='dd':
+                raw=' '.join(siblings[index+1].text().split())
+                try:result['published']=datetime.strptime(raw,'%B %d, %Y').date().isoformat()
+                except ValueError:pass
+                if result:break
+    if host=='greatergood.berkeley.edu':
+        rows=set()
+        for node in document.root.all():
+            text=' '.join(node.text().split())
+            if len(text)>500:continue  # metadata transport bound; article text is never clipped
+            match=re.fullmatch(r'By (.+?)\s*\|\s*([A-Za-z]+ \d{1,2}, \d{4})',text)
+            if match:
+                try:rows.add((match[1],datetime.strptime(match[2],'%B %d, %Y').date().isoformat()))
+                except ValueError:pass
+        if len(rows)==1:result['author'],result['published']=next(iter(rows))
+    return result
 
 
 def extract(html,url):
     safe_url(url)
+    base=safe_url(getattr(html,'resolved_url',url))
     try:
         from scripts import source_dom41 as dom
     except ImportError: import source_dom41 as dom
@@ -64,23 +96,24 @@ def extract(html,url):
     if not isinstance(title,str) or not title: raise policy.Blocked('SOURCE_METADATA_INCOMPLETE')
     if not any(b['kind']=='title' for b in blocks):
         blocks.insert(0,{'id':'title','kind':'title','text':title,'links':[],'heading_level':1})
-    for block in blocks: block['links']=[urljoin(url,link) for link in block['links']]
-    host=urlparse(url).hostname
+    for block in blocks: block['links']=[urljoin(base,link) for link in block['links']]
+    host=urlparse(base).hostname
     profiles=json.loads((policy.ROOT/'config/source-profiles.json').read_text())['institutions']
     profile=next((v for domain,v in profiles.items() if host==domain or host.endswith('.'+domain)),None)
-    author=meta.get('schema_author') or meta.get('author') or meta.get('article:author') or meta.get('citation_author') or ''
-    published=meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
+    publisher_fields=publisher_metadata(document,host)
+    author=publisher_fields.get('author') or meta.get('schema_author') or meta.get('author') or meta.get('article:author') or meta.get('citation_author') or ''
+    published=publisher_fields.get('published') or meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
     language=meta.get('lang') or meta.get('schema_inLanguage') or meta.get('og:locale') or ''
     language=language.split('-')[0].split('_')[0] if isinstance(language,str) else ''
     license_url=meta.get('license') or meta.get('schema_license')
-    source={'id':policy.digest(url),'url':url,'canonical':urljoin(url,meta.get('canonical') or url),
+    source={'id':policy.digest(url),'url':url,'canonical':urljoin(base,meta.get('canonical') or base),
             'title':title,'publisher':meta.get('og:site_name') or (profile or {}).get('publisher') or host,
             'author':author,'published':published,'event_date':None,'language':language,
             'blocks':blocks,'content_hash':policy.digest(blocks),'raw_hash':policy.digest(html),
             'full_text_verified':True,'extraction_status':'complete','extraction_method':method,
             'access_checked_at':datetime.now(timezone.utc).isoformat(),
-            'declared_license':urljoin(url,license_url) if isinstance(license_url,str) else None,
-            'images':[dict(image,url=urljoin(url,image['url'])) for image in images],
+            'declared_license':urljoin(base,license_url) if isinstance(license_url,str) else None,
+            'images':[dict(image,url=urljoin(base,image['url'])) for image in images],
             'institutional_source':bool(profile),'ai_use_restricted':bool((profile or {}).get('ai_use_restricted')),
             'metadata_gaps':[name for name,value in (('author',author),('published',published)) if not value]}
     source['metadata_status']='verified' if language and (bool(author and published) or profile) else 'needs_review'
