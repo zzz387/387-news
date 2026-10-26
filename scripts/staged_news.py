@@ -556,14 +556,17 @@ def main():
             raise RuntimeError('Encrypted draft missing; run plan first')
         ready=False
         if args.phase=='plan':
+            pipeline.status(state,'PLANNING','research')
             build_plan(state,date)
         elif args.phase=='research':
+            pipeline.status(state,'RESEARCHING','write')
             if not state.get('plan'): build_plan(state,date)
             research_batch(state)
         elif args.phase in ('run','resume','write','audit','auto'):
             ready=pipeline.advance(state,date,args.preview,sys.modules[__name__],persist)
         elif args.phase=='publish':
             ready=render(state,args.preview)
+            pipeline.status(state,'PUBLISHING' if ready else 'APPROVED','commit_and_deploy' if ready else 'preview_complete')
         if output and ready:
             with open(output,'a',encoding='utf-8') as stream:
                 stream.write(f'published=true\nissue_date={state["date"]}\n')
