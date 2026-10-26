@@ -324,8 +324,8 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
 
     def test_sigterm_saves_dossier_and_restores_handler(self):
         key = bytes(range(32))
-        state = {'version':31,'date':'2030-01-01','sources':[{'id':'S001'}],
-                 'plan':[{'category':'Семья','long':False,'source_ids':['S001']}],
+        state = {'version':31,'date':'2030-01-01','sources':[{'id':f'S{i+1:03d}'} for i in range(8)],
+                 'plan':[{'category':'Семья','long':False,'source_ids':[f'S{i+1:03d}']} for i in range(8)],
                  'articles':{}, 'dossiers':{}, 'audit_passed':False}
         previous = signal.getsignal(signal.SIGTERM)
         with tempfile.TemporaryDirectory() as directory:

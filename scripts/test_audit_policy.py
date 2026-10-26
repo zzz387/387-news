@@ -198,14 +198,14 @@ class LegacyRecoveryTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'plan mismatch'): repair.recover_legacy_article(state,prior)
         self.assertEqual(len(state['articles']),7)
 
-    def test_backlog_resumes_after_quota_day_rollover_without_changing_daily_cron(self):
+    def test_routing_after_quota_day_rollover_uses_current_day_not_legacy_backlog(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory)
             phase,preview,date=release_queue.context('write',False,'','schedule',root,datetime(2026,10,26,3,17))
-            self.assertEqual((phase,preview,date),('resume',False,'2026-10-25'))
+            self.assertEqual((phase,preview,date),('run',False,'2026-10-26'))
             (root/'issues/2026-10-25').mkdir(parents=True)
             (root/'issues/2026-10-25/issue.json').write_text('{}')
-            self.assertEqual(release_queue.context('write',False,'','schedule',root,datetime(2026,10,26,3,17)),('write',False,''))
+            self.assertEqual(release_queue.context('write',False,'','schedule',root,datetime(2026,10,26,3,17)),('run',False,'2026-10-26'))
             self.assertEqual(release_queue.context('audit',True,'2026-10-27','workflow_dispatch',root,datetime(2026,10,26)),('audit',True,'2026-10-27'))
 
 if __name__=='__main__': unittest.main()

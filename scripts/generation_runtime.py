@@ -35,6 +35,18 @@ class RequestBudget:
         self.used = 0
         self.last = None
 
+    def remaining_requests(self):
+        day = datetime.now(timezone.utc).date().isoformat()
+        used_today = self.ledger.get('requests',0) if self.ledger.get('day')==day else 0
+        return max(0,min(self.run_limit-self.used,self.day_limit-used_today))
+
+    def remaining_seconds(self):
+        return max(0,self.deadline-time.monotonic())
+
+    def can_request(self):
+        # Inspection does not reset the ledger or reserve an extra request.
+        return self.remaining_requests()>0 and self.remaining_seconds()>self.gap+155
+
     def reserve(self, model):
         day = datetime.now(timezone.utc).date().isoformat()
         if self.ledger.get('day') != day:

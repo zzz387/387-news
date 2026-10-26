@@ -1,43 +1,28 @@
-name: 387 News — editorial v3.1 (SAFE / manual approval)
+name: 387 News — autonomous daily edition
 
 on:
   push:
-    branches: [main, codex/structured-audit-recovery]
-    paths: ['scripts/site_checks.py', 'scripts/publication.py', 'scripts/audit_policy.py', 'scripts/audit_repair.py', 'scripts/release_queue.py', '.github/workflows/daily-v31.yml']
+    branches: [main, codex/state-driven-daily]
+    paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   pull_request:
     paths: ['scripts/**', '.github/workflows/daily-v31.yml']
   schedule:
-    # UTC; Moscow = UTC+3 all year.
-    # 12:17 Moscow — select sources & create tomorrow's editorial plan
-    - cron: '17 9 * * *'
-    # Research at 14:17 Moscow, bounded writing windows every two hours.
-    - cron: '17 11 * * *'
-    - cron: '17 15 * * *'
-    - cron: '17 19 * * *'
-    - cron: '17 22 * * *'
-    - cron: '17 13 * * *'
-    - cron: '17 17 * * *'
-    - cron: '17 21 * * *'
-    - cron: '17 0 * * *'
-    # 04:17 Moscow repair window; 05:17 final audit
-    - cron: '17 2 * * *'
-    # No generation is performed by the final audit
-    - cron: '17 1 * * *'
-    # 05:54 Moscow — wait until 06:00 then publish; GitHub Pages may lag
+    # Every cron wakes the same state-driven controller. UTC = Moscow minus 3h.
+    - cron: '17 9,11,13,15,17,19,21,22 * * *'
+    - cron: '17 0,1,2 * * *'
+    # Prepare and wait until 06:00 Moscow when ready; late wake-ups publish immediately.
     - cron: '54 2 * * *'
-    # Bounded recovery if the 06:00 issue was incomplete or deployment failed.
-    - cron: '17 3 * * *'
-    - cron: '37 3 * * *'
-    - cron: '54 3 * * *'
-    # 07:30 Moscow: public HTTPS and edition freshness monitor.
-    - cron: '30 4 * * *'
+    # Independent morning recovery opportunities: 06:17, 06:37, 06:54, 07:15, 07:30, 08:15.
+    - cron: '17,37,54 3 * * *'
+    - cron: '15,30 4 * * *'
+    - cron: '15 5 * * *'
   workflow_dispatch:
     inputs:
       phase:
-        description: 'Safe phase to test: plan → write (repeat) → audit → publish'
+        description: 'run: automatic next action; inspect: restore only; preview prevents publication'
         type: choice
-        options: [check, plan, research, write, audit, publish, resume, status]
-        default: plan
+        options: [run, inspect, check, plan, research, write, audit, publish, resume, status]
+        default: run
         required: true
       preview:
         description: 'TEST mode: never publish to 387.su (keep checked)'
@@ -56,12 +41,12 @@ permissions:
   id-token: write
 
 concurrency:
-  group: ${{ github.event_name == 'pull_request' && format('387-news-ci-{0}', github.event.pull_request.number) || '387-news-stage-v31' }}
+  group: ${{ (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}', github.event_name, github.ref) || '387-news-stage-v31' }}
   cancel-in-progress: false
 
 jobs:
   public-health:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.phase == 'status') || (github.event_name == 'schedule' && github.event.schedule == '30 4 * * *' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true') }}
+    if: ${{ (github.event_name == 'push' && github.ref != 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.phase == 'status') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -100,7 +85,7 @@ jobs:
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.NEWS_RELEASE_APPROVED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && github.event.schedule != '30 4 * * *' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -116,6 +101,7 @@ jobs:
     outputs:
       ready: ${{ steps.commit.outputs.ready }}
       issue_date: ${{ steps.stage.outputs.issue_date }}
+      pipeline_status: ${{ steps.stage.outputs.pipeline_status }}
     steps:
       - name: Read website repository
         uses: actions/checkout@v4
@@ -136,22 +122,12 @@ jobs:
           MANUAL_PREVIEW: ${{ inputs.preview }}
           MANUAL_DATE: ${{ inputs.target_date }}
         run: |
-          if [[ "$GITHUB_EVENT_NAME" == 'schedule' ]]; then
-            case "$SCHEDULE" in
-              '17 9 * * *')  phase=plan ;;
-              '17 11 * * *') phase=research ;;
-              '17 13 * * *'|'17 15 * * *'|'17 17 * * *'|'17 19 * * *'|'17 21 * * *'|'17 22 * * *'|'17 0 * * *'|'17 1 * * *'|'17 3 * * *') phase=write ;;
-              '17 2 * * *'|'37 3 * * *') phase=audit ;;
-              '54 2 * * *'|'54 3 * * *') phase=publish ;;
-              *) echo 'Unexpected schedule'; exit 1 ;;
-            esac
-            preview=false
-          elif [[ "$GITHUB_EVENT_NAME" == 'push' ]]; then
-            phase=resume
-            preview=false
-          else
+          if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
             phase="$MANUAL_PHASE"
             preview="$MANUAL_PREVIEW"
+          else
+            phase=run
+            preview=false
           fi
           PHASE="$phase" PREVIEW="$preview" TARGET_DATE="$MANUAL_DATE" python scripts/release_queue.py
       - name: Find previously saved encrypted checkpoint
@@ -173,16 +149,6 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/checkpoint
           merge-multiple: true  # v4: artifact-ids otherwise nests under its name
-      - name: Recover prior accepted article only inside protected Actions infrastructure
-        if: ${{ steps.context.outputs.legacy_recovery == 'true' }}
-        uses: actions/download-artifact@v4
-        with:
-          artifact-ids: ${{ steps.context.outputs.prior_artifact_id }}
-          run-id: ${{ steps.context.outputs.prior_run_id }}
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          path: ${{ runner.temp }}/prior-accepted
-          merge-multiple: true
       - name: Download shared daily request ledger
         if: ${{ steps.checkpoint.outputs.quota_found == 'true' }}
         uses: actions/download-artifact@v4
@@ -202,7 +168,6 @@ jobs:
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
           NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
-          NEWS_PRIOR_CHECKPOINT_FILE: ${{ steps.context.outputs.legacy_recovery == 'true' && format('{0}/prior-accepted/news-draft.enc', runner.temp) || '' }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
           NEWS_LONGFORM_GAP_SECONDS: "6"  # stay below free-tier 15 RPM during longform drafting
@@ -291,3 +256,24 @@ jobs:
         env:
           EXPECTED_DATE: ${{ needs.prepare.outputs.issue_date }}
         run: python scripts/site_checks.py --expected-date "$EXPECTED_DATE" --attempts 5
+
+  monitor:
+    needs: [prepare, deploy]
+    if: ${{ always() && github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify today's public release and reconcile one incident
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PIPELINE_STATUS: ${{ needs.prepare.outputs.pipeline_status }}
+        run: python scripts/release_monitor.py

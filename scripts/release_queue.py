@@ -1,43 +1,59 @@
-"""Public release date routing only. No checkpoint, dossier, or credential access."""
-from datetime import datetime
-import json
+"""Route each wake-up using Moscow time and current public delivery state."""
+from datetime import datetime, timedelta
 import os
 from pathlib import Path
 try:
-    from scripts import news
+    from scripts import news, site_checks
 except ImportError:
     import news
+    import site_checks
 
-CONFIG = {'date':'2026-10-25','prior_run_id':40209759347,'prior_artifact_id':12605134114}
+
+def moscow(now=None):
+    now = now or datetime.now(news.TZ)
+    return now.replace(tzinfo=news.TZ) if now.tzinfo is None else now.astimezone(news.TZ)
 
 
 def pending_date(root, now):
-    date = CONFIG['date']
-    if datetime.fromisoformat(date).date()<=now.date() and not (root/'issues'/date/'issue.json').is_file():
-        return date
-    return None
+    today = moscow(now).date().isoformat()
+    return today if not (Path(root)/'issues'/today/'issue.json').is_file() else None
 
 
-def context(phase, preview, date, event, root=None, now=None):
+def target_date(root, now=None, check_public=None):
+    now = moscow(now)
+    today = now.date().isoformat()
+    if pending_date(root,now):
+        return today
+    # A committed edition with stale Pages remains today's recovery task.
+    if now.hour>=6 and check_public is not None:
+        try:
+            check_public(expected_date=today)
+        except Exception:
+            print('[release-context] today committed but HTTPS delivery unverified; recover deployment',flush=True)
+            return today
+    return (now.date()+timedelta(days=1)).isoformat() if now.hour>=12 else today
+
+
+def context(phase, preview, date, event, root=None, now=None, check_public=None):
     root = root or news.ROOT
-    now = now or datetime.now(news.TZ)
-    pending = pending_date(root,now)
-    # Explicit manual requests retain their date/mode. All cron strings are unchanged.
-    if event=='push':
-        return ('resume' if pending else 'check'),False,CONFIG['date']
-    if event=='schedule' and phase in ('write','audit','publish') and pending:
-        return 'resume',False,pending
-    return phase,preview,date
+    now = moscow(now)
+    if date:
+        datetime.strptime(date,'%Y-%m-%d')
+    if event in ('push','schedule'):
+        return 'run',False,target_date(root,now,check_public)
+    if date:
+        return phase,preview,date
+    if phase in ('plan','auto'):
+        return phase,preview,(now.date()+timedelta(days=1)).isoformat()
+    return phase,preview,target_date(root,now,check_public if not preview else None)
 
 
 def main():
-    phase,preview,date = context(os.environ['PHASE'],os.environ['PREVIEW']=='true',
-                                os.environ.get('TARGET_DATE',''),os.environ['GITHUB_EVENT_NAME'])
+    phase,preview,date = context(os.environ.get('PHASE','run'),os.environ.get('PREVIEW','false')=='true',
+                                os.environ.get('TARGET_DATE',''),os.environ['GITHUB_EVENT_NAME'],
+                                check_public=site_checks.check_site)
     with open(os.environ['GITHUB_OUTPUT'],'a') as output:
         output.write(f'phase={phase}\npreview={str(preview).lower()}\ntarget_date={date}\n')
-        recover = phase=='resume' and date==CONFIG['date'] and not preview
-        output.write(f'legacy_recovery={str(recover).lower()}\n')
-        output.write(f'prior_run_id={CONFIG["prior_run_id"]}\nprior_artifact_id={CONFIG["prior_artifact_id"]}\n')
-    print(f'[release-context] phase={phase} preview={preview} target_date={date or "automatic"}',flush=True)
+    print(f'[release-context] phase={phase} preview={preview} target_date={date}',flush=True)
 
 if __name__=='__main__': main()
