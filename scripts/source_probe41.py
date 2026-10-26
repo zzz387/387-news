@@ -27,7 +27,20 @@ def probe(item,fetch=source41.fetch):
         if item['test_id']=='unicef-21':
             # This is structure evidence only, never a claim that Gemini produced 21 safe games.
             row['original_activity_headings']=sum(b['kind']=='heading' and b.get('heading_level')==4 for b in source['blocks'])
-    except p.Blocked as exc: row.update(status='rejected',code=exc.code)
+    except p.Blocked as exc:
+        row.update(status='rejected',code=exc.code)
+        if exc.code=='SOURCE_EXTRACTION_PARTIAL' and fetch is source41.fetch:
+            # Robots already passed in fetch. Public DOM labels only, never prose or a dossier.
+            try:
+                try: from scripts import source_dom41 as dom
+                except ImportError: import source_dom41 as dom
+                document=dom.Document(); document.feed(source41.transport(item['url'])); document.close()
+                nodes=list(document.root.all())
+                row['dom_diagnostics']={'semantic_regions':[{ 'tag':n.tag,'closed':n.closed} for n in nodes if n.tag in ('article','main')],
+                    'candidates':[{'tag':n.tag,'class':n.attrs.get('class',''),'id':n.attrs.get('id',''),'closed':n.closed}
+                        for n in nodes if n.tag in ('div','section') and any(w in (n.attrs.get('class','')+' '+n.attrs.get('id','')).lower() for w in ('article','body','content'))][:50],
+                    'paragraphs':sum(n.tag=='p' for n in nodes)}
+            except Exception as error: row['diagnostic_code']=type(error).__name__
     except Exception as exc: row.update(status='unavailable',code=type(exc).__name__)
     return row
 

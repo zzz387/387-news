@@ -160,6 +160,35 @@
         "negative-ai-terms"
       ],
       "trial_eligible": false
+    },
+    {
+      "test_id": "tsaritsyno-history",
+      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
+      "category_hint": "Москва и путешествия",
+      "tags": [
+        "russian",
+        "history"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "tsaritsyno-restoration",
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "category_hint": "Москва и путешествия",
+      "tags": [
+        "russian",
+        "architecture"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "who-russian",
+      "url": "https://www.who.int/ru/news-room/fact-sheets/detail/healthy-diet",
+      "category_hint": "Здоровье и движение",
+      "tags": [
+        "russian"
+      ],
+      "trial_eligible": false
     }
   ]
 }

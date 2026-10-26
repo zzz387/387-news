@@ -37,6 +37,10 @@
     "kids.frontiersin.org": {
       "publisher": "Frontiers for Young Minds",
       "evidence_url": "https://kids.frontiersin.org/about"
+    },
+    "tsaritsyno-museum.ru": {
+      "publisher": "Музей-заповедник «Царицыно»",
+      "evidence_url": "https://tsaritsyno-museum.ru/the_museum/about/"
     }
   }
 }
