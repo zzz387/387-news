@@ -15,8 +15,8 @@ def estimate(mode,source_operations,review_operations,sections=4,support_operati
                            'retries':0,'generated_output_measured':False}}
 
 
-def issue_scenario(articles,retry_fraction=.2,reserves=()):
-    baseline=sum(a['operations'] for a in articles)+1
+def issue_scenario(articles,retry_fraction=.2,reserves=(),shared_support_operations=0):
+    baseline=sum(a['operations'] for a in articles)+1+shared_support_operations
     planned=baseline+sum(a['operations'] for a in reserves)
     return {'article_count':len(articles),'baseline_http_without_retries':baseline,
             'including_reserves':planned,'with_retry_allowance':math.ceil(planned*(1+retry_fraction)),

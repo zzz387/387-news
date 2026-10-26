@@ -13,6 +13,12 @@ from scripts.test_policy41 import source,record,issue
 
 
 class SourceAndRightsTests(unittest.TestCase):
+    def test_official_www_and_subdomains_match_authority_without_counting_aliases_twice(self):
+        self.assertTrue(e.host_matches('https://www.who.int/example',{'who.int'}))
+        self.assertTrue(e.host_matches('https://www.niddk.nih.gov/example',{'nih.gov'}))
+        self.assertFalse(e.host_matches('https://who.int.evil.example/',{'who.int'}))
+        self.assertEqual(e.publisher_identity('https://www.who.int/a'),e.publisher_identity('https://who.int/b'))
+
     def test_dateless_institution_is_transparent_not_an_invented_author(self):
         html='<html lang="ru"><main><h1>Учебная тема</h1><div>Первый полный абзац.</div><section><p>Последняя оговорка.</p></section></main></html>'
         s=source41.extract(html,'https://www.unicef.org/example')
@@ -32,6 +38,9 @@ class SourceAndRightsTests(unittest.TestCase):
         self.assertEqual(s['blocks'][-1]['text'],'Финал.')
         self.assertTrue(any(b.get('list_depth')==2 and b['text']=='Вложенная оговорка' for b in s['blocks']))
         self.assertEqual(rights41.select_mode(s)[0],'ORIGINAL_REPUBLICATION')
+        from scripts import publication41
+        rendered=publication41.render_blocks({'title':s['title'],'blocks':s['blocks']})
+        self.assertIn('<li>Первое действие<ul><li>Вложенная оговорка</li></ul></li><li>Второе действие</li>',rendered)
 
     def test_summary_skeleton_and_ambiguous_body_are_blocked(self):
         for html in ('<html lang="en"><main><h1>Study</h1><div class="abstract"><p>Only abstract.</p></div></main></html>',
@@ -60,6 +69,8 @@ class SourceAndRightsTests(unittest.TestCase):
     def test_documented_doubt_and_ai_terms_fail_closed(self):
         s=source(); s['ai_use_restricted']=True
         for mode in p.MODES: self.assertEqual(rights41.decision(s,mode,[])['status'],'unknown')
+        s.update(url='https://openstax.org/books/example',ai_use_restricted=False)
+        self.assertEqual(rights41.decision(s,'INDEPENDENT_ARTICLE',[])['status'],'unknown')
         s=source(); permit={'status':'unknown','verification':'human_documented','basis':'Specific dispute',
              'evidence_url':'https://example.org/dispute','checked_by':'editor','checked_at':'2026-10-26'}
         grants=[{'url':s['url'],'content_hash':s['content_hash'],'uses':{'INDEPENDENT_ARTICLE':permit}}]
@@ -69,6 +80,7 @@ class SourceAndRightsTests(unittest.TestCase):
         r=record(); r['mode']='INDEPENDENT_ARTICLE'; r['article'].update(mode=r['mode'],blocks=[{
             'id':'own','kind':'paragraph','text':'Самостоятельно выглядящий текст с потенциально чужой подборкой.'}])
         r['rights']=rights41.decision(r['source'],r['mode']); r['checks']={}
+        r['rejected_part']={'stage':'fact_checked','block_id':'old-section/0'}
         def model(prompt,**kwargs):
             if prompt.startswith('Проверка самостоятельности'):
                 return {'approve':False,'issues':['Подборка воспроизведена'],'unresolved':[],
@@ -78,6 +90,7 @@ class SourceAndRightsTests(unittest.TestCase):
         with self.assertRaisesRegex(p.Blocked,'REVIEW_REJECTED'):
             e.Editor(call=model).review(e.new_state('2026-10-27'),r,'editorial_checked')
         self.assertNotIn('editorial_checked',r['checks'])
+        self.assertEqual(r['rejected_part']['block_id'],'')
 
 
 class BatchingAndQuotaTests(unittest.TestCase):
@@ -125,6 +138,9 @@ class BatchingAndQuotaTests(unittest.TestCase):
         report=quota41.issue_scenario([article]*12,reserves=[article]*2)
         self.assertEqual(report['baseline_http_without_retries'],205)
         self.assertFalse(report['fits_daily_budget']); self.assertEqual(report['day_limit'],220)
+        small=quota41.estimate('INDEPENDENT_ARTICLE',2,1,sections=4)
+        forecast=quota41.issue_scenario([small]*12,reserves=[small]*2,shared_support_operations=6)
+        self.assertEqual(forecast['with_retry_allowance'],194); self.assertTrue(forecast['fits_daily_budget'])
 
 
 class TrialSafetyTests(unittest.TestCase):
@@ -162,6 +178,32 @@ class TrialSafetyTests(unittest.TestCase):
     def test_export_refuses_full_issue_without_required_unicef_and_translation_cases(self):
         with tempfile.TemporaryDirectory() as directory,self.assertRaisesRegex(p.Blocked,'TRIAL_UNICEF_21_INCOMPLETE'):
             trial41.export(issue(),p.ROOT,Path(directory)/'private',browser=lambda *a:self.fail('No render of an incomplete trial'))
+
+    def test_complete_synthetic_trial_exports_all_html_markdown_without_touching_repo(self):
+        from scripts.test_policy41 import SemanticTests
+        state=issue(); first,second=state['candidates'][:2]
+        a,_=SemanticTests().article()
+        url='https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers'
+        first.update(test_id='unicef-21',url=url,mode='INDEPENDENT_ARTICLE')
+        first['source'].update(url=url,canonical=url)
+        first['article'].update(mode=first['mode'],title=a['title'],blocks=a['blocks'],activities=a['activities'])
+        first['rights']=rights41.decision(first['source'],first['mode'])
+        second.update(mode='FULL_TRANSLATION'); second['source']['language']='en'
+        second['article']['mode']=second['mode']; second['rights']=rights41.decision(second['source'],second['mode'])
+        for r in (first,second):
+            fp=e.article_hash(r['article'],r['source'],r['rights'])
+            for name in p.STAGES: r['checks'][name]={'approved':True,'input_hash':fp}
+            r['checks']['source_verified']['input_hash']=p.digest({'source':r['source']['content_hash'],'rights':r['rights'],'images':[]})
+        state['issue_approval_hash']=p.digest([e.article_hash(r['article'],r['source'],r['rights']) for r in state['candidates']])
+        original=(p.ROOT/'index.html').read_bytes()
+        with tempfile.TemporaryDirectory() as directory:
+            output=Path(directory)/'private'
+            report=trial41.export(state,p.ROOT,output,browser=lambda *a:{'pages':36,'mock':True})
+            self.assertEqual(report['article_count'],12)
+            self.assertEqual(len(list((output/'issues'/state['date']).glob('articles/*/index.html'))),12)
+            self.assertEqual(len(list((output/'issues'/state['date']).glob('articles/*/article.md'))),12)
+            self.assertFalse((output/'config').exists()); self.assertFalse((output/'scripts').exists())
+        self.assertEqual((p.ROOT/'index.html').read_bytes(),original)
 
     def test_workflow_never_runs_trial_on_push_and_shares_lock_only_after_review(self):
         workflow=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()

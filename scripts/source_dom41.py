@@ -126,7 +126,7 @@ def blocks(regions):
     def emit(text,kind='paragraph',fmt=None,links=()):
         text=' '.join(text.split())
         if text: result.append({'id':f'b{len(result)+1}','kind':kind,'text':text,'links':list(links),**(fmt or {})})
-    def walk(node):
+    def walk(node,inherited=None):
         nonlocal list_serial
         if ignored(node): return
         if node.tag=='img':
@@ -136,11 +136,13 @@ def blocks(regions):
         if node.tag in ('ol','ul'):
             list_serial+=1; listing.append({'kind':node.tag,'group':str(list_serial),'index':int(node.attrs.get('start','1'))-1})
         kind='title' if node.tag=='h1' else 'heading' if re.fullmatch('h[2-6]',node.tag) else 'item' if node.tag=='li' else 'quote' if node.tag=='blockquote' else 'table' if node.tag=='tr' else 'paragraph'
-        fmt={}
+        fmt=dict(inherited or {}) if node.tag not in ('li','h1','h2','h3','h4','h5','h6') else {}
+        if inherited and node.tag in ('p','div','section'): kind='item'
         if re.fullmatch('h[1-6]',node.tag): fmt['heading_level']=int(node.tag[1:])
         if node.tag=='li' and listing:
             listing[-1]['index']+=1; l=listing[-1]
-            fmt={'list_kind':l['kind'],'list_group':l['group'],'list_index':int(node.attrs.get('value',l['index'])),'list_depth':len(listing)}
+            if 'value' in node.attrs: l['index']=int(node.attrs['value'])
+            fmt={'list_kind':l['kind'],'list_group':l['group'],'list_index':l['index'],'list_depth':len(listing)}
         run=[]; links=[]
         def flush():
             emit(''.join(run),kind,fmt,links); run.clear(); links.clear()
@@ -148,7 +150,7 @@ def blocks(regions):
             if isinstance(child,str): run.append(child); return
             if ignored(child): return
             if child.tag in BLOCK or child.tag in ('ol','ul','div','section','figure','table','tbody','thead','aside'):
-                flush(); walk(child); return
+                flush(); walk(child,fmt if node.tag=='li' else inherited); return
             if child.tag=='br': run.append('\n')
             if child.tag in ('td','th'): run.append(' | ')
             if child.tag=='a' and child.attrs.get('href'): links.append(child.attrs['href'])

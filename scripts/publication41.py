@@ -56,6 +56,41 @@ def source_block(article):
     return text+'</aside>'
 
 
+
+def render_blocks(article):
+    out=[]; stack=[]
+    def close_one():
+        row=stack.pop()
+        if row['item_open']: out.append('</li>')
+        out.append('</'+row['kind']+'>')
+    for block in article['blocks']:
+        if block['kind']=='title' and block['text']==article['title']: continue
+        kind=block.get('list_kind')
+        if kind in ('ol','ul'):
+            depth=max(1,int(block.get('list_depth',1))); group=block.get('list_group')
+            while len(stack)>depth: close_one()
+            if stack and len(stack)==depth and (stack[-1]['kind']!=kind or stack[-1]['group']!=group): close_one()
+            while len(stack)<depth:
+                if stack and not stack[-1]['item_open']:
+                    out.append('<li>'); stack[-1]['item_open']=True
+                index=int(block.get('list_index',1))
+                out.append('<'+kind+(' start="'+str(index)+'"' if kind=='ol' else '')+'>')
+                stack.append({'kind':kind,'group':group,'item_open':False,'index':None,'next':index})
+            current=stack[-1]; index=int(block.get('list_index',1))
+            if current['item_open'] and current['index']==index:
+                out.append('<p>'+escape(block['text'])+'</p>'); continue
+            if current['item_open']: out.append('</li>')
+            value=' value="'+str(index)+'"' if kind=='ol' and index!=current['next'] else ''
+            out.append('<li'+value+'>'+escape(block['text']))
+            current.update(item_open=True,index=index,next=index+1)
+        else:
+            while stack: close_one()
+            tag=('h'+str(min(6,max(2,int(block.get('heading_level',2)))))) if block['kind'] in ('heading','title') else 'blockquote' if block['kind']=='quote' else 'p'
+            out.append('<'+tag+'>'+escape(block['text'])+'</'+tag+'>')
+    while stack: close_one()
+    return ''.join(out)
+
+
 def render_article(date,no,article,root):
     images_valid(article,root)
     moment=datetime.fromisoformat(date+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
@@ -70,19 +105,7 @@ def render_article(date,no,article,root):
     for image in article.get('images',[]):
         out.append('<img class="heroimg" src="/'+escape(image['asset'],quote=True)+'" alt="'+escape(image.get('alt',''),quote=True)+'">')
     out.append('<div class="article-body">')
-    listing=None
-    for block in article['blocks']:
-        group=(block.get('list_kind'),block.get('list_group')) if block.get('list_kind') in ('ol','ul') else None
-        if listing and group!=listing:
-            out.append('</'+listing[0]+'>'); listing=None
-        if block['kind']=='title' and block['text']==article['title']: continue  # represented by the H1, not dropped
-        if group and listing!=group:
-            listing=group
-            start=' start="'+str(int(block.get('list_index',1)))+'"' if group[0]=='ol' else ''
-            out.append('<'+group[0]+start+'>')
-        tag=('h'+str(min(6,max(2,int(block.get('heading_level',2)))))) if block['kind'] in ('heading','title') else 'blockquote' if block['kind']=='quote' else 'li' if group else 'p'
-        out.append('<'+tag+'>'+escape(block['text'])+'</'+tag+'>')
-    if listing: out.append('</'+listing[0]+'>')
+    out.append(render_blocks(article))
     if article['activities']:
         out.append('<ol class="practical-activities">')
         for activity in article['activities']:
@@ -122,7 +145,8 @@ def markdown(article):
     for block in article['blocks']:
         if block['kind']=='title' and block['text']==article['title']: continue
         prefix=('#'*min(6,max(2,int(block.get('heading_level',2))))+' ') if block['kind'] in ('heading','title') else (str(block['list_index'])+'. ' if block.get('list_kind')=='ol' else '- ' if block.get('list_kind')=='ul' else '')
-        out.extend([prefix+block['text'],''])
+        indentation='  '*max(0,int(block.get('list_depth',1))-1) if block.get('list_kind') else ''
+        out.extend([indentation+prefix+block['text'],''])
     for item in article['activities']:
         out.extend(['## '+item['title'],'','Возраст и предпосылки: '+item['age'],'Материалы: '+', '.join(item['materials']),''])
         out.extend(f'{i}. {step}' for i,step in enumerate(item['steps'],1))

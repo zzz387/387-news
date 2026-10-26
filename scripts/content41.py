@@ -138,7 +138,7 @@ def semantic_structure(article,source,practical=True):
         if mode=='ORIGINAL_REPUBLICATION' and [b['text'] for b in blocks]!=[b['text'] for b in source['blocks']]:
             raise policy.Blocked('ORIGINAL_CHANGED')
         for block,original in zip(blocks,source['blocks']):
-            if any(block.get(k)!=original.get(k) for k in ('heading_level','list_kind','list_group','list_index')):
+            if any(block.get(k)!=original.get(k) for k in ('heading_level','list_kind','list_group','list_index','list_depth')):
                 raise policy.Blocked('SOURCE_STRUCTURE_CHANGED')
     else:
         if any(b.get('source_block_id') for b in blocks): raise policy.Blocked('COPIED_SOURCE_LAYOUT')

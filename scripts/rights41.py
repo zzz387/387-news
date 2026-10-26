@@ -18,6 +18,10 @@ def configuration(path=None):
     return json.loads(Path(path or policy.ROOT/'config/rights.json').read_text(encoding='utf-8'))
 
 
+def source_profiles():
+    return json.loads((policy.ROOT/'config/source-profiles.json').read_text())
+
+
 def documented(record):
     valid=(isinstance(record,dict) and record.get('status') in ('allowed','forbidden','unknown')
             and bool(record.get('evidence_url')) and bool(record.get('checked_by'))
@@ -35,12 +39,18 @@ def documented(record):
 def decision(source,mode,records=None):
     if mode not in policy.MODES: raise policy.Blocked('RIGHTS_MODE_INVALID')
     records=records if records is not None else configuration()['grants']
+    from urllib.parse import urlparse
+    host=urlparse(source['url']).hostname or ''
+    ai_restricted=bool(source.get('ai_use_restricted')) or any(
+        profile.get('ai_use_restricted') and (host==domain or host.endswith('.'+domain))
+        for domain,profile in source_profiles()['institutions'].items())
     for grant in records:
         if grant.get('url')!=source['url'] or grant.get('content_hash')!=source['content_hash']: continue
         item=(grant.get('uses') or {}).get(mode)
         if documented(item):
+            if ai_restricted and item.get('ai_processing_permitted') is not True: continue
             return dict(item,source_hash=source['content_hash'],mode=mode,verification='documented_grant',needs_review=item['status']=='unknown')
-    if source.get('ai_use_restricted'):
+    if ai_restricted:
         return {'status':'unknown','mode':mode,'source_hash':source['content_hash'],
                 'needs_review':True,'reason_code':'SOURCE_AI_TERMS_REVIEW_REQUIRED'}
     if mode=='INDEPENDENT_ARTICLE':

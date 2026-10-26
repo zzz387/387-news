@@ -22,6 +22,18 @@ TRUSTED={
 }
 
 
+def host_matches(url,domains):
+    host=(urlparse(url).hostname or '').lower().removeprefix('www.')
+    return any(host==domain or host.endswith('.'+domain) for domain in domains)
+
+
+def publisher_identity(url):
+    host=(urlparse(url).hostname or '').lower().removeprefix('www.')
+    roots=set(TRUSTED)|set(rights41.source_profiles()['institutions'])
+    matches=[domain for domain in roots if host==domain or host.endswith('.'+domain)]
+    return min(matches,key=lambda d:len(d.split('.'))) if matches else host
+
+
 def new_state(date):
     return {'version':41,'policy_version':policy.VERSION,'date':date,'articles':{},'dossiers':{},
             'plan':[],'candidates':[],'sources':[],'history':[],'audit_passed':False,'stage':'planning'}
@@ -105,9 +117,10 @@ class Editor:
                 if counter is not None: counter['failures']+=1
                 raise
             finally:
-                if counter is not None:
-                    self.persist()
-                if budget: budget.usage_counter=previous_counter
+                try:
+                    if counter is not None: self.persist()
+                finally:
+                    if budget: budget.usage_counter=previous_counter
         self.call=checked_call; self.fetch=fetch or source41.fetch
         cfg=rights41.configuration()
         self.grants=cfg['grants'] if grants is None else grants
@@ -164,6 +177,12 @@ class Editor:
         if not source.get('full_text_verified') or source.get('extraction_status')!='complete':
             raise policy.Blocked('FULL_ORIGINAL_REQUIRED')
         mode,rights=rights41.select_mode(source,self.grants)
+        if mode in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION') and any(re.search(r'https?://|www\.',block['text']) for block in source['blocks']):
+            # Preserve the complete original, rather than silently deleting its visible URLs.
+            # The reader policy requires a single source block, so choose an independent work.
+            alternative=rights41.decision(source,'INDEPENDENT_ARTICLE',self.grants)
+            if alternative.get('status')!='allowed': raise policy.Blocked('ORIGINAL_READER_FORMAT_CONFLICT')
+            mode,rights='INDEPENDENT_ARTICLE',alternative
         rights41.require(source,mode,rights)
         if record.get('mode') and record['mode']!=mode:
             record.setdefault('previous_preparations',[]).append({'article':record.pop('article',None),'progress':record['progress'],'checks':record['checks']})
@@ -293,17 +312,18 @@ class Editor:
         self.active_stage=stage
         article=record['article']; source=record['source']; fp=article_hash(article,source,record['rights'])
         if valid_gate(record,stage,fp): return
+        record.pop('rejected_part',None)
         if stage=='completeness_checked' and record['mode']!='INDEPENDENT_ARTICLE': self.practical_manifest(record)
         content.semantic_structure(article,source,practical=record['mode']=='INDEPENDENT_ARTICLE' or stage!='fact_checked')
-        sensitive=(article['category']=='Здоровье и движение' or any(c['sensitive'] for c in record['claims']))
+        sensitive=(article['category']=='Здоровье и движение' or bool(article.get('activities')) or any(c['sensitive'] for c in record['claims']))
         supporting=record.setdefault('supporting_sources',[])
         if stage=='fact_checked' and sensitive:
             if not supporting:
                 for url in record.get('verification_urls',[]):
                     supporting.append(self.cached_fetch(url)); self.persist()
-            domains={urlparse(s['url']).hostname for s in [source]+supporting if s.get('full_text_verified')}
+            domains={publisher_identity(s['url']) for s in [source]+supporting if s.get('full_text_verified')}
             allowed=({'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org'} if article['category']=='Здоровье и движение' else TRUSTED)
-            authoritative=[s for s in [source]+supporting if urlparse(s['url']).hostname in allowed]
+            authoritative=[s for s in [source]+supporting if host_matches(s['url'],allowed)]
             if len(domains)<2 or not authoritative: raise policy.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
         support_facts=[]
         if stage=='fact_checked' and supporting:
@@ -335,7 +355,7 @@ class Editor:
                 references=record['claims']
             instructions={
               'fact_checked':'Отдельный фактчекинг: имена, даты события, числа, цитаты, научные/медицинские/правовые сведения, безопасность. Непроверяемое существенное утверждение — unresolved, а не approve. Ошибку чужого оригинала не исправлять молча.',
-              'completeness_checked':'Проверь смысловую полноту: все обещания заголовка, инструкции, примеры, числа, оговорки и выводы. Для A/B сравни полный оригинал с данной частью, не допускай сокращение. Для C оцени полноту самостоятельной темы и применимость действий, а не копирование чужой композиции.',
+              'completeness_checked':'Проверь смысловую полноту: все обещания заголовка, инструкции, примеры, числа, оговорки и выводы. Для A/B сравни полный оригинал с данной частью, не допускай сокращение. Если существенный смысл зависит от отсутствующей иллюстрации/таблицы, unresolved; не считай лицензию текста разрешением на каждую картинку. Для C оцени полноту самостоятельной темы и применимость действий, а не копирование чужой композиции.',
               'editorial_checked':'Отдельная литературная проверка, включая самостоятельность режима C: сравни исходную подборку и расположение идей с новым текстом. Лёгкий рерайт/перевод/копирование авторской подборки запрещены, даже при иных словах. Если самостоятельность не установлена — unresolved. Законченность мысли, ясный живой русский язык, связность, отсутствие воды, дублей, канцелярита и метатекста. Практические действия действительно выполнимы. Никаких нормативов длины.',
             }[stage]
             result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nЧасть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
@@ -367,7 +387,10 @@ class Editor:
                 '\nПолный оригинал: '+json.dumps(source['blocks'],ensure_ascii=False)+
                 '\nСамостоятельная статья: '+json.dumps({'title':article['title'],'blocks':article['blocks'],'activities':article.get('activities',[])},ensure_ascii=False),
                 output_tokens=5000,schema='v41_review')
-            content.approved_review(result,['composition','wording','examples','explanations'])
+            try: content.approved_review(result,['composition','wording','examples','explanations'])
+            except policy.Blocked:
+                record['rejected_part']={'stage':stage,'block_id':'','result':result}; self.persist()
+                raise
             progress['independence_hash']=fp; progress['independence_result']=result; self.persist()
         record['checks'][stage]={'approved':True,'input_hash':fp,'checked_at':datetime.now(policy.TZ).isoformat()}
         self.active_stage=None
@@ -572,7 +595,7 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
     if (ops.ROOT/'issues'/date/'index.html').is_file():
         return pipeline.published_delivery(state,date,ops,preview,current,check_public or pipeline.site_checks.check_site)
     editor=editor or Editor(persist=persist)
-    rights_signature=policy.digest({'grants':editor.grants,'images':editor.image_grants})
+    rights_signature=policy.digest({'grants':editor.grants,'images':editor.image_grants,'source_profiles':rights41.source_profiles()})
     if state.get('rights_config_hash')!=rights_signature:
         for record in state['candidates']:
             last=(record.get('history') or [{}])[-1].get('code','')

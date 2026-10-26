@@ -12,8 +12,8 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+        "https://developingchild.harvard.edu/key-concept/serve-and-return/",
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
       ]
     },
     {
@@ -25,8 +25,8 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+        "https://developingchild.harvard.edu/key-concept/serve-and-return/",
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
       ]
     },
     {
@@ -38,8 +38,8 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+        "https://developingchild.harvard.edu/key-concept/serve-and-return/",
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
       ]
     },
     {
@@ -50,7 +50,7 @@
         "russian",
         "long-complex"
       ],
-      "trial_eligible": true
+      "trial_eligible": false
     },
     {
       "test_id": "culture-literature",
@@ -60,7 +60,7 @@
         "russian",
         "culture"
       ],
-      "trial_eligible": true
+      "trial_eligible": false
     },
     {
       "test_id": "who-activity",
@@ -71,8 +71,7 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
       ]
     },
     {
@@ -84,8 +83,7 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
       ]
     },
     {
@@ -95,7 +93,7 @@
       "tags": [
         "popular-science"
       ],
-      "trial_eligible": true
+      "trial_eligible": false
     },
     {
       "test_id": "nasa-solar",
@@ -187,6 +185,27 @@
       "category_hint": "Здоровье и движение",
       "tags": [
         "russian"
+      ],
+      "trial_eligible": false,
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "test_id": "harvard-serve-return",
+      "url": "https://developingchild.harvard.edu/key-concept/serve-and-return/",
+      "category_hint": "Семья",
+      "tags": [
+        "verification"
+      ],
+      "trial_eligible": false
+    },
+    {
+      "test_id": "nih-adult-health",
+      "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+      "category_hint": "Здоровье и движение",
+      "tags": [
+        "verification"
       ],
       "trial_eligible": false
     }

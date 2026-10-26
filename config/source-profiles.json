@@ -41,6 +41,14 @@
     "tsaritsyno-museum.ru": {
       "publisher": "Музей-заповедник «Царицыно»",
       "evidence_url": "https://tsaritsyno-museum.ru/the_museum/about/"
+    },
+    "developingchild.harvard.edu": {
+      "publisher": "Center on the Developing Child, Harvard University",
+      "evidence_url": "https://developingchild.harvard.edu/"
+    },
+    "nih.gov": {
+      "publisher": "National Institutes of Health",
+      "evidence_url": "https://www.nih.gov/about-nih"
     }
   }
 }

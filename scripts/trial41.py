@@ -70,7 +70,8 @@ def export(state,root,destination,browser=browser41.check):
     editorial41.validate_issue(state)
     selected=[r for r in state['candidates'] if r['id'] in state['selected_ids']]
     unicef=next((r for r in selected if r.get('test_id')=='unicef-21'),None)
-    if not unicef or unicef['mode']!='INDEPENDENT_ARTICLE' or len(unicef['article'].get('activities',[]))!=21:
+    if (not unicef or unicef['url']!='https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers'
+            or unicef['mode']!='INDEPENDENT_ARTICLE' or len(unicef['article'].get('activities',[]))!=21):
         raise p.Blocked('TRIAL_UNICEF_21_INCOMPLETE')
     if not any(r['mode']=='FULL_TRANSLATION' for r in selected): raise p.Blocked('TRIAL_LICENSED_TRANSLATION_REQUIRED')
     destination=Path(destination)

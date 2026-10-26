@@ -20,6 +20,7 @@ def check(root,date,output):
                 page=browser.new_page(viewport={'width':width,'height':900})
                 base=f'http://127.0.0.1:{server.server_port}'
                 page.goto(base+'/',wait_until='networkidle')
+                if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HOMEPAGE_HORIZONTAL_OVERFLOW')
                 urls=page.locator(f'a[href^="/issues/{date}/articles/"]').evaluate_all('(nodes)=>[...new Set(nodes.map(n=>n.getAttribute("href")))]')
                 if len(urls)!=12: raise ValueError('BROWSER_TWELVE_ARTICLES_REQUIRED')
                 for index,url in enumerate(urls):
@@ -47,11 +48,13 @@ def main():
     import shutil
     import tempfile
     try:
-        from scripts import policy41 as p,publication41
+        from scripts import policy41 as p,publication41,editorial41,rights41
         from scripts.test_policy41 import issue
     except ImportError:
         import policy41 as p
         import publication41
+        import editorial41
+        import rights41
         from test_policy41 import issue
     parser=argparse.ArgumentParser(); parser.add_argument('--synthetic',action='store_true',required=True)
     parser.add_argument('--output',required=True); args=parser.parse_args()
@@ -59,7 +62,21 @@ def main():
     with tempfile.TemporaryDirectory(prefix='387-synthetic-browser-') as temp:
         root=Path(temp)/'site'; root.mkdir(); shutil.copytree(p.ROOT/'assets',root/'assets')
         (root/'archive').mkdir(); (root/'issues').mkdir()
-        state=issue(); publication41.build(state,root)
+        state=issue()
+        # Stress actual server-rendered HTML, not an injected DOM or a short card.
+        first=state['candidates'][0]
+        title='Сверхдлинныйзаголовокдляпроверкипереносов'*5
+        text=('Полная учебная история с конкретным вымышленным примером. '*800)+'Последняя существенная оговорка.'
+        first['source']['title']=first['article']['title']=title
+        first['source']['blocks'][0]['text']=first['article']['blocks'][0]['text']=title
+        first['source']['blocks'][-1]['text']=first['article']['blocks'][-1]['text']=text
+        first['source']['content_hash']=p.digest(first['source']['blocks'])
+        first['rights']=rights41.decision(first['source'],first['mode'])
+        fp=editorial41.article_hash(first['article'],first['source'],first['rights'])
+        for name in p.STAGES: first['checks'][name]={'approved':True,'input_hash':fp}
+        first['checks']['source_verified']['input_hash']=p.digest({'source':first['source']['content_hash'],'rights':first['rights'],'images':[]})
+        state['issue_approval_hash']=p.digest([editorial41.article_hash(r['article'],r['source'],r['rights']) for r in state['candidates']])
+        publication41.build(state,root)
         report=check(root,state['date'],Path(temp)/'screenshots')
     Path(args.output).write_text(json.dumps(report)); print(json.dumps(report))
 
