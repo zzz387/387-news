@@ -197,5 +197,20 @@ class SpecialTests(unittest.TestCase):
         with self.assertRaises(RuntimeError):runner.remaining_run_limit(-1,{'requests':100})
 
 
+    def test_explicit_publication_labels_and_real_bylines_not_last_modified(self):
+        from scripts import source41
+        page='<html lang="en"><meta name="last-modified" content="today"><dl><dt>Date:</dt><dd>October 21, 2026</dd></dl><main><h1>Synthetic study</h1><p>Complete fictional publication.</p></main></html>'
+        source=source41.extract(page,'https://www.sciencedaily.com/releases/synthetic.htm')
+        self.assertEqual(source['published'],'2026-10-21');self.assertEqual(source['author'],'')
+        self.assertIn('author',source['metadata_gaps'])
+        other='<html lang="en"><p>By Fixture Author | February 13, 2025</p><article><h1>Synthetic relationship</h1><p>Complete fictional article.</p></article></html>'
+        source=source41.extract(other,'https://greatergood.berkeley.edu/article/item/synthetic')
+        self.assertEqual(source['author'],'Fixture Author');self.assertEqual(source['published'],'2025-02-13')
+
+    def test_cited_dx_doi_alias_is_resolved_securely_without_search_or_abstract_fallback(self):
+        source={'url':'https://www.sciencedaily.com/releases/synthetic.htm','blocks':[{'links':['http://dx.doi.org/10.1234/fixture']}]}
+        self.assertEqual(runner.study_links(source),['https://doi.org/10.1234/fixture'])
+
+
 
 if __name__=='__main__':unittest.main()

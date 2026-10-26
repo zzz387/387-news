@@ -65,8 +65,9 @@ def study_links(source):
     for block in source['blocks']:
         for url in block.get('links',[]):
             host=(urlparse(url).hostname or '').lower()
-            if host in ('doi.org','pubmed.ncbi.nlm.nih.gov','pmc.ncbi.nlm.nih.gov') and url.startswith('https://') and url not in result:
-                result.append(url)
+            if host in ('doi.org','dx.doi.org','pubmed.ncbi.nlm.nih.gov','pmc.ncbi.nlm.nih.gov') and urlparse(url).scheme in ('http','https'):
+                url=urlparse(url)._replace(scheme='https',netloc='doi.org' if host.endswith('doi.org') else host).geturl()
+                if url not in result:result.append(url)
     if not result and (urlparse(source['url']).hostname or '').endswith('sciencedaily.com'):
         # Journal references may sit outside the article's prose region. Read the already
         # robots-verified public original, never a search snippet or an abstract fallback.
@@ -75,8 +76,9 @@ def study_links(source):
             def handle_starttag(self,tag,attrs):
                 href=dict(attrs).get('href','')
                 url=urljoin(source['url'],href);host=(urlparse(url).hostname or '').lower()
-                if tag=='a' and host in ('doi.org','pubmed.ncbi.nlm.nih.gov','pmc.ncbi.nlm.nih.gov') and url not in result:
-                    result.append(url)
+                if tag=='a' and host in ('doi.org','dx.doi.org','pubmed.ncbi.nlm.nih.gov','pmc.ncbi.nlm.nih.gov') and urlparse(url).scheme in ('http','https'):
+                    url=urlparse(url)._replace(scheme='https',netloc='doi.org' if host.endswith('doi.org') else host).geturl()
+                    if url not in result:result.append(url)
         parser=References();parser.feed(source41.transport(source['url']))
     return result[:4]  # bounded discovery, never a substitute for full study verification
 
@@ -108,9 +110,19 @@ def probe():
             return row
     with ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(inspect,urls))
     by_url={r['url']:r for r in rows}
-    report={'id':sc.ID,'gemini_requests':0,'checked_at':datetime.now(p.TZ).isoformat(),'sources':rows,
+    research_urls=list(dict.fromkeys(u for slot in config['slots'] if slot['category']=='Здоровье и движение'
+        for u in by_url[slot['url']].get('study_urls',[])))
+    with ThreadPoolExecutor(max_workers=3) as pool:research=list(pool.map(inspect,research_urls))
+    research_by_url={r['url']:r for r in research}
+    def slot_status(slot):
+        if not all(by_url[u]['status']=='eligible' for u in slot['original_urls']):return 'source_hold'
+        if slot['category']=='Здоровье и движение':
+            studies=by_url[slot['url']].get('study_urls',[])
+            if not studies or not all(research_by_url[u]['status']=='eligible' for u in studies):return 'medical_evidence_hold'
+        return 'sources_ready'
+    report={'id':sc.ID,'gemini_requests':0,'checked_at':datetime.now(p.TZ).isoformat(),'sources':rows,'research_sources':research,
         'articles':[{'slot':s['slot'],'topic':s['original_title'],'original_urls':s['original_urls'],
-                     'status':'sources_ready' if all(by_url[u]['status']=='eligible' for u in s['original_urls']) else 'source_hold',
+                     'status':slot_status(s),
                      'generation':'not_started'} for s in config['slots']]}
     print('[special-sources] '+json.dumps(report,ensure_ascii=False))
     Path(os.environ.get('SPECIAL_SOURCE_REPORT','/tmp/special-source-report.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2))
@@ -162,6 +174,7 @@ def verify_sources(state,persist):
         if record.get('article',{}).get('kind','').casefold()=='новость':
             event=record['source'].get('event_date')
             try:
+                if not record['source'].get('published'):raise ValueError()
                 event=datetime.fromisoformat(event);event=event.replace(tzinfo=p.TZ) if event.tzinfo is None else event.astimezone(p.TZ)
                 if not timedelta(0)<=datetime.now(p.TZ)-event<=timedelta(hours=p.CONFIG['news_event_hours']):raise ValueError()
             except (ValueError,TypeError):raise p.Blocked('SPECIAL_NEWS_NO_LONGER_CURRENT')

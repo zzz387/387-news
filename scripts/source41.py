@@ -36,6 +36,32 @@ def transport(url,limit=None):
         return data.decode(response.headers.get_content_charset() or 'utf-8',errors='strict')
 
 
+def publisher_metadata(document,host):
+    """Explicit publisher bylines/publication labels, never last-modified or event dates."""
+    result={}
+    if host=='sciencedaily.com' or host.endswith('.sciencedaily.com'):
+        for node in document.root.all():
+            if node.tag!='dt' or node.text().strip().rstrip(':').casefold()!='date' or node.parent is None:continue
+            siblings=[child for child in node.parent.children if hasattr(child,'tag')]
+            index=siblings.index(node)
+            if index+1<len(siblings) and siblings[index+1].tag=='dd':
+                raw=' '.join(siblings[index+1].text().split())
+                try:result['published']=datetime.strptime(raw,'%B %d, %Y').date().isoformat()
+                except ValueError:pass
+                if result:break
+    if host=='greatergood.berkeley.edu':
+        rows=set()
+        for node in document.root.all():
+            text=' '.join(node.text().split())
+            if len(text)>500:continue  # metadata transport bound; article text is never clipped
+            match=re.fullmatch(r'By (.+?)\s*\|\s*([A-Za-z]+ \d{1,2}, \d{4})',text)
+            if match:
+                try:rows.add((match[1],datetime.strptime(match[2],'%B %d, %Y').date().isoformat()))
+                except ValueError:pass
+        if len(rows)==1:result['author'],result['published']=next(iter(rows))
+    return result
+
+
 def extract(html,url):
     safe_url(url)
     try:
@@ -68,8 +94,9 @@ def extract(html,url):
     host=urlparse(url).hostname
     profiles=json.loads((policy.ROOT/'config/source-profiles.json').read_text())['institutions']
     profile=next((v for domain,v in profiles.items() if host==domain or host.endswith('.'+domain)),None)
-    author=meta.get('schema_author') or meta.get('author') or meta.get('article:author') or meta.get('citation_author') or ''
-    published=meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
+    publisher_fields=publisher_metadata(document,host)
+    author=publisher_fields.get('author') or meta.get('schema_author') or meta.get('author') or meta.get('article:author') or meta.get('citation_author') or ''
+    published=publisher_fields.get('published') or meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
     language=meta.get('lang') or meta.get('schema_inLanguage') or meta.get('og:locale') or ''
     language=language.split('-')[0].split('_')[0] if isinstance(language,str) else ''
     license_url=meta.get('license') or meta.get('schema_license')
