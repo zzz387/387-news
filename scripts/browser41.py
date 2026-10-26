@@ -84,6 +84,9 @@ def main():
         state['issue_approval_hash']=p.digest([editorial41.article_hash(r['article'],r['source'],r['rights']) for r in state['candidates']])
         publication41.build(state,root)
         report=check(root,state['date'],Path(temp)/'screenshots')
+        try: from scripts import review_viewer41
+        except ImportError: import review_viewer41
+        report['owner_reader']=review_viewer41.synthetic_browser_check(root,state['date'])
     Path(args.output).write_text(json.dumps(report)); print(json.dumps(report))
 
 

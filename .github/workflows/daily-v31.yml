@@ -21,7 +21,7 @@ on:
       phase:
         description: 'run: automatic next action; inspect: restore only; preview prevents publication'
         type: choice
-        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, trial, trial-inspect]
+        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, trial, trial-inspect, trial-route]
         default: run
         required: true
       preview:
@@ -43,6 +43,11 @@ on:
         type: string
         required: false
 
+      trial_review_public_key:
+        description: 'Optional owner PUBLIC RSA SPKI base64, generated on the owner PC; never a private or production key'
+        type: string
+        required: false
+
 permissions:
   contents: write
   actions: read
@@ -50,7 +55,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: ${{ (github.event_name == 'workflow_dispatch' && (inputs.phase == 'trial' || inputs.phase == 'trial-inspect')) && format('387-news-trial-review-{0}', github.run_id) || (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}', github.event_name, github.ref) || '387-news-stage-v31' }}
+  group: ${{ (github.event_name == 'workflow_dispatch' && startsWith(inputs.phase, 'trial')) && format('387-news-trial-review-{0}', github.run_id) || (github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')) && format('387-news-ci-{0}-{1}', github.event_name, github.ref) || '387-news-stage-v31' }}
   cancel-in-progress: false
 
 jobs:
@@ -132,6 +137,25 @@ jobs:
       - run: python -m unittest discover -s scripts -p 'test_*.py' -v
 
 
+
+  trial-route:
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/editorial-policy-v41' && inputs.phase == 'trial-route' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Verify real owner dispatch routing with no Secrets or Gemini
+        env:
+          TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
+          TRIAL_PREVIEW: ${{ inputs.preview }}
+        run: python scripts/trial41.py --route-only
+
   trial-approval:
     if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/codex/editorial-policy-v41' && (inputs.phase == 'trial' || inputs.phase == 'trial-inspect') }}
     runs-on: ubuntu-latest
@@ -151,6 +175,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
           TRIAL_CONFIRMATION: ${{ inputs.trial_confirmation }}
+          TRIAL_REVIEW_PUBLIC_KEY: ${{ inputs.trial_review_public_key }}
           TRIAL_PREVIEW: ${{ inputs.preview }}
           TARGET_DATE: ${{ inputs.target_date }}
           TRIAL_INSPECT: ${{ inputs.phase == 'trial-inspect' }}
@@ -183,6 +208,7 @@ jobs:
       GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
       TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
       TRIAL_CONFIRMATION: ${{ inputs.trial_confirmation }}
+      TRIAL_REVIEW_PUBLIC_KEY: ${{ inputs.trial_review_public_key }}
       TRIAL_PREVIEW: ${{ inputs.preview }}
       TRIAL_INSPECT: ${{ inputs.phase == 'trial-inspect' }}
       TARGET_DATE: ${{ inputs.target_date }}
@@ -218,6 +244,16 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/quota
           merge-multiple: true
+      - name: Restore upcoming production checkpoint for read-only quota priority
+        if: ${{ steps.checkpoint.outputs.production_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.production_id }}
+          run-id: ${{ steps.checkpoint.outputs.production_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/production-checkpoint
+          merge-multiple: true
       - name: Prepare or inspect the private full edition; never publish
         id: trial
         timeout-minutes: 20
@@ -228,6 +264,8 @@ jobs:
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
+          NEWS_PRODUCTION_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.production_found }}
+          NEWS_PRODUCTION_CHECKPOINT_FILE: ${{ runner.temp }}/production-checkpoint/news-draft.enc
         shell: bash
         run: |
           arguments=()
@@ -258,10 +296,19 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 
+      - name: Retain independently encrypted owner reader bundle
+        if: ${{ success() && steps.trial.outputs.owner_review_ready == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: v41-owner-review-${{ inputs.target_date }}-${{ github.run_id }}
+          path: ${{ runner.temp }}/owner-review.enc
+          retention-days: 7
+          if-no-files-found: error
+
   prepare:
     # This is deliberately OFF by default. Enable with repository variable
     # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
-    if: ${{ github.ref == 'refs/heads/main' && inputs.phase != 'trial' && inputs.phase != 'trial-inspect' && ((github.event_name == 'push' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
+    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -390,7 +437,7 @@ jobs:
     # Only fully verified issues go to Pages. A separate job avoids GH Pages
     # environment restrictions applying to research/writing stages.
     needs: prepare
-    if: ${{ github.ref == 'refs/heads/main' && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
+    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -435,7 +482,7 @@ jobs:
 
   monitor:
     needs: [prepare, deploy]
-    if: ${{ always() && github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     permissions:

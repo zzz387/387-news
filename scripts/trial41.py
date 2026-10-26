@@ -14,7 +14,7 @@ import tempfile
 from urllib.request import Request,urlopen
 import zipfile
 try:
-    from scripts import policy41 as p, editorial41, publication41, staged_news as stage, quota41, browser41
+    from scripts import policy41 as p, editorial41, publication41, staged_news as stage, quota41, browser41,review_crypto41,trial_admission41,site_checks
 except ImportError:
     import policy41 as p
     import editorial41
@@ -22,6 +22,9 @@ except ImportError:
     import staged_news as stage
     import quota41
     import browser41
+    import review_crypto41
+    import trial_admission41
+    import site_checks
 
 CONFIRMATION='RUN_V41_TRIAL_WITH_GEMINI'
 ENVIRONMENT='387-news-v41-trial'
@@ -77,11 +80,19 @@ def export(state,root,destination,browser=browser41.check):
     destination=Path(destination)
     if destination.resolve().is_relative_to(p.ROOT.resolve()): raise p.Blocked('TRIAL_EXPORT_MUST_BE_OUTSIDE_REPOSITORY')
     destination.mkdir(parents=True,exist_ok=True)
+    for path in (Path(root)/'assets').rglob('*'):
+        if path.is_symlink() or path.name.startswith('.') or path.suffix.lower() in ('.enc','.pem','.key','.env'):
+            raise p.Blocked('TRIAL_UNSAFE_PUBLIC_ASSET')
     shutil.copytree(Path(root)/'assets',destination/'assets')
     (destination/'issues').mkdir(); (destination/'archive').mkdir()
     publication41.build(state,destination,preview=False)  # private temporary tree only
     report={'policy_version':p.VERSION,'article_count':len(selected),'gemini_usage':quota41.actual_usage(state),
-            'source_urls':[r['url'] for r in selected],'checks':'all_required_gates_passed'}
+            'source_urls':[r['url'] for r in selected],'checks':'all_required_gates_passed',
+            'human_editorial_review':'pending; automatic gates do not prove literary quality',
+            'articles':[{'title':r['article']['title'],'category':r['article']['category'],
+                         'mode':r['mode'],'source_url':r['url'],'automatic_gates':{
+                         name:bool(r['checks'].get(name,{}).get('approved')) for name in p.STAGES}}
+                        for r in selected]}
     report['browser']=browser(destination,state['date'],destination/'screenshots')
     (destination/'review.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
     return report
@@ -89,11 +100,34 @@ def export(state,root,destination,browser=browser41.check):
 
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--preflight',action='store_true'); parser.add_argument('--inspect',action='store_true')
-    args=parser.parse_args(); guard(inspect=args.inspect); protected_environment()
+    parser.add_argument('--route-only',action='store_true')
+    args=parser.parse_args(); guard(inspect=args.inspect or args.route_only)
+    if args.route_only:
+        print('[trial-route] owner workflow_dispatch, branch, exact SHA and preview verified; no Secrets or Gemini used')
+        return
+    protected_environment()
+    recipient=os.getenv('TRIAL_REVIEW_PUBLIC_KEY','').strip()
+    if recipient: review_crypto41.public_key(recipient)
     date=os.environ['TARGET_DATE']; moment=datetime.strptime(date,'%Y-%m-%d').date()
     if args.preflight: print('[trial] protected owner approval and pinned commit verified'); return
     if moment<=datetime.now(p.TZ).date() and not Path(os.environ['NEWS_CHECKPOINT_FILE']).is_file():
         raise RuntimeError('TRIAL_NEW_RUN_REQUIRES_FUTURE_DATE')
+    key=stage.validate_key(os.environ['DRAFT_ENCRYPTION_KEY'])
+    if not args.inspect:
+        production=None
+        if os.getenv('NEWS_PRODUCTION_CHECKPOINT_EXPECTED')=='true':
+            production=stage.decipher(Path(os.environ['NEWS_PRODUCTION_CHECKPOINT_FILE']).read_bytes(),key)
+        ledger_path=Path(os.environ['NEWS_QUOTA_FILE'])
+        if os.getenv('NEWS_QUOTA_EXPECTED')=='true' and not ledger_path.is_file(): raise RuntimeError('SHARED_LEDGER_RESTORE_FAILED')
+        ledger=json.loads(ledger_path.read_text()) if ledger_path.is_file() else {}
+        admitted,reason=trial_admission41.assess(p.ROOT,production,ledger)
+        if admitted:
+            try: site_checks.check_site(expected_date=datetime.now(p.TZ).date().isoformat())
+            except Exception: admitted,reason=False,'CURRENT_PRODUCTION_HTTPS_UNVERIFIED'
+        if not admitted:
+            print('[trial-admission] deferred code='+reason+'; Gemini requests=0')
+            with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('trial_deferred='+reason+'\n')
+            return
     # Always force preview. The normal official restoration, budget and persistence paths remain authoritative.
     if not args.inspect:
         previous=sys.argv
@@ -110,7 +144,6 @@ def main():
                 stage.main()
             finally:
                 sys.argv=previous; stage.ROOT=previous_root; stage.news.ROOT=previous_news
-    key=stage.validate_key(os.environ['DRAFT_ENCRYPTION_KEY'])
     file=stage.ARTIFACT_FILE if stage.ARTIFACT_FILE.is_file() else Path(os.environ['NEWS_CHECKPOINT_FILE'])
     state=stage.decipher(file.read_bytes(),key)
     if state.get('date')!=date or state.get('preview') is not True or state.get('branch')!='codex/editorial-policy-v41':
@@ -132,6 +165,10 @@ def main():
                 if path.is_file(): archive.write(path,path.relative_to(Path(temp)/'site'))
         destination=Path(os.environ['RUNNER_TEMP'])/'trial-review.enc'
         destination.write_bytes(seal(buffer.getvalue(),key)); destination.chmod(0o600)
+        if recipient:
+            owner_file=Path(os.environ['RUNNER_TEMP'])/'owner-review.enc'
+            owner_file.write_bytes(review_crypto41.seal(buffer.getvalue(),recipient,date,os.environ['GITHUB_SHA'])); owner_file.chmod(0o600)
+            with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('owner_review_ready=true\n')
         print('[trial] complete: 12 reviewed articles, desktop/mobile checks; encrypted review bundle retained; no publication')
         print('[trial-metrics] '+json.dumps(report['gemini_usage']))
         with open(os.environ['GITHUB_OUTPUT'],'a') as output: output.write('trial_complete=true\n')
