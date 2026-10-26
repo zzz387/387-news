@@ -50,6 +50,20 @@ def migrate(state,date):
     return migrated
 
 
+ANALYSIS_REPAIR_REVISION='literal-quotes-bounded-v1'
+ANALYSIS_RETRY_CODES={'CLAIM_NOT_IN_ORIGINAL','SOURCE_ANALYSIS_INCOMPLETE','EVENT_DATE_UNVERIFIED'}
+
+
+def restore_analysis_repairs(state):
+    if state.get('analysis_repair_revision')==ANALYSIS_REPAIR_REVISION:return
+    for record in state.get('candidates',[]):
+        last=(record.get('history') or [{}])[-1]
+        if record.get('status')=='rejected' and last.get('code') in ANALYSIS_RETRY_CODES:
+            record['status']='preparing'
+            record.setdefault('progress',{})['_prior_analysis_failures']=1
+    state['analysis_repair_revision']=ANALYSIS_REPAIR_REVISION
+
+
 def event(state,record,stage,decision,code='',detail=''):
     entry={'at':datetime.now(policy.TZ).isoformat(),'stage':stage,'decision':decision,'code':code}
     if detail: entry['detail']=detail
@@ -142,21 +156,42 @@ class Editor:
             if piece['id'] not in progress and piece['id'] in shared:
                 progress[piece['id']]=copy.deepcopy(shared[piece['id']])
         pending=[piece for piece in pieces if piece['id'] not in progress]
+        repairs=record['progress'].setdefault('analysis_repairs',{})
         for group in content.operation_groups(pending):
-            result=self.call('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
+            group_id=policy.digest([part['id'] for part in group])
+            attempt=repairs.setdefault(group_id,{'failures':record['progress'].pop('_prior_analysis_failures',0),'code':''})
+            while True:
+                if attempt['failures']>=policy.CONFIG['technical']['content_attempts']:
+                    raise policy.Blocked(attempt['code'] or 'SOURCE_ANALYSIS_INCOMPLETE')
+                prompt=('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
                 '\nМетаданные: '+json.dumps({k:source[k] for k in ('id','url','title','author','published','language')},ensure_ascii=False)+
                 '\nИзвлеки проверяемые факты, точные дословные quote из одной конкретной части, требования к полноте и дату события (пусто, если неизвестна). '
                 'Не придумывай. source_id должен совпадать с исходником. sensitive=true для спорных/медицинских/опасных утверждений. '
                 'Для самостоятельного текста выделяй нейтральные проверяемые факты и общие знания. Авторские примеры, подборка и формулировки не являются свободным сырьём для рерайта. '
-                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок.',output_tokens=8000,schema='v41_analysis')
-            if set(result.get('covered_ids',[]))!={p['id'] for p in group}: raise policy.Blocked('SOURCE_ANALYSIS_INCOMPLETE')
-            if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in p['text'] for p in group)):
-                raise policy.Blocked('EVENT_DATE_UNVERIFIED')
-            assigned={p['id']:[] for p in group}
-            for claim in result['claims']:
-                matches=[p for p in group if claim.get('quote','').strip() and claim['quote'] in p['text']]
-                if claim['source_id']!=source['id'] or not matches: raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
-                owner=matches[0]['id']; claim=dict(claim,id=owner+'/'+claim['id']); assigned[owner].append(claim)
+                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок.')
+                if attempt['code']:
+                    prompt+='\nПредыдущая попытка отклонена: '+attempt['code']+(
+                        '. Исправь именно диагностированную ошибку. quote — непрерывная дословная строка из одной '
+                        'конкретной части, без парафраза, исправлений и склеивания. source_id — точный id оригинала; '
+                        'covered_ids — все id переданных частей. Не выдумывай подтверждение. Если факт нельзя '
+                        'подтвердить точной цитатой, не включай его в claims. Дату не указывай без дословного свидетельства.')
+                result=self.call(prompt,output_tokens=8000,schema='v41_analysis')
+                try:
+                    if set(result.get('covered_ids',[]))!={part['id'] for part in group}: raise policy.Blocked('SOURCE_ANALYSIS_INCOMPLETE')
+                    if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in part['text'] for part in group)):
+                        raise policy.Blocked('EVENT_DATE_UNVERIFIED')
+                    assigned={part['id']:[] for part in group}
+                    for claim in result['claims']:
+                        matches=[part for part in group if claim.get('quote','').strip() and claim['quote'] in part['text']]
+                        if claim['source_id']!=source['id'] or not matches: raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
+                        owner=matches[0]['id']; claim=dict(claim,id=owner+'/'+claim['id']); assigned[owner].append(claim)
+                except policy.Blocked as exc:
+                    attempt['failures']+=1; attempt['code']=exc.code
+                    event(getattr(self,'state',{}),record,'source_analysis','retry_pending',exc.code)
+                    self.persist()
+                    if attempt['failures']>=policy.CONFIG['technical']['content_attempts']: raise
+                    continue
+                break
             for piece in group:
                 progress[piece['id']]=dict(result,claims=assigned[piece['id']],covered_ids=[piece['id']])
                 shared[piece['id']]=copy.deepcopy(progress[piece['id']])
@@ -600,6 +635,7 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
     if (ops.ROOT/'issues'/date/'index.html').is_file():
         return pipeline.published_delivery(state,date,ops,preview,current,check_public or pipeline.site_checks.check_site)
     editor=editor or Editor(persist=persist)
+    restore_analysis_repairs(state); persist()
     rights_signature=policy.digest({'grants':editor.grants,'images':editor.image_grants,'source_profiles':rights41.source_profiles()})
     if state.get('rights_config_hash')!=rights_signature:
         for record in state['candidates']:
