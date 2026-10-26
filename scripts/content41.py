@@ -14,8 +14,8 @@ def schema(properties): return {'type':'object','properties':properties,'require
 
 news.SCHEMAS.update({
  'v41_translation':schema({'finished':B,'segments':{'type':'array','items':schema({'id':S,'text':S})}}),
- 'v41_analysis':schema({'claims':{'type':'array','items':schema({'id':S,'source_id':S,'quote':S,'fact':S,'sensitive':B})},
-                       'requirements':{'type':'array','items':S},'topic_key':S,'event_date':S,'event_date_quote':S,
+ 'v41_analysis':schema({'claims':{'type':'array','items':schema({'id':S,'source_id':S,'quote':S,'evidence_id':S,'fact':S,'sensitive':B})},
+                       'requirements':{'type':'array','items':S},'topic_key':S,'event_date':S,'event_date_quote':S,'event_evidence_id':S,
                        'category':{'type':'string','enum':list(policy.CATEGORIES)},'kind':S,'worth_publishing':B,'reader_value':S,
                        'covered_ids':{'type':'array','items':S}}),
  'v41_outline':schema({'title':S,'teaser':S,'category':S,'kind':S,'sections':{'type':'array','items':schema({'id':S,'heading':S,'purpose':S,'fact_ids':{'type':'array','items':S}})}}),
@@ -31,6 +31,16 @@ news.SCHEMAS.update({
 # Required in real model responses; legacy accepted checkpoints retain their original covered IDs.
 news.SCHEMAS['v41_review']['properties']['affected_ids']={'type':'array','items':S}
 news.SCHEMAS['v41_review']['required'].append('affected_ids')
+
+
+def evidence_units(group):
+    """Exact source spans, selected by short IDs; no model-generated quotation text."""
+    units=[]
+    for piece in group:
+        for raw in re.split(r'(?<=[.!?。！？])\s+|\n+',piece['text']):
+            text=raw.strip()
+            if text:units.append({'id':'q'+str(len(units)+1),'piece_id':piece['id'],'text':text})
+    return units
 
 
 def chunks(blocks):

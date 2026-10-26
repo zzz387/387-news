@@ -20,6 +20,7 @@ except ImportError:
 TRUSTED={
     'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org','unicef.org',
     'publication.pravo.gov.ru','consultant.ru','cbr.ru','mos.ru','nasa.gov','esa.int',
+    'journals.plos.org',  # peer-reviewed primary research; health still requires WHO/NIH/etc.
 }
 
 
@@ -73,7 +74,7 @@ def event(state,record,stage,decision,code='',detail=''):
 
 
 def discover(state):
-    if state.get('discovered'): return
+    if state.get('discovered') and os.getenv('NEWS_V41_TRIAL')=='true': return
     urls=[]
     if os.getenv('NEWS_V41_TRIAL')=='true':
         if os.getenv('GITHUB_ACTIONS')!='true': raise policy.Blocked('TRIAL_ACTIONS_REQUIRED')
@@ -85,6 +86,19 @@ def discover(state):
         return
     configured=policy.ROOT/'config/candidates.json'
     if configured.is_file(): urls.extend(json.loads(configured.read_text()).get('candidates',[]))
+    signature=policy.digest(urls)
+    if state.get('discovered'):
+        if state.get('candidate_catalog_hash')==signature:return
+        existing={r['url']:r for r in state['candidates']}
+        added=0
+        for item in urls:
+            if item['url'] in existing:continue
+            state['candidates'].append(dict(item,id=policy.digest(item['url']),status='discovered',checks={},progress={}))
+            existing[item['url']]=state['candidates'][-1];added+=1
+        state['candidate_catalog_hash']=signature
+        print(f'[source-reserve] appended={added}; saved candidates and accepted stages preserved',flush=True)
+        return
+    state['candidate_catalog_hash']=signature
     # RSS descriptions are discovery hints only. They never become source evidence.
     with ThreadPoolExecutor(max_workers=4) as pool:
         for items in pool.map(news.read_feed,news.FEEDS.items()):
@@ -161,33 +175,56 @@ class Editor:
         for group in content.operation_groups(pending):
             group_id=policy.digest([part['id'] for part in group])
             attempt=repairs.setdefault(group_id,{'failures':record['progress'].pop('_prior_analysis_failures',0),'code':''})
+            evidence=content.evidence_units(group);by_evidence={item['id']:item for item in evidence}
             while True:
                 if attempt['failures']>=policy.CONFIG['technical']['content_attempts']:
                     raise policy.Blocked(attempt['code'] or 'SOURCE_ANALYSIS_INCOMPLETE')
                 prompt=('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
                 '\nМетаданные: '+json.dumps({k:source[k] for k in ('id','url','title','author','published','language')},ensure_ascii=False)+
+                '\nДословные свидетельства: '+json.dumps(evidence,ensure_ascii=False)+
                 '\nИзвлеки проверяемые факты, точные дословные quote из одной конкретной части, требования к полноте и дату события (пусто, если неизвестна). '
                 'Не придумывай. source_id должен совпадать с исходником. sensitive=true для спорных/медицинских/опасных утверждений. '
                 'Для самостоятельного текста выделяй нейтральные проверяемые факты и общие знания. Авторские примеры, подборка и формулировки не являются свободным сырьём для рерайта. '
-                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок.')
+                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок. '
+                'Для каждого claim выбери evidence_id из таблицы дословных свидетельств; программа сама возьмёт исходную цитату и source_id. '
+                'Не переводить и не перепечатывать quote: при выбранном evidence_id поле quote оставь пустым. Факт должен прямо следовать из выбранного свидетельства. '
+                'Дату события указывай только при её прямом подтверждении текстом; event_evidence_id — id содержащего дату свидетельства. '
+                'Дата публикации в метаданных не является датой события. Если событие не датировано, event_date, event_date_quote и event_evidence_id должны быть пустыми.')
                 if attempt['code']:
                     prompt+='\nПредыдущая попытка отклонена: '+attempt['code']+(
                         '. Исправь именно диагностированную ошибку. quote — непрерывная дословная строка из одной '
                         'конкретной части, без парафраза, исправлений и склеивания. source_id — точный id оригинала; '
                         'covered_ids — все id переданных частей. Не выдумывай подтверждение. Если факт нельзя '
-                        'подтвердить точной цитатой, не включай его в claims. Дату не указывай без дословного свидетельства.')
+                        'подтвердить точной цитатой, не включай его в claims. Дату не указывай без дословного свидетельства. '
+                        'Предпочитай существующий evidence_id из таблицы qN: цитату и source_id программа привяжет сама; quote можно оставить пустым. Не придумывай идентификатор.')
                 result=self.call(prompt,output_tokens=8000,schema='v41_analysis')
+                diagnosis='UNKNOWN'
                 try:
+                    diagnosis='COVERAGE_MISMATCH'
                     if set(result.get('covered_ids',[]))!={part['id'] for part in group}: raise policy.Blocked('SOURCE_ANALYSIS_INCOMPLETE')
+                    diagnosis='EVENT_DATE_WITHOUT_LITERAL_EVIDENCE'
+                    if result.get('event_evidence_id'):
+                        event_evidence=by_evidence.get(result['event_evidence_id'])
+                        if event_evidence is None:raise policy.Blocked('EVENT_DATE_UNVERIFIED')
+                        result['event_date_quote']=event_evidence['text']
                     if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in part['text'] for part in group)):
                         raise policy.Blocked('EVENT_DATE_UNVERIFIED')
                     assigned={part['id']:[] for part in group}
                     for claim in result['claims']:
+                        if claim.get('evidence_id'):
+                            diagnosis='UNKNOWN_EVIDENCE_ID'
+                            selected=by_evidence.get(claim['evidence_id'])
+                            if selected is None:raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
+                            claim=dict({k:v for k,v in claim.items() if k!='evidence_id'},quote=selected['text'],source_id=source['id'])
+                        diagnosis='SOURCE_ID_MISMATCH' if claim['source_id']!=source['id'] else 'NON_LITERAL_QUOTE'
                         matches=[part for part in group if claim.get('quote','').strip() and claim['quote'] in part['text']]
                         if claim['source_id']!=source['id'] or not matches: raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
                         owner=matches[0]['id']; claim=dict(claim,id=owner+'/'+claim['id']); assigned[owner].append(claim)
                 except policy.Blocked as exc:
                     attempt['failures']+=1; attempt['code']=exc.code
+                    attempt['last_rejected_result']=copy.deepcopy(result)  # encrypted checkpoint only
+                    attempt['diagnosis']=diagnosis
+                    print('[analysis-diagnostic] '+json.dumps({'code':exc.code,'reason':diagnosis,'attempt':attempt['failures']}),flush=True)
                     event(getattr(self,'state',{}),record,'source_analysis','retry_pending',exc.code)
                     self.persist()
                     if attempt['failures']>=policy.CONFIG['technical']['content_attempts']: raise
@@ -214,6 +251,8 @@ class Editor:
         if not source.get('full_text_verified') or source.get('extraction_status')!='complete':
             raise policy.Blocked('FULL_ORIGINAL_REQUIRED')
         mode,rights=rights41.select_mode(source,self.grants)
+        if contract.is_special(state) and contract.evidence_plan(contract.definition()['slots'][record['special_slot']-1]).get('mode')=='INDEPENDENT_ARTICLE':
+            mode='INDEPENDENT_ARTICLE';rights=rights41.decision(source,mode,self.grants)
         if mode in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION') and any(re.search(r'https?://|www\.',block['text']) for block in source['blocks']):
             # Preserve the complete original, rather than silently deleting its visible URLs.
             # The reader policy requires a single source block, so choose an independent work.
@@ -661,7 +700,8 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
         except policy.Blocked as exc:
             pipeline.status(state,'BLOCKED','review_stale_approval',exc.code); persist(); return False
     else:
-        discover(state); persist()
+        if not state.get('discovered') or pipeline.capacity():discover(state)
+        persist()
         archive=archive_entries(ops.ROOT)
         for _ in range(policy.CONFIG['technical']['run_steps']):
             selected=select_ready(state,archive)
@@ -689,6 +729,10 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
             all_records=state['candidates']; start=state.get('candidate_cursor',0)%len(all_records)
             index=next((start+i)%len(all_records) for i in range(len(all_records)) if all_records[(start+i)%len(all_records)] in pending)
             record=all_records[index]; state['candidate_cursor']=(index+1)%len(all_records)
+            known_urls={u for u in (record['url'],record.get('source',{}).get('canonical')) if u}
+            if any(prior.get('source_url') in known_urls for prior in archive):
+                record['status']='rejected';event(state,record,'source_preflight','rejected','SOURCE_ALREADY_PUBLISHED')
+                persist();continue
             record['status']='preparing'; persist()
             pipeline.status(state,'RESEARCHING' if not record['checks'].get('source_verified') else 'WRITING','prepare_verified_reserves')
             try:

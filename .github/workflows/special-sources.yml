@@ -1,9 +1,9 @@
 name: 387 News — 003-R public source checks (no Gemini)
 on:
   push:
-    branches: [codex/reissue-003-r]
+    branches: [codex/reissue-003-r, codex/stabilize-v41]
   pull_request:
-    paths: ['scripts/**', 'config/special-003-r.json', '.github/workflows/special*.yml']
+    paths: ['scripts/**', 'config/**', '.github/workflows/special*.yml']
 permissions:
   contents: read
 jobs:
@@ -25,4 +25,23 @@ jobs:
         with:
           name: 003-R-public-source-diagnostics
           path: ${{ runner.temp }}/special-sources.json
+          retention-days: 30
+
+  daily-source-reserve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Verify proposed full sources and independent references without Gemini
+        run: python -m scripts.source_reserve41 --output '${{ runner.temp }}/source-reserve.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: daily-public-source-reserve
+          path: ${{ runner.temp }}/source-reserve.json
           retention-days: 30

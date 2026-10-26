@@ -1,7 +1,7 @@
 {
   "candidates": [
     {
-      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "url": "https://www.unicef.org/parenting/child-development/baby-tips",
       "category_hint": "Семья",
       "verification_urls": [
         "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
@@ -15,17 +15,63 @@
       ]
     },
     {
-      "url": "https://www.unicef.org/parenting/mental-health/how-reduce-stress-parents",
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
       "category_hint": "Семья",
       "verification_urls": [
         "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
       ]
     },
     {
-      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-      "category_hint": "Здоровье и движение",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/",
+      "category_hint": "Семья",
       "verification_urls": [
-        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/architecture/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://www.nps.gov/subjects/healthandsafety/trip-planning-guide.htm",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://www.mskagency.ru/materials/3571845",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://www.mskagency.ru/materials/3555954",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": [
+        "https://www.mskagency.ru/materials/3571841"
+      ]
+    },
+    {
+      "url": "https://www.mskagency.ru/materials/3571841",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": [
+        "https://www.mskagency.ru/materials/3555954"
       ]
     },
     {
@@ -36,36 +82,127 @@
       ]
     },
     {
+      "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+      ]
+    },
+    {
+      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "url": "https://www.nps.gov/subjects/biking/safety.htm",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+      ]
+    },
+    {
+      "url": "https://www.nccih.nih.gov/health/yoga-effectiveness-and-safety",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+      ]
+    },
+    {
+      "url": "https://www.nccih.nih.gov/health/tai-chi-what-you-need-to-know",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+      ]
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0336748",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "url": "https://science.nasa.gov/mission/osiris-rex/",
+      "category_hint": "История и культура",
+      "verification_urls": []
+    },
+    {
+      "url": "https://science.nasa.gov/people/katherine-johnson/",
+      "category_hint": "История и культура",
+      "verification_urls": []
+    },
+    {
+      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080109.html",
+      "category_hint": "История и культура",
+      "verification_urls": []
+    },
+    {
+      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080116.html",
+      "category_hint": "История и культура",
+      "verification_urls": []
+    },
+    {
       "url": "https://science.nasa.gov/solar-system/",
-      "category_hint": "Наука"
-    },
-    {
-      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1045912/full",
-      "category_hint": "Наука"
-    },
-    {
-      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
-      "category_hint": "Технологии"
-    },
-    {
-      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1137068",
-      "category_hint": "Наука"
-    },
-    {
-      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
-      "category_hint": "Технологии"
+      "category_hint": "Наука",
+      "verification_urls": []
     },
     {
       "url": "https://science.nasa.gov/mars/",
-      "category_hint": "Наука"
+      "category_hint": "Наука",
+      "verification_urls": []
     },
     {
-      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
-      "category_hint": "Москва и путешествия"
+      "url": "https://www.cbr.ru/dkp/about_inflation/",
+      "category_hint": "Экономика и бизнес",
+      "verification_urls": []
     },
     {
-      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
-      "category_hint": "Москва и путешествия"
+      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "category_hint": "Технологии",
+      "verification_urls": [
+        "https://science.nasa.gov/earth/"
+      ]
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "category_hint": "Технологии",
+      "verification_urls": []
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
     }
   ]
 }

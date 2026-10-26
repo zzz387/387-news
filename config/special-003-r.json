@@ -20,7 +20,15 @@
       "verification_urls": [],
       "requirements": [
         "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
-      ]
+      ],
+      "evidence_plan": {
+        "primary": "https://www.mskagency.ru/materials/3571846",
+        "support": [
+          "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/"
+        ],
+        "studies": [],
+        "mode": "INDEPENDENT_ARTICLE"
+      }
     },
     {
       "slot": 2,
@@ -34,7 +42,15 @@
       "verification_urls": [],
       "requirements": [
         "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
-      ]
+      ],
+      "evidence_plan": {
+        "primary": "https://www.mskagency.ru/materials/3571841",
+        "support": [
+          "https://www.mskagency.ru/materials/3555954"
+        ],
+        "studies": [],
+        "mode": "INDEPENDENT_ARTICLE"
+      }
     },
     {
       "slot": 3,
@@ -65,7 +81,13 @@
       "verification_urls": [],
       "requirements": [
         "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
-      ]
+      ],
+      "evidence_plan": {
+        "primary": "https://www.mskagency.ru/materials/3571845",
+        "support": [],
+        "studies": [],
+        "mode": "INDEPENDENT_ARTICLE"
+      }
     },
     {
       "slot": 5,
@@ -82,7 +104,15 @@
       ],
       "requirements": [
         "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект."
-      ]
+      ],
+      "evidence_plan": {
+        "primary": "https://www.unicef.org/eca/stories/11-tips-communicating-your-teen",
+        "support": [
+          "https://www.who.int/news-room/fact-sheets/detail/adolescent-mental-health"
+        ],
+        "studies": [],
+        "mode": "INDEPENDENT_ARTICLE"
+      }
     },
     {
       "slot": 6,
@@ -113,8 +143,21 @@
         "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
       ],
       "requirements": [
-        "Описать проверенное исследование: дизайн, участники, результаты, ограничения и корректные выводы; не подменять исследование пресс-релизом."
-      ]
+        "Описать проверенное исследование: дизайн, участники, результаты, ограничения и корректные выводы; не подменять исследование пресс-релизом.",
+        "Тема — добавки к кофе, калорийность и ограничения наблюдательных данных. Исследование 2025 года не выдавать за исходное исследование 2026 года; неподтверждённый рост 40% не повторять. Не рекомендовать сливки как средство похудения; различать калорийность и наблюдаемую связь с массой тела."
+      ],
+      "evidence_plan": {
+        "primary": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
+        "support": [
+          "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+          "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+        ],
+        "studies": [
+          "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full"
+        ],
+        "mode": "INDEPENDENT_ARTICLE"
+      },
+      "replacement_topic": "Калорийность добавок к кофе: сахар, сливки, состав тела и ограничения наблюдательных исследований"
     },
     {
       "slot": 8,
@@ -129,8 +172,17 @@
         "https://www.nia.nih.gov/health/loneliness-and-social-isolation/loneliness-and-social-isolation-tips-staying-connected"
       ],
       "requirements": [
-        "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект."
-      ]
+        "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект.",
+        "Исследование PLOS о пожилых жителях Китая использовать только с его реальными ограничениями: поперечный дизайн, контекст страны и возраста; не считать описательные различия причинным эффектом и не переносить их автоматически на все семьи."
+      ],
+      "evidence_plan": {
+        "primary": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
+        "support": [
+          "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231"
+        ],
+        "studies": [],
+        "mode": "INDEPENDENT_ARTICLE"
+      }
     }
   ],
   "daily_reserve_requests": 24

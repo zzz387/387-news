@@ -84,7 +84,22 @@ def extract(html,url):
             re.search(r'(?:class|id)=["\'][^"\']*\bpaywall|data-paywall=["\']true',html,re.I)):
         raise policy.Blocked('SOURCE_ACCESS_RESTRICTED')
     if meta.get('next'): raise policy.Blocked('SOURCE_PAGINATED_NEEDS_REVIEW')
-    regions,method=dom.choose_region(document)
+    # NIST's documented Drupal content region is the complete publication body,
+    # distinct from its content-top header and the government's navigation banner.
+    if base.startswith('https://www.nist.gov/'):
+        explicit=[n for n in document.root.all() if 'nist-page__region--content' in n.attrs.get('class','').split()]
+        regions,method=(explicit,'nist_complete_body') if len(explicit)==1 else dom.choose_region(document)
+    elif base.startswith('https://www.frontiersin.org/journals/') and urlparse(base).path.endswith('/full'):
+        explicit=[n for n in document.root.all() if 'ArticleDetailsV4__main__content' in n.attrs.get('class','').split()]
+        if len(explicit)==1:
+            headings=' '.join(n.text().casefold() for n in explicit[0].all() if n.tag in ('h2','h3','h4'))
+            if not re.search(r'methods',headings) or not re.search(r'results',headings):raise policy.Blocked('SOURCE_ABSTRACT_ONLY')
+            regions,method=explicit,'frontiers_complete_research'
+        else:regions,method=dom.choose_region(document)
+    elif base.startswith('https://dmtya.ru/theatre/news/'):
+        explicit=[n for n in document.root.all() if 'studio-content' in n.attrs.get('class','').split()]
+        regions,method=(explicit,'dmtya_complete_news') if len(explicit)==1 else dom.choose_region(document)
+    else:regions,method=dom.choose_region(document)
     if method=='abstract_only': raise policy.Blocked('SOURCE_ABSTRACT_ONLY')
     if not regions or any(not region.closed for region in regions):
         raise policy.Blocked('SOURCE_EXTRACTION_PARTIAL')
@@ -105,10 +120,16 @@ def extract(html,url):
     published=publisher_fields.get('published') or meta.get('article:published_time') or meta.get('datePublished') or meta.get('schema_datePublished') or meta.get('citation_date') or ''
     language=meta.get('lang') or meta.get('schema_inLanguage') or meta.get('og:locale') or ''
     language=language.split('-')[0].split('_')[0] if isinstance(language,str) else ''
+    # The verified Russian CBR /dkp/ publication omits html lang. Restrict this
+    # fallback to that publisher/path and Cyrillic text; script alone is not a language.
+    language_evidence='publisher_metadata' if language else None
+    letters=[c for block in blocks for c in block['text'] if c.isalpha()]
+    if not language and host in ('www.cbr.ru','cbr.ru') and urlparse(base).path.startswith('/dkp/') and profile and letters and sum('А'<=c<='я' or c in 'Ёё' for c in letters)/len(letters)>0.7:
+        language='ru';language_evidence='extracted_cyrillic_script'
     license_url=meta.get('license') or meta.get('schema_license')
     source={'id':policy.digest(url),'url':url,'canonical':urljoin(base,meta.get('canonical') or base),
             'title':title,'publisher':meta.get('og:site_name') or (profile or {}).get('publisher') or host,
-            'author':author,'published':published,'event_date':None,'language':language,
+            'author':author,'published':published,'event_date':None,'language':language,'language_evidence':language_evidence,
             'blocks':blocks,'content_hash':policy.digest(blocks),'raw_hash':policy.digest(html),
             'full_text_verified':True,'extraction_status':'complete','extraction_method':method,
             'access_checked_at':datetime.now(timezone.utc).isoformat(),

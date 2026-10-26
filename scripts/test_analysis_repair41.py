@@ -66,6 +66,50 @@ class AnalysisRepairTests(unittest.TestCase):
             self.assertEqual(len(remaining),1)
             self.assertEqual(restored['progress']['analysis'][pieces[0]['id']],accepted[pieces[0]['id']])
 
+    def test_selected_evidence_binds_literal_quote_and_source_id_without_translation(self):
+        s=one_source();pieces=c.chunks(s['blocks']);valid=answer(s,pieces)
+        evidence=c.evidence_units(pieces)[0]
+        valid['claims'][0].update(source_id='model-typo',quote='A translated or mistyped quotation',evidence_id=evidence['id'])
+        record={'source':s,'progress':{}};e.Editor(call=lambda *a,**k:valid).analyse(record)
+        self.assertEqual(record['claims'][0]['quote'],evidence['text'])
+        self.assertEqual(record['claims'][0]['source_id'],s['id']);self.assertNotIn('evidence_id',record['claims'][0])
+        self.assertIn(record['claims'][0]['quote'],pieces[0]['text'])
+
+    def test_literal_evidence_does_not_bypass_independent_fact_review(self):
+        import json
+        from scripts.test_policy41 import record as fixture
+        r=fixture(0);r['checks']={};r['claims']=[{'id':'claim','fact':'Synthetic unsupported conclusion','quote':r['source']['blocks'][-1]['text'],'source_id':r['source']['id'],'sensitive':False}]
+        r['article']['category']='Наука';r['article']['activities']=[]
+        def reject(prompt,**kwargs):
+            part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0]);members=part.get('pieces',[part])
+            return {'approve':False,'issues':['Claim is not entailed by the literal source'],'unresolved':[],
+                    'covered_ids':[m['id'] for m in members],'affected_ids':[m['id'] for m in members]}
+        with self.assertRaisesRegex(p.Blocked,'REVIEW_REJECTED'):
+            e.Editor(call=reject).review(e.new_state('2026-10-27'),r,'fact_checked')
+        self.assertNotIn('fact_checked',r['checks'])
+
+    def test_unknown_evidence_identifier_does_not_approve_a_claim(self):
+        s=one_source();bad=answer(s,c.chunks(s['blocks']));bad['claims'][0]['evidence_id']='foreign-q'
+        record={'source':s,'progress':{}}
+        with self.assertRaisesRegex(p.Blocked,'CLAIM_NOT_IN_ORIGINAL'):
+            e.Editor(call=lambda *a,**k:copy.deepcopy(bad)).analyse(record)
+        attempt=next(iter(record['progress']['analysis_repairs'].values()))
+        self.assertEqual(attempt['failures'],3);self.assertEqual(attempt['diagnosis'],'UNKNOWN_EVIDENCE_ID')
+        self.assertEqual(record['progress'].get('analysis',{}),{})
+
+    def test_selected_event_evidence_must_exist_and_date_is_never_created_from_metadata(self):
+        s=one_source();bad=answer(s,c.chunks(s['blocks']));bad.update(event_date='2026-10-27',event_evidence_id='missing-q')
+        with self.assertRaisesRegex(p.Blocked,'EVENT_DATE_UNVERIFIED'):
+            e.Editor(call=lambda *a,**k:copy.deepcopy(bad)).analyse({'source':s,'progress':{}})
+
+    def test_every_evidence_unit_is_an_exact_span_of_its_declared_part(self):
+        pieces=[{'id':'first','text':'First sentence. Second sentence! A third line?\nFourth line.'},
+                {'id':'second','text':'Русский оригинал — без перевода.'}]
+        units=c.evidence_units(pieces);self.assertGreater(len(units),2)
+        by_id={piece['id']:piece for piece in pieces}
+        self.assertEqual(len({unit['id'] for unit in units}),len(units))
+        for unit in units:self.assertIn(unit['text'],by_id[unit['piece_id']]['text'])
+
     def test_legacy_refusal_requeues_only_affected_candidate_once_without_counter_reset(self):
         state=e.new_state('2026-10-27');state['_quota_snapshot']={'requests':207}
         bad={'id':'bad','status':'rejected','history':[{'code':'CLAIM_NOT_IN_ORIGINAL'}],'progress':{}}

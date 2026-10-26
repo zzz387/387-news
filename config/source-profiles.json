@@ -61,6 +61,30 @@
     "mskagency.ru": {
       "publisher": "Агентство городских новостей «Москва»",
       "evidence_url": "https://www.mskagency.ru/about"
+    },
+    "dmtya.ru": {
+      "publisher": "Детский музыкальный театр юного актёра",
+      "evidence_url": "https://dmtya.ru/"
+    },
+    "cbr.ru": {
+      "publisher": "Банк России",
+      "evidence_url": "https://www.cbr.ru/about_br/"
+    },
+    "nist.gov": {
+      "publisher": "National Institute of Standards and Technology",
+      "evidence_url": "https://www.nist.gov/about-nist"
+    },
+    "nps.gov": {
+      "publisher": "National Park Service",
+      "evidence_url": "https://www.nps.gov/aboutus/index.htm"
+    },
+    "imf.org": {
+      "publisher": "International Monetary Fund",
+      "evidence_url": "https://www.imf.org/en/About"
+    },
+    "vatican.va": {
+      "publisher": "The Holy See",
+      "evidence_url": "https://www.vatican.va/content/vatican/en.html"
     }
   }
 }
