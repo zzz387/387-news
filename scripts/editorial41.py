@@ -73,7 +73,7 @@ def event(state,record,stage,decision,code='',detail=''):
 
 
 def discover(state):
-    if state.get('discovered'): return
+    if state.get('discovered') and os.getenv('NEWS_V41_TRIAL')=='true': return
     urls=[]
     if os.getenv('NEWS_V41_TRIAL')=='true':
         if os.getenv('GITHUB_ACTIONS')!='true': raise policy.Blocked('TRIAL_ACTIONS_REQUIRED')
@@ -85,6 +85,19 @@ def discover(state):
         return
     configured=policy.ROOT/'config/candidates.json'
     if configured.is_file(): urls.extend(json.loads(configured.read_text()).get('candidates',[]))
+    signature=policy.digest(urls)
+    if state.get('discovered'):
+        if state.get('candidate_catalog_hash')==signature:return
+        existing={r['url']:r for r in state['candidates']}
+        added=0
+        for item in urls:
+            if item['url'] in existing:continue
+            state['candidates'].append(dict(item,id=policy.digest(item['url']),status='discovered',checks={},progress={}))
+            existing[item['url']]=state['candidates'][-1];added+=1
+        state['candidate_catalog_hash']=signature
+        print(f'[source-reserve] appended={added}; saved candidates and accepted stages preserved',flush=True)
+        return
+    state['candidate_catalog_hash']=signature
     # RSS descriptions are discovery hints only. They never become source evidence.
     with ThreadPoolExecutor(max_workers=4) as pool:
         for items in pool.map(news.read_feed,news.FEEDS.items()):
