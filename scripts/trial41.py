@@ -118,6 +118,12 @@ def main():
     if not state.get('audit_passed'):
         print('[trial] incomplete; encrypted checkpoint retained; resume with the same date after quota/cooldown')
         return
+    def retain():
+        stage.save(state,key)
+        with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+            output.write('checkpoint=true\nartifact_name='+stage.artifact_label(date,True)+'\n')
+    # Recheck originals after all writing/reviews; loss/change replaces only the affected candidate.
+    editorial41.verify_publication_sources(state,persist=retain)
     with tempfile.TemporaryDirectory(prefix='387-private-trial-') as temp:
         report=export(state,p.ROOT,Path(temp)/'site')
         buffer=io.BytesIO()

@@ -11,7 +11,7 @@
 @media print{.topics,.bookmark,.readingprogress,.footnav,.top{display:none}body{background:#fff}.wrap{width:100%}.article-body{font-size:12pt}}
 
 /* v4.1 full reader text: no height/line clamp, including practical lists. */
-[data-policy-version="4.1"] .article-body{overflow-wrap:anywhere;min-width:0}
+[data-policy-version="4.1"] .article-body{display:flow-root;overflow-wrap:anywhere;min-width:0}
 .article-shell[data-policy-version="4.1"] h1,.article-shell[data-policy-version="4.1"] h2,main[data-policy-version="4.1"] h2,main[data-policy-version="4.1"] .toc h3{overflow-wrap:anywhere;min-width:0}
 .source-primary{max-width:730px;margin:44px auto 0;padding:20px 24px;background:var(--tint);font:14px/1.65 Arial,sans-serif;overflow-wrap:anywhere}
 .source-primary a{text-decoration:underline;text-underline-offset:3px}

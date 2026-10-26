@@ -74,7 +74,9 @@ def run(catalog,fetch=source41.fetch):
               'required_category_hints':p.REQUIRED<={r['category_hint'] for r in trial},
               'licensed_translation':any(r['mode']=='FULL_TRANSLATION' for r in trial),
               'russian_primary':any('russian' in r['tags'] for r in trial),
-              'unicef_21_original':any(r['test_id']=='unicef-21' for r in trial)}
+              'unicef_21_original':any(r['test_id']=='unicef-21' for r in trial),
+              'independent_child_evidence':any(r['test_id']=='who-under-five' for r in eligible),
+              'independent_health_evidence':any(r['test_id']=='nih-adult-health' for r in eligible)}
     return {'checked_at':datetime.now(timezone.utc).isoformat(),'gemini_requests':0,'sources':rows,
             'eligible':len(eligible),'trial_candidates':len(trial),'coverage':coverage,
             'source_pool_sufficient':all(coverage.values())}

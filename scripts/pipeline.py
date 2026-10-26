@@ -208,7 +208,8 @@ def report(state,ledger,now=None):
     if state.get('block_code')=='DAILY_QUOTA':
         tomorrow_utc=datetime.combine(datetime.now(timezone.utc).date()+timedelta(days=1),datetime.min.time(),tzinfo=timezone.utc)
         retry=next_wake(tomorrow_utc.astimezone(news.TZ))
-    return dict(date=state['date'],articles=max(len(state.get('articles',{})),state.get('public_article_count',0)),
+    ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version')==41 else len(state.get('articles',{}))
+    return dict(date=state['date'],articles=max(ready_count,state.get('public_article_count',0)),
                 segments=segments,dossiers=len(state.get('dossiers',{})),audit_passed=bool(state.get('audit_passed')),
                 quota_day=ledger.get('day'),requests_used=ledger.get('requests',0),
                 requests_used_today=ledger.get('requests',0) if ledger.get('day')==datetime.now(timezone.utc).date().isoformat() else 0,

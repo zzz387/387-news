@@ -115,6 +115,10 @@ def fetch_latest_checkpoint(label: str, key: bytes) -> dict | None:
     return None
 
 
+def vetted_count(state):
+    return sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version')==41 else len(state.get('articles',{}))
+
+
 def save(state: dict, key: bytes):
     ARTIFACT_FILE.parent.mkdir(parents=True, exist_ok=True)
     temp = ARTIFACT_FILE.with_suffix('.tmp')
@@ -122,7 +126,7 @@ def save(state: dict, key: bytes):
     temp.chmod(0o600)
     temp.replace(ARTIFACT_FILE)
     target=policy41.ARTICLE_COUNT if state.get('version')==41 else 8  # historical schema v31 only
-    print(f'[checkpoint] AES-256-GCM encrypted; {len(state.get("articles",{}))}/{target} vetted article drafts',flush=True)
+    print(f'[checkpoint] AES-256-GCM encrypted; {vetted_count(state)}/{target} vetted article drafts',flush=True)
 
 
 def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
@@ -520,7 +524,7 @@ def main():
     if state:
         state.pop('pause_reason', None)
         count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
-        print(f'[resume] {len(state.get("articles", {}))}/{target_count} verified articles; {count} accepted segments; '
+        print(f'[resume] {vetted_count(state)}/{target_count} verified articles; {count} accepted segments; '
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
     if args.phase not in ('check','inspect') and not release_queue.edition_exists(ROOT,date):
         state=editorial41.migrate(state,date)
@@ -528,10 +532,10 @@ def main():
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')
         segments = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
-        print(f'[checkpoint-test] restored {len(state.get("articles", {}))}/{target_count} articles, {segments} segments', flush=True)
+        print(f'[checkpoint-test] restored {vetted_count(state)}/{target_count} articles, {segments} segments', flush=True)
         if args.phase=='inspect':
-            action='publish_when_due' if state.get('audit_passed') else 'audit' if len(state.get('articles',{}))==(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'continue_saved_writing'
-            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if len(state.get('articles',{}))==(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'RETRY_PENDING',action)
+            action='publish_when_due' if state.get('audit_passed') else 'audit' if vetted_count(state)>=(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'continue_saved_writing'
+            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if vetted_count(state)>=(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'RETRY_PENDING',action)
             pipeline.emit_report(state,state.get('_quota_snapshot',{}),os.getenv('GITHUB_OUTPUT'))
         return
     quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
@@ -591,7 +595,7 @@ def main():
         print(f'[paused] {exc}', flush=True)
         if state:
             state['pause_reason']=str(exc)
-            pipeline.pause(state,ready=len(state.get('articles',{}))==(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) and not state.get('audit_passed'))
+            pipeline.pause(state,ready=vetted_count(state)>=(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) and not state.get('audit_passed'))
             if any(marker in str(exc) for marker in ('429','503','cooldown')):
                 pipeline.status(state,'RETRY_PENDING','resume_after_cooldown','API_COOLDOWN')
     except policy41.Blocked as exc:

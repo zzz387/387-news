@@ -163,7 +163,8 @@ class Editor:
             self.persist()
         if not any(r.get('worth_publishing') is True for r in progress.values()): raise policy.Blocked('NO_EDITORIAL_VALUE')
         categories=[r['category'] for r in progress.values()]
-        record['category']=max(set(categories),key=categories.count)
+        record['category']=max(policy.CATEGORIES,key=lambda category:(categories.count(category),
+            category==record.get('category_hint'),-policy.CATEGORIES.index(category)))
         record['kind']=next(iter(progress.values()))['kind']
         record['claims']=[claim for result in progress.values() for claim in result['claims']]
         record['requirements']=list(dict.fromkeys(r for result in progress.values() for r in result['requirements']))
@@ -524,10 +525,14 @@ def verify_publication_sources(state,fetch=None,persist=lambda:None):
         record=records[identity]; original=record['source']
         try: current=fetch(original['url'])
         except Exception as exc:
+            record['status']='needs_review'; state['audit_passed']=False
+            event(state,record,'release_source','needs_review','SOURCE_RELEASE_UNAVAILABLE',type(exc).__name__)
+            persist()
             raise policy.Blocked('SOURCE_RELEASE_UNAVAILABLE',type(exc).__name__) from exc
         keys=('content_hash','title','author','published','language','declared_license')
         if (not current.get('full_text_verified') or current.get('metadata_status')!='verified'
                 or any(current.get(k)!=original.get(k) for k in keys)):
+            record['status']='needs_review'; state['audit_passed']=False
             event(state,record,'release_source','needs_review','SOURCE_CHANGED_AFTER_REVIEW')
             persist()
             raise policy.Blocked('SOURCE_CHANGED_AFTER_REVIEW')

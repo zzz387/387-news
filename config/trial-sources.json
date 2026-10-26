@@ -12,8 +12,7 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://developingchild.harvard.edu/key-concept/serve-and-return/",
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
       ]
     },
     {
@@ -25,8 +24,7 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://developingchild.harvard.edu/key-concept/serve-and-return/",
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
       ]
     },
     {
@@ -38,8 +36,7 @@
       ],
       "trial_eligible": true,
       "verification_urls": [
-        "https://developingchild.harvard.edu/key-concept/serve-and-return/",
-        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
       ]
     },
     {
@@ -204,6 +201,15 @@
       "test_id": "nih-adult-health",
       "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
       "category_hint": "Здоровье и движение",
+      "tags": [
+        "verification"
+      ],
+      "trial_eligible": false
+    },
+    {
+      "test_id": "who-under-five",
+      "url": "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more",
+      "category_hint": "Семья",
       "tags": [
         "verification"
       ],

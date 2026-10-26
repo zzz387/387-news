@@ -272,7 +272,11 @@ class IssueTests(unittest.TestCase):
         current=copy.deepcopy(state['candidates'][0]['source']); current['content_hash']='changed'
         with self.assertRaisesRegex(p.Blocked,'SOURCE_CHANGED_AFTER_REVIEW'):
             e.verify_publication_sources(state,fetch=lambda url:current)
-        self.assertTrue(all(r['status']=='ready' for r in state['candidates']))
+        self.assertEqual(state['candidates'][0]['status'],'needs_review')
+        self.assertTrue(all(r['status']=='ready' for r in state['candidates'][1:]))
+        self.assertFalse(state['audit_passed'])
+        from scripts import pipeline
+        self.assertEqual(pipeline.report(state,{})['articles'],11)
 
     def test_only_failed_independent_section_is_repaired_then_all_gates_repeat(self):
         r=record(); r.pop('article'); r['mode']='INDEPENDENT_ARTICLE'
