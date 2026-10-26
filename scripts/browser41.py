@@ -12,7 +12,7 @@ def check(root,date,output):
         def log_message(self,*args): pass
     server=ThreadingHTTPServer(('127.0.0.1',0),partial(Silent,directory=str(root)))
     thread=Thread(target=server.serve_forever,daemon=True); thread.start()
-    report={'viewports':[],'pages':0,'horizontal_overflow':False}
+    report={'viewports':[],'pages':0,'horizontal_overflow':False,'visible_overflow_pages':0}
     try:
         with sync_playwright() as playwright:
             browser=playwright.chromium.launch()
@@ -27,10 +27,16 @@ def check(root,date,output):
                     page.goto(base+url,wait_until='networkidle')
                     if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HORIZONTAL_OVERFLOW')
                     body=page.locator('.article-body')
-                    if not body.is_visible() or body.evaluate('(n)=>n.scrollHeight>n.clientHeight+1'): raise ValueError('BROWSER_BODY_CLIPPED')
+                    metrics=body.evaluate('(n)=>({scroll:n.scrollHeight,client:n.clientHeight,overflow:getComputedStyle(n).overflowY})')
+                    if not body.is_visible(): raise ValueError('BROWSER_BODY_HIDDEN')
+                    if metrics['scroll']>metrics['client']+1:
+                        if metrics['overflow']!='visible': raise ValueError('BROWSER_BODY_CLIPPED')
+                        report['visible_overflow_pages']+=1
                     if page.locator('.source-primary').count()!=1: raise ValueError('BROWSER_SOURCE_BLOCK_COUNT')
-                    if body.locator('p,li,h2,h3,blockquote').evaluate_all('(nodes)=>nodes.some(n=>getComputedStyle(n).display==="none"||getComputedStyle(n).visibility==="hidden")'):
+                    if body.locator('p,li,h2,h3,blockquote').evaluate_all('(nodes)=>nodes.some(n=>{const s=getComputedStyle(n);return s.display==="none"||s.visibility==="hidden"||(n.scrollHeight>n.clientHeight+1&&s.overflowY!=="visible")})'):
                         raise ValueError('BROWSER_BODY_HIDDEN')
+                    if page.evaluate('Math.max(...[...document.querySelectorAll(".article-body p,.article-body li,.article-body h2,.article-body h3,.article-body blockquote")].map(n=>n.getBoundingClientRect().bottom))>document.querySelector(".source-primary").getBoundingClientRect().top+1'):
+                        raise ValueError('BROWSER_SOURCE_OVERLAPS_BODY')
                     page.screenshot(path=str(output/f'{width}-{index+1:02d}-top.png'))
                     page.evaluate('window.scrollTo(0,document.documentElement.scrollHeight)')
                     page.screenshot(path=str(output/f'{width}-{index+1:02d}-end.png'))
