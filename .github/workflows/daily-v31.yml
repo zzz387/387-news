@@ -540,6 +540,8 @@ jobs:
     if: ${{ always() && github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && needs.prepare.result == 'success' && needs.monitor.result == 'success' && (github.event_name == 'schedule' || github.event_name == 'push') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
     # The caller's existing 387-news-stage-v31 mutex covers this entire tail.
     uses: ./.github/workflows/special-003-r.yml
+    with:
+      daily_run_used: ${{ fromJSON(needs.prepare.outputs.pipeline_status).run_used }}
     secrets: inherit
 
   special-initialize:

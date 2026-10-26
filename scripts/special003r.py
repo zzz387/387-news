@@ -55,6 +55,11 @@ def admit(root,daily,ledger,now=None):
     return True,'DAILY_APPROVED_AND_SPARE_QUOTA'
 
 
+def remaining_run_limit(daily_used,ledger):
+    if type(daily_used) is not int or not 0<=daily_used<=24:raise RuntimeError('DAILY_RUN_ACCOUNTING_INVALID')
+    return max(0,min(24-daily_used,220-ledger.get('requests',220)-sc.definition()['daily_reserve_requests']))
+
+
 def study_links(source):
     result=[]
     for block in source['blocks']:
@@ -89,7 +94,7 @@ def probe():
             row={'url':url,'status':'blocked','code':getattr(exc,'code',None) if isinstance(exc,p.Blocked) else type(exc).__name__}
             if 'source' in locals():
                 try:
-                    row['metadata']={key:source.get(key) for key in ('language','author','published','publisher','metadata_gaps','metadata_status')}
+                    row['metadata']={key:source.get(key) for key in ('title','canonical','language','author','published','publisher','metadata_gaps','metadata_status','extraction_method')}
                     row['study_urls']=study_links(source)
                     if source.get('metadata_status')!='verified':
                         try:from scripts import source_dom41 as dom
@@ -272,6 +277,8 @@ def run():
             with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('ready=true\n')
         return
     admitted,reason=admit(root,daily,ledger)
+    daily_used=int(os.getenv('NEWS_DAILY_RUN_USED','24'))
+    if remaining_run_limit(daily_used,ledger)==0:admitted,reason=False,'DAILY_USED_RUN_BUDGET'
     if stale_shared:admitted,reason=False,'SPECIAL_SHARED_LEDGER_STALE'
     if os.getenv('SPECIAL_INITIALIZE_ONLY')=='true':admitted,reason=False,'INITIALIZED_ONLY_NO_GEMINI'
     if admitted:
@@ -285,7 +292,7 @@ def run():
     if not admitted:
         print('[special-status] '+json.dumps({'id':sc.ID,'stage':'DEFERRED','reason':reason,'articles':sum(r['status']=='ready' for r in state['candidates']),'gemini_requests':0}));return
     # Independent state, identical global request budget/cooldown; never mutate the daily file.
-    budget=news.runtime.RequestBudget(ledger,persist,run_limit=min(24,220-ledger['requests']-sc.definition()['daily_reserve_requests']))
+    budget=news.runtime.RequestBudget(ledger,persist,run_limit=remaining_run_limit(daily_used,ledger))
     news.runtime.ACTIVE_BUDGET=budget;news.runtime.CHECKPOINT=persist
     previous=signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(news.runtime.GenerationPaused('Special runner stopped')))
     try:
@@ -307,7 +314,7 @@ def run():
         state['status']='BLOCKED';state['block_code']=exc.code;print('[special-status] BLOCKED code='+exc.code)
     finally:
         persist();print('[special-metrics] '+json.dumps({'id':sc.ID,'articles':sum(r['status']=='ready' for r in state['candidates']),
-            'requests_used':ledger.get('requests'),'run_used':budget.used,'stages':quota41.actual_usage(state)}))
+            'requests_used':ledger.get('requests'),'run_used':budget.used,'workflow_run_used':daily_used+budget.used,'stages':quota41.actual_usage(state)}))
         news.runtime.ACTIVE_BUDGET=news.runtime.CHECKPOINT=None;signal.signal(signal.SIGTERM,previous)
 
 

@@ -3,6 +3,9 @@ name: 387 News — 003-R after daily production
 on:
   workflow_call:
     inputs:
+      daily_run_used:
+        type: number
+        default: 24
       initialize_only:
         type: boolean
         default: false
@@ -24,6 +27,7 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       NEWS_SPECIAL_EDITION: 003-R
       SPECIAL_INITIALIZE_ONLY: ${{ inputs.initialize_only }}
+      NEWS_DAILY_RUN_USED: ${{ inputs.daily_run_used }}
       NEWS_MAX_REQUESTS_PER_RUN: '24'
       NEWS_MAX_REQUESTS_PER_DAY: '220'
       NEWS_REQUEST_GAP_SECONDS: '6'

@@ -189,5 +189,13 @@ class SpecialTests(unittest.TestCase):
             runner.verify_sources(state,lambda:None)
 
 
+    def test_shared_workflow_run_never_exceeds_daily_plus_special_twenty_four(self):
+        self.assertEqual(runner.remaining_run_limit(24,{'requests':100}),0)
+        self.assertEqual(runner.remaining_run_limit(22,{'requests':100}),2)
+        self.assertEqual(runner.remaining_run_limit(0,{'requests':194}),2)
+        self.assertEqual(runner.remaining_run_limit(0,{'requests':196}),0)
+        with self.assertRaises(RuntimeError):runner.remaining_run_limit(-1,{'requests':100})
+
+
 
 if __name__=='__main__':unittest.main()
