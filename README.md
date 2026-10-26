@@ -23,3 +23,7 @@ Pages должен публиковаться через **GitHub Actions**, и�
 Подготовлен [защищённый испытательный режим PR№7](docs/V41_TRIAL_READINESS.md): реальные источники, расчёт/учёт квоты,12 приватных HTML/Markdown и мобильные/desktop проверки. Реальные Gemini-вызовы требуют отдельного разрешения владельца; испытание не публикуется и не требует слияния PR.
 
 Текущий [статус автономного испытания и закрытый просмотр на ПК](docs/V41_AUTO_TRIAL_STATUS.md): owner-helper проверяет реальный dispatch, настраивает только trial-environment и шифрует reader bundle на отдельный ключ владельца. Production-ключ не экспортируется.
+
+### Испытание с телефона через GitHub Codespaces
+
+[Создать Codespace из PR №7](https://codespaces.new/zzz387/387-news?ref=codex%2Feditorial-policy-v41&devcontainer_path=.devcontainer%2Fdevcontainer.json&machine=basicLinux32gb). Установка автоматическая, затем задача **387 News: открыть панель**. [Инструкция и честный статус проверок](docs/V41_CODESPACES.md). Production не включается; Gemini запускается только после защищённого approval.

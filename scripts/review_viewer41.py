@@ -1,6 +1,6 @@
-"""Owner PC fallback: decrypt reader-only output in RAM and bind loopback only.
+"""Owner reader: decrypt final output in RAM; loopback with optional private Codespaces proxy.
 
-No production key, no external hosting, no plaintext extraction, no public URL.
+No production key, no plaintext extraction, no public port.
 """
 import argparse
 import html
@@ -31,7 +31,10 @@ WORKFLOW='.github/workflows/daily-v31.yml'
 MAX_BYTES=64*1024*1024  # technical memory budget, never a publication length target
 
 
-def key_directory(): return Path.home()/'.local/share/387-news-owner-review'
+def key_directory():
+    # /workspaces survives Codespace stop/rebuild; never place the key in the repo.
+    if os.getenv('CODESPACES')=='true': return Path('/workspaces/.387-news-owner-review')
+    return Path.home()/'.local/share/387-news-owner-review'
 
 
 def owner_key(directory=None):
@@ -117,7 +120,7 @@ def synthetic_browser_check(root,date):
     try:
         with sync_playwright() as playwright:
             browser=playwright.chromium.launch()
-            for width in (320,390,1440):
+            for width in (320,390,768,1440):
                 page=browser.new_page(viewport={'width':width,'height':900})
                 response=page.goto(server.url,wait_until='networkidle')
                 if response.status!=200: raise ValueError('OWNER_READER_HOMEPAGE_FAILED')
@@ -133,12 +136,15 @@ def synthetic_browser_check(root,date):
                 page.close(); report['viewports'].append(width)
             browser.close()
     finally:
-        server.shutdown(); server.server_close(); thread.join(); files.clear()
+        server.shutdown(); server.server_close(); thread.join()
+    try: from scripts import codespace_browser41
+    except ImportError: import codespace_browser41
+    report['https_proxy']=codespace_browser41.check(files,date)
     return report
 
 
 class ReviewServer(ThreadingHTTPServer):
-    def __init__(self,files,date):
+    def __init__(self,files,date,port=0,external_origin=None,access_check=None):
         self.files=dict(files); self.date=date; self.access_token=secrets.token_urlsafe(32)
         report=json.loads(files['review.json'])
         rows=[]; notes={a.get('title'):a for a in report.get('articles',[])}
@@ -148,7 +154,11 @@ class ReviewServer(ThreadingHTTPServer):
             title=html.unescape(re.sub('<[^>]*>','',match[1])) if match else path
             info=notes.get(title,{})
             rows.append('<li><a href="/'+html.escape(path.removesuffix('index.html'),quote=True)+'">'+html.escape(title)+'</a><p>'+
-                html.escape(str(info.get('category','')))+' · '+html.escape(str(info.get('mode','')))+ '</p></li>')
+                html.escape(str(info.get('category','')))+' · '+html.escape(str(info.get('mode','')))+
+                '</p><p>Фактчекинг: '+str(info.get('automatic_gates',{}).get('fact_checked','не указан'))+
+                ' · Полнота: '+str(info.get('automatic_gates',{}).get('completeness_checked','не указана'))+
+                ' · Редактура и самостоятельность C: '+str(info.get('automatic_gates',{}).get('editorial_checked','не указана'))+
+                '</p><p>Источник: '+html.escape(str(info.get('source_url','указан в конце статьи')))+ '</p></li>')
         panel=('<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
             '<title>Закрытый редакционный просмотр</title><style>body{max-width:850px;margin:24px auto;padding:16px;font:18px/1.6 Georgia,serif;overflow-wrap:anywhere}li{margin-bottom:20px}</style></head><body>'
             '<h1>Закрытый просмотр · '+html.escape(date)+'</h1><p>Все 12 статей доступны целиком. '
@@ -156,20 +166,32 @@ class ReviewServer(ThreadingHTTPServer):
             ('<p>Синтетическая проверка механизма, не выпуск Gemini.</p>' if report.get('synthetic') else '')+
             '<p><a href="/">Главная номера</a> · <a href="/review.json">Технический редакционный протокол</a></p><ol>'+''.join(rows)+'</ol></body></html>')
         self.files['_review/index.html']=panel.encode()
-        super().__init__(('127.0.0.1',0),ReviewHandler)
+        self.external_origin=external_origin
+        self.access_check=access_check
+        super().__init__(('127.0.0.1',port),ReviewHandler)
     @property
-    def url(self): return f'http://127.0.0.1:{self.server_port}/{self.access_token}/'
+    def url(self): return (self.external_origin or f'http://127.0.0.1:{self.server_port}')+'/'+self.access_token+'/'
 
 
 class ReviewHandler(BaseHTTPRequestHandler):
     def log_message(self,*args): pass  # URLs contain a local bearer token; never log it
-    def do_GET(self):
+    def authorized(self):
         server=self.server
         hosts={f'127.0.0.1:{server.server_port}',f'localhost:{server.server_port}'}
+        origins={'http://'+host for host in hosts}
+        if server.external_origin:
+            hosts.add(urlsplit(server.external_origin).netloc)
+            origins.add(server.external_origin)
         if (self.headers.get('Host') not in hosts or
-                self.headers.get('Origin') not in (None,*('http://'+host for host in hosts)) or
-                self.headers.get('Sec-Fetch-Site') not in (None,'none','same-origin')):
-            self.send_error(403); return
+                self.headers.get('Origin') not in (None,*origins) or
+                self.headers.get('Sec-Fetch-Site') not in (None,'none','same-origin')): return False
+        if server.access_check:
+            try: server.access_check()
+            except Exception: return False
+        return True
+    def do_GET(self):
+        server=self.server
+        if not self.authorized(): self.send_error(403); return
         path=unquote(urlsplit(self.path).path); prefix='/'+server.access_token+'/'
         if not path.startswith(prefix): self.send_error(404); return
         relative=path[len(prefix):]
@@ -195,6 +217,21 @@ class ReviewHandler(BaseHTTPRequestHandler):
         self.end_headers(); self.wfile.write(data)
 
 
+def load_review(run_id,sha,date,directory=None):
+    run=gh(['api',f'repos/{REPO}/actions/runs/{run_id}'],True); verify_run(run,sha)
+    name=f'v41-owner-review-{date}-{run_id}'
+    artifacts=gh(['api',f'repos/{REPO}/actions/runs/{run_id}/artifacts'],True).get('artifacts',[])
+    if not any(a.get('name')==name and not a.get('expired') for a in artifacts): raise ValueError('OWNER_REVIEW_NOT_READY_OR_EXPIRED')
+    key,_=owner_key(directory)
+    with tempfile.TemporaryDirectory(prefix='387-owner-ciphertext-') as temp:
+        gh(['run','download',str(run_id),'--repo',REPO,'--name',name,'--dir',temp])
+        path=Path(temp)/'owner-review.enc'
+        if path.stat().st_size>MAX_BYTES*2: raise ValueError('OWNER_REVIEW_TRANSFER_LIMIT')
+        data=crypto.open_bundle(path.read_bytes(),key,sha,date)
+        files=read_files(data,date)
+    return files
+
+
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--run',required=True,type=int)
     parser.add_argument('--expected-sha',required=True); parser.add_argument('--date',required=True)
@@ -202,17 +239,7 @@ def main():
     if os.getenv('GITHUB_ACTIONS')=='true': raise RuntimeError('OWNER_PC_VIEWER_CLI_ONLY')
     if not re.fullmatch('[0-9a-f]{40}',args.expected_sha) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}',args.date):
         raise ValueError('OWNER_REVIEW_ARGUMENTS_INVALID')
-    run=gh(['api',f'repos/{REPO}/actions/runs/{args.run}'],True); verify_run(run,args.expected_sha)
-    name=f'v41-owner-review-{args.date}-{args.run}'
-    artifacts=gh(['api',f'repos/{REPO}/actions/runs/{args.run}/artifacts'],True).get('artifacts',[])
-    if not any(a.get('name')==name and not a.get('expired') for a in artifacts): raise ValueError('OWNER_REVIEW_NOT_READY_OR_EXPIRED')
-    key,_=owner_key(args.key_dir)
-    with tempfile.TemporaryDirectory(prefix='387-owner-ciphertext-') as temp:
-        gh(['run','download',str(args.run),'--repo',REPO,'--name',name,'--dir',temp])
-        path=Path(temp)/'owner-review.enc'
-        if path.stat().st_size>MAX_BYTES*2: raise ValueError('OWNER_REVIEW_TRANSFER_LIMIT')
-        data=crypto.open_bundle(path.read_bytes(),key,args.expected_sha,args.date)
-        files=read_files(data,args.date)
+    files=load_review(args.run,args.expected_sha,args.date,args.key_dir)
     server=ReviewServer(files,args.date)
     opened=webbrowser.open(server.url)
     print('Закрытый просмотр открыт на этом ПК.' if opened else 'Откройте на этом ПК: '+server.url)

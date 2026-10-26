@@ -16,7 +16,7 @@ def check(root,date,output):
     try:
         with sync_playwright() as playwright:
             browser=playwright.chromium.launch()
-            for width in (320,390,1440):
+            for width in (320,390,768,1440):
                 page=browser.new_page(viewport={'width':width,'height':900})
                 base=f'http://127.0.0.1:{server.server_port}'
                 page.goto(base+'/',wait_until='networkidle')

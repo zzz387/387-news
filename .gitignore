@@ -4,3 +4,10 @@ __pycache__/
 .env
 news-draft.enc
 quota.json
+
+# Never commit owner reader credentials or local panel/session metadata.
+owner-review-key.pem
+owner-review-public.txt
+owner-review.enc
+panel.json
+session.json
