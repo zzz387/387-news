@@ -1,0 +1,139 @@
+name: 387 News — 003-R after daily production
+
+on:
+  workflow_call:
+    inputs:
+      initialize_only:
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+  pages: write
+  id-token: write
+
+jobs:
+  prepare:
+    if: ${{ github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      ready: ${{ steps.commit.outputs.ready }}
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NEWS_SPECIAL_EDITION: 003-R
+      SPECIAL_INITIALIZE_ONLY: ${{ inputs.initialize_only }}
+      NEWS_MAX_REQUESTS_PER_RUN: '24'
+      NEWS_MAX_REQUESTS_PER_DAY: '220'
+      NEWS_REQUEST_GAP_SECONDS: '6'
+      NEWS_STAGE_SECONDS: '600'
+      GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49' playwright
+      - name: Use preinstalled runner Chromium
+        run: |
+          google-chrome --version
+          echo 'NEWS_BROWSER_CHANNEL=chrome' >> "$GITHUB_ENV"
+      - name: Select independent special state and read-only daily state
+        id: locate
+        run: python scripts/special003r.py --locate
+      - name: Restore only the special encrypted checkpoint
+        if: ${{ steps.locate.outputs.special_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.locate.outputs.special_id }}
+          run-id: ${{ steps.locate.outputs.special_run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/special
+          merge-multiple: true
+      - name: Restore daily checkpoint for admission only; never save it
+        if: ${{ steps.locate.outputs.daily_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.locate.outputs.daily_id }}
+          run-id: ${{ steps.locate.outputs.daily_run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/read-only-daily
+          merge-multiple: true
+      - name: Restore the same global Gemini ledger
+        if: ${{ steps.locate.outputs.quota_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.locate.outputs.quota_id }}
+          run-id: ${{ steps.locate.outputs.quota_run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/special-quota
+          merge-multiple: true
+      - name: Admit only after the daily issue and reserve quota are protected
+        id: special
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
+          SPECIAL_CHECKPOINT_FILE: ${{ runner.temp }}/special/special-003-r.enc
+          SPECIAL_EXPECTED: ${{ steps.locate.outputs.special_found }}
+          DAILY_CHECKPOINT_FILE: ${{ runner.temp }}/read-only-daily/news-draft.enc
+          DAILY_EXPECTED: ${{ steps.locate.outputs.daily_found }}
+          QUOTA_CHECKPOINT_FILE: ${{ runner.temp }}/special-quota/quota.json
+          QUOTA_EXPECTED: ${{ steps.locate.outputs.quota_found }}
+        run: python scripts/special003r.py
+      - name: Retain independent encrypted 003-R progress
+        if: ${{ always() && steps.special.outputs.checkpoint == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 387news41-special-003-r
+          path: ${{ runner.temp }}/special-003-r.enc
+          retention-days: 90
+          if-no-files-found: error
+      - name: Retain real shared API reservations including 429 and 503
+        if: ${{ always() && steps.special.outputs.quota == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.special.outputs.quota_name }}
+          path: ${{ runner.temp }}/special-quota/quota.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Commit only the complete audited special release and archive navigation
+        id: commit
+        if: ${{ success() && steps.special.outputs.ready == 'true' }}
+        run: |
+          git diff --exit-code -- index.html issues/2026-10-26/
+          git add issues/2026-10-26-v41/ archive/index.html sitemap.xml
+          if ! git diff --cached --quiet; then
+            git config user.name '387 News Bot'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git commit -m '387 News: verified special edition 003-R'
+            git push origin HEAD:main
+          fi
+          echo 'ready=true' >> "$GITHUB_OUTPUT"
+  deploy:
+    needs: prepare
+    if: ${{ needs.prepare.outputs.ready == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.delivery.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/site_checks.py --package '${{ runner.temp }}/public-site'
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: ${{ runner.temp }}/public-site
+      - uses: actions/deploy-pages@v4
+        id: delivery
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Verify all eight special articles and the unchanged daily front page over HTTPS
+        run: python scripts/special003r.py --verify-public

@@ -574,6 +574,9 @@ def render_archive():
     r = [page_header('Архив выпусков','Архив всех выпусков 387 News','/archive/',latest_date,no), '<main class="wrap archive"><div class="overline">Ретроспектива номеров</div><h1>Архив 387 News</h1>']
     for dt, num, title, desc in entries:
         r.append(f'<div class="archive-card"><div><div class="meta">№ {num:03d} · {escape(dt)}</div><h2><a href="/issues/{dt}/">{title}</a></h2><p>{desc}</p></div><a href="/issues/{dt}/">Обзор выпуска →</a></div>')
+    try: from scripts import special_publication41
+    except ImportError: import special_publication41
+    r.append(special_publication41.archive_cards(ROOT))
     r.append('</main>'+page_footer())
     return ''.join(r)
 
@@ -586,6 +589,9 @@ def sitemap():
         urls.append(f'/issues/{issue.name}/')
         for d in sorted((issue/'articles').glob('*/index.html')):
             urls.append(f'/issues/{issue.name}/articles/{d.parent.name}/')
+    try: from scripts import special_publication41
+    except ImportError: import special_publication41
+    urls.extend(special_publication41.sitemap_urls(ROOT))
     return '<?xml version="1.0" encoding="utf-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'+''.join('<url><loc>https://387.su'+escape(url)+'</loc></url>' for url in urls)+'</urlset>'
 
 

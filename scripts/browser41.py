@@ -14,7 +14,7 @@ def launch_browser(playwright):
     return playwright.chromium.launch(**({'channel':channel} if channel else {}))
 
 
-def check(root,date,output):
+def check(root,date,output,*,expected_count=12,overview_path="/"):
     from playwright.sync_api import sync_playwright
     root=Path(root); output=Path(output); output.mkdir(parents=True,exist_ok=True)
     class Silent(SimpleHTTPRequestHandler):
@@ -28,10 +28,10 @@ def check(root,date,output):
             for width in (320,390,768,1440):
                 page=browser.new_page(viewport={'width':width,'height':900})
                 base=f'http://127.0.0.1:{server.server_port}'
-                page.goto(base+'/',wait_until='networkidle')
+                page.goto(base+overview_path,wait_until='networkidle')
                 if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HOMEPAGE_HORIZONTAL_OVERFLOW')
                 urls=page.locator(f'a[href^="/issues/{date}/articles/"]').evaluate_all('(nodes)=>[...new Set(nodes.map(n=>n.getAttribute("href")))]')
-                if len(urls)!=12: raise ValueError('BROWSER_TWELVE_ARTICLES_REQUIRED')
+                if len(urls)!=expected_count: raise ValueError('BROWSER_ARTICLE_COUNT_MISMATCH')
                 for index,url in enumerate(urls):
                     page.goto(base+url,wait_until='networkidle')
                     if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HORIZONTAL_OVERFLOW')
@@ -96,6 +96,21 @@ def main():
         try: from scripts import review_viewer41
         except ImportError: import review_viewer41
         report['owner_reader']=review_viewer41.synthetic_browser_check(root,state['date'])
+        from unittest.mock import patch
+        from scripts import special_contract41 as sc,special_publication41 as sp
+        from scripts.test_special003r import complete_special
+        special=complete_special();config=json.loads(json.dumps(sc.definition()))
+        original={'number':3,'date':sc.ORIGINAL,'articles':[{'title':'Вымышленная исходная тема '+str(i)} for i in range(8)]}
+        config['original_manifest_hash']=p.digest(original)
+        special['special_edition']['definition_hash']=p.digest(config)
+        special['published_at']='2026-10-28T13:00:00+03:00'
+        folder=root/'issues'/sc.ORIGINAL;folder.mkdir(exist_ok=True)
+        (folder/'issue.json').write_text(json.dumps(original))
+        (folder/'index.html').write_text('<html><body>Вымышленный оригинал</body></html>')
+        with patch.object(sc,'definition',return_value=config):
+            sp.build(special,root)
+            report['special_003_r']=check(root,sc.SLUG,Path(temp)/'special-screenshots',expected_count=8,overview_path='/issues/'+sc.SLUG+'/')
+
     Path(args.output).write_text(json.dumps(report)); print(json.dumps(report))
 
 

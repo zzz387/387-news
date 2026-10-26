@@ -91,9 +91,9 @@ def render_blocks(article):
     return ''.join(out)
 
 
-def render_article(date,no,article,root):
+def render_article(date,no,article,root,*,moment=None):
     images_valid(article,root)
-    moment=datetime.fromisoformat(date+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
+    moment=moment or datetime.fromisoformat(date+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
     link=f'/issues/{date}/articles/{article["slug"]}/'
     author=(article['primary_source']['author'] or article['primary_source']['publisher']+' · автор не указан') if article['mode']!='INDEPENDENT_ARTICLE' else 'Редакция 387 News'
     out=[news.page_header(article['title'],article['teaser'],link,moment,no).replace('Редакция 2.0','Редакция 4.1'),

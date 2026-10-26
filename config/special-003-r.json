@@ -1,0 +1,137 @@
+{
+  "id": "003-R",
+  "slug": "2026-10-26-v41",
+  "original_date": "2026-10-26",
+  "original_number": 3,
+  "original_manifest_hash": "890d6d58d25702ca088779059d9ea657b193ac351c8c6aa6beb14422127b9bae",
+  "article_count": 8,
+  "minimum_spare_requests": 25,
+  "slots": [
+    {
+      "slot": 1,
+      "original_title": "«Мосбилет» и ДМТЮА представили премьеру сказки «Василиса Прекрасная» с элементами электроники",
+      "original_slug": "feature-01",
+      "category": "Москва и путешествия",
+      "url": "https://www.mskagency.ru/materials/3571846",
+      "original_urls": [
+        "https://www.mskagency.ru/materials/3571846",
+        "https://www.mos.ru/news/item/177656073/"
+      ],
+      "verification_urls": [],
+      "requirements": [
+        "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
+      ]
+    },
+    {
+      "slot": 2,
+      "original_title": "Школа будущего в Пресненском районе получит фасад из стеклофибробетона с сотней цветов",
+      "original_slug": "feature-02",
+      "category": "Москва и путешествия",
+      "url": "https://www.mos.ru/news/item/177660073/",
+      "original_urls": [
+        "https://www.mos.ru/news/item/177660073/"
+      ],
+      "verification_urls": [],
+      "requirements": [
+        "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
+      ]
+    },
+    {
+      "slot": 3,
+      "original_title": "Развитие малыша до двух лет: 21 идея для совместных занятий и игр",
+      "original_slug": "feature-03",
+      "category": "Семья",
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "original_urls": [
+        "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+        "https://www.unicef.org/parenting/child-development/baby-tips"
+      ],
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ],
+      "requirements": [
+        "Ровно 21 полноценная самостоятельная инструкция: возраст, материалы, действия, польза и безопасность; не копировать подборку и форму UNICEF."
+      ]
+    },
+    {
+      "slot": 4,
+      "original_title": "Обновление Напрудного переулка в Мещанском районе: завершение работ и исторический контекст",
+      "original_slug": "feature-04",
+      "category": "Москва и путешествия",
+      "url": "https://www.mos.ru/news/item/177635073/",
+      "original_urls": [
+        "https://www.mos.ru/news/item/177635073/"
+      ],
+      "verification_urls": [],
+      "requirements": [
+        "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
+      ]
+    },
+    {
+      "slot": 5,
+      "original_title": "Строим доверие: почему открытый разговор с подростком о сложных темах становится нормой",
+      "original_slug": "feature-05",
+      "category": "Семья",
+      "url": "https://www.cdc.gov/free-mind/parents/talk-to-your-teen.html",
+      "original_urls": [
+        "https://www.cdc.gov/free-mind/parents/talk-to-your-teen.html",
+        "https://www.cdc.gov/healthy-youth/connecting-conversations/index.html"
+      ],
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ],
+      "requirements": [
+        "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект."
+      ]
+    },
+    {
+      "slot": 6,
+      "original_title": "Всего 4 минуты силовых упражнений в день улучшают подвижность после 65 лет",
+      "original_slug": "feature-06",
+      "category": "Здоровье и движение",
+      "url": "https://www.sciencedaily.com/releases/2026/10/261020085025.htm",
+      "original_urls": [
+        "https://www.sciencedaily.com/releases/2026/10/261020085025.htm"
+      ],
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ],
+      "requirements": [
+        "Описать проверенное исследование: дизайн, участники, результаты, ограничения и корректные выводы; не подменять исследование пресс-релизом."
+      ]
+    },
+    {
+      "slot": 7,
+      "original_title": "Кофейные калории выросли на 40%: главным виновником оказался не сахар",
+      "original_slug": "feature-07",
+      "category": "Здоровье и движение",
+      "url": "https://www.sciencedaily.com/releases/2026/10/261021231224.htm",
+      "original_urls": [
+        "https://www.sciencedaily.com/releases/2026/10/261021231224.htm"
+      ],
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ],
+      "requirements": [
+        "Описать проверенное исследование: дизайн, участники, результаты, ограничения и корректные выводы; не подменять исследование пресс-релизом."
+      ]
+    },
+    {
+      "slot": 8,
+      "original_title": "Опустевшее гнездо: как супруги заново открывают друг друга после уезда детей",
+      "original_slug": "feature-08",
+      "category": "Семья",
+      "url": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
+      "original_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ],
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ],
+      "requirements": [
+        "Сохранить тему и информационную ценность; полноценная самостоятельная русская статья, не конспект."
+      ]
+    }
+  ],
+  "daily_reserve_requests": 24
+}

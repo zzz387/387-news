@@ -8,13 +8,14 @@ from pathlib import Path
 import re
 from urllib.parse import urlparse
 try:
-    from scripts import policy41 as policy, source41, rights41, content41 as content, news
+    from scripts import policy41 as policy, source41, rights41, content41 as content, news, special_contract41 as contract
 except ImportError:
     import policy41 as policy
     import source41
     import rights41
     import content41 as content
     import news
+    import special_contract41 as contract
 
 TRUSTED={
     'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org','unicef.org',
@@ -256,6 +257,7 @@ class Editor:
                     'Не перевод и не рерайт. Самостоятельные композиция, примеры и подбор. '
                     'Только проверенные факты: '+json.dumps([{k:v for k,v in fact.items() if k!='quote'} for fact in record['claims']],ensure_ascii=False)+
                     '\nПолезные вопросы: '+json.dumps(record['requirements'],ensure_ascii=False)+
+                    '\nРедакционное задание: '+json.dumps(record.get('commission',{}),ensure_ascii=False)+
                     '\nКатегории: '+json.dumps(policy.CATEGORIES,ensure_ascii=False)+
                     '\nВсе 20 приоритетов очерков: '+json.dumps(policy.CONFIG['priority_topics'],ensure_ascii=False)+
                     '\n2–3 глубоких очерка — предпочтение, не квота объёма. Никаких норм длины. '
@@ -398,6 +400,7 @@ class Editor:
                 '\nПроверенные сведения/оригинал: '+json.dumps(references,ensure_ascii=False)+
                 '\nНезависимые проверенные цитаты: '+json.dumps(support_facts,ensure_ascii=False)+
                 '\nИсходная композиция (для выявления скрытого рерайта): '+json.dumps([b for b in source['blocks'] if b['kind'] in ('title','heading','item')] if record['mode']=='INDEPENDENT_ARTICLE' else [],ensure_ascii=False)+
+                '\nРедакционное задание: '+json.dumps(record.get('commission',{}),ensure_ascii=False)+
                 '\nОбязательные вопросы: '+json.dumps(record['requirements'],ensure_ascii=False)+
                 '\nСоседние части для проверки связности: '+json.dumps(parts[max(0,part_index-1):part_index]+parts[part_index+1:part_index+2],ensure_ascii=False)+
                 '\nПроверяй локальные факты/полноту именно этой части; другие вопросы могут быть раскрыты в других разделах. Не требуй всей статьи внутри одной технической части.'+
@@ -530,7 +533,8 @@ news.SCHEMAS['v41_issue']=content.schema({'approve':content.B,'covered_ids':{'ty
 
 def validate_issue(state):
     ids=state.get('selected_ids',[])
-    if len(ids)!=policy.ARTICLE_COUNT or len(set(ids))!=policy.ARTICLE_COUNT: raise policy.Blocked('TWELVE_READY_ARTICLES_REQUIRED')
+    if len(ids)!=contract.count(state) or len(set(ids))!=contract.count(state): raise policy.Blocked('TWELVE_READY_ARTICLES_REQUIRED')
+    contract.validate_slots(state)
     records={r['id']:r for r in state['candidates']}
     for identity in ids:
         record=records[identity]
@@ -584,7 +588,7 @@ def approve_selection(state,selected,editor):
     records=[{'article_id':i+1,'id':r['id'],'title':r['article']['title'],'category':r['article']['category'],
               'kind':r['article']['kind'],'reader_value':[a.get('reader_value','') for a in r['progress']['analysis'].values()],
               'topic':r['topic_key']} for i,r in enumerate(selected)]
-    result=editor.call('Финальная композиция 387 News v4.1: ровно '+str(policy.ARTICLE_COUNT)+
+    result=editor.call('Финальная композиция 387 News v4.1: ровно '+str(contract.count(state))+
         ' законченных проверенных статей; обязательные рубрики '+json.dumps(list(policy.REQUIRED),ensure_ascii=False)+
         '. Примерно половина про жизнь — ориентир, не механическая квота. '
         'Предпочтительны 2–3 глубоких очерка (человеческий и интеллектуальный), без требования длины. '
@@ -602,11 +606,11 @@ def approve_selection(state,selected,editor):
         for finding in findings:
             affected=finding.get('article_ids'); fixes=finding.get('repair_ids')
             safe_code=finding.get('code') if finding.get('code') in ISSUE_CODES else 'OTHER'
-            safe_ids=[i for i in affected if type(i) is int and 1<=i<=policy.ARTICLE_COUNT] if isinstance(affected,list) else []
+            safe_ids=[i for i in affected if type(i) is int and 1<=i<=contract.count(state)] if isinstance(affected,list) else []
             print(f'[editorial41] stage=issue_editorial decision=rejected code={safe_code} article_ids={safe_ids}',flush=True)
             if (finding.get('action')!='replace_story' or not isinstance(affected,list) or not isinstance(fixes,list)
                     or not fixes or not set(fixes)<=set(affected)
-                    or any(type(i) is not int or not 1<=i<=policy.ARTICLE_COUNT for i in affected+fixes)):
+                    or any(type(i) is not int or not 1<=i<=contract.count(state) for i in affected+fixes)):
                 raise policy.Blocked('ISSUE_EDITORIAL_HOLD',json.dumps(result,ensure_ascii=False))
             targets.update(fixes)
         if not targets: raise policy.Blocked('ISSUE_EDITORIAL_HOLD',json.dumps(result,ensure_ascii=False))
