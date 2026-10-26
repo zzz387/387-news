@@ -535,7 +535,7 @@ news.SCHEMAS['v41_issue']=content.schema({'approve':content.B,'covered_ids':{'ty
 
 def validate_issue(state):
     ids=state.get('selected_ids',[])
-    if len(ids)!=contract.count(state) or len(set(ids))!=contract.count(state): raise policy.Blocked('TWELVE_READY_ARTICLES_REQUIRED')
+    if len(ids)!=contract.count(state) or len(set(ids))!=contract.count(state): raise policy.Blocked('SPECIAL_EIGHT_READY_ARTICLES_REQUIRED' if contract.is_special(state) else 'TWELVE_READY_ARTICLES_REQUIRED')
     contract.validate_slots(state)
     records={r['id']:r for r in state['candidates']}
     for identity in ids:

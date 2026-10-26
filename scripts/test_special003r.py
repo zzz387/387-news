@@ -212,5 +212,16 @@ class SpecialTests(unittest.TestCase):
         self.assertEqual(runner.study_links(source),['https://doi.org/10.1234/fixture'])
 
 
+    def test_redirected_full_study_resolves_links_on_publisher_not_doi_resolver(self):
+        from scripts import source41
+        text='<html lang="en"><meta name="author" content="Fixture author"><meta property="article:published_time" content="2026-10-01"><article><h1>Fixture study</h1><p>Complete fictional result <a href="/other">reference</a>.</p></article></html>'
+        html=source41.ResolvedHTML(text,'https://journal.example.org/paper')
+        source=source41.extract(html,'https://doi.org/10.1234/fixture')
+        self.assertEqual(source['url'],'https://doi.org/10.1234/fixture')
+        self.assertEqual(source['canonical'],'https://journal.example.org/paper')
+        self.assertEqual(source['blocks'][-1]['links'],['https://journal.example.org/other'])
+        self.assertEqual(runner.study_links({'url':'https://example.org/paper','blocks':[{'links':['https://doi.org/plosone/article?id=1']}]}),[])
+
+
 
 if __name__=='__main__':unittest.main()

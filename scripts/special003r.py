@@ -66,6 +66,7 @@ def study_links(source):
         for url in block.get('links',[]):
             host=(urlparse(url).hostname or '').lower()
             if host in ('doi.org','dx.doi.org','pubmed.ncbi.nlm.nih.gov','pmc.ncbi.nlm.nih.gov') and urlparse(url).scheme in ('http','https'):
+                if host.endswith('doi.org') and not re.match(r'^/10\.\d{4,9}/',urlparse(url).path):continue
                 url=urlparse(url)._replace(scheme='https',netloc='doi.org' if host.endswith('doi.org') else host).geturl()
                 if url not in result:result.append(url)
     if not result and (urlparse(source['url']).hostname or '').endswith('sciencedaily.com'):
@@ -77,6 +78,7 @@ def study_links(source):
                 href=dict(attrs).get('href','')
                 url=urljoin(source['url'],href);host=(urlparse(url).hostname or '').lower()
                 if tag=='a' and host in ('doi.org','dx.doi.org','pubmed.ncbi.nlm.nih.gov','pmc.ncbi.nlm.nih.gov') and urlparse(url).scheme in ('http','https'):
+                    if host.endswith('doi.org') and not re.match(r'^/10\.\d{4,9}/',urlparse(url).path):return
                     url=urlparse(url)._replace(scheme='https',netloc='doi.org' if host.endswith('doi.org') else host).geturl()
                     if url not in result:result.append(url)
         parser=References();parser.feed(source41.transport(source['url']))
