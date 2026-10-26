@@ -42,3 +42,13 @@ GitHub connector позволяет стандартный merge, но не пр
 При критической ошибке сначала остановить новые production через существующие Variables, дождаться mutex, сохранить Artifacts/ledger, затем стандартный revert технических изменений. Не force-reset, не удалять новые статьи/исторический архив и не терять41 checkpoint при возврате31 кода. Полная [инструкция эксплуатации](POLICY_V41_OPERATIONS.md).
 
 Уточнение CI: установка bundled Chromium/system dependencies в GitHub runner затянулась. Для hosted Ubuntu используется уже установленный Google Chrome (движок Chromium) через официальный Playwright channel=chrome; при отсутствии бинарника остаётся bundled fallback. Полный объём HTML/browser-проверок сохранён. Старый ручной Gemini endurance workflow отключён job if=false, поскольку его отдельный mutex/счётчик не совместим с общим production ledger.
+
+## Первый настоящий v4.1 production
+
+PR№7 слит стандартным merge: main `436bd50fe9ccae4d66e454dba68a14cacc06eee2`. CI текущего перед merge HEAD: https://github.com/zzz387/387-news/actions/runs/40367773757 —246tests,144browser checks,source pool success.
+
+Production https://github.com/zzz387/387-news/actions/runs/40368218938 восстановил27октября и старый ledger2 без сброса. Preflight подтвердил обе Variables=true, существующие Secrets bindings,policy4.1/12,06:00 МСК. Pages API подтвердил **build_type=legacy,cname=387.su,https_enforced=true**. Владелец должен переключить Settings→Pages→Source→GitHub Actions; доступная интеграция не меняет эту настройку.
+
+Выполнены2 настоящих HTTP Gemini: одна аналитическая попытка отклонена CLAIM_NOT_IN_ORIGINAL, следующая получила503. Сохранены v4.1 ciphertext12671466857 и ledger12671676522:4/220 за26октябряUTC,0/12,RETRY_PENDING/API_COOLDOWN,next22:17МСК,release27октября06:00. Это снимок завершённого run, не текущий гарантированный остаток. Deploy пропущен;monitor проверяет прежний опубликованный выпуск. Новый12-статейный номер не опубликован.
+
+Для наблюдаемого отказа добавлено ограниченное автоматическое исправление анализа: до3 диагностированных попыток группы с точными цитатами/covered_ids, счётчик и принятые группы сохраняются. При503/квоте попытки смыслового исправления не сбрасываются/не расходуются заново; все HTTP по-прежнему считают quota. Прежний одноразовый отказ requeue только1раз с учётом уже использованной попытки; готовые статьи не затрагиваются. Проверка дословности не ослаблена. Исправление после слитого PR№7 оформляется отдельным технически необходимым hotfix PR.
