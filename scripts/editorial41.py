@@ -230,7 +230,9 @@ class Editor:
         for image in record.get('images',[]):
             if rights41.image_decision(image,self.image_grants)['status']!='allowed': raise policy.Blocked('IMAGE_RIGHTS_UNKNOWN')
         self.analyse(record)
-        if record['kind'].casefold()=='новость':
+        # Reissues may turn an old news source into an explicitly historical C article.
+        # Their actual reader-facing news freshness is checked again before special publication.
+        if record['kind'].casefold()=='новость' and not contract.is_special(state):
             try:
                 if not source.get('published'): raise ValueError('news publication date missing')
                 event_date=datetime.fromisoformat(source['event_date'])
@@ -588,7 +590,8 @@ def approve_selection(state,selected,editor):
     records=[{'article_id':i+1,'id':r['id'],'title':r['article']['title'],'category':r['article']['category'],
               'kind':r['article']['kind'],'reader_value':[a.get('reader_value','') for a in r['progress']['analysis'].values()],
               'topic':r['topic_key']} for i,r in enumerate(selected)]
-    result=editor.call('Финальная композиция 387 News v4.1: ровно '+str(contract.count(state))+
+    special_note=('Это разрешённое переиздание003-R: сохранены все8 тем исходного номера. Не требуй12статей, новых рубрик или подмены закреплённых тем. Оцени качество и композицию именно этого состава. ' if contract.is_special(state) else '')
+    result=editor.call(special_note+'Финальная композиция 387 News v4.1: ровно '+str(contract.count(state))+
         ' законченных проверенных статей; обязательные рубрики '+json.dumps(list(policy.REQUIRED),ensure_ascii=False)+
         '. Примерно половина про жизнь — ориентир, не механическая квота. '
         'Предпочтительны 2–3 глубоких очерка (человеческий и интеллектуальный), без требования длины. '

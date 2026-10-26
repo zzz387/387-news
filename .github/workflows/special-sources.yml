@@ -20,7 +20,7 @@ jobs:
       - name: Read all eleven public original URLs and document rights without models
         env:
           SPECIAL_SOURCE_REPORT: ${{ runner.temp }}/special-sources.json
-        run: python scripts/special003r.py --probe
+        run: python -m scripts.special003r --probe
       - uses: actions/upload-artifact@v4
         with:
           name: 003-R-public-source-diagnostics

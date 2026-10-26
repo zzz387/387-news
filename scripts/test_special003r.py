@@ -172,5 +172,22 @@ class SpecialTests(unittest.TestCase):
         with self.assertRaises(OSError):editor.source_verified(state,r)
 
 
+    def test_existing_special_pages_redeploy_without_model_work_and_stop_after_five_attempts(self):
+        state={'_quota_snapshot':{'requests':207}};saved=[]
+        def unavailable():raise OSError('Synthetic Pages unavailable')
+        for _ in range(5):self.assertTrue(runner.recover_delivery(state,lambda:saved.append(copy.deepcopy(state)),unavailable))
+        self.assertFalse(runner.recover_delivery(state,lambda:None,unavailable))
+        self.assertEqual(state['delivery_attempts'],5);self.assertEqual(state['_quota_snapshot']['requests'],207)
+        self.assertFalse(runner.recover_delivery(state,lambda:None,lambda:{'status':'PUBLISHED','articles':8}))
+        self.assertTrue(state['publication_verified'])
+
+
+    def test_reissue_does_not_publish_stale_material_as_current_news(self):
+        state=complete_special();r=state['candidates'][0]
+        r['article']['kind']='новость';r['source']['event_date']='2020-01-01T12:00:00+03:00'
+        with patch.object(e,'verify_publication_sources',return_value=True),self.assertRaisesRegex(p.Blocked,'SPECIAL_NEWS_NO_LONGER_CURRENT'):
+            runner.verify_sources(state,lambda:None)
+
+
 
 if __name__=='__main__':unittest.main()

@@ -49,7 +49,8 @@ def admit(root,daily,ledger,now=None):
     if ledger['requests']<0 or 220-ledger['requests']<sc.definition()['minimum_spare_requests']:
         return False,'NO_SPARE_QUOTA_WITH_DAILY_RESERVE'
     if any(until>now.timestamp() for until in ledger.get('cooldowns',{}).values()):return False,'GEMINI_COOLDOWN'
-    from scripts import pipeline
+    try:from scripts import pipeline
+    except ImportError:import pipeline
     if (datetime.fromisoformat(pipeline.next_wake(now))-now).total_seconds()<720:return False,'DAILY_WINDOW_TOO_CLOSE'
     return True,'DAILY_APPROVED_AND_SPARE_QUOTA'
 
@@ -87,15 +88,18 @@ def probe():
         except Exception as exc:
             row={'url':url,'status':'blocked','code':getattr(exc,'code',None) if isinstance(exc,p.Blocked) else type(exc).__name__}
             if 'source' in locals():
-                row['metadata']={key:source.get(key) for key in ('language','author','published','publisher','metadata_gaps','metadata_status')}
-                row['study_urls']=study_links(source)
-                if source.get('metadata_status')!='verified':
-                    from scripts import source_dom41 as dom
-                    document=dom.Document();document.feed(source41.transport(url));document.close()
-                    meta=dom.metadata(document)
-                    row['public_metadata_candidates']={key:value for key,value in meta.items()
-                        if any(part in key.lower() for part in ('language','lang','locale','date','author','creator','modified','pubdate'))
-                        and isinstance(value,str)}
+                try:
+                    row['metadata']={key:source.get(key) for key in ('language','author','published','publisher','metadata_gaps','metadata_status')}
+                    row['study_urls']=study_links(source)
+                    if source.get('metadata_status')!='verified':
+                        try:from scripts import source_dom41 as dom
+                    except ImportError:import source_dom41 as dom
+                        document=dom.Document();document.feed(source41.transport(url));document.close()
+                        meta=dom.metadata(document)
+                        row['public_metadata_candidates']={key:value for key,value in meta.items()
+                            if any(part in key.lower() for part in ('language','lang','locale','date','author','creator','modified','pubdate'))
+                            and isinstance(value,str)}
+                except Exception as diagnostic:row['diagnostic_error']=type(diagnostic).__name__
             return row
     with ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(inspect,urls))
     by_url={r['url']:r for r in rows}
@@ -221,13 +225,23 @@ def select_artifacts():
         for key,value in output.items():stream.write(key+'='+value+'\n')
 
 
+def recover_delivery(state,persist,check=None):
+    check=check or publication.check_public
+    try:
+        result=check();state['publication_verified']=True;persist()
+        print('[special-status] '+json.dumps(result));return False
+    except Exception:
+        if state.get('delivery_attempts',0)>=5:
+            print('[special-status] BLOCKED code=SPECIAL_DELIVERY_RETRY_LIMIT');return False
+        state['delivery_attempts']=state.get('delivery_attempts',0)+1;persist()
+        return True
+
+
 def run():
     if (os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REF_NAME')!='main' or
         os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('NEWS_SPECIAL_EDITION')!=sc.ID):
         raise RuntimeError('SPECIAL_PROTECTED_ACTIONS_MAIN_REQUIRED')
     root=p.ROOT;sc.check_original(root)
-    if (root/'issues'/sc.SLUG/'index.html').is_file():
-        print('[special-status] '+json.dumps(publication.check_public()));return
     key=stage.validate_key(os.environ['DRAFT_ENCRYPTION_KEY'])
     files={kind:Path(os.environ[kind.upper()+'_CHECKPOINT_FILE']) for kind in ('special','daily','quota')}
     for kind,path in files.items():
@@ -249,6 +263,14 @@ def run():
             path=files['quota'];path.parent.mkdir(parents=True,exist_ok=True);temp=path.with_suffix('.tmp')
             temp.write_text(json.dumps(ledger));temp.replace(path)
             with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('quota=true\nquota_name='+stage.quota_label()+'\n')
+    if (root/'issues'/sc.SLUG/'index.html').is_file() and os.getenv('SPECIAL_INITIALIZE_ONLY')!='true':
+        publication.validate(root)
+        if recover_delivery(state,persist):
+            try:from scripts import production_preflight41
+            except ImportError:import production_preflight41
+            production_preflight41.require_pages()
+            with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('ready=true\n')
+        return
     admitted,reason=admit(root,daily,ledger)
     if stale_shared:admitted,reason=False,'SPECIAL_SHARED_LEDGER_STALE'
     if os.getenv('SPECIAL_INITIALIZE_ONLY')=='true':admitted,reason=False,'INITIALIZED_ONLY_NO_GEMINI'
@@ -270,7 +292,8 @@ def run():
         persist();ready=advance(state,Editor(persist=persist),root,persist)
         if ready:
             verify_sources(state,persist)
-            from scripts import browser41,production_preflight41
+            try:from scripts import browser41,production_preflight41
+            except ImportError:import browser41,production_preflight41
             production_preflight41.require_pages()
             state['published_at']=datetime.now(p.TZ).isoformat()
             publication.build(state,root)
