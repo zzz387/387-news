@@ -1,3 +1,5 @@
+> **Обновление26октября2026:** владелец разрешил прямой rollout v4.1 без обязательного trial/Codespaces. Актуальная [production-инструкция](POLICY_V41_OPERATIONS.md) и [статус](PRODUCTION_V41_ROLLOUT.md). Прежние запреты на merge/production и нормы3.2 ниже — история, не действующие указания.
+
 > Актуальный статус автономного задания и owner-only просмотр: [V41_AUTO_TRIAL_STATUS.md](V41_AUTO_TRIAL_STATUS.md). Разрешение на один Gemini-cycle получено; реальные GitHub Required reviewers не обходятся.
 
 # Подготовка испытания v4.1 — без разрешения на реальные Gemini-вызовы

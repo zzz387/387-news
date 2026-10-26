@@ -313,8 +313,8 @@ jobs:
           if-no-files-found: error
 
   prepare:
-    # This is deliberately OFF by default. Enable with repository variable
-    # NEWS_AUTOMATION_V31_ENABLED=true after test and editorial review.
+    # Owner authorized direct v4.1 production rollout on 2026-10-26.
+    # Repository variables and all technical/editorial publication gates remain mandatory.
     if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -343,6 +343,10 @@ jobs:
         run: python -m pip install 'cryptography>=44,<49'
       - name: Run editorial policy and recovery unit tests (no API calls)
         run: python -m unittest discover -s scripts -p 'test_*.py' -v
+      - name: Verify existing production configuration without revealing values
+        env:
+          NEWS_AUTOMATION_V31_ENABLED: ${{ vars.NEWS_AUTOMATION_V31_ENABLED }}
+        run: python scripts/production_preflight41.py
       - name: Resolve phase and release date
         id: context
         shell: bash
@@ -423,6 +427,16 @@ jobs:
           path: ${{ runner.temp }}/quota/quota.json
           if-no-files-found: error
           retention-days: 90
+      - name: Install browser only for a fully audited release
+        if: ${{ success() && steps.stage.outputs.published == 'true' }}
+        run: |
+          python -m pip install playwright
+          python -m playwright install --with-deps chromium
+      - name: Verify full release at phone tablet and desktop widths before Git commit
+        if: ${{ success() && steps.stage.outputs.published == 'true' }}
+        env:
+          ISSUE_DATE: ${{ steps.stage.outputs.issue_date }}
+        run: python scripts/release_browser41.py
       - name: Commit fully audited and released issue
         id: commit
         if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}
