@@ -42,6 +42,27 @@ def chunks(blocks):
     return result
 
 
+def operation_groups(pieces,boundary=None):
+    """Pack complete short pieces into a technical request; retain every id/offset.
+
+    Three-piece operations keep the legacy single-piece protocol for restored
+    small jobs. No content is shortened and no editorial length rule is applied.
+    """
+    if len(pieces)<=3: return [[piece] for piece in pieces]
+    groups=[]; current=[]; size=0; key=None
+    for piece in pieces:
+        next_key=boundary(piece) if boundary else None
+        if current and (size+len(piece['text'])>policy.CONFIG['technical']['operation_characters'] or next_key!=key):
+            groups.append(current); current=[]; size=0
+        current.append(piece); size+=len(piece['text']); key=next_key
+    if current: groups.append(current)
+    return groups
+
+
+def operation_payload(group):
+    return group[0] if len(group)==1 else {'id':'batch/'+policy.digest([p['id'] for p in group]),'pieces':group}
+
+
 def complete_translation(source,progress,call=news.gemini,persist=lambda:None):
     if progress.get('translation_source_hash') not in (None,source['content_hash']):
         raise policy.Blocked('TRANSLATION_SOURCE_CHANGED')
@@ -49,26 +70,27 @@ def complete_translation(source,progress,call=news.gemini,persist=lambda:None):
     pieces=chunks(source['blocks'])
     expected=[p['id'] for p in pieces]
     accepted=progress.setdefault('translated',{})
-    for piece in pieces:
-        if piece['id'] in accepted: continue
-        failures=progress.setdefault('translation_attempts',{})
+    pending=[piece for piece in pieces if piece['id'] not in accepted]
+    for group in operation_groups(pending):
+        identity=policy.digest([p['id'] for p in group]); failures=progress.setdefault('translation_attempts',{})
         for _ in range(policy.CONFIG['technical']['content_attempts']):
-            if failures.get(piece['id'],0)>=policy.CONFIG['technical']['content_attempts']:
+            if failures.get(identity,0)>=policy.CONFIG['technical']['content_attempts']:
                 raise policy.Blocked('TRANSLATION_ATTEMPTS_EXHAUSTED')
             result=call('Полный точный перевод на русский. Ничего не сокращай и не добавляй: '
                 'сохрани все инструкции, примеры, цифры и оговорки. Техническая часть исходника: '+
-                json.dumps(piece,ensure_ascii=False)+'. Верни finished=true и segments=[{id:точный id,text:полный перевод}]. '
+                json.dumps(operation_payload(group),ensure_ascii=False)+'. Верни finished=true и segments=[{id:точный id каждой части,text:полный перевод}]. '
+                'В batch верни ВСЕ pieces, отдельный segment для каждого исходного id. '
                 'Если не завершено, finished=false. Предыдущая ошибка: '+str(progress.get('translation_error','')),
                 output_tokens=12000,schema='v41_translation')
-            if (isinstance(result,dict) and result.get('finished') is True
-                    and isinstance(result.get('segments'),list) and len(result['segments'])==1
-                    and result['segments'][0].get('id')==piece['id']
-                    and isinstance(result['segments'][0].get('text'),str) and result['segments'][0]['text'].strip()):
-                accepted[piece['id']]=result['segments'][0]['text']; persist(); break
-            failures[piece['id']]=failures.get(piece['id'],0)+1
+            segments=result.get('segments',[]) if isinstance(result,dict) else []
+            if (isinstance(result,dict) and result.get('finished') is True and isinstance(segments,list)
+                    and len(segments)==len(group) and all(isinstance(x,dict) and isinstance(x.get('text'),str) and x['text'].strip() for x in segments)
+                    and {x.get('id') for x in segments}=={p['id'] for p in group}):
+                accepted.update({x['id']:x['text'] for x in segments}); persist(); break
+            failures[identity]=failures.get(identity,0)+1
             progress['translation_error']='Incomplete response or missing/incorrect segment id; continue full content, never summarize'
             persist()
-        if piece['id'] not in accepted: raise policy.Blocked('TRANSLATION_INCOMPLETE')
+        if any(p['id'] not in accepted for p in group): raise policy.Blocked('TRANSLATION_INCOMPLETE')
     if set(accepted)!=set(expected): raise policy.Blocked('TRANSLATION_PART_SET_MISMATCH')
     blocks=[]
     for block in source['blocks']:

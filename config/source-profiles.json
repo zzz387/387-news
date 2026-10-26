@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "institutions": {
+    "unicef.org": {
+      "publisher": "UNICEF",
+      "evidence_url": "https://www.unicef.org/about-unicef"
+    },
+    "who.int": {
+      "publisher": "World Health Organization",
+      "evidence_url": "https://www.who.int/about"
+    },
+    "cdc.gov": {
+      "publisher": "CDC",
+      "evidence_url": "https://www.cdc.gov/about/"
+    },
+    "nasa.gov": {
+      "publisher": "NASA",
+      "evidence_url": "https://www.nasa.gov/about/"
+    },
+    "science.nasa.gov": {
+      "publisher": "NASA Science",
+      "evidence_url": "https://science.nasa.gov/"
+    },
+    "openstax.org": {
+      "publisher": "OpenStax, Rice University",
+      "evidence_url": "https://openstax.org/about",
+      "ai_use_restricted": true
+    },
+    "mos.ru": {
+      "publisher": "Официальный портал Москвы",
+      "evidence_url": "https://www.mos.ru/"
+    },
+    "culture.ru": {
+      "publisher": "Культура.РФ",
+      "evidence_url": "https://www.culture.ru/about"
+    },
+    "kids.frontiersin.org": {
+      "publisher": "Frontiers for Young Minds",
+      "evidence_url": "https://kids.frontiersin.org/about"
+    }
+  }
+}

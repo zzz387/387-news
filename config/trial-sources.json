@@ -1,0 +1,165 @@
+{
+  "schema_version": 1,
+  "candidates": [
+    {
+      "test_id": "unicef-21",
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "category_hint": "Семья",
+      "tags": [
+        "child-development",
+        "independent",
+        "21-activities"
+      ],
+      "trial_eligible": true,
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+      ]
+    },
+    {
+      "test_id": "unicef-play",
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "category_hint": "Семья",
+      "tags": [
+        "family"
+      ],
+      "trial_eligible": true,
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+      ]
+    },
+    {
+      "test_id": "unicef-parents",
+      "url": "https://www.unicef.org/parenting/mental-health/how-reduce-stress-parents",
+      "category_hint": "Семья",
+      "tags": [
+        "family"
+      ],
+      "trial_eligible": true,
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+      ]
+    },
+    {
+      "test_id": "culture-estates",
+      "url": "https://www.culture.ru/materials/141277/magiya-russkoi-usadby",
+      "category_hint": "Москва и путешествия",
+      "tags": [
+        "russian",
+        "long-complex"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "culture-literature",
+      "url": "https://www.culture.ru/materials/209589/usadby-i-dachi-v-proizvedeniyakh-russkikh-klassikov",
+      "category_hint": "Москва и путешествия",
+      "tags": [
+        "russian",
+        "culture"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "who-activity",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "category_hint": "Здоровье и движение",
+      "tags": [
+        "health"
+      ],
+      "trial_eligible": true,
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+      ]
+    },
+    {
+      "test_id": "who-diet",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      "category_hint": "Здоровье и движение",
+      "tags": [
+        "health"
+      ],
+      "trial_eligible": true,
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+        "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health"
+      ]
+    },
+    {
+      "test_id": "nasa-blue",
+      "url": "https://science.nasa.gov/earth/atmosphere/why-is-the-sky-blue/",
+      "category_hint": "Наука",
+      "tags": [
+        "popular-science"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "nasa-solar",
+      "url": "https://science.nasa.gov/solar-system/",
+      "category_hint": "Наука",
+      "tags": [
+        "popular-science"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "frontiers-clouds",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1045912/full",
+      "category_hint": "Наука",
+      "tags": [
+        "licensed-translation",
+        "long-complex"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "frontiers-optics",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "category_hint": "Технологии",
+      "tags": [
+        "licensed-translation"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "frontiers-pollution",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2023.1137068",
+      "category_hint": "Наука",
+      "tags": [
+        "licensed-translation"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "frontiers-water",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "category_hint": "Технологии",
+      "tags": [
+        "reserve"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "nasa-mars",
+      "url": "https://science.nasa.gov/mars/",
+      "category_hint": "Наука",
+      "tags": [
+        "reserve"
+      ],
+      "trial_eligible": true
+    },
+    {
+      "test_id": "openstax-negative",
+      "url": "https://openstax.org/books/astronomy-2e/pages/5-1-the-behavior-of-light",
+      "category_hint": "Наука",
+      "tags": [
+        "negative-ai-terms"
+      ],
+      "trial_eligible": false
+    }
+  ]
+}

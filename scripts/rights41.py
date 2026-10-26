@@ -8,6 +8,7 @@ except ImportError:
     import policy41 as policy
 
 OPEN_LICENSES={
+    'https://creativecommons.org/licenses/by/3.0/':{'name':'CC BY 3.0','attribution':True},
     'https://creativecommons.org/licenses/by/4.0/':{'name':'CC BY 4.0','attribution':True},
     'https://creativecommons.org/publicdomain/zero/1.0/':{'name':'CC0 1.0','attribution':False},
 }
@@ -39,13 +40,30 @@ def decision(source,mode,records=None):
         item=(grant.get('uses') or {}).get(mode)
         if documented(item):
             return dict(item,source_hash=source['content_hash'],mode=mode,verification='documented_grant',needs_review=item['status']=='unknown')
-    license_url=source.get('declared_license')
+    if source.get('ai_use_restricted'):
+        return {'status':'unknown','mode':mode,'source_hash':source['content_hash'],
+                'needs_review':True,'reason_code':'SOURCE_AI_TERMS_REVIEW_REQUIRED'}
+    if mode=='INDEPENDENT_ARTICLE':
+        # Permission to copy a work is distinct from lawful use of unprotected facts.
+        # This decision grants no right to translate, paraphrase or copy its selection.
+        doubtful=any(source.get(key) for key in ('rights_review_required','access_restricted',
+            'confidential','database_extraction_restricted','legal_dispute'))
+        permitted=(source.get('full_text_verified') is True and
+                   source.get('metadata_status')=='verified' and not doubtful)
+        return {'status':'allowed' if permitted else 'unknown','mode':mode,
+                'source_hash':source['content_hash'],'verification':'unprotected_facts_rule_v2',
+                'evidence_url':source['url'],'basis':'Unprotected facts and ideas only; no licence to the source expression',
+                'checked_by':'deterministic-facts-use-v2','checked_at':source['access_checked_at'],
+                'conditions':['facts_only','independent_expression','independent_selection'],
+                'needs_review':not permitted}
+    license_url=(source.get('declared_license') or '').replace('http://creativecommons.org/','https://creativecommons.org/')
     if license_url in OPEN_LICENSES and source.get('full_text_verified'):
-        if not source.get('author'): return {'status':'unknown','mode':mode,'needs_review':True}
+        if not source.get('author') and not source.get('institutional_source'):
+            return {'status':'unknown','mode':mode,'needs_review':True}
         return {'status':'allowed','mode':mode,'source_hash':source['content_hash'],
                 'evidence_url':license_url,'basis':OPEN_LICENSES[license_url]['name'],
                 'checked_by':'declared-page-license-v1','checked_at':source['access_checked_at'],
-                'attribution':{'author':source['author'],'license':OPEN_LICENSES[license_url]['name'],'license_url':license_url},
+                'attribution':{'author':source.get('author') or source['publisher'],'license':OPEN_LICENSES[license_url]['name'],'license_url':license_url},
                 'verification':'declared_page_license','needs_review':False}
     return {'status':'unknown','mode':mode,'source_hash':source['content_hash'],'needs_review':True}
 
@@ -70,8 +88,11 @@ def image_decision(image,records=None):
 
 def require(source,mode,rights):
     conditions=set(rights.get('conditions',[]))
-    if conditions-{'attribution','license_notice','indicate_translation','no_modifications'}:
+    if conditions-{'attribution','license_notice','indicate_translation','no_modifications',
+                   'facts_only','independent_expression','independent_selection'}:
         raise policy.Blocked('LICENSE_CONDITIONS_UNSUPPORTED')
+    if conditions & {'facts_only','independent_expression','independent_selection'} and mode!='INDEPENDENT_ARTICLE':
+        raise policy.Blocked('FACTS_PERMISSION_IS_NOT_COPYRIGHT_LICENSE')
     if 'no_modifications' in conditions and mode!='ORIGINAL_REPUBLICATION':
         raise policy.Blocked('LICENSE_MODIFICATION_FORBIDDEN')
     attribution=rights.get('attribution') or {}

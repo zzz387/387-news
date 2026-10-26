@@ -60,7 +60,7 @@ def render_article(date,no,article,root):
     images_valid(article,root)
     moment=datetime.fromisoformat(date+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
     link=f'/issues/{date}/articles/{article["slug"]}/'
-    author=article['primary_source']['author'] if article['mode']!='INDEPENDENT_ARTICLE' else 'Редакция 387 News'
+    author=(article['primary_source']['author'] or article['primary_source']['publisher']+' · автор не указан') if article['mode']!='INDEPENDENT_ARTICLE' else 'Редакция 387 News'
     out=[news.page_header(article['title'],article['teaser'],link,moment,no).replace('Редакция 2.0','Редакция 4.1'),
          '<main class="wrap"><article class="article-shell" data-policy-version="4.1">',
          '<div class="meta">'+escape(article['category'])+' · '+escape(article['kind'])+'</div>',

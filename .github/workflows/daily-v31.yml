@@ -45,6 +45,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  source-smoke:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Inspect public originals only (no Secrets, no Gemini, no drafts)
+        run: python scripts/source_probe41.py --output '${{ runner.temp }}/source-report.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v41-public-source-diagnostics
+          path: ${{ runner.temp }}/source-report.json
+          retention-days: 7
+
   public-health:
     if: ${{ (github.event_name == 'push' && github.ref != 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.phase == 'status') }}
     runs-on: ubuntu-latest

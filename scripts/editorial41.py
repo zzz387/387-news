@@ -79,30 +79,66 @@ class Editor:
             # API context is a transport constraint, never a reason to shorten an article.
             if len(prompt)>policy.CONFIG['technical']['context_characters']:
                 raise policy.Blocked('OPERATION_CONTEXT_NEEDS_REVIEW','No input was clipped or sent; reduce the scope of this operation')
-            return model(prompt,**kwargs)
+            usage=getattr(self,'usage_record',None)
+            stage=(getattr(self,'active_stage',None) if kwargs.get('schema') in ('v41_review','v41_issue') else None) or kwargs.get('schema','unknown')
+            counter=None
+            if usage is not None:
+                counter=usage.setdefault('model_usage',{}).setdefault(stage,{'operations':0,'http_requests':0,'completed':0,'failures':0})
+                counter['operations']+=1; self.persist()
+            budget=news.runtime.ACTIVE_BUDGET
+            previous_counter=budget.usage_counter if budget else None
+            if budget: budget.usage_counter=counter
+            try:
+                result=model(prompt,**kwargs)
+                if counter is not None: counter['completed']+=1
+                return result
+            except BaseException:
+                if counter is not None: counter['failures']+=1
+                raise
+            finally:
+                if counter is not None:
+                    self.persist()
+                if budget: budget.usage_counter=previous_counter
         self.call=checked_call; self.fetch=fetch or source41.fetch
         cfg=rights41.configuration()
         self.grants=cfg['grants'] if grants is None else grants
         self.image_grants=cfg['images'] if images is None else images
         self.persist=persist
+    def cached_fetch(self,url):
+        state=getattr(self,'state',None)
+        if state is None: return self.fetch(url)
+        cache=state.setdefault('source_cache',{})
+        if url not in cache: cache[url]=self.fetch(url); self.persist()
+        return copy.deepcopy(cache[url])
     def analyse(self,record):
         source=record['source']; progress=record['progress'].setdefault('analysis',{})
         pieces=content.chunks(source['blocks'])
+        cache_key=policy.digest({'source':source['content_hash'],'url':source['url'],
+            'metadata':[source.get(k) for k in ('author','published','language')],'analysis_revision':'facts-v2'})
+        shared=getattr(self,'state',{}).setdefault('analysis_cache',{}).setdefault(cache_key,{})
         for piece in pieces:
-            if piece['id'] in progress: continue
-            result=self.call('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(piece,ensure_ascii=False)+
+            if piece['id'] not in progress and piece['id'] in shared:
+                progress[piece['id']]=copy.deepcopy(shared[piece['id']])
+        pending=[piece for piece in pieces if piece['id'] not in progress]
+        for group in content.operation_groups(pending):
+            result=self.call('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
                 '\nМетаданные: '+json.dumps({k:source[k] for k in ('id','url','title','author','published','language')},ensure_ascii=False)+
-                '\nИзвлеки проверяемые факты, точные дословные quote, требования к полноте и дату события (пусто, если неизвестна). '
+                '\nИзвлеки проверяемые факты, точные дословные quote из одной конкретной части, требования к полноте и дату события (пусто, если неизвестна). '
                 'Не придумывай. source_id должен совпадать с исходником. sensitive=true для спорных/медицинских/опасных утверждений. '
-                'covered_ids=[id этой части]. topic_key — фактический сюжет, не заголовок.',output_tokens=8000,schema='v41_analysis')
-            if result.get('covered_ids')!=[piece['id']]: raise policy.Blocked('SOURCE_ANALYSIS_INCOMPLETE')
-            if result.get('event_date') and (not result.get('event_date_quote') or result['event_date_quote'] not in piece['text']):
+                'Для самостоятельного текста выделяй нейтральные проверяемые факты и общие знания. Авторские примеры, подборка и формулировки не являются свободным сырьём для рерайта. '
+                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок.',output_tokens=8000,schema='v41_analysis')
+            if set(result.get('covered_ids',[]))!={p['id'] for p in group}: raise policy.Blocked('SOURCE_ANALYSIS_INCOMPLETE')
+            if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in p['text'] for p in group)):
                 raise policy.Blocked('EVENT_DATE_UNVERIFIED')
+            assigned={p['id']:[] for p in group}
             for claim in result['claims']:
-                if claim['source_id']!=source['id'] or not claim['quote'].strip() or claim['quote'] not in piece['text']:
-                    raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
-                claim['id']=piece['id']+'/'+claim['id']
-            progress[piece['id']]=result; self.persist()
+                matches=[p for p in group if claim.get('quote','').strip() and claim['quote'] in p['text']]
+                if claim['source_id']!=source['id'] or not matches: raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
+                owner=matches[0]['id']; claim=dict(claim,id=owner+'/'+claim['id']); assigned[owner].append(claim)
+            for piece in group:
+                progress[piece['id']]=dict(result,claims=assigned[piece['id']],covered_ids=[piece['id']])
+                shared[piece['id']]=copy.deepcopy(progress[piece['id']])
+            self.persist()
         if not any(r.get('worth_publishing') is True for r in progress.values()): raise policy.Blocked('NO_EDITORIAL_VALUE')
         categories=[r['category'] for r in progress.values()]
         record['category']=max(set(categories),key=categories.count)
@@ -115,16 +151,10 @@ class Editor:
     def source_verified(self,state,record):
         source=record.get('source')
         if source is None:
-            source=self.fetch(record['url']); record['source']=source; self.persist()
+            source=self.cached_fetch(record['url']); record['source']=source; self.persist()
         if not source.get('full_text_verified') or source.get('extraction_status')!='complete':
             raise policy.Blocked('FULL_ORIGINAL_REQUIRED')
         mode,rights=rights41.select_mode(source,self.grants)
-        if mode in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION'):
-            external={link for block in source['blocks'] for link in block.get('links',[]) if link not in (source['url'],source['canonical'],source.get('declared_license'))}
-            if external:
-                alternate=rights41.decision(source,'INDEPENDENT_ARTICLE',self.grants)
-                if alternate['status']!='allowed': raise policy.Blocked('ORIGINAL_LINK_FORMAT_CONFLICT')
-                mode,rights='INDEPENDENT_ARTICLE',alternate
         rights41.require(source,mode,rights)
         if record.get('mode') and record['mode']!=mode:
             record.setdefault('previous_preparations',[]).append({'article':record.pop('article',None),'progress':record['progress'],'checks':record['checks']})
@@ -137,6 +167,7 @@ class Editor:
         self.analyse(record)
         if record['kind'].casefold()=='новость':
             try:
+                if not source.get('published'): raise ValueError('news publication date missing')
                 event_date=datetime.fromisoformat(source['event_date'])
                 event_date=event_date.replace(tzinfo=policy.TZ) if event_date.tzinfo is None else event_date.astimezone(policy.TZ)
                 release=datetime.fromisoformat(state['date']+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
@@ -202,7 +233,7 @@ class Editor:
                 result=progress['sections'][section['id']]
                 if section['heading']: article['blocks'].append({'id':section['id']+'/heading','kind':'heading','text':section['heading']})
                 article['blocks'].extend(dict(b,id=f'{section["id"]}/{i}') for i,b in enumerate(result['blocks']))
-                article['activities'].extend(result['activities'])
+                article['activities'].extend(dict(item,section_id=section['id']) for item in result['activities'])
             covered={question for section in progress['sections'].values() for question in section.get('covered_requirements',[])}
             if not set(record['requirements'])<=covered: raise policy.Blocked('TOPIC_REQUIREMENTS_NOT_COVERED')
             record['category']=outline['category']; record['kind']=outline['kind']
@@ -250,6 +281,7 @@ class Editor:
         content.semantic_structure(article,source)
 
     def review(self,state,record,stage):
+        self.active_stage=stage
         article=record['article']; source=record['source']; fp=article_hash(article,source,record['rights'])
         if valid_gate(record,stage,fp): return
         if stage=='completeness_checked' and record['mode']!='INDEPENDENT_ARTICLE': self.practical_manifest(record)
@@ -259,7 +291,7 @@ class Editor:
         if stage=='fact_checked' and sensitive:
             if not supporting:
                 for url in record.get('verification_urls',[]):
-                    supporting.append(self.fetch(url)); self.persist()
+                    supporting.append(self.cached_fetch(url)); self.persist()
             domains={urlparse(s['url']).hostname for s in [source]+supporting if s.get('full_text_verified')}
             allowed=({'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org'} if article['category']=='Здоровье и движение' else TRUSTED)
             authoritative=[s for s in [source]+supporting if urlparse(s['url']).hostname in allowed]
@@ -279,14 +311,18 @@ class Editor:
                     'text':record['progress']['translated'][piece['id']], 'source_piece':piece}
                    for piece in content.chunks(source['blocks'])]
         for item in article.get('activities',[]):
-            parts.extend(content.chunks([{'id':'activity/'+item['id'],'kind':'paragraph','text':json.dumps(item,ensure_ascii=False)}]))
+            parts.extend(dict(part,section_id=item.get('section_id')) for part in content.chunks([{'id':'activity/'+item['id'],'kind':'paragraph','text':json.dumps(item,ensure_ascii=False)}]))
         progress=record['progress'].setdefault('reviews',{}).setdefault(stage,{})
         if progress.get('input_hash')!=fp: progress.clear(); progress.update(input_hash=fp,parts={})
-        for part_index,part in enumerate(parts):
-            if part['id'] in progress['parts']: continue
+        pending=[part for part in parts if part['id'] not in progress['parts']]
+        boundary=(lambda part:part.get('section_id') or part['block_id'].split('/')[0]) if record['mode']=='INDEPENDENT_ARTICLE' else None
+        for group in content.operation_groups(pending,boundary):
+            part=group[0]; part_index=parts.index(part)
+            references=[]
             if record['mode'] in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION'):
-                reference=part.get('source_piece') or next((b for b in content.chunks(source['blocks']) if b['id']==part['id']),None)
-                references=[reference] if reference else record['claims']
+                for member in group:
+                    reference=member.get('source_piece') or next((b for b in content.chunks(source['blocks']) if b['id']==member['id']),None)
+                    references.extend([reference] if reference else record['claims'])
             else:
                 section=next((s for s in record['progress'].get('outline',{}).get('sections',[])
                               if part['block_id'].startswith(s['id']+'/')),None)
@@ -296,23 +332,38 @@ class Editor:
               'completeness_checked':'Проверь смысловую полноту: все обещания заголовка, инструкции, примеры, числа, оговорки и выводы. Для A/B сравни полный оригинал с данной частью, не допускай сокращение. Для C оцени полноту самостоятельной темы и применимость действий, а не копирование чужой композиции.',
               'editorial_checked':'Отдельная литературная проверка, включая самостоятельность режима C: сравни исходную подборку и расположение идей с новым текстом. Лёгкий рерайт/перевод/копирование авторской подборки запрещены, даже при иных словах. Если самостоятельность не установлена — unresolved. Законченность мысли, ясный живой русский язык, связность, отсутствие воды, дублей, канцелярита и метатекста. Практические действия действительно выполнимы. Никаких нормативов длины.',
             }[stage]
-            result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nЧасть: '+json.dumps(part,ensure_ascii=False)+
+            result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nЧасть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
                 '\nПроверенные сведения/оригинал: '+json.dumps(references,ensure_ascii=False)+
                 '\nНезависимые проверенные цитаты: '+json.dumps(support_facts,ensure_ascii=False)+
                 '\nИсходная композиция (для выявления скрытого рерайта): '+json.dumps([b for b in source['blocks'] if b['kind'] in ('title','heading','item')] if record['mode']=='INDEPENDENT_ARTICLE' else [],ensure_ascii=False)+
                 '\nОбязательные вопросы: '+json.dumps(record['requirements'],ensure_ascii=False)+
                 '\nСоседние части для проверки связности: '+json.dumps(parts[max(0,part_index-1):part_index]+parts[part_index+1:part_index+2],ensure_ascii=False)+
                 '\nПроверяй локальные факты/полноту именно этой части; другие вопросы могут быть раскрыты в других разделах. Не требуй всей статьи внутри одной технической части.'+
-                '\nВерни approve,issues,unresolved,covered_ids=[точный id проверенной части].',output_tokens=5000,schema='v41_review')
-            try: content.approved_review(result,[part['id']])
+                '\nВерни approve,issues,unresolved,covered_ids=[точные id ВСЕХ проверенных pieces или одной части].',output_tokens=5000,schema='v41_review')
+            try: content.approved_review(result,[member['id'] for member in group])
             except policy.Blocked:
-                record['rejected_part']={'stage':stage,'block_id':part['block_id'],'result':result}
+                record['rejected_part']={'stage':stage,'block_id':(part['section_id']+'/activities') if part.get('section_id') else part['block_id'],'result':result}
                 self.persist()
                 raise
-            progress['parts'][part['id']]=result; self.persist()
+            for member in group: progress['parts'][member['id']]=result
+            self.persist()
+        if stage=='editorial_checked' and record['mode']=='INDEPENDENT_ARTICLE' and progress.get('independence_hash')!=fp:
+            result=self.call('Проверка самостоятельности режима C. Отдельно проверь композицию, формулировки, '
+                'подбор примеров и объяснения. Использование общих неохраняемых фактов допустимо без разрешения автора. '
+                'Но перевод, синонимический рерайт или сохранение охраняемой подборки не превращают произведение в самостоятельное. '
+                'Сомнения — unresolved. Для темы21 занятия нужен собственный набор и организация применимых действий, '
+                'а не перевод той же подборки. covered_ids=[composition,wording,examples,explanations]. '
+                '\nПолный оригинал: '+json.dumps(source['blocks'],ensure_ascii=False)+
+                '\nСамостоятельная статья: '+json.dumps({'title':article['title'],'blocks':article['blocks'],'activities':article.get('activities',[])},ensure_ascii=False),
+                output_tokens=5000,schema='v41_review')
+            content.approved_review(result,['composition','wording','examples','explanations'])
+            progress['independence_hash']=fp; progress['independence_result']=result; self.persist()
         record['checks'][stage]={'approved':True,'input_hash':fp,'checked_at':datetime.now(policy.TZ).isoformat()}
+        self.active_stage=None
         event(state,record,stage,'approved'); self.persist()
     def finish(self,state,record):
+        self.state=state
+        self.usage_record=record; self.active_stage=None
         if record.get('source') and record.get('mode'):
             current=rights41.decision(record['source'],record['mode'],self.grants)
             if current.get('status')!='allowed' or current!=record.get('rights'): record['checks'].pop('source_verified',None)
@@ -451,6 +502,7 @@ def verify_publication_sources(state,fetch=None,persist=lambda:None):
 
 
 def approve_selection(state,selected,editor):
+    editor.usage_record=state; editor.active_stage='issue_audit'
     signature=policy.digest([article_hash(r['article'],r['source'],r['rights']) for r in selected])
     if state.get('issue_approval_hash')==signature and state.get('audit_passed'): return True
     if signature in state.get('issue_rejections',{}): raise policy.Blocked('UNCHANGED_ISSUE_REJECTED')

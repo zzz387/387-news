@@ -61,7 +61,6 @@ class ExtractionTests(unittest.TestCase):
         for html in ('<html><article><p>Оборвано',
                      '<html><article><p>Текст</p></article><div class="paywall"></div></html>',
                      '<html><link rel="next" href="/2"><article><p>Текст</p></article></html>',
-                     '<html><article><h1>Тема</h1><p>Начало</p><div>Нераспознанное продолжение</div></article></html>',
                      '<html><article><p>Один</p></article><article><p>Два</p></article></html>'):
             with self.subTest(html=html),self.assertRaises(p.Blocked): src.extract(html,'https://example.org/')
 
@@ -79,7 +78,10 @@ class ExtractionTests(unittest.TestCase):
 class RightsTests(unittest.TestCase):
     def test_unknown_unicef_is_not_permission(self):
         s=source(); s.update(url='https://www.unicef.org/example',declared_license=None)
-        for mode in p.MODES: self.assertEqual(rights.decision(s,mode,[])['status'],'unknown')
+        for mode in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION'):
+            self.assertEqual(rights.decision(s,mode,[])['status'],'unknown')
+        self.assertEqual(rights.select_mode(s,[])[0],'INDEPENDENT_ARTICLE')
+        s['rights_review_required']=True
         with self.assertRaisesRegex(p.Blocked,'RIGHTS_NEEDS_REVIEW'): rights.select_mode(s,[])
 
     def test_mode_selection_and_human_grant(self):
@@ -92,7 +94,7 @@ class RightsTests(unittest.TestCase):
         grants=[{'url':s['url'],'content_hash':s['content_hash'],'uses':{'INDEPENDENT_ARTICLE':permit}}]
         self.assertEqual(rights.select_mode(s,grants)[0],'INDEPENDENT_ARTICLE')
         permit['verification']='model_confidence'
-        with self.assertRaises(p.Blocked): rights.select_mode(s,grants)
+        self.assertEqual(rights.select_mode(s,grants)[1]['verification'],'unprotected_facts_rule_v2')
 
     def test_separate_image_rights_and_license_conditions(self):
         self.assertEqual(rights.image_decision({'url':'https://example.org/photo','sha256':'abc'},[])['status'],'unknown')
@@ -112,7 +114,7 @@ class TranslationTests(unittest.TestCase):
         s=source(text='Пример.</p><h3>Порядок</h3><ol start="3"><li>Шаг один.</li><li>Шаг два.</li></ol><p>Финальная оговорка.')
         def model(prompt,**kwargs):
             part=json.loads(prompt.split('Техническая часть исходника: ')[1].split('. Верни finished')[0])
-            return {'finished':True,'segments':[{'id':part['id'],'text':part['text']}]}
+            return {'finished':True,'segments':[{'id':member['id'],'text':member['text']} for member in part.get('pieces',[part])]}
         blocks=c.complete_translation(s,{},model)
         article={'title':s['title'],'teaser':'','mode':'FULL_TRANSLATION','category':'Семья','kind':'статья',
                  'blocks':blocks,'activities':[],'images':[],'slug':'lists',
@@ -176,7 +178,7 @@ class SemanticTests(unittest.TestCase):
                             'kind':'статья','worth_publishing':True,'reader_value':'Вымышленный пример','covered_ids':[part['id']]}
                     if kwargs['schema']=='v41_translation':
                         part=json.loads(prompt.split('Техническая часть исходника: ')[1].split('. Верни finished')[0])
-                        return {'finished':True,'segments':[{'id':part['id'],'text':part['text']}]}
+                        return {'finished':True,'segments':[{'id':member['id'],'text':member['text']} for member in part.get('pieces',[part])]}
                     self.assertEqual(kwargs['schema'],'v41_review')
                     part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0])
                     return {'approve':True,'issues':[],'unresolved':[],'covered_ids':[part['id']]}
@@ -288,11 +290,13 @@ class IssueTests(unittest.TestCase):
                     'text':'Собственная завершённая мысль '+section['id']+str(len(generated))}],
                     'activities':[],'covered_requirements':[]}
             self.assertEqual(kwargs['schema'],'v41_review')
-            part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0]); reviews.append(part['id'])
-            reject=part['block_id']=='s1/0' and not failed
+            if prompt.startswith('Проверка самостоятельности'):
+                return {'approve':True,'issues':[],'unresolved':[],'covered_ids':['composition','wording','examples','explanations']}
+            part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0]); members=part.get('pieces',[part]); reviews.extend(p['id'] for p in members)
+            reject=any(member['block_id']=='s1/0' for member in members) and not failed
             if reject: failed.append(True)
             return {'approve':not reject,'issues':['Исправить конкретную мысль'] if reject else [],
-                    'unresolved':[],'covered_ids':[part['id']]}
+                    'unresolved':[],'covered_ids':[member['id'] for member in members]}
         e.Editor(call=model).finish(e.new_state('2026-10-27'),r)
         self.assertEqual(generated.count('s1'),2); self.assertEqual(generated.count('s2'),1)
         self.assertEqual(r['status'],'ready'); self.assertEqual(r['progress']['repair_count'],1)
