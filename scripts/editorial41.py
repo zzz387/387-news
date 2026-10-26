@@ -705,6 +705,10 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
             all_records=state['candidates']; start=state.get('candidate_cursor',0)%len(all_records)
             index=next((start+i)%len(all_records) for i in range(len(all_records)) if all_records[(start+i)%len(all_records)] in pending)
             record=all_records[index]; state['candidate_cursor']=(index+1)%len(all_records)
+            known_urls={u for u in (record['url'],record.get('source',{}).get('canonical')) if u}
+            if any(prior.get('source_url') in known_urls for prior in archive):
+                record['status']='rejected';event(state,record,'source_preflight','rejected','SOURCE_ALREADY_PUBLISHED')
+                persist();continue
             record['status']='preparing'; persist()
             pipeline.status(state,'RESEARCHING' if not record['checks'].get('source_verified') else 'WRITING','prepare_verified_reserves')
             try:

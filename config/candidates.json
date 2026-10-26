@@ -1,314 +1,223 @@
 {
   "candidates": [
     {
-      "topic_id": "1",
-      "category_hint": "Семья",
       "url": "https://www.unicef.org/parenting/child-development/baby-tips",
+      "category_hint": "Семья",
       "verification_urls": [
         "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "07766ef284444c3aefb27a5c68728601095235c0d36bc355a5d6e56ad23c4b84"
+      ]
     },
     {
-      "topic_id": "1",
-      "category_hint": "Семья",
       "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "category_hint": "Семья",
       "verification_urls": [
         "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "a57d93fcb7ace6dfbdce075a8ca92c1bdb5aab56ff07150c9f580812dec536d2"
+      ]
     },
     {
-      "topic_id": "2",
-      "category_hint": "Семья",
       "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "category_hint": "Семья",
       "verification_urls": [
         "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "994cfa7267c0c2f296add394e912d2eee6346769f30fcbd9f3d0f716ea15ad27"
+      ]
     },
     {
-      "topic_id": "3",
-      "category_hint": "Семья",
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/",
-      "verification_urls": [
-        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "4d797f748167b1d2ee2ca2df178feb1afad314be3a3224536245e904ad4f6d7b"
-    },
-    {
-      "topic_id": "3",
       "category_hint": "Семья",
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
       "verification_urls": [
         "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "ecda6cb207950ff314d57574e62560b9464a238937a6ff2d281d1ae1111fa890"
+      ]
     },
     {
-      "topic_id": "6",
-      "category_hint": "Москва и путешествия",
       "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "2f6cd77c2a547a549dabe5b94de1f1b3b8c082a1501853e9af83735531e72f47"
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
     },
     {
-      "topic_id": "6",
-      "category_hint": "Москва и путешествия",
       "url": "https://tsaritsyno-museum.ru/park/architecture/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "ad2170a8c50a8b38e6fc268741d2001f5412474d0331b8dbf28442891c3c70b5"
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
     },
     {
-      "topic_id": "8",
-      "category_hint": "Москва и путешествия",
       "url": "https://www.nps.gov/subjects/healthandsafety/trip-planning-guide.htm",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "a47a5745a8784da43a33091bef951e1da02c175721e2c3e4af000a3b31e2a2e6"
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
     },
     {
-      "topic_id": "9",
-      "category_hint": "Москва и путешествия",
       "url": "https://tsaritsyno-museum.ru/the_museum/about/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "dc5ac5864ca9b0bc52bea61126fbca45f565b1ff3bb48d171c3e25e9a0dc8512"
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
     },
     {
-      "topic_id": "9",
-      "category_hint": "Москва и путешествия",
       "url": "https://www.mskagency.ru/materials/3571845",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "d031bd66994fdfb97477476f0822046f34e2d19f794300493ddaa6d80ff15e3b"
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
     },
     {
-      "topic_id": "10",
-      "category_hint": "Москва и путешествия",
       "url": "https://www.nasa.gov/history/alsj/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "4641161b201e21183502568f380a217c17f6054ad9748431c84e83521048f8bd"
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
     },
     {
-      "topic_id": "11",
-      "category_hint": "Москва и путешествия",
       "url": "https://www.mskagency.ru/materials/3555954",
+      "category_hint": "Москва и путешествия",
       "verification_urls": [
         "https://www.mskagency.ru/materials/3571841"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "393b0cde29b9c621006df91f88cb7ebd86d99fc07925f3ac4225666c4ea78610"
+      ]
     },
     {
-      "topic_id": "11",
-      "category_hint": "Москва и путешествия",
       "url": "https://www.mskagency.ru/materials/3571841",
+      "category_hint": "Москва и путешествия",
       "verification_urls": [
         "https://www.mskagency.ru/materials/3555954"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "2d864d9a8147e2d79f8ee0eb38bfb53e4d9cb1cd650012ac4f52fe2180d07909"
+      ]
     },
     {
-      "topic_id": "12",
-      "category_hint": "Здоровье и движение",
       "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "2f0c23b0c98eb38ab5fd2fe263a84e409e3f7cff5c3cc78637d495fc15ea2639"
+      ]
     },
     {
-      "topic_id": "12",
-      "category_hint": "Здоровье и движение",
       "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "1e0581ad27048f0be5cf89435d5df41e6d78079f8969caeddfef8437e34ff952"
+      ]
     },
     {
-      "topic_id": "13",
-      "category_hint": "Здоровье и движение",
       "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "bfa41c474493f6e94789beb881b0e44170bda48471ff210f748151ac893ba205"
+      ]
     },
     {
-      "topic_id": "14",
-      "category_hint": "Здоровье и движение",
       "url": "https://www.nps.gov/subjects/biking/safety.htm",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "40a22c164de7c147bc3db16f81b69e1aec7f794bc35901101445d06b836fadae"
+      ]
     },
     {
-      "topic_id": "15",
-      "category_hint": "Здоровье и движение",
       "url": "https://www.nccih.nih.gov/health/yoga-effectiveness-and-safety",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "72e84752205e64447dfb957347d9e94e5a5167999ad5782724f20ec5ee2ce9fa"
+      ]
     },
     {
-      "topic_id": "15",
-      "category_hint": "Здоровье и движение",
       "url": "https://www.nccih.nih.gov/health/tai-chi-what-you-need-to-know",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "31dd0855979c36322cc1298eed42d11266b416c4aed2f8dfcaf1b97c956634ef"
+      ]
     },
     {
-      "topic_id": "16",
-      "category_hint": "Здоровье и движение",
       "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0336748",
+      "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "179be505c6d05ecb72cbae96e1d9e983c83b53633aa83a968cecf5fb0cf89e2b"
+      ]
     },
     {
-      "topic_id": "17",
-      "category_hint": "История и культура",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
       "url": "https://science.nasa.gov/mission/osiris-rex/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "8392c2ef2aa554abbbb669bbf58c89ed1972cf707d5b9d0d478c291b3a09e996"
+      "category_hint": "История и культура",
+      "verification_urls": []
     },
     {
-      "topic_id": "17",
-      "category_hint": "История и культура",
       "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "52732de03889ee80c41876e9894066296592bb004dcfb9eb3013c62745544d37"
+      "category_hint": "История и культура",
+      "verification_urls": []
     },
     {
-      "topic_id": "18",
-      "category_hint": "История и культура",
       "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "f26bb971017b382b4e1a64a6f10958d8ac9205efc7881e8c0085210a1a1cce9c"
+      "category_hint": "История и культура",
+      "verification_urls": []
     },
     {
-      "topic_id": "18",
-      "category_hint": "История и культура",
       "url": "https://science.nasa.gov/people/katherine-johnson/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "a061c09a8f6ac97649221132220bbdcb9da69067a2ad373e9aded009265fd2d6"
+      "category_hint": "История и культура",
+      "verification_urls": []
     },
     {
-      "topic_id": "21",
-      "category_hint": "История и культура",
       "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080109.html",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "465bee124fe763d52ebb92e84a9f932e989e7c7f3a1607b147657c54782027f6"
-    },
-    {
-      "topic_id": "21",
       "category_hint": "История и культура",
+      "verification_urls": []
+    },
+    {
       "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080116.html",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "80b4f2e66c1f940f91e67c6ba57f662d72515c167e8331484a7d260aee27a7b0"
+      "category_hint": "История и культура",
+      "verification_urls": []
     },
     {
-      "topic_id": "22",
-      "category_hint": "Наука",
       "url": "https://science.nasa.gov/solar-system/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "c4c58e9654e1300db8e9e6a98741dbf15c1776add65197638c580b02f1fa4dd6"
-    },
-    {
-      "topic_id": "22",
       "category_hint": "Наука",
+      "verification_urls": []
+    },
+    {
       "url": "https://science.nasa.gov/mars/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "bef50f2c7e01905df9bc1b7dd56fffb7149623b7e5297567af49b48cdd44c94c"
+      "category_hint": "Наука",
+      "verification_urls": []
     },
     {
-      "topic_id": "23",
-      "category_hint": "Экономика и бизнес",
       "url": "https://www.cbr.ru/dkp/about_inflation/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "68ffb759ffdcd2a06b6e69c93618032cad4f94e778be90de94ddfbbbb63d6d72"
+      "category_hint": "Экономика и бизнес",
+      "verification_urls": []
     },
     {
-      "topic_id": "7",
-      "category_hint": "Москва и путешествия",
-      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "a97fa3c7bd9441027c439e95906fb11689e53ffb404ebfb59c861a27a174db61"
-    },
-    {
-      "topic_id": "7",
-      "category_hint": "Москва и путешествия",
-      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "613388a5dcc1467566e59ca69eda3e5d11db74b09b4acea91f4bd6f1d16878a6"
-    },
-    {
-      "topic_id": "8",
-      "category_hint": "Москва и путешествия",
-      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "648ba1d7f8a086b79f11b43f3372713fe95b86e19c0790a6991b44b72aa70dab"
-    },
-    {
-      "topic_id": "10",
-      "category_hint": "Москва и путешествия",
-      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "6e7e3fe747c6481388e4062e78ceaa6cfc0249239b9d933b6f3afc6ee2ff459e"
-    },
-    {
-      "topic_id": "24",
+      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
       "category_hint": "Технологии",
+      "verification_urls": [
+        "https://www.nasa.gov/technology/"
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
+      "category_hint": "Технологии",
+      "verification_urls": [
+        "https://www.nasa.gov/technology/"
+      ]
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
+      "category_hint": "Москва и путешествия",
+      "verification_urls": []
+    },
+    {
       "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "category_hint": "Технологии",
       "verification_urls": [
         "https://science.nasa.gov/earth/"
-      ],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "1a159c2e1af13c28d83502ed778c713c24c70d3144131aaf27727516735af268"
+      ]
     },
     {
-      "topic_id": "24",
-      "category_hint": "Технологии",
       "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
-      "verification_urls": [],
-      "source_preflight_at": "2026-10-26T21:17:19.354449+00:00",
-      "source_preflight_hash": "78e31260100d2f7f2e93169b78f06a84775daca7981fcbb2d7cfefc64188e103"
+      "category_hint": "Технологии",
+      "verification_urls": []
     }
   ]
 }

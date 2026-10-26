@@ -96,6 +96,48 @@ class StabilizeTests(unittest.TestCase):
         with self.assertRaises(p.Blocked):source41.extract(html,'https://example.org/ambiguous')
         with self.assertRaises(p.Blocked):source41.extract(html.split('</div></body>')[0],'https://www.nist.gov/partial')
 
+    def test_already_published_primary_is_rejected_before_spending_model_quota(self):
+        from scripts import pipeline
+        from types import SimpleNamespace
+        state=e.new_state('2026-11-04');state['discovered']=True
+        state['candidates']=[{'id':'old','url':'https://example.org/published','status':'discovered','checks':{},'progress':{}}]
+        state['_quota_snapshot']={'requests':207}
+        with tempfile.TemporaryDirectory() as directory,patch.object(e,'discover'),patch.object(e,'archive_entries',return_value=[{'source_url':'https://example.org/published'}]),patch.object(pipeline,'capacity',return_value=True):
+            self.assertFalse(e.advance(state,state['date'],True,SimpleNamespace(ROOT=Path(directory)),lambda:None,
+                editor=e.Editor(call=lambda *a,**k:self.fail('Published material must not consume Gemini again'))))
+        self.assertEqual(state['candidates'][0]['history'][-1]['code'],'SOURCE_ALREADY_PUBLISHED')
+        self.assertEqual(state['_quota_snapshot'],{'requests':207})
+
+    def test_public_source_throttle_does_not_retry_other_urls_on_the_same_origin(self):
+        from scripts.public_sources41 import Session
+        from scripts import source41
+        session=Session();failure=HTTPError('https://example.org/a',429,'Too Many Requests',{},None)
+        with patch.object(source41,'transport',side_effect=failure) as transport,patch('time.sleep'):
+            for url in ('https://example.org/a','https://example.org/b'):
+                with self.assertRaises(HTTPError):session.transport(url)
+        self.assertEqual(transport.call_count,1)
+
+    def test_theatre_news_complete_region_ignores_modal_and_requires_closing_boundary(self):
+        from scripts import source41
+        html='<html lang="ru"><head><title>Премьера</title></head><body><div class="modal-body">Реклама</div><div class="studio-content"><h1>Премьера</h1><p>Полный вымышленный оригинал театра.</p></div></body></html>'
+        url='https://dmtya.ru/theatre/news/theatre/synthetic'
+        source=source41.extract(html,url)
+        self.assertEqual(source['extraction_method'],'dmtya_complete_news')
+        self.assertNotIn('Реклама',' '.join(b['text'] for b in source['blocks']))
+        with self.assertRaises(p.Blocked):source41.extract(html.split('</div></body>')[0],url)
+
+    def test_special_transient_source_hold_stops_after_three_without_touching_quota(self):
+        from scripts import special003r as runner
+        from types import SimpleNamespace
+        state=runner.new_state();state['_quota_snapshot']={'requests':207};calls=[]
+        def finish(state,record):calls.append(record['id']);raise p.Blocked('SOURCE_EXTRACTION_PARTIAL')
+        editor=SimpleNamespace(finish=finish)
+        with tempfile.TemporaryDirectory() as directory:
+            for _ in range(3):self.assertFalse(runner.advance(state,editor,Path(directory),lambda:None))
+        self.assertEqual(calls,['003-R-1']*3);self.assertEqual(state['candidates'][0]['status'],'needs_review')
+        self.assertTrue(all(r['status']=='discovered' for r in state['candidates'][1:]))
+        self.assertEqual(state['_quota_snapshot'],{'requests':207})
+
     def test_read_only_monitor_has_no_pinned_dates_and_merge_does_not_wake_production(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)

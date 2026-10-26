@@ -1,0 +1,1169 @@
+{
+  "checked_at": "2026-10-26T21:22:59.578689+00:00",
+  "gemini_requests": 0,
+  "sources": [
+    {
+      "url": "https://www.unicef.org/parenting/child-development/baby-tips",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "07766ef284444c3aefb27a5c68728601095235c0d36bc355a5d6e56ad23c4b84",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Parenting tips for the first two years of life"
+    },
+    {
+      "url": "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "1914950d658e9204f5469cb42cd3164f83936b55d2410322a7697072902106ae",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "To grow up healthy, children need to sit less and play more"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "a57d93fcb7ace6dfbdce075a8ca92c1bdb5aab56ff07150c9f580812dec536d2",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "How play strengthens your child’s mental health"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "994cfa7267c0c2f296add394e912d2eee6346769f30fcbd9f3d0f716ea15ad27",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "21 learning activities for babies and toddlers"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-development/10-playful-activities-children-disabilities",
+      "status": "blocked",
+      "code": 404
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "4d797f748167b1d2ee2ca2df178feb1afad314be3a3224536245e904ad4f6d7b",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Empty Nest Status, Marital Closeness, and Perceived Health: Testing Couples’ Direct and Moderated Associations with an Actor-Partner Interdependence Model"
+    },
+    {
+      "url": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "b5300d02cd8eb77fe4df47d7d933cd418b4778796b4960b7e3f2c6c03e82a6db",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Four Ways to Refresh Your Relationship"
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
+      "status": "blocked",
+      "code": "SOURCE_EXTRACTION_PARTIAL",
+      "structure": {
+        "method": "ambiguous",
+        "selected": 0,
+        "candidates": [
+          {
+            "tag": "html",
+            "id": null,
+            "class": null,
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "body",
+            "id": "yDmH0d",
+            "class": "tQj5Y ghyPEc IqBfM e2G3Fb EWZcud",
+            "itemprop": null,
+            "closed": true
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "2f6cd77c2a547a549dabe5b94de1f1b3b8c082a1501853e9af83735531e72f47",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Было-Стало. Как реставрировали царицынский дворцовый ансамбль – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/architecture/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "ad2170a8c50a8b38e6fc268741d2001f5412474d0331b8dbf28442891c3c70b5",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Архитектурный ансамбль – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://www.culture.ru/s/tsaritsyno-museum/",
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "dc5ac5864ca9b0bc52bea61126fbca45f565b1ff3bb48d171c3e25e9a0dc8512",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "История – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://www.culture.ru/institutes/13984/muzei-zapovednik-caricyno",
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
+    },
+    {
+      "url": "https://www.culture.ru/institutes/13711/muzei-zapovednik-kolomenskoe",
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
+    },
+    {
+      "url": "https://www.nps.gov/subjects/healthandsafety/trip-planning-guide.htm",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "a47a5745a8784da43a33091bef951e1da02c175721e2c3e4af000a3b31e2a2e6",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Trip Planning Guide"
+    },
+    {
+      "url": "https://www.mskagency.ru/materials/3571845",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "d031bd66994fdfb97477476f0822046f34e2d19f794300493ddaa6d80ff15e3b",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Дорожное покрытие и освещение обновили в Напрудном переулке"
+    },
+    {
+      "url": "https://www.darwinmuseum.ru/pages/istoriya-muzeya",
+      "status": "blocked",
+      "code": "SOURCE_EXTRACTION_PARTIAL",
+      "structure": {
+        "method": "ambiguous",
+        "selected": 0,
+        "candidates": [
+          {
+            "tag": "body",
+            "id": null,
+            "class": null,
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-body",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "buy_ticket_main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "buy_ticket_main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "buy_ticket_main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "buy_ticket_main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "a",
+            "id": null,
+            "class": "buy_ticket_main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "tab-content col-xs-12 col-sm-offset-2 col-sm-10 col-md-offset-2 col-md-6 col-lg-offset-2 col-lg-6 wrapper_topsend",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "tab-content col-xs-12 col-sm-offset-2 col-sm-10 col-md-offset-2 col-md-6 col-lg-offset-2 col-lg-6 wrapper_topsend",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "tab-content col-xs-12 col-sm-offset-2 col-sm-10 col-md-offset-2 col-md-6 col-lg-offset-2 col-lg-6 wrapper_topsend",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "tab-content inpadding",
+            "itemprop": null,
+            "closed": true
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://www.nasa.gov/history/alsj/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "4641161b201e21183502568f380a217c17f6054ad9748431c84e83521048f8bd",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "The Apollo Lunar Surface Journal and Apollo Flight Journal"
+    },
+    {
+      "url": "https://www.mskagency.ru/materials/3555954",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "393b0cde29b9c621006df91f88cb7ebd86d99fc07925f3ac4225666c4ea78610",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Собянин: Футуристическое здание «школы будущего» появится в Пресненском районе"
+    },
+    {
+      "url": "https://www.mskagency.ru/materials/3571841",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "2d864d9a8147e2d79f8ee0eb38bfb53e4d9cb1cd650012ac4f52fe2180d07909",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Школу будущего в Пресненском районе украсят почти 100 цветов из стеклофибробетона"
+    },
+    {
+      "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "2f0c23b0c98eb38ab5fd2fe263a84e409e3f7cff5c3cc78637d495fc15ea2639",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Healthy diet"
+    },
+    {
+      "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "1e0581ad27048f0be5cf89435d5df41e6d78079f8969caeddfef8437e34ff952",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Health Tips for Adults"
+    },
+    {
+      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "bfa41c474493f6e94789beb881b0e44170bda48471ff210f748151ac893ba205",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Physical activity"
+    },
+    {
+      "url": "https://www.nhlbi.nih.gov/health/heart/physical-activity",
+      "status": "blocked",
+      "code": "SOURCE_PAGINATED_NEEDS_REVIEW"
+    },
+    {
+      "url": "https://www.nps.gov/articles/bicycle-safety.htm",
+      "status": "blocked",
+      "code": 404
+    },
+    {
+      "url": "https://www.nps.gov/subjects/biking/safety.htm",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "40a22c164de7c147bc3db16f81b69e1aec7f794bc35901101445d06b836fadae",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Safety"
+    },
+    {
+      "url": "https://www.nccih.nih.gov/health/yoga-effectiveness-and-safety",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "72e84752205e64447dfb957347d9e94e5a5167999ad5782724f20ec5ee2ce9fa",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Yoga: Effectiveness and Safety"
+    },
+    {
+      "url": "https://www.nccih.nih.gov/health/tai-chi-what-you-need-to-know",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "31dd0855979c36322cc1298eed42d11266b416c4aed2f8dfcaf1b97c956634ef",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Tai Chi: What You Need To Know"
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0336748",
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "rights": "allowed",
+      "content_hash": "179be505c6d05ecb72cbae96e1d9e983c83b53633aa83a968cecf5fb0cf89e2b",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Brief daily functional strength training to improve functional performance in older adults with mobility disability: A randomized trial"
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "f09cece4c06e8ecde952fccd343be0aee793da21b213f00f9e8aae3d18689122",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Changes in Coffee Intake, Added Sugar and Long-Term Weight Gain - Results from Three Large Prospective US Cohort Studies"
+    },
+    {
+      "url": "https://science.nasa.gov/mission/osiris-rex/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "8392c2ef2aa554abbbb669bbf58c89ed1972cf707d5b9d0d478c291b3a09e996",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "OSIRIS-REx"
+    },
+    {
+      "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "52732de03889ee80c41876e9894066296592bb004dcfb9eb3013c62745544d37",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Apollo 11 Mission Overview - NASA"
+    },
+    {
+      "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "f26bb971017b382b4e1a64a6f10958d8ac9205efc7881e8c0085210a1a1cce9c",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Katherine Johnson Biography - NASA"
+    },
+    {
+      "url": "https://science.nasa.gov/people/katherine-johnson/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "a061c09a8f6ac97649221132220bbdcb9da69067a2ad373e9aded009265fd2d6",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Katherine Johnson (1918-2020)"
+    },
+    {
+      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080109.html",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "465bee124fe763d52ebb92e84a9f932e989e7c7f3a1607b147657c54782027f6",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "General Audience of 9 January 2008: Saint Augustine of Hippo (1)"
+    },
+    {
+      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080116.html",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "80b4f2e66c1f940f91e67c6ba57f662d72515c167e8331484a7d260aee27a7b0",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "General Audience of 16 January 2008: Saint Augustine of Hippo (2)"
+    },
+    {
+      "url": "https://science.nasa.gov/solar-system/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "c4c58e9654e1300db8e9e6a98741dbf15c1776add65197638c580b02f1fa4dd6",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Solar System Exploration"
+    },
+    {
+      "url": "https://science.nasa.gov/mars/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "bef50f2c7e01905df9bc1b7dd56fffb7149623b7e5297567af49b48cdd44c94c",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Mars"
+    },
+    {
+      "url": "https://www.cbr.ru/dkp/about_inflation/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "68ffb759ffdcd2a06b6e69c93618032cad4f94e778be90de94ddfbbbb63d6d72",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Что такое инфляция"
+    },
+    {
+      "url": "https://www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/Inflation",
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
+    },
+    {
+      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "ae233f84e481890e00119027c26bed711a081c9b803a0d9c57339f064cc908eb",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "What is Additive Manufacturing?"
+    },
+    {
+      "url": "https://www.nasa.gov/technology/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "dd0d19f3359e586bd6708d8e25a51518bd5ca2d4e2a8a19588fde4af239ffaf4",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Technology Drives Exploration"
+    },
+    {
+      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "d57b904a7f59aca49283cb120aaef3785b5eb303babf677b253c3317c7445b52",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Additive Manufacturing FAQs"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "a97fa3c7bd9441027c439e95906fb11689e53ffb404ebfb59c861a27a174db61",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Башня-руина – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "613388a5dcc1467566e59ca69eda3e5d11db74b09b4acea91f4bd6f1d16878a6",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Оранжереи в Москве – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "648ba1d7f8a086b79f11b43f3372713fe95b86e19c0790a6991b44b72aa70dab",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Часто задаваемые вопросы – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "6e7e3fe747c6481388e4062e78ceaa6cfc0249239b9d933b6f3afc6ee2ff459e",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Декоративно-прикладное искусство – Музей-заповедник «Царицыно»"
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "rights": "allowed",
+      "content_hash": "1a159c2e1af13c28d83502ed778c713c24c70d3144131aaf27727516735af268",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Keeping an Eye on Water Quality From the Sky"
+    },
+    {
+      "url": "https://science.nasa.gov/earth/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "b3cb2ac7fb3307f3fe9c31a452013b04830e1ab80c4dc2641d70e0025f82047e",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Earth"
+    },
+    {
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "rights": "allowed",
+      "content_hash": "78e31260100d2f7f2e93169b78f06a84775daca7981fcbb2d7cfefc64188e103",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Why Light Going Backward Can Help us go Forward"
+    },
+    {
+      "url": "https://dmtya.ru/repertoire/vasilisa-prekrasnaya/",
+      "status": "blocked",
+      "code": "SOURCE_EXTRACTION_PARTIAL",
+      "structure": {
+        "method": "ambiguous",
+        "selected": 0,
+        "candidates": [
+          {
+            "tag": "html",
+            "id": null,
+            "class": null,
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "body",
+            "id": null,
+            "class": "dark theme-red",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "side-menu-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-body",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-footer justify-content-center",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-body pb-4",
+            "itemprop": null,
+            "closed": true
+          }
+        ]
+      }
+    },
+    {
+      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+      "status": "blocked",
+      "code": "SOURCE_EXTRACTION_PARTIAL",
+      "structure": {
+        "method": "ambiguous",
+        "selected": 0,
+        "candidates": [
+          {
+            "tag": "html",
+            "id": null,
+            "class": null,
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "body",
+            "id": null,
+            "class": "dark theme-blue",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "side-menu-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-body",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-footer justify-content-center",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "modal-body pb-4",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "studio-content",
+            "itemprop": null,
+            "closed": true
+          }
+        ]
+      }
+    }
+  ],
+  "eligible_candidates": [
+    {
+      "topic_id": "1",
+      "category_hint": "Семья",
+      "url": "https://www.unicef.org/parenting/child-development/baby-tips",
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ]
+    },
+    {
+      "topic_id": "1",
+      "category_hint": "Семья",
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ]
+    },
+    {
+      "topic_id": "2",
+      "category_hint": "Семья",
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "verification_urls": [
+        "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+      ]
+    },
+    {
+      "topic_id": "3",
+      "category_hint": "Семья",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "topic_id": "6",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "6",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/park/architecture/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "8",
+      "category_hint": "Москва и путешествия",
+      "url": "https://www.nps.gov/subjects/healthandsafety/trip-planning-guide.htm",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "9",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "9",
+      "category_hint": "Москва и путешествия",
+      "url": "https://www.mskagency.ru/materials/3571845",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "10",
+      "category_hint": "Москва и путешествия",
+      "url": "https://www.nasa.gov/history/alsj/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "11",
+      "category_hint": "Москва и путешествия",
+      "url": "https://www.mskagency.ru/materials/3555954",
+      "verification_urls": [
+        "https://www.mskagency.ru/materials/3571841"
+      ]
+    },
+    {
+      "topic_id": "11",
+      "category_hint": "Москва и путешествия",
+      "url": "https://www.mskagency.ru/materials/3571841",
+      "verification_urls": [
+        "https://www.mskagency.ru/materials/3555954"
+      ]
+    },
+    {
+      "topic_id": "12",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "topic_id": "12",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+      ]
+    },
+    {
+      "topic_id": "13",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "topic_id": "14",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.nps.gov/subjects/biking/safety.htm",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+      ]
+    },
+    {
+      "topic_id": "15",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.nccih.nih.gov/health/yoga-effectiveness-and-safety",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+      ]
+    },
+    {
+      "topic_id": "15",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.nccih.nih.gov/health/tai-chi-what-you-need-to-know",
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/physical-activity"
+      ]
+    },
+    {
+      "topic_id": "16",
+      "category_hint": "Здоровье и движение",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0336748",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "topic_id": "16",
+      "category_hint": "Здоровье и движение",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
+      ]
+    },
+    {
+      "topic_id": "17",
+      "category_hint": "История и культура",
+      "url": "https://science.nasa.gov/mission/osiris-rex/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "17",
+      "category_hint": "История и культура",
+      "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "18",
+      "category_hint": "История и культура",
+      "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "18",
+      "category_hint": "История и культура",
+      "url": "https://science.nasa.gov/people/katherine-johnson/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "21",
+      "category_hint": "История и культура",
+      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080109.html",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "21",
+      "category_hint": "История и культура",
+      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080116.html",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "22",
+      "category_hint": "Наука",
+      "url": "https://science.nasa.gov/solar-system/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "22",
+      "category_hint": "Наука",
+      "url": "https://science.nasa.gov/mars/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "23",
+      "category_hint": "Экономика и бизнес",
+      "url": "https://www.cbr.ru/dkp/about_inflation/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "24",
+      "category_hint": "Технологии",
+      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
+      "verification_urls": [
+        "https://www.nasa.gov/technology/"
+      ]
+    },
+    {
+      "topic_id": "24",
+      "category_hint": "Технологии",
+      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
+      "verification_urls": [
+        "https://www.nasa.gov/technology/"
+      ]
+    },
+    {
+      "topic_id": "7",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "7",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "8",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "10",
+      "category_hint": "Москва и путешествия",
+      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "24",
+      "category_hint": "Технологии",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
+      "verification_urls": [
+        "https://science.nasa.gov/earth/"
+      ]
+    },
+    {
+      "topic_id": "24",
+      "category_hint": "Технологии",
+      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
+      "verification_urls": []
+    }
+  ],
+  "rejected_candidates": [
+    {
+      "url": "https://www.unicef.org/parenting/child-development/10-playful-activities-children-disabilities",
+      "topic_id": "2",
+      "failures": [
+        {
+          "url": "https://www.unicef.org/parenting/child-development/10-playful-activities-children-disabilities",
+          "code": 404
+        }
+      ]
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
+      "topic_id": "3",
+      "failures": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
+          "code": "SOURCE_EXTRACTION_PARTIAL"
+        }
+      ]
+    },
+    {
+      "url": "https://www.culture.ru/s/tsaritsyno-museum/",
+      "topic_id": "7",
+      "failures": [
+        {
+          "url": "https://www.culture.ru/s/tsaritsyno-museum/",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.culture.ru/institutes/13984/muzei-zapovednik-caricyno",
+      "topic_id": "7",
+      "failures": [
+        {
+          "url": "https://www.culture.ru/institutes/13984/muzei-zapovednik-caricyno",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.culture.ru/institutes/13711/muzei-zapovednik-kolomenskoe",
+      "topic_id": "8",
+      "failures": [
+        {
+          "url": "https://www.culture.ru/institutes/13711/muzei-zapovednik-kolomenskoe",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.darwinmuseum.ru/pages/istoriya-muzeya",
+      "topic_id": "10",
+      "failures": [
+        {
+          "url": "https://www.darwinmuseum.ru/pages/istoriya-muzeya",
+          "code": "SOURCE_EXTRACTION_PARTIAL"
+        }
+      ]
+    },
+    {
+      "url": "https://www.nhlbi.nih.gov/health/heart/physical-activity",
+      "topic_id": "13",
+      "failures": [
+        {
+          "url": "https://www.nhlbi.nih.gov/health/heart/physical-activity",
+          "code": "SOURCE_PAGINATED_NEEDS_REVIEW"
+        }
+      ]
+    },
+    {
+      "url": "https://www.nps.gov/articles/bicycle-safety.htm",
+      "topic_id": "14",
+      "failures": [
+        {
+          "url": "https://www.nps.gov/articles/bicycle-safety.htm",
+          "code": 404
+        }
+      ]
+    },
+    {
+      "url": "https://www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/Inflation",
+      "topic_id": "23",
+      "failures": [
+        {
+          "url": "https://www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/Inflation",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://dmtya.ru/repertoire/vasilisa-prekrasnaya/",
+      "topic_id": "2",
+      "failures": [
+        {
+          "url": "https://dmtya.ru/repertoire/vasilisa-prekrasnaya/",
+          "code": "SOURCE_EXTRACTION_PARTIAL"
+        }
+      ]
+    },
+    {
+      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+      "topic_id": "2",
+      "failures": [
+        {
+          "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+          "code": "SOURCE_EXTRACTION_PARTIAL"
+        }
+      ]
+    }
+  ],
+  "topics": {
+    "1": {
+      "topic": "Воспитание и развитие детей",
+      "eligible_candidates": 2
+    },
+    "2": {
+      "topic": "Семейные занятия и совместный досуг",
+      "eligible_candidates": 1
+    },
+    "3": {
+      "topic": "Супружеские отношения",
+      "eligible_candidates": 1
+    },
+    "6": {
+      "topic": "Московские усадьбы и дворцы",
+      "eligible_candidates": 2
+    },
+    "7": {
+      "topic": "Необычные места Москвы и Подмосковья",
+      "eligible_candidates": 2
+    },
+    "8": {
+      "topic": "Путешествия выходного дня",
+      "eligible_candidates": 2
+    },
+    "9": {
+      "topic": "История Москвы",
+      "eligible_candidates": 2
+    },
+    "10": {
+      "topic": "Музеи и выставки",
+      "eligible_candidates": 2
+    },
+    "11": {
+      "topic": "Архитектура и дизайн интерьеров",
+      "eligible_candidates": 2
+    },
+    "12": {
+      "topic": "Питание и долголетие",
+      "eligible_candidates": 2
+    },
+    "13": {
+      "topic": "Кардиотренировки и физиология",
+      "eligible_candidates": 1
+    },
+    "14": {
+      "topic": "Велосипедные путешествия и маршруты",
+      "eligible_candidates": 1
+    },
+    "15": {
+      "topic": "Йога, подвижность и восстановление",
+      "eligible_candidates": 2
+    },
+    "16": {
+      "topic": "Современная медицина",
+      "eligible_candidates": 2
+    },
+    "17": {
+      "topic": "Исторические загадки и открытия",
+      "eligible_candidates": 2
+    },
+    "18": {
+      "topic": "Выдающиеся люди и необычные судьбы",
+      "eligible_candidates": 2
+    },
+    "21": {
+      "topic": "Христианская история и философия",
+      "eligible_candidates": 2
+    },
+    "22": {
+      "topic": "Открытия и загадки природы",
+      "eligible_candidates": 2
+    },
+    "23": {
+      "topic": "Экономика, предпринимательство и право",
+      "eligible_candidates": 1
+    },
+    "24": {
+      "topic": "Инженерия, производство и технологии",
+      "eligible_candidates": 4
+    }
+  },
+  "unique_eligible": 37,
+  "not_previously_published": 36,
+  "required_reserve": 14,
+  "all_twenty_topics_covered": true,
+  "editorial_or_factual_approval": false
+}
