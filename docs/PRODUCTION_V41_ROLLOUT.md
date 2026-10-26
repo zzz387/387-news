@@ -1,3 +1,5 @@
+> **26 октября 2026,21:25МСК: блокер Pages устранён владельцем и подтверждён GitHub REST API в read-only Actions.** build_type=workflow,cname387.su,https_enforced=true,statusbuilt; последний deployment7339005364 —success. [Проверка40377479858](https://github.com/zzz387/387-news/actions/runs/40377479858) проверила HTTPS, выпуск№003/26октября/8полныхстатей, неизменный ledger5/220 и неистёкший encrypted checkpoint27октября. Cooldown закончился20:37МСК; текущее восстановление Gemini после503 не проверялось новыми запросами. Production активен,0/12 по последнему pipeline-status, следующее плановое окно22:17МСК. Проверка не запускала production/Gemini и не выполняла deployment. Настройку Source повторять не нужно. Ниже — история внедрения, включая ранее действовавший Pages blocker.
+
 # Прямое внедрение 387 News v4.1 — 26 октября 2026
 
 Владелец разрешил merge PR№7, настоящий production, существующие Gemini Secrets/квоту и публикацию без отдельного trial. Это разрешение не отменяет CI/права/фактчекинг/редакционные проверки и защиты GitHub. Codespaces не используется.
