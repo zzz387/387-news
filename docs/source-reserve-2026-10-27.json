@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-26T21:22:59.578689+00:00",
+  "checked_at": "2026-10-26T21:39:24.356838+00:00",
   "gemini_requests": 0,
   "sources": [
     {
@@ -69,28 +69,13 @@
     },
     {
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
-      "status": "blocked",
-      "code": "SOURCE_EXTRACTION_PARTIAL",
-      "structure": {
-        "method": "ambiguous",
-        "selected": 0,
-        "candidates": [
-          {
-            "tag": "html",
-            "id": null,
-            "class": null,
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "body",
-            "id": "yDmH0d",
-            "class": "tQj5Y ghyPEc IqBfM e2G3Fb EWZcud",
-            "itemprop": null,
-            "closed": true
-          }
-        ]
-      }
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "ecda6cb207950ff314d57574e62560b9464a238937a6ff2d281d1ae1111fa890",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Is an Empty Nest Best?: Coresidence With Adult Children and Parental Marital Quality Before and After the Great Recession"
     },
     {
       "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
@@ -364,13 +349,28 @@
     },
     {
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
-      "status": "eligible",
-      "mode": "INDEPENDENT_ARTICLE",
-      "rights": "allowed",
-      "content_hash": "f09cece4c06e8ecde952fccd343be0aee793da21b213f00f9e8aae3d18689122",
-      "metadata_status": "verified",
-      "extraction": "complete",
-      "title": "Changes in Coffee Intake, Added Sugar and Long-Term Weight Gain - Results from Three Large Prospective US Cohort Studies"
+      "status": "blocked",
+      "code": "SOURCE_EXTRACTION_PARTIAL",
+      "structure": {
+        "method": "ambiguous",
+        "selected": 0,
+        "candidates": [
+          {
+            "tag": "html",
+            "id": null,
+            "class": null,
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "body",
+            "id": "yDmH0d",
+            "class": "tQj5Y ghyPEc IqBfM e2G3Fb EWZcud",
+            "itemprop": null,
+            "closed": true
+          }
+        ]
+      }
     },
     {
       "url": "https://science.nasa.gov/mission/osiris-rex/",
@@ -585,7 +585,7 @@
           {
             "tag": "body",
             "id": null,
-            "class": "dark theme-red",
+            "class": "dark theme-yellow",
             "itemprop": null,
             "closed": true
           },
@@ -636,6 +636,26 @@
     },
     {
       "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "21411a1545c2882d8ad0aee410cfebf87c772e2ee310e2fd7f8e797ad0181477",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Премьера спектакля «Василиса Прекрасная»"
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "rights": "allowed",
+      "content_hash": "90db0c1ed9126be6082cbdc6a3786dec45a6e1481166b122e6292b583b86267f",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Health and wellbeing among the empty nest and non-empty nest elderly in China—Results from a national cross-sectional study"
+    },
+    {
+      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
       "status": "blocked",
       "code": "SOURCE_EXTRACTION_PARTIAL",
       "structure": {
@@ -652,56 +672,203 @@
           {
             "tag": "body",
             "id": null,
-            "class": "dark theme-blue",
+            "class": "body--v4",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "side-menu-content",
+            "class": "Ibar__main",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "modal-content",
+            "class": "Ibar__journal Ibar__journal--main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "article",
+            "id": null,
+            "class": "CardJournal",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "article",
+            "id": null,
+            "class": "Card CardRT2",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "modal-body",
+            "class": "Card__body",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "modal-footer justify-content-center",
+            "class": "ExpandablePanel__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "main",
+            "id": null,
+            "class": "ArticleDetailsV4__main",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "h1",
+            "id": null,
+            "class": "ArticleDetailsV4__main__title",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "modal-content",
+            "class": "ArticleDetailsV4__main__content",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "modal-body pb-4",
+            "class": "ArticleTable__content",
             "itemprop": null,
             "closed": true
           },
           {
             "tag": "div",
             "id": null,
-            "class": "studio-content",
+            "class": "ArticleTable__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "ArticleTable__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "ArticleTable__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "ArticleTable__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "ArticleTable__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "ArticleTable__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
+            "itemprop": null,
+            "closed": true
+          },
+          {
+            "tag": "div",
+            "id": null,
+            "class": "References__content",
             "itemprop": null,
             "closed": true
           }
@@ -738,6 +905,14 @@
       "topic_id": "3",
       "category_hint": "Семья",
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "topic_id": "3",
+      "category_hint": "Семья",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
       "verification_urls": [
         "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
       ]
@@ -851,14 +1026,6 @@
       ]
     },
     {
-      "topic_id": "16",
-      "category_hint": "Здоровье и движение",
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
-      "verification_urls": [
-        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
-      ]
-    },
-    {
       "topic_id": "17",
       "category_hint": "История и культура",
       "url": "https://science.nasa.gov/mission/osiris-rex/",
@@ -965,6 +1132,20 @@
       "category_hint": "Технологии",
       "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
       "verification_urls": []
+    },
+    {
+      "topic_id": "2",
+      "category_hint": "Семья",
+      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+      "verification_urls": []
+    },
+    {
+      "topic_id": "3",
+      "category_hint": "Семья",
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
     }
   ],
   "rejected_candidates": [
@@ -975,16 +1156,6 @@
         {
           "url": "https://www.unicef.org/parenting/child-development/10-playful-activities-children-disabilities",
           "code": 404
-        }
-      ]
-    },
-    {
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
-      "topic_id": "3",
-      "failures": [
-        {
-          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
-          "code": "SOURCE_EXTRACTION_PARTIAL"
         }
       ]
     },
@@ -1049,6 +1220,16 @@
       ]
     },
     {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
+      "topic_id": "16",
+      "failures": [
+        {
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
+          "code": "SOURCE_EXTRACTION_PARTIAL"
+        }
+      ]
+    },
+    {
       "url": "https://www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/Inflation",
       "topic_id": "23",
       "failures": [
@@ -1069,11 +1250,11 @@
       ]
     },
     {
-      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
-      "topic_id": "2",
+      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
+      "topic_id": "16",
       "failures": [
         {
-          "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+          "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
           "code": "SOURCE_EXTRACTION_PARTIAL"
         }
       ]
@@ -1086,11 +1267,11 @@
     },
     "2": {
       "topic": "Семейные занятия и совместный досуг",
-      "eligible_candidates": 1
+      "eligible_candidates": 2
     },
     "3": {
       "topic": "Супружеские отношения",
-      "eligible_candidates": 1
+      "eligible_candidates": 3
     },
     "6": {
       "topic": "Московские усадьбы и дворцы",
@@ -1134,7 +1315,7 @@
     },
     "16": {
       "topic": "Современная медицина",
-      "eligible_candidates": 2
+      "eligible_candidates": 1
     },
     "17": {
       "topic": "Исторические загадки и открытия",
@@ -1161,8 +1342,8 @@
       "eligible_candidates": 4
     }
   },
-  "unique_eligible": 37,
-  "not_previously_published": 36,
+  "unique_eligible": 39,
+  "not_previously_published": 38,
   "required_reserve": 14,
   "all_twenty_topics_covered": true,
   "editorial_or_factual_approval": false

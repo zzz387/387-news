@@ -29,6 +29,13 @@
       ]
     },
     {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
       "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
       "category_hint": "Москва и путешествия",
       "verification_urls": []
@@ -116,13 +123,6 @@
     },
     {
       "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0336748",
-      "category_hint": "Здоровье и движение",
-      "verification_urls": [
-        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
-      ]
-    },
-    {
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
       "category_hint": "Здоровье и движение",
       "verification_urls": [
         "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
@@ -218,6 +218,18 @@
       "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
       "category_hint": "Технологии",
       "verification_urls": []
+    },
+    {
+      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+      "category_hint": "Семья",
+      "verification_urls": []
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
+      "category_hint": "Семья",
+      "verification_urls": [
+        "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
     }
   ]
 }

@@ -141,9 +141,19 @@ class StabilizeTests(unittest.TestCase):
         self.assertTrue(all(r['status']=='discovered' for r in state['candidates'][1:]))
         self.assertEqual(state['_quota_snapshot'],{'requests':207})
 
+    def test_frontiers_full_research_region_requires_methods_results_and_closed_body(self):
+        from scripts import source41
+        html='<html lang="en"><head><title>Synthetic study</title></head><body><article class="Card">Unrelated card</article><main><h1>Synthetic study</h1><div class="ArticleDetailsV4__main__content"><h2>Abstract</h2><p>Synthetic abstract.</p><h2>2 Methods</h2><p>Complete synthetic methods.</p><h2>3 Results</h2><p>Complete synthetic results.</p></div></main></body></html>'
+        url='https://www.frontiersin.org/journals/nutrition/articles/10.synthetic/full'
+        source=source41.extract(html,url);self.assertEqual(source['extraction_method'],'frontiers_complete_research')
+        self.assertNotIn('Unrelated card',' '.join(b['text'] for b in source['blocks']))
+        with self.assertRaises(p.Blocked):source41.extract(html.split('<h2>2 Methods')[0]+'</div></main></body></html>',url)
+        with self.assertRaises(p.Blocked):source41.extract(html.split('</div>')[0],url)
+
     def test_read_only_monitor_has_no_pinned_dates_and_release_requirements_are_preserved(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)
         daily=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
         self.assertIn("cron: '54 2 * * *'",daily);self.assertEqual(p.RELEASE_TIME,'06:00')
+        self.assertIn("!contains(github.event.head_commit.message, '[maintenance only]')",daily)
         self.assertEqual(p.ARTICLE_COUNT,12)

@@ -175,33 +175,56 @@ class Editor:
         for group in content.operation_groups(pending):
             group_id=policy.digest([part['id'] for part in group])
             attempt=repairs.setdefault(group_id,{'failures':record['progress'].pop('_prior_analysis_failures',0),'code':''})
+            evidence=content.evidence_units(group);by_evidence={item['id']:item for item in evidence}
             while True:
                 if attempt['failures']>=policy.CONFIG['technical']['content_attempts']:
                     raise policy.Blocked(attempt['code'] or 'SOURCE_ANALYSIS_INCOMPLETE')
                 prompt=('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
                 '\nМетаданные: '+json.dumps({k:source[k] for k in ('id','url','title','author','published','language')},ensure_ascii=False)+
+                '\nДословные свидетельства: '+json.dumps(evidence,ensure_ascii=False)+
                 '\nИзвлеки проверяемые факты, точные дословные quote из одной конкретной части, требования к полноте и дату события (пусто, если неизвестна). '
                 'Не придумывай. source_id должен совпадать с исходником. sensitive=true для спорных/медицинских/опасных утверждений. '
                 'Для самостоятельного текста выделяй нейтральные проверяемые факты и общие знания. Авторские примеры, подборка и формулировки не являются свободным сырьём для рерайта. '
-                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок.')
+                'covered_ids — точные id ВСЕХ частей pieces (или единственной части). topic_key — фактический сюжет, не заголовок. '
+                'Для каждого claim выбери evidence_id из таблицы дословных свидетельств; программа сама возьмёт исходную цитату и source_id. '
+                'Не переводить и не перепечатывать quote: при выбранном evidence_id поле quote оставь пустым. Факт должен прямо следовать из выбранного свидетельства. '
+                'Дату события указывай только при её прямом подтверждении текстом; event_evidence_id — id содержащего дату свидетельства. '
+                'Дата публикации в метаданных не является датой события. Если событие не датировано, event_date, event_date_quote и event_evidence_id должны быть пустыми.')
                 if attempt['code']:
                     prompt+='\nПредыдущая попытка отклонена: '+attempt['code']+(
                         '. Исправь именно диагностированную ошибку. quote — непрерывная дословная строка из одной '
                         'конкретной части, без парафраза, исправлений и склеивания. source_id — точный id оригинала; '
                         'covered_ids — все id переданных частей. Не выдумывай подтверждение. Если факт нельзя '
-                        'подтвердить точной цитатой, не включай его в claims. Дату не указывай без дословного свидетельства.')
+                        'подтвердить точной цитатой, не включай его в claims. Дату не указывай без дословного свидетельства. '
+                        'Предпочитай существующий evidence_id из таблицы qN: цитату и source_id программа привяжет сама; quote можно оставить пустым. Не придумывай идентификатор.')
                 result=self.call(prompt,output_tokens=8000,schema='v41_analysis')
+                diagnosis='UNKNOWN'
                 try:
+                    diagnosis='COVERAGE_MISMATCH'
                     if set(result.get('covered_ids',[]))!={part['id'] for part in group}: raise policy.Blocked('SOURCE_ANALYSIS_INCOMPLETE')
+                    diagnosis='EVENT_DATE_WITHOUT_LITERAL_EVIDENCE'
+                    if result.get('event_evidence_id'):
+                        event_evidence=by_evidence.get(result['event_evidence_id'])
+                        if event_evidence is None:raise policy.Blocked('EVENT_DATE_UNVERIFIED')
+                        result['event_date_quote']=event_evidence['text']
                     if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in part['text'] for part in group)):
                         raise policy.Blocked('EVENT_DATE_UNVERIFIED')
                     assigned={part['id']:[] for part in group}
                     for claim in result['claims']:
+                        if claim.get('evidence_id'):
+                            diagnosis='UNKNOWN_EVIDENCE_ID'
+                            selected=by_evidence.get(claim['evidence_id'])
+                            if selected is None:raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
+                            claim=dict({k:v for k,v in claim.items() if k!='evidence_id'},quote=selected['text'],source_id=source['id'])
+                        diagnosis='SOURCE_ID_MISMATCH' if claim['source_id']!=source['id'] else 'NON_LITERAL_QUOTE'
                         matches=[part for part in group if claim.get('quote','').strip() and claim['quote'] in part['text']]
                         if claim['source_id']!=source['id'] or not matches: raise policy.Blocked('CLAIM_NOT_IN_ORIGINAL')
                         owner=matches[0]['id']; claim=dict(claim,id=owner+'/'+claim['id']); assigned[owner].append(claim)
                 except policy.Blocked as exc:
                     attempt['failures']+=1; attempt['code']=exc.code
+                    attempt['last_rejected_result']=copy.deepcopy(result)  # encrypted checkpoint only
+                    attempt['diagnosis']=diagnosis
+                    print('[analysis-diagnostic] '+json.dumps({'code':exc.code,'reason':diagnosis,'attempt':attempt['failures']}),flush=True)
                     event(getattr(self,'state',{}),record,'source_analysis','retry_pending',exc.code)
                     self.persist()
                     if attempt['failures']>=policy.CONFIG['technical']['content_attempts']: raise

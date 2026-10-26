@@ -89,6 +89,13 @@ def extract(html,url):
     if base.startswith('https://www.nist.gov/'):
         explicit=[n for n in document.root.all() if 'nist-page__region--content' in n.attrs.get('class','').split()]
         regions,method=(explicit,'nist_complete_body') if len(explicit)==1 else dom.choose_region(document)
+    elif base.startswith('https://www.frontiersin.org/journals/') and urlparse(base).path.endswith('/full'):
+        explicit=[n for n in document.root.all() if 'ArticleDetailsV4__main__content' in n.attrs.get('class','').split()]
+        if len(explicit)==1:
+            headings=' '.join(n.text().casefold() for n in explicit[0].all() if n.tag in ('h2','h3','h4'))
+            if not re.search(r'methods',headings) or not re.search(r'results',headings):raise policy.Blocked('SOURCE_ABSTRACT_ONLY')
+            regions,method=explicit,'frontiers_complete_research'
+        else:regions,method=dom.choose_region(document)
     elif base.startswith('https://dmtya.ru/theatre/news/'):
         explicit=[n for n in document.root.all() if 'studio-content' in n.attrs.get('class','').split()]
         regions,method=(explicit,'dmtya_complete_news') if len(explicit)==1 else dom.choose_region(document)
