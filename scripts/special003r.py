@@ -27,11 +27,39 @@ def new_state():
     state['special_edition']={'id':sc.ID,'definition_hash':p.digest(sc.definition())}
     state.update(branch='main',preview=False,discovered=True)
     for slot in sc.definition()['slots']:
+        plan=sc.evidence_plan(slot)
         state['candidates'].append({'id':'003-R-'+str(slot['slot']),'special_slot':slot['slot'],
-            'url':slot['url'],'original_urls':slot['original_urls'],'category_hint':slot['category'],
-            'verification_urls':slot['verification_urls'],'status':'discovered','checks':{},'progress':{},
+            'url':plan['primary'],'original_urls':slot['original_urls'],'category_hint':slot['category'],
+            'verification_urls':plan['support'],'evidence_plan':copy.deepcopy(plan),
+            'unused_original_urls':[url for url in slot['original_urls'] if url not in [plan['primary']]+plan['support']],'status':'discovered','checks':{},'progress':{},
             'commission':{'original_topic':slot['original_title'],'category':slot['category'],
-                'requirements':slot['requirements'],'kind':'Внеочередное переиздание; события26октября не выдавать за новые; контекст только по подтверждённым источникам.'}})
+                'requirements':slot['requirements'],'kind':'Внеочередное переиздание: события 26 октября не выдавать за новые; контекст только по подтверждённым источникам. Неиспользованные исходные URL не считаются проверенными. Научная статья, использованная вместо исходной, должна быть явно отличима от исходного исследования.'}})
+    return state
+
+
+PREVIOUS_DEFINITION_HASH='5921ed0c3b6f8750294f2336f71f290f4f5e104df7d932a123781086b3eaac98'
+
+
+def refresh_definition(state):
+    identity=state.get('special_edition',{})
+    if identity=={'id':sc.ID,'definition_hash':p.digest(sc.definition())}:return state
+    if identity!={'id':sc.ID,'definition_hash':PREVIOUS_DEFINITION_HASH}:raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
+    replacement=new_state();old={r['special_slot']:r for r in state['candidates']}
+    changed=[]
+    for index,fresh in enumerate(replacement['candidates']):
+        previous=old[fresh['special_slot']]
+        previous_support=list(dict.fromkeys(previous['original_urls'][1:]+previous['verification_urls']))
+        if previous['url']==fresh['url'] and previous_support==fresh['evidence_plan']['support']:
+            previous.update(evidence_plan=fresh['evidence_plan'],unused_original_urls=fresh['unused_original_urls'])
+            replacement['candidates'][index]=previous
+        else:
+            state.setdefault('prior_source_plans',[]).append(copy.deepcopy(previous))
+            state.get('articles',{}).pop(previous['id'],None);state.get('dossiers',{}).pop(previous['id'],None)
+            changed.append(previous['special_slot'])
+    state['candidates']=replacement['candidates'];state['special_edition']=replacement['special_edition']
+    if changed:
+        state['audit_passed']=False;state.pop('issue_approval_hash',None);state['selected_ids']=[]
+    print('[special-source-migration] '+json.dumps({'changed_slots':changed,'quota_preserved':True,'unrelated_progress_preserved':True}))
     return state
 
 
@@ -86,10 +114,12 @@ def study_links(source):
 
 
 def probe():
-    config=sc.definition();urls=list(dict.fromkeys(u for slot in config['slots'] for u in slot['original_urls']+slot['verification_urls']))
+    config=sc.definition();urls=list(dict.fromkeys(u for slot in config['slots'] for u in slot['original_urls']+[sc.evidence_plan(slot)['primary']]+sc.evidence_plan(slot)['support']+sc.evidence_plan(slot)['studies']))
+    from scripts.public_sources41 import Session
+    fetch=Session().fetch
     def inspect(url):
         try:
-            source=source41.fetch(url);mode,decision=rights41.select_mode(source)
+            source=fetch(url);mode,decision=rights41.select_mode(source)
             rights41.require(source,mode,decision)
             return {'url':url,'status':'eligible','mode':mode,'rights':decision['status'],
                 'verification':decision.get('verification'),'content_hash':source['content_hash'],
@@ -113,18 +143,20 @@ def probe():
     with ThreadPoolExecutor(max_workers=3) as pool:rows=list(pool.map(inspect,urls))
     by_url={r['url']:r for r in rows}
     research_urls=list(dict.fromkeys(u for slot in config['slots'] if slot['category']=='Здоровье и движение'
-        for u in by_url[slot['url']].get('study_urls',[])))
+        for u in (sc.evidence_plan(slot)['studies'] or by_url[sc.evidence_plan(slot)['primary']].get('study_urls',[]))))
     with ThreadPoolExecutor(max_workers=3) as pool:research=list(pool.map(inspect,research_urls))
     research_by_url={r['url']:r for r in research}
     def slot_status(slot):
-        if not all(by_url[u]['status']=='eligible' for u in slot['original_urls']+slot['verification_urls']):return 'source_hold'
+        plan=sc.evidence_plan(slot)
+        if not all(by_url[u]['status']=='eligible' for u in [plan['primary']]+plan['support']):return 'source_hold'
         if slot['category']=='Здоровье и движение':
-            studies=by_url[slot['url']].get('study_urls',[])
+            studies=plan['studies'] or by_url[plan['primary']].get('study_urls',[])
             if not studies or not all(research_by_url[u]['status']=='eligible' for u in studies):return 'medical_evidence_hold'
         return 'sources_ready'
     report={'id':sc.ID,'gemini_requests':0,'checked_at':datetime.now(p.TZ).isoformat(),'sources':rows,'research_sources':research,
         'articles':[{'slot':s['slot'],'topic':s['original_title'],'original_urls':s['original_urls'],
-                     'status':slot_status(s),
+                     'status':slot_status(s),'active_primary':sc.evidence_plan(s)['primary'],
+                     'unused_original_urls':[u for u in s['original_urls'] if u not in [sc.evidence_plan(s)['primary']]+sc.evidence_plan(s)['support']],
                      'generation':'not_started'} for s in config['slots']]}
     print('[special-sources] '+json.dumps(report,ensure_ascii=False))
     Path(os.environ.get('SPECIAL_SOURCE_REPORT','/tmp/special-source-report.json')).write_text(json.dumps(report,ensure_ascii=False,indent=2))
@@ -137,9 +169,10 @@ class Editor(e.Editor):
         if not record.get('source'):record['source']=self.cached_fetch(record['url']);self.persist()
         mode,decision=rights41.select_mode(record['source']);rights41.require(record['source'],mode,decision)
         medical=record['category_hint']=='Здоровье и движение'
-        studies=study_links(record['source']) if medical else []
+        plan=record['evidence_plan']
+        studies=(plan['studies'] or study_links(record['source'])) if medical else []
         if medical and not studies:raise p.Blocked('SPECIAL_FULL_STUDY_REQUIRED')
-        extra=list(dict.fromkeys(record['original_urls'][1:]+record['verification_urls']+studies))
+        extra=list(dict.fromkeys(plan['support']+studies))
         for url in extra:
             original=self.cached_fetch(url)
             rights41.require(original,'INDEPENDENT_ARTICLE',rights41.decision(original,'INDEPENDENT_ARTICLE'))
@@ -267,7 +300,7 @@ def run():
     files={kind:Path(os.environ[kind.upper()+'_CHECKPOINT_FILE']) for kind in ('special','daily','quota')}
     for kind,path in files.items():
         if os.getenv(kind.upper()+'_EXPECTED')=='true' and not path.is_file():raise RuntimeError('SPECIAL_OFFICIAL_RESTORE_MISSING')
-    state=stage.decipher(files['special'].read_bytes(),key) if files['special'].is_file() else new_state()
+    state=refresh_definition(stage.decipher(files['special'].read_bytes(),key)) if files['special'].is_file() else new_state()
     if not sc.is_special(state) or state.get('branch')!='main' or state.get('preview') is not False:raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
     ledger=json.loads(files['quota'].read_text()) if files['quota'].is_file() else {}
     daily=stage.decipher(files['daily'].read_bytes(),key) if files['daily'].is_file() else None

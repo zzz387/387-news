@@ -16,15 +16,16 @@ def complete_special():
     config=sc.definition();state=runner.new_state()
     records=[]
     for index,slot in enumerate(config['slots']):
+        plan=sc.evidence_plan(slot)
         r=record(index);r['id']='003-R-'+str(slot['slot']);r['special_slot']=slot['slot']
-        r['url']=r['source']['url']=r['source']['canonical']=slot['url'];r['original_urls']=slot['original_urls']
+        r['url']=r['source']['url']=r['source']['canonical']=plan['primary'];r['original_urls']=slot['original_urls']
         r['mode']=r['article']['mode']='INDEPENDENT_ARTICLE'
         r['article']['blocks']=[{'kind':'paragraph','text':'Самостоятельное вымышленное объяснение с подробностью '+str(index)}]
         r['article']['category']=slot['category'];r['article']['activities']=[]
         r['rights']=rights41.decision(r['source'],r['mode']);r['article']['attribution']=r['rights'].get('attribution',{})
-        r['supporting_sources']=[{'url':u,'full_text_verified':True} for u in slot['original_urls'][1:]]
+        r['supporting_sources']=[{'url':u,'full_text_verified':True} for u in plan['support']]
         if slot['category']=='Здоровье и движение':
-            r['special_study_urls']=['https://doi.org/10.synthetic/'+str(index)]
+            r['special_study_urls']=plan['studies'] or ['https://doi.org/10.synthetic/'+str(index)]
             r['supporting_sources'] += [{'url':r['special_study_urls'][0],'full_text_verified':True}]
         if slot['slot']==3:
             r['article']['activities']=[{'id':str(i),'title':'Вымышленное занятие '+str(i),'age':'При готовности ребёнка',

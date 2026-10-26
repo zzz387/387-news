@@ -227,6 +227,8 @@ class Editor:
         if not source.get('full_text_verified') or source.get('extraction_status')!='complete':
             raise policy.Blocked('FULL_ORIGINAL_REQUIRED')
         mode,rights=rights41.select_mode(source,self.grants)
+        if contract.is_special(state) and contract.evidence_plan(contract.definition()['slots'][record['special_slot']-1]).get('mode')=='INDEPENDENT_ARTICLE':
+            mode='INDEPENDENT_ARTICLE';rights=rights41.decision(source,mode,self.grants)
         if mode in ('ORIGINAL_REPUBLICATION','FULL_TRANSLATION') and any(re.search(r'https?://|www\.',block['text']) for block in source['blocks']):
             # Preserve the complete original, rather than silently deleting its visible URLs.
             # The reader policy requires a single source block, so choose an independent work.
@@ -674,7 +676,8 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
         except policy.Blocked as exc:
             pipeline.status(state,'BLOCKED','review_stale_approval',exc.code); persist(); return False
     else:
-        discover(state); persist()
+        if not state.get('discovered') or pipeline.capacity():discover(state)
+        persist()
         archive=archive_entries(ops.ROOT)
         for _ in range(policy.CONFIG['technical']['run_steps']):
             selected=select_ready(state,archive)

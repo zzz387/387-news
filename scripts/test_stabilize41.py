@@ -51,6 +51,33 @@ class StabilizeTests(unittest.TestCase):
         self.assertEqual(state['candidates'][0],r);self.assertEqual(len(state['candidates']),2)
         self.assertEqual(state['_quota_snapshot'],{'requests':207})
 
+    def test_special_alternative_migration_preserves_quota_and_unrelated_progress(self):
+        from scripts import special003r as runner,special_contract41 as sc
+        config=copy.deepcopy(sc.definition())
+        for slot in config['slots']:slot.pop('evidence_plan',None)
+        config['slots'][6]['requirements'].pop()
+        self.assertEqual(p.digest(config),runner.PREVIOUS_DEFINITION_HASH)
+        with patch.object(sc,'definition',return_value=config):old=runner.new_state()
+        accepted=old['candidates'][2];accepted['status']='ready';accepted['article']={'title':'Synthetic accepted article'}
+        accepted['progress']={'saved':'synthetic stage'}
+        old['_quota_snapshot']={'day':'2026-10-26','requests':207,'models':{'lite':207},'cooldowns':{'lite':9999999999}}
+        before=copy.deepcopy(old['_quota_snapshot']);runner.refresh_definition(old)
+        self.assertIs(old['candidates'][2],accepted);self.assertEqual(accepted['progress'],{'saved':'synthetic stage'})
+        self.assertEqual(old['_quota_snapshot'],before);self.assertTrue(sc.is_special(old))
+        self.assertIn('https://www.mos.ru/news/item/177660073/',old['candidates'][1]['unused_original_urls'])
+        self.assertNotEqual(old['candidates'][1]['url'],config['slots'][1]['url'])
+
+    def test_source_reserve_never_accepts_unreadable_independent_reference(self):
+        from scripts import source_reserve41 as reserve
+        from scripts.test_policy41 import record
+        catalog={'candidates':[{'topic_id':'1','url':'https://example.org/primary','verification_urls':['https://example.org/blocked']}]}
+        def fetch(url):
+            if url.endswith('blocked'):raise p.Blocked('ROBOTS_FORBIDDEN')
+            source=record(0)['source'];source['url']=url;return source
+        report=reserve.run(catalog,fetch)
+        self.assertEqual(report['unique_eligible'],0);self.assertEqual(report['gemini_requests'],0)
+        self.assertEqual(report['rejected_candidates'][0]['failures'][0]['code'],'ROBOTS_FORBIDDEN')
+
     def test_read_only_monitor_has_no_pinned_dates_and_merge_does_not_wake_production(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)
