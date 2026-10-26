@@ -150,6 +150,16 @@ class StabilizeTests(unittest.TestCase):
         with self.assertRaises(p.Blocked):source41.extract(html.split('<h2>2 Methods')[0]+'</div></main></body></html>',url)
         with self.assertRaises(p.Blocked):source41.extract(html.split('</div>')[0],url)
 
+    def test_source_reserve_requires_independent_authoritative_life_evidence(self):
+        from scripts import source_reserve41 as reserve
+        catalog={'candidates':[{'topic_id':'2','category_hint':'Семья','url':'https://dmtya.ru/source','verification_urls':[]}]}
+        report=reserve.evaluate(catalog,[{'url':'https://dmtya.ru/source','status':'eligible'}])
+        self.assertEqual(report['unique_eligible'],0)
+        self.assertEqual(report['rejected_candidates'][0]['failures'][0]['code'],'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
+        catalog['candidates'][0]['verification_urls']=['https://www.unicef.org/parenting/example']
+        report=reserve.evaluate(catalog,[{'url':'https://dmtya.ru/source','status':'eligible'},{'url':'https://www.unicef.org/parenting/example','status':'eligible'}])
+        self.assertEqual(report['unique_eligible'],1)
+
     def test_read_only_monitor_has_no_pinned_dates_and_release_requirements_are_preserved(self):
         text=(p.ROOT/'.github/workflows/pages-health.yml').read_text()
         self.assertNotIn('2026-10-27',text);self.assertNotIn('2026-10-26',text)

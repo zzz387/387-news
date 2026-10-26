@@ -61,11 +61,6 @@
       "verification_urls": []
     },
     {
-      "url": "https://www.nasa.gov/history/alsj/",
-      "category_hint": "Москва и путешествия",
-      "verification_urls": []
-    },
-    {
       "url": "https://www.mskagency.ru/materials/3555954",
       "category_hint": "Москва и путешествия",
       "verification_urls": [
@@ -134,16 +129,6 @@
       "verification_urls": []
     },
     {
-      "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
-      "category_hint": "История и культура",
-      "verification_urls": []
-    },
-    {
-      "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
-      "category_hint": "История и культура",
-      "verification_urls": []
-    },
-    {
       "url": "https://science.nasa.gov/people/katherine-johnson/",
       "category_hint": "История и культура",
       "verification_urls": []
@@ -172,20 +157,6 @@
       "url": "https://www.cbr.ru/dkp/about_inflation/",
       "category_hint": "Экономика и бизнес",
       "verification_urls": []
-    },
-    {
-      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
-      "category_hint": "Технологии",
-      "verification_urls": [
-        "https://www.nasa.gov/technology/"
-      ]
-    },
-    {
-      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
-      "category_hint": "Технологии",
-      "verification_urls": [
-        "https://www.nasa.gov/technology/"
-      ]
     },
     {
       "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
@@ -220,15 +191,17 @@
       "verification_urls": []
     },
     {
-      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
-      "category_hint": "Семья",
-      "verification_urls": []
-    },
-    {
       "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
       "category_hint": "Семья",
       "verification_urls": [
         "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
+      "category_hint": "Здоровье и движение",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
       ]
     }
   ]

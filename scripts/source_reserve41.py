@@ -32,10 +32,20 @@ def run(catalog,fetch=source41.fetch):
                 except Exception as diagnostic:row['diagnostic_error']=type(diagnostic).__name__
             return row
     with ThreadPoolExecutor(max_workers=3) as pool:sources=list(pool.map(inspect,urls))
+    return evaluate(catalog,sources)
+
+
+def evaluate(catalog,sources):
+    candidates=catalog['candidates']
     by_url={r['url']:r for r in sources};eligible=[];rejected=[]
     for candidate in candidates:
         urls=[candidate['url']]+candidate.get('verification_urls',[])
         failures=[{'url':u,'code':by_url[u].get('code')} for u in urls if by_url[u]['status']!='eligible']
+        category=candidate.get('category_hint')
+        if not failures and category in ('Семья','Здоровье и движение'):
+            allowed=({'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org'} if category=='Здоровье и движение' else e.TRUSTED)
+            if len({e.publisher_identity(url) for url in urls})<2 or not any(e.host_matches(url,allowed) for url in urls):
+                failures.append({'url':candidate['url'],'code':'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'})
         if not failures:eligible.append(candidate)
         else:rejected.append({'url':candidate['url'],'topic_id':candidate['topic_id'],'failures':failures})
     published={r.get('source_url') for r in e.archive_entries(p.ROOT)}

@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-26T21:39:24.356838+00:00",
+  "checked_at": "2026-10-26T21:54:09.220085+00:00",
   "gemini_requests": 0,
   "sources": [
     {
@@ -239,13 +239,8 @@
     },
     {
       "url": "https://www.nasa.gov/history/alsj/",
-      "status": "eligible",
-      "mode": "INDEPENDENT_ARTICLE",
-      "rights": "allowed",
-      "content_hash": "4641161b201e21183502568f380a217c17f6054ad9748431c84e83521048f8bd",
-      "metadata_status": "verified",
-      "extraction": "complete",
-      "title": "The Apollo Lunar Surface Journal and Apollo Flight Journal"
+      "status": "blocked",
+      "code": 429
     },
     {
       "url": "https://www.mskagency.ru/materials/3555954",
@@ -349,28 +344,13 @@
     },
     {
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
-      "status": "blocked",
-      "code": "SOURCE_EXTRACTION_PARTIAL",
-      "structure": {
-        "method": "ambiguous",
-        "selected": 0,
-        "candidates": [
-          {
-            "tag": "html",
-            "id": null,
-            "class": null,
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "body",
-            "id": "yDmH0d",
-            "class": "tQj5Y ghyPEc IqBfM e2G3Fb EWZcud",
-            "itemprop": null,
-            "closed": true
-          }
-        ]
-      }
+      "status": "eligible",
+      "mode": "INDEPENDENT_ARTICLE",
+      "rights": "allowed",
+      "content_hash": "f09cece4c06e8ecde952fccd343be0aee793da21b213f00f9e8aae3d18689122",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Changes in Coffee Intake, Added Sugar and Long-Term Weight Gain - Results from Three Large Prospective US Cohort Studies"
     },
     {
       "url": "https://science.nasa.gov/mission/osiris-rex/",
@@ -384,23 +364,13 @@
     },
     {
       "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
-      "status": "eligible",
-      "mode": "INDEPENDENT_ARTICLE",
-      "rights": "allowed",
-      "content_hash": "52732de03889ee80c41876e9894066296592bb004dcfb9eb3013c62745544d37",
-      "metadata_status": "verified",
-      "extraction": "complete",
-      "title": "Apollo 11 Mission Overview - NASA"
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
     },
     {
       "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
-      "status": "eligible",
-      "mode": "INDEPENDENT_ARTICLE",
-      "rights": "allowed",
-      "content_hash": "f26bb971017b382b4e1a64a6f10958d8ac9205efc7881e8c0085210a1a1cce9c",
-      "metadata_status": "verified",
-      "extraction": "complete",
-      "title": "Katherine Johnson Biography - NASA"
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
     },
     {
       "url": "https://science.nasa.gov/people/katherine-johnson/",
@@ -479,13 +449,8 @@
     },
     {
       "url": "https://www.nasa.gov/technology/",
-      "status": "eligible",
-      "mode": "INDEPENDENT_ARTICLE",
-      "rights": "allowed",
-      "content_hash": "dd0d19f3359e586bd6708d8e25a51518bd5ca2d4e2a8a19588fde4af239ffaf4",
-      "metadata_status": "verified",
-      "extraction": "complete",
-      "title": "Technology Drives Exploration"
+      "status": "blocked",
+      "code": "ROBOTS_UNVERIFIED"
     },
     {
       "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
@@ -656,224 +621,13 @@
     },
     {
       "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
-      "status": "blocked",
-      "code": "SOURCE_EXTRACTION_PARTIAL",
-      "structure": {
-        "method": "ambiguous",
-        "selected": 0,
-        "candidates": [
-          {
-            "tag": "html",
-            "id": null,
-            "class": null,
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "body",
-            "id": null,
-            "class": "body--v4",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "Ibar__main",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "Ibar__journal Ibar__journal--main",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "article",
-            "id": null,
-            "class": "CardJournal",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "article",
-            "id": null,
-            "class": "Card CardRT2",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "Card__body",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ExpandablePanel__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "main",
-            "id": null,
-            "class": "ArticleDetailsV4__main",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "h1",
-            "id": null,
-            "class": "ArticleDetailsV4__main__title",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleDetailsV4__main__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "ArticleTable__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          },
-          {
-            "tag": "div",
-            "id": null,
-            "class": "References__content",
-            "itemprop": null,
-            "closed": true
-          }
-        ]
-      }
+      "status": "eligible",
+      "mode": "FULL_TRANSLATION",
+      "rights": "allowed",
+      "content_hash": "90d5e0f1c6281dbd421539f30f37bb03bd3bfa48cb8f42fa241df5338f001d60",
+      "metadata_status": "verified",
+      "extraction": "complete",
+      "title": "Differential impact of coffee quantity and sweetening on body composition parameters and inflammation"
     }
   ],
   "eligible_candidates": [
@@ -945,12 +699,6 @@
       "topic_id": "9",
       "category_hint": "Москва и путешествия",
       "url": "https://www.mskagency.ru/materials/3571845",
-      "verification_urls": []
-    },
-    {
-      "topic_id": "10",
-      "category_hint": "Москва и путешествия",
-      "url": "https://www.nasa.gov/history/alsj/",
       "verification_urls": []
     },
     {
@@ -1032,18 +780,6 @@
       "verification_urls": []
     },
     {
-      "topic_id": "17",
-      "category_hint": "История и культура",
-      "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
-      "verification_urls": []
-    },
-    {
-      "topic_id": "18",
-      "category_hint": "История и культура",
-      "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
-      "verification_urls": []
-    },
-    {
       "topic_id": "18",
       "category_hint": "История и культура",
       "url": "https://science.nasa.gov/people/katherine-johnson/",
@@ -1078,22 +814,6 @@
       "category_hint": "Экономика и бизнес",
       "url": "https://www.cbr.ru/dkp/about_inflation/",
       "verification_urls": []
-    },
-    {
-      "topic_id": "24",
-      "category_hint": "Технологии",
-      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
-      "verification_urls": [
-        "https://www.nasa.gov/technology/"
-      ]
-    },
-    {
-      "topic_id": "24",
-      "category_hint": "Технологии",
-      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
-      "verification_urls": [
-        "https://www.nasa.gov/technology/"
-      ]
     },
     {
       "topic_id": "7",
@@ -1134,17 +854,19 @@
       "verification_urls": []
     },
     {
-      "topic_id": "2",
-      "category_hint": "Семья",
-      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
-      "verification_urls": []
-    },
-    {
       "topic_id": "3",
       "category_hint": "Семья",
       "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
       "verification_urls": [
         "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship"
+      ]
+    },
+    {
+      "topic_id": "16",
+      "category_hint": "Здоровье и движение",
+      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
+      "verification_urls": [
+        "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults"
       ]
     }
   ],
@@ -1225,7 +947,27 @@
       "failures": [
         {
           "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
-          "code": "SOURCE_EXTRACTION_PARTIAL"
+          "code": "INDEPENDENT_SAFETY_EVIDENCE_REQUIRED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
+      "topic_id": "17",
+      "failures": [
+        {
+          "url": "https://www.nasa.gov/history/apollo-11-mission-overview/",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
+      "topic_id": "18",
+      "failures": [
+        {
+          "url": "https://www.nasa.gov/centers-and-facilities/langley/katherine-johnson-biography/",
+          "code": "ROBOTS_UNVERIFIED"
         }
       ]
     },
@@ -1235,6 +977,26 @@
       "failures": [
         {
           "url": "https://www.imf.org/en/Publications/fandd/issues/Series/Back-to-Basics/Inflation",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
+      "topic_id": "24",
+      "failures": [
+        {
+          "url": "https://www.nasa.gov/technology/",
+          "code": "ROBOTS_UNVERIFIED"
+        }
+      ]
+    },
+    {
+      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
+      "topic_id": "24",
+      "failures": [
+        {
+          "url": "https://www.nasa.gov/technology/",
           "code": "ROBOTS_UNVERIFIED"
         }
       ]
@@ -1250,12 +1012,12 @@
       ]
     },
     {
-      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
-      "topic_id": "16",
+      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+      "topic_id": "2",
       "failures": [
         {
-          "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
-          "code": "SOURCE_EXTRACTION_PARTIAL"
+          "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
+          "code": "INDEPENDENT_SAFETY_EVIDENCE_REQUIRED"
         }
       ]
     }
@@ -1267,7 +1029,7 @@
     },
     "2": {
       "topic": "Семейные занятия и совместный досуг",
-      "eligible_candidates": 2
+      "eligible_candidates": 1
     },
     "3": {
       "topic": "Супружеские отношения",
@@ -1291,7 +1053,7 @@
     },
     "10": {
       "topic": "Музеи и выставки",
-      "eligible_candidates": 2
+      "eligible_candidates": 1
     },
     "11": {
       "topic": "Архитектура и дизайн интерьеров",
@@ -1315,15 +1077,15 @@
     },
     "16": {
       "topic": "Современная медицина",
-      "eligible_candidates": 1
+      "eligible_candidates": 2
     },
     "17": {
       "topic": "Исторические загадки и открытия",
-      "eligible_candidates": 2
+      "eligible_candidates": 1
     },
     "18": {
       "topic": "Выдающиеся люди и необычные судьбы",
-      "eligible_candidates": 2
+      "eligible_candidates": 1
     },
     "21": {
       "topic": "Христианская история и философия",
@@ -1339,12 +1101,13 @@
     },
     "24": {
       "topic": "Инженерия, производство и технологии",
-      "eligible_candidates": 4
+      "eligible_candidates": 2
     }
   },
-  "unique_eligible": 39,
-  "not_previously_published": 38,
+  "unique_eligible": 34,
+  "not_previously_published": 33,
   "required_reserve": 14,
   "all_twenty_topics_covered": true,
-  "editorial_or_factual_approval": false
+  "editorial_or_factual_approval": false,
+  "network_check_run_id": 40408035238
 }
