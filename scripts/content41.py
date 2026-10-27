@@ -33,6 +33,17 @@ news.SCHEMAS['v41_independence']=schema({'approve':B,'issues':{'type':'array','i
     'unresolved':{'type':'array','items':S},**{name+'_checked':B for name in INDEPENDENCE_FIELDS}})
 
 
+
+def legacy_independence_response(result):
+    """Extra acknowledgments cannot negate four explicitly completed required checks."""
+    aliases={'композиция':'composition','формулировки':'wording','примеры':'examples','объяснения':'explanations'}
+    ids=result.get('covered_ids') if isinstance(result,dict) else None
+    if (not isinstance(ids,list) or any(not isinstance(value,str) for value in ids)
+            or result.get('approve') is not True or result.get('issues')!=[] or result.get('unresolved')!=[]):return None
+    mapped={aliases.get(value.strip().casefold(),value.strip().casefold()) for value in ids}
+    if not set(INDEPENDENCE_FIELDS)<=mapped:return None
+    return dict(result,covered_ids=list(INDEPENDENCE_FIELDS),legacy_acknowledgments=ids)
+
 def independence_response(result):
     if not isinstance(result,dict) or any(result.get(name+'_checked') is not True for name in INDEPENDENCE_FIELDS):
         raise policy.Blocked('INDEPENDENCE_PROTOCOL_INVALID')
