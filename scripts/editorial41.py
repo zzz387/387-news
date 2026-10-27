@@ -142,7 +142,7 @@ class Editor:
             if len(prompt)>policy.CONFIG['technical']['context_characters']:
                 raise policy.Blocked('OPERATION_CONTEXT_NEEDS_REVIEW','No input was clipped or sent; reduce the scope of this operation')
             usage=getattr(self,'usage_record',None)
-            stage=(getattr(self,'active_stage',None) if kwargs.get('schema') in ('v41_review','v41_issue') else None) or kwargs.get('schema','unknown')
+            stage=(getattr(self,'active_stage',None) if kwargs.get('schema') in ('v41_review','v41_issue','v41_independence') else None) or kwargs.get('schema','unknown')
             counter=None
             if usage is not None:
                 counter=usage.setdefault('model_usage',{}).setdefault(stage,{'operations':0,'http_requests':0,'completed':0,'failures':0})
@@ -539,14 +539,26 @@ class Editor:
             for member in group: progress['parts'][member['id']]=result
             self.persist()
         if stage=='editorial_checked' and record['mode']=='INDEPENDENT_ARTICLE' and (progress.get('independence_hash')!=fp or progress.get('independence_scope')!='all_commissioned_sources_v1'):
-            result=self.call('Проверка самостоятельности режима C. Отдельно проверь композицию, формулировки, '
+            transport=progress.setdefault('independence_protocol',{'failures':0})
+            while True:
+                if transport['failures']>=policy.CONFIG['technical']['content_attempts']:raise policy.Blocked('INDEPENDENCE_PROTOCOL_INVALID')
+                raw=self.call('Проверка самостоятельности режима C. Отдельно проверь композицию, формулировки, '
                 'подбор примеров и объяснения. Использование общих неохраняемых фактов допустимо без разрешения автора. '
                 'Но перевод, синонимический рерайт или сохранение охраняемой подборки не превращают произведение в самостоятельное. '
                 'Сомнения — unresolved. Для темы21 занятия нужен собственный набор и организация применимых действий, '
-                'а не перевод той же подборки. covered_ids=[composition,wording,examples,explanations]. '
+                'а не перевод той же подборки. '
+                'Верни approve,issues,unresolved и composition_checked,wording_checked,examples_checked,explanations_checked. '
+                'checked=true означает, что соответствующая проверка действительно выполнена, а не что текст одобрен. '
+                'При проблеме сохрани checked=true, но approve=false и конкретную причину в issues/unresolved. '
+                'Не возвращай covered_ids или идентификаторы фактов. '
                 '\nПолные оригиналы ВСЕХ использованных материалов (проверь самостоятельность относительно каждого): '+json.dumps([{'url':original['url'],'blocks':original['blocks']} for original in [source]+supporting],ensure_ascii=False)+
                 '\nСамостоятельная статья: '+json.dumps({'title':article['title'],'blocks':article['blocks'],'activities':article.get('activities',[])},ensure_ascii=False),
-                output_tokens=5000,schema='v41_review')
+                output_tokens=5000,schema='v41_independence')
+                try:result=content.independence_response(raw)
+                except policy.Blocked:
+                    transport['failures']+=1;transport['last_result']=copy.deepcopy(raw)
+                    event(state,record,'independence_protocol','retry_pending','INDEPENDENCE_PROTOCOL_INVALID');self.persist();continue
+                break
             try: content.approved_review(result,['composition','wording','examples','explanations'])
             except policy.Blocked:
                 record['rejected_part']={'stage':stage,'block_id':'','result':result,'scope':'article_independence'}; review_diagnostic(stage,result,independence=True); self.persist()
@@ -600,7 +612,7 @@ class Editor:
 
 
 def review_diagnostic(stage,result,scoped=False,independence=False):
-    text=json.dumps(result,ensure_ascii=False).casefold()
+    text=json.dumps({key:result.get(key,[]) for key in ('issues','unresolved')},ensure_ascii=False).casefold()
     classes=[]
     for code,pattern in [('INDEPENDENCE',r'копир|рерайт|перевод|композиц|подборк|самостоятель|copyright|independ'),
                          ('FACTS',r'факт|достовер|подтвержд|evidence|fact'),
@@ -609,7 +621,9 @@ def review_diagnostic(stage,result,scoped=False,independence=False):
         if re.search(pattern,text):classes.append(code)
     if independence and 'INDEPENDENCE' not in classes:classes.append('INDEPENDENCE')
     print('[review-diagnostic] '+json.dumps({'stage':stage,'scope':'section' if scoped else 'article',
-        'categories':classes or ['UNCLASSIFIED']}),flush=True)
+        'categories':classes or ['UNCLASSIFIED'],'approve':result.get('approve') is True,
+        'issues_count':len(result.get('issues',[])),'unresolved_count':len(result.get('unresolved',[])),
+        'coverage_complete':set(result.get('covered_ids',[]))==set(content.INDEPENDENCE_FIELDS) if independence else None}),flush=True)
 
 
 def begin_article_repair(state,record):

@@ -84,7 +84,7 @@ class SourceAndRightsTests(unittest.TestCase):
         def model(prompt,**kwargs):
             if prompt.startswith('Проверка самостоятельности'):
                 return {'approve':False,'issues':['Подборка воспроизведена'],'unresolved':[],
-                        'covered_ids':['composition','wording','examples','explanations']}
+                        **{key+'_checked':True for key in c.INDEPENDENCE_FIELDS}}
             part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0])
             return {'approve':True,'issues':[],'unresolved':[],'covered_ids':[part['id']]}
         with self.assertRaisesRegex(p.Blocked,'REVIEW_REJECTED'):

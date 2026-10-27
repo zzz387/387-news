@@ -293,9 +293,9 @@ class IssueTests(unittest.TestCase):
                 return {'id':section['id'],'finished':True,'blocks':[{'kind':'paragraph',
                     'text':'Собственная завершённая мысль '+section['id']+str(len(generated))}],
                     'activities':[],'covered_requirements':[]}
-            self.assertEqual(kwargs['schema'],'v41_review')
+            self.assertIn(kwargs['schema'],('v41_review','v41_independence'))
             if prompt.startswith('Проверка самостоятельности'):
-                return {'approve':True,'issues':[],'unresolved':[],'covered_ids':['composition','wording','examples','explanations']}
+                return {'approve':True,'issues':[],'unresolved':[],**{key+'_checked':True for key in c.INDEPENDENCE_FIELDS}}
             part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0]); members=part.get('pieces',[part]); reviews.extend(p['id'] for p in members)
             reject=any(member['block_id']=='s1/0' for member in members) and not failed
             if reject: failed.append(True)

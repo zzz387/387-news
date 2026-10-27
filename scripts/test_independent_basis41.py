@@ -67,7 +67,7 @@ class IndependentBasisTests(unittest.TestCase):
             if prompt.startswith('Проверка самостоятельности'):
                 self.assertIn('SYNTHETIC_SUPPORT_EXPRESSION',prompt)
                 return {'approve':False,'issues':['Synthetic support expression concern'],'unresolved':[],
-                        'covered_ids':['composition','wording','examples','explanations'],'affected_ids':[]}
+                        **{key+'_checked':True for key in __import__('scripts.content41',fromlist=['INDEPENDENCE_FIELDS']).INDEPENDENCE_FIELDS}}
             part=json.loads(prompt.split('\nЧасть: ')[1].split('\nПроверенные')[0])
             return {'approve':True,'issues':[],'unresolved':[],'covered_ids':[x['id'] for x in part.get('pieces',[part])],'affected_ids':[]}
         with self.assertRaisesRegex(p.Blocked,'REVIEW_REJECTED'):e.Editor(call=model).review(e.new_state('2026-10-27'),r,'editorial_checked')

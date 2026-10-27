@@ -145,3 +145,26 @@ and preserves all request/repair counters and usage telemetry. It cannot revive
 an arbitrary checkpoint. Remaining pending topics can progress without repeatedly
 rewriting a blocked topic. An issue with no remaining work and a real veto is
 still blocked and cannot publish.
+
+## Dedicated independence protocol
+
+The full-source independence operation now uses its own boolean acknowledgment
+schema: composition/wording/examples/explanations checked. A checked criterion is
+not an approval: approve=false, issues and unresolved retain their full force.
+Missing/false/non-boolean acknowledgments trigger at most three persisted
+transport retries and cannot trigger article recomposition. The generic chunk
+review's free-form covered_ids schema is no longer reused for this operation.
+A one-time migration rechecks an old refusal only when the old verdict explicitly
+approved the content with no concerns but had a wrong acknowledgment set. Actual
+negative verdicts are not reopened. Logs expose verdict/concern counts and coverage
+status, and classify only private concern text into predefined categories; a
+technical identifier containing 'facts' or 'date' cannot invent an editorial cause.
+
+A cached positive legacy audit can also be replayed without HTTP when all four
+required acknowledgments are explicitly present (additional check names are
+retained), approve is true and both concerns arrays are empty. This requires the
+identical article/source/rights fingerprint, all factual/completeness/source
+approvals, approved literary reviews of every body/activity chunk, full-source
+scope provenance, semantic structure and the special slot constraints. Any
+missing criterion, changed body, real concern or missing prior gate prevents
+local recovery. No verdict is fabricated and no quota reservation is removed.

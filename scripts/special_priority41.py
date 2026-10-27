@@ -108,3 +108,61 @@ def repair_protocol_v3(state):
         priority['status']='ACTIVE';priority.pop('reason',None)
     state['special_protocol_repair_revision']=3
     print('[special-protocol-migration] '+json.dumps({'revision':3,'slots':changed,'counters_preserved':True}),flush=True)
+
+
+def repair_independence_protocol_v4(state):
+    if state.get('independence_protocol_revision')==4:return
+    changed=[];recovered=[]
+    expected={'composition','wording','examples','explanations'}
+    for record in state['candidates']:
+        rejection=record.get('rejected_part',{});result=rejection.get('result',{})
+        if rejection.get('scope')=='article_independence':
+            formal=(result.get('approve') is True and not result.get('issues') and not result.get('unresolved') and set(result.get('covered_ids',[]))!=expected)
+            print('[independence-refusal-diagnostic] '+json.dumps({'slot':record['special_slot'],
+                'approve':result.get('approve') is True,'issues_count':len(result.get('issues',[])),
+                'unresolved_count':len(result.get('unresolved',[])),'coverage_complete':set(result.get('covered_ids',[]))==expected,
+                'formal_only':formal}),flush=True)
+            if record.get('status')=='needs_review' and formal:
+                if recover_complete_independence(state,record):recovered.append(record['special_slot'])
+                else:record['status']='preparing'
+                changed.append(record['special_slot'])
+    priority=state.get('production_priority',{})
+    if changed and priority.get('reason')=='SPECIAL_TOPIC_NEEDS_REVIEW':
+        priority.setdefault('repair_history',[]).append({'revision':4,'formal_recheck_slots':changed})
+        priority['status']='ACTIVE';priority.pop('reason',None)
+        if state.get('block_code')=='SPECIAL_EIGHT_FIXED_TOPICS_NOT_READY':
+            state['status']='RETRY_PENDING';state.pop('block_code',None)
+    state['independence_protocol_revision']=4
+    print('[independence-protocol-migration] '+json.dumps({'revision':4,'slots':changed,'locally_recovered':recovered,'articles_and_counters_preserved':True}),flush=True)
+
+
+def recover_complete_independence(state,record):
+    """Replay a complete, real positive audit; never infer a missing approval/check."""
+    from scripts import editorial41 as e,content41 as c,rights41
+    from scripts.special003r import unsupported_palette
+    result=c.legacy_independence_response(record.get('rejected_part',{}).get('result',{}))
+    if result is None or state.get('all_sources_independence_revision')!=1 or not record.get('article'):return False
+    article=record['article'];source=record['source'];fp=e.article_hash(article,source,record['rights'])
+    if any(not e.valid_gate(record,name,fp) for name in ('content_prepared','fact_checked','completeness_checked')):return False
+    source_gate=record.get('checks',{}).get('source_verified',{})
+    expected=p.digest({'source':source['content_hash'],'rights':record['rights'],'images':record.get('images',[])})
+    if not source_gate.get('approved') or source_gate.get('input_hash')!=expected or not source_gate.get('special_evidence_complete'):return False
+    review=record['progress'].get('reviews',{}).get('editorial_checked',{})
+    if review.get('input_hash')!=fp:return False
+    if any(not block.get('id') for block in article['blocks']):return False
+    parts=c.chunks(article['blocks'])
+    for item in article.get('activities',[]):parts.extend(c.chunks([{'id':'activity/'+item['id'],'kind':'paragraph','text':json.dumps(item,ensure_ascii=False)}]))
+    for part in parts:
+        verdict=review.get('parts',{}).get(part['id'],{})
+        if verdict.get('approve') is not True or verdict.get('issues') or verdict.get('unresolved') or part['id'] not in verdict.get('covered_ids',[]):return False
+    if article['category']!=record['category_hint'] or (record['special_slot']==2 and unsupported_palette(c.body(article))):return False
+    try:
+        rights41.require(source,article['mode'],record['rights']);c.semantic_structure(article,source)
+        c.approved_review(result,list(c.INDEPENDENCE_FIELDS))
+    except p.Blocked:return False
+    review.update(independence_hash=fp,independence_result=result,independence_scope='all_commissioned_sources_v1')
+    for name in ('editorial_checked','ready_to_publish'):
+        record['checks'][name]={'approved':True,'input_hash':fp,'revalidated_from':'complete_positive_legacy_audit'}
+    record['status']='ready';state['articles'][record['id']]=article
+    e.event(state,record,'independence_protocol','approved','COMPLETE_POSITIVE_AUDIT_REVALIDATED')
+    return True

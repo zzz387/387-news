@@ -379,6 +379,7 @@ def run():
         from scripts import special_priority41 as priority_queue
         priority_queue.repair_real_run_v2(state)
         priority_queue.repair_protocol_v3(state)
+        priority_queue.repair_independence_protocol_v4(state)
         news.runtime.merge_snapshot(ledger,state.get('_quota_snapshot',{}))
         if daily:news.runtime.merge_snapshot(ledger,daily.get('_quota_snapshot',{}))
         priority_active,priority_reason=priority_queue.reconcile(state)
