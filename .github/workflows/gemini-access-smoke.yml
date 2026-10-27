@@ -1,0 +1,65 @@
+name: TEMP Gemini API smoke test (three cities)
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main]
+    paths:
+      - '.github/workflows/gemini-access-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  check-gemini:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Test 3 authenticated Gemini requests (without publishing)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json, os, sys, time, urllib.request, urllib.error
+          key = os.environ.get("GEMINI_API_KEY", "").strip()
+          if not key:
+              print("ERROR: GEMINI_API_KEY secret unavailable in this job")
+              sys.exit(2)
+          url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent"
+          cities = ("Москва", "Киев", "Лондон")
+          ok = 0
+          for city in cities:
+              prompt = (
+                  "Сегодня 27 октября 2026 года. Найди в интернете и перечисли 10 "
+                  "главных новостей за СЕГОДНЯ для города " + city + ". "
+                  "Для каждой дай краткий заголовок и действующую ссылку на источник. "
+                  "Указывай только новости, опубликованные 27 октября 2026 года; "
+                  "не выдумывай события и ссылки, если не нашёл 10 — дай меньше. "
+                  "Ответ на русском языке. В начале напиши дату и город."
+              )
+              payload = {"contents":[{"role":"user","parts":[{"text":prompt}]}],
+                         "tools":[{"googleSearch":{}}],
+                         "generationConfig":{"temperature":0.2,"maxOutputTokens":1800}}
+              body=json.dumps(payload,ensure_ascii=False).encode("utf-8")
+              req=urllib.request.Request(url,data=body,method="POST",
+                      headers={"Content-Type":"application/json","x-goog-api-key":key})
+              t=time.monotonic()
+              print("\\n"+("="*25)+" "+city+" "+("="*25),flush=True)
+              try:
+                  with urllib.request.urlopen(req, timeout=85) as resp:
+                      data=json.load(resp)
+                  texts=[p.get("text","") for c in data.get("candidates",[]) for p in c.get("content",{}).get("parts",[]) if p.get("text")]
+                  text="\\n".join(texts)
+                  metadata = data.get("candidates",[{}])[0].get("groundingMetadata",{}) if data.get("candidates") else {}
+                  urls=[c.get("web",{}).get("uri") for c in metadata.get("groundingChunks",[]) if c.get("web",{}).get("uri")]
+                  print("HTTP=200; elapsed_s=%.1f; response_chars=%d; grounding_urls=%d; tokens=%s" %
+                        (time.monotonic()-t,len(text),len(urls),json.dumps(data.get("usageMetadata",{}),ensure_ascii=False)),flush=True)
+                  print("RESPONSE:\\n"+text[:7000],flush=True)
+                  print("GROUNDING_SOURCES:\\n"+"\\n".join(urls[:12]),flush=True)
+                  if text: ok+=1
+              except urllib.error.HTTPError as e:
+                  print("HTTP_ERROR=%s; elapsed_s=%.1f" % (e.code, time.monotonic()-t),flush=True)
+                  print("ERROR_BODY="+e.read(3000).decode("utf-8","replace"),flush=True)
+              except Exception as e:
+                  print("ERROR=%s: %s"%(type(e).__name__,str(e)[:600]),flush=True)
+          print("\\nFINAL: successful_requests=%d of %d"%(ok,len(cities)),flush=True)
+          sys.exit(0 if ok==len(cities) else 1)
+          PY
