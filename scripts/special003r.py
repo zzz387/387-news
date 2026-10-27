@@ -326,6 +326,7 @@ def run():
     priority_first=os.getenv('SPECIAL_PRIORITY_FIRST')=='true'
     if priority_first:
         from scripts import special_priority41 as priority_queue
+        priority_queue.repair_real_run_v2(state)
         news.runtime.merge_snapshot(ledger,state.get('_quota_snapshot',{}))
         if daily:news.runtime.merge_snapshot(ledger,daily.get('_quota_snapshot',{}))
         priority_active,priority_reason=priority_queue.reconcile(state)
