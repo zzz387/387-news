@@ -1,0 +1,94 @@
+"""Owner priority, bounded lifecycle and section repair: synthetic/no API calls."""
+import copy,json,os,tempfile,unittest
+from datetime import datetime,timedelta,timezone
+from pathlib import Path
+from unittest.mock import patch
+from scripts import special_priority41 as q,special003r as runner,policy41 as p,content41 as c,editorial41 as e,staged_news as stage
+from scripts.test_policy41 import record
+
+
+class PriorityTests(unittest.TestCase):
+    def test_priority_admits_at_night_without_daily_and_preserves_inputs(self):
+        now=datetime(2026,10,27,5,tzinfo=p.TZ);ledger={'day':'2026-10-27','requests':24,'models':{'lite':24},'cooldowns':{}}
+        before=copy.deepcopy(ledger)
+        self.assertEqual(runner.admit(p.ROOT,None,ledger,now,priority=True),(True,'SPECIAL_FIRST_OWNER_AUTHORIZED'))
+        self.assertEqual(ledger,before)
+        self.assertEqual(runner.remaining_run_limit(0,dict(ledger,requests=219),priority=True),1)
+        self.assertEqual(runner.remaining_run_limit(24,ledger,priority=True),0)
+
+    def test_priority_never_overrides_quota_or_cooldown(self):
+        now=datetime(2026,10,27,5,tzinfo=p.TZ)
+        self.assertEqual(runner.admit(p.ROOT,None,{'day':'2026-10-27','requests':220},now,priority=True)[1],'DAILY_QUOTA')
+        self.assertEqual(runner.admit(p.ROOT,None,{'day':'2026-10-26','requests':220,'cooldowns':{'lite':now.timestamp()+60}},now,priority=True)[1],'GEMINI_COOLDOWN')
+        self.assertTrue(runner.admit(p.ROOT,None,{'day':'2026-10-26','requests':220},now,priority=True)[0])
+        self.assertEqual(runner.admit(p.ROOT,None,{'day':'2026-10-28','requests':0},now,priority=True)[1],'FUTURE_SHARED_LEDGER')
+
+    def test_priority_survives_checkpoint_and_releases_only_after_https_verification(self):
+        state=runner.new_state();self.assertTrue(q.reconcile(state)[0]);key=bytes(range(32))
+        restored=stage.decipher(stage.cipher(state,key),key)
+        self.assertEqual(state['production_priority'],restored['production_priority'])
+        restored['audit_passed']=True;self.assertTrue(q.reconcile(restored)[0])
+        restored['publication_verified']=True;self.assertFalse(q.reconcile(restored)[0])
+        self.assertEqual(restored['production_priority']['status'],'COMPLETED')
+        restored.pop('publication_verified');self.assertFalse(q.reconcile(restored)[0])
+
+    def test_terminal_block_and_stalls_are_bounded_and_not_reactivated(self):
+        state=runner.new_state();q.reconcile(state)
+        for _ in range(4):q.finish_run(state,q.fingerprint(state),1)
+        self.assertEqual(q.reconcile(state)[1],'SPECIAL_PRIORITY_STALLED')
+        state['production_priority']['stalled_runs']=0
+        self.assertFalse(q.reconcile(state)[0])
+        other=runner.new_state();q.reconcile(other);other['candidates'][0]['status']='needs_review'
+        self.assertEqual(q.reconcile(other)[1],'SPECIAL_TOPIC_NEEDS_REVIEW')
+
+    def test_budget_wait_does_not_count_as_stall_and_time_limit_survives_restore(self):
+        state=runner.new_state();now=datetime(2026,10,27,5,tzinfo=p.TZ);q.reconcile(state,now)
+        q.finish_run(state,q.fingerprint(state),0)
+        self.assertEqual(state['production_priority']['stalled_runs'],0)
+        self.assertEqual(q.reconcile(copy.deepcopy(state),now+timedelta(hours=72))[1],'SPECIAL_PRIORITY_TIME_LIMIT')
+
+    def test_workflow_routes_special_first_under_original_mutex_and_cron(self):
+        daily=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
+        self.assertIn('needs: special-003-r',daily)
+        self.assertIn("needs.special-003-r.outputs.hold_daily == 'false'",daily)
+        self.assertIn("needs.special-003-r.outputs.run_used == '0'",daily)
+        self.assertIn('priority_first: true',daily)
+        self.assertIn("|| '387-news-stage-v31'",daily)
+        self.assertEqual(daily.count('- cron:'),6)
+        self.assertIn("cron: '54 2 * * *'",daily)
+        special=(p.ROOT/'.github/workflows/special-003-r.yml').read_text()
+        self.assertNotIn('schedule:',special)
+        self.assertNotIn('path: ${{ runner.temp }}/read-only-daily\n          retention',special)
+
+
+class SectionTests(unittest.TestCase):
+    def fixture(self):
+        r=record();r['mode']='INDEPENDENT_ARTICLE';r.pop('article');r['progress']={}
+        section={'id':'s1','requirement_ids':['r1'],'activity_count':0}
+        result={'id':'s1','finished':True,'blocks':[{'kind':'paragraph','text':'Другое самостоятельное объяснение.'}],
+                'activities':[],'covered_requirements':[],'covered_requirement_ids':['r1']}
+        return r,section,result
+
+    def test_requirement_ids_bind_exact_text_but_unknown_reference_is_rejected(self):
+        r,section,result=self.fixture();c.validate_section(result,section,r,{'r1':'Полный точный вопрос'})
+        self.assertEqual(result['covered_requirements'],['Полный точный вопрос'])
+        result['covered_requirement_ids']=['r100']
+        with self.assertRaisesRegex(p.Blocked,'SECTION_REQUIREMENT_REFERENCE_INVALID'):c.validate_section(result,section,r,{'r1':'Вопрос'})
+
+    def test_bad_block_is_rejected_before_accepted_cache(self):
+        r,section,result=self.fixture();result['blocks'][0]['kind']='list'
+        with self.assertRaisesRegex(p.Blocked,'ARTICLE_BLOCK_INVALID'):c.validate_section(result,section,r,{'r1':'Вопрос'})
+        self.assertNotIn('s1',r['progress'].get('sections',{}))
+
+    def test_activity_counts_and_real_content_duplicates_are_checked(self):
+        r,section,result=self.fixture();section['activity_count']=1
+        with self.assertRaisesRegex(p.Blocked,'SECTION_ACTIVITY_COUNT_MISMATCH'):c.validate_section(result,section,r,{'r1':'Вопрос'})
+        a={'id':'1','title':'Уникальное занятие','age':'После года','materials':['Кубик'],'steps':['Покажите кубик и передайте его ребёнку.'],'benefit':'Совместное внимание','safety':'Под наблюдением взрослого'}
+        result['activities']=[a];r['progress']['sections']={'old':{'activities':[dict(a,id='other')]}}
+        with self.assertRaisesRegex(p.Blocked,'REPEATED_ACTIVITY_CONTENT'):c.validate_section(result,section,r,{'r1':'Вопрос'})
+
+    def test_event_reference_must_witness_the_actual_calendar_date(self):
+        self.assertTrue(c.witnessed_event_date('2026-10-26','26 октября 2026 года прошло открытие.'))
+        self.assertTrue(c.witnessed_event_date('2026-10-26','October 26, 2026 marked the event.'))
+        self.assertFalse(c.witnessed_event_date('2026-10-27','The study was conducted in 2026.'))
+        self.assertFalse(c.witnessed_event_date('2026-10-27','26 октября 2026 года.'))

@@ -18,10 +18,10 @@ news.SCHEMAS.update({
                        'requirements':{'type':'array','items':S},'topic_key':S,'event_date':S,'event_date_quote':S,'event_evidence_id':S,
                        'category':{'type':'string','enum':list(policy.CATEGORIES)},'kind':S,'worth_publishing':B,'reader_value':S,
                        'covered_ids':{'type':'array','items':S}}),
- 'v41_outline':schema({'title':S,'teaser':S,'category':S,'kind':S,'sections':{'type':'array','items':schema({'id':S,'heading':S,'purpose':S,'fact_ids':{'type':'array','items':S}})}}),
- 'v41_section':schema({'id':S,'finished':B,'blocks':{'type':'array','items':schema({'kind':S,'text':S})},
+ 'v41_outline':schema({'title':S,'teaser':S,'category':S,'kind':S,'sections':{'type':'array','items':schema({'id':S,'heading':S,'purpose':S,'fact_ids':{'type':'array','items':S},'requirement_ids':{'type':'array','items':S},'activity_count':{'type':'integer','minimum':0}})}}),
+ 'v41_section':schema({'id':S,'finished':B,'blocks':{'type':'array','items':schema({'kind':{'type':'string','enum':['title','heading','paragraph','item','quote','table']},'text':S})},
      'activities':{'type':'array','items':schema({'id':S,'title':S,'age':S,'materials':{'type':'array','items':S},
-        'steps':{'type':'array','items':S},'benefit':S,'safety':S})},'covered_requirements':{'type':'array','items':S}}),
+        'steps':{'type':'array','items':S},'benefit':S,'safety':S})},'covered_requirements':{'type':'array','items':S},'covered_requirement_ids':{'type':'array','items':S}}),
  'v41_practical':schema({'id':S,'title':S,'age':S,'materials':{'type':'array','items':S},
                            'steps':{'type':'array','items':S},'benefit':S,'safety':S}),
  'v41_review':schema({'approve':B,'issues':{'type':'array','items':S},'unresolved':{'type':'array','items':S},
@@ -189,3 +189,50 @@ def approved_review(result,expected_ids):
             or result.get('unresolved') or not isinstance(result.get('covered_ids'),list)
             or set(result['covered_ids'])!=set(expected_ids)):
         raise policy.Blocked('REVIEW_REJECTED',json.dumps(result,ensure_ascii=False))
+
+
+def validate_section(result,section,record,requirements):
+    if (not isinstance(result,dict) or result.get('id')!=section['id'] or result.get('finished') is not True
+            or not isinstance(result.get('blocks'),list) or not result['blocks']
+            or not isinstance(result.get('activities'),list)):
+        raise policy.Blocked('SECTION_INCOMPLETE')
+    covered=list(result.get('covered_requirements',[]))
+    selected=result.get('covered_requirement_ids',[])
+    if not isinstance(selected,list) or not set(selected)<=set(requirements):raise policy.Blocked('SECTION_REQUIREMENT_REFERENCE_INVALID')
+    if selected:covered=[requirements[key] for key in selected]
+    if not set(covered)<=set(requirements.values()):raise policy.Blocked('SECTION_REQUIREMENT_REFERENCE_INVALID')
+    result['covered_requirements']=covered
+    if section.get('requirement_ids') and not set(section['requirement_ids'])<=set(selected):
+        raise policy.Blocked('SECTION_REQUIRED_COVERAGE_MISSING')
+    if 'activity_count' in section and len(result['activities'])!=section['activity_count']:
+        raise policy.Blocked('SECTION_ACTIVITY_COUNT_MISMATCH')
+    # Validate a section without imposing the whole article's promised activity count.
+    source=dict(record['source'],title='')
+    semantic_structure({'title':'Самостоятельный раздел','mode':'INDEPENDENT_ARTICLE',
+                        'blocks':result['blocks'],'activities':result['activities']},source)
+    prior=[item for key,value in record['progress'].get('sections',{}).items() if key!=section['id'] for item in value.get('activities',[])]
+    signatures={normalized(item['title']) for item in prior}
+    instructions={normalized(' '.join(item['steps'])) for item in prior}
+    for item in result['activities']:
+        if normalized(item['title']) in signatures or normalized(' '.join(item['steps'])) in instructions:
+            raise policy.Blocked('REPEATED_ACTIVITY_CONTENT')
+        signatures.add(normalized(item['title']));instructions.add(normalized(' '.join(item['steps'])))
+    return result
+
+
+def witnessed_event_date(value,quote):
+    """Require the declared calendar date in the literal witness, not metadata."""
+    from datetime import datetime
+    try:date=datetime.fromisoformat(value.replace('Z','+00:00')).date()
+    except (ValueError,TypeError,AttributeError):return False
+    text=quote.casefold()
+    if date.isoformat() in text:return True
+    numeric=rf'(?<!\d)0?{date.day}[./]0?{date.month}[./]{date.year}(?!\d)'
+    if re.search(numeric,text):return True
+    months=[('января','january'),('февраля','february'),('марта','march'),('апреля','april'),
+            ('мая','may'),('июня','june'),('июля','july'),('августа','august'),
+            ('сентября','september'),('октября','october'),('ноября','november'),('декабря','december')]
+    for month in months[date.month-1]:
+        if re.search(rf'(?<!\d)0?{date.day}\s+{month}\s*,?\s*{date.year}(?!\d)',text):return True
+        if re.search(rf'\b{month}\s+0?{date.day}\s*,?\s*{date.year}(?!\d)',text):return True
+    return False

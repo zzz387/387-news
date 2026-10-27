@@ -333,9 +333,10 @@ jobs:
           if-no-files-found: error
 
   prepare:
+    needs: special-003-r
     # Owner authorized direct v4.1 production rollout on 2026-10-26.
     # Repository variables and all technical/editorial publication gates remain mandatory.
-    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && !contains(github.event.head_commit.message, '[maintenance only]') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
+    if: ${{ github.ref == 'refs/heads/main' && always() && (needs.special-003-r.result == 'skipped' || (needs.special-003-r.result == 'success' && needs.special-003-r.outputs.hold_daily == 'false' && needs.special-003-r.outputs.run_used == '0')) && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && !contains(github.event.head_commit.message, '[maintenance only]') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -560,12 +561,12 @@ jobs:
         run: python scripts/release_monitor.py
 
   special-003-r:
-    needs: [prepare, deploy, monitor]
-    if: ${{ always() && github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && needs.prepare.result == 'success' && needs.monitor.result == 'success' && (github.event_name == 'schedule' || github.event_name == 'push') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
-    # The caller's existing 387-news-stage-v31 mutex covers this entire tail.
+    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && !contains(github.event.head_commit.message, '[maintenance only]')) || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.preview == false && (inputs.phase == 'run' || inputs.phase == 'resume'))) }}
+    # Same root mutex, existing schedule; owner now gives 003-R first use of quota.
     uses: ./.github/workflows/special-003-r.yml
     with:
-      daily_run_used: ${{ fromJSON(needs.prepare.outputs.pipeline_status).run_used }}
+      daily_run_used: 0
+      priority_first: true
     secrets: inherit
 
   special-initialize:
