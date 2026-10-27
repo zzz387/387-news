@@ -22,7 +22,7 @@ class ReviewProtocolTests(unittest.TestCase):
             responses.append(ids)
             return {'approve':True,'issues':[],'unresolved':[],'covered_ids':['wrong'] if len(responses)==1 else ids,'affected_ids':[]}
         before=copy.deepcopy(r['article']);e.Editor(call=call).review(e.new_state('2026-10-27'),r,'fact_checked')
-        self.assertEqual(len(responses),1+len(c.operation_groups(c.chunks(r['article']['blocks']))));self.assertEqual(r['article'],before)
+        self.assertEqual(len(responses),1+len(c.operation_groups(c.review_parts(r['article'],r))));self.assertEqual(r['article'],before)
         self.assertNotIn('article_repair_count',r['progress']);self.assertTrue(r['checks']['fact_checked']['approved'])
 
     def test_outline_requirement_strings_canonicalize_but_unknown_refs_cannot_reach_writer(self):

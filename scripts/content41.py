@@ -50,6 +50,29 @@ def independence_response(result):
     # Normalize explicit completed checks, preserving the actual verdict and every concern.
     return dict(result,covered_ids=list(INDEPENDENCE_FIELDS),affected_ids=[])
 
+news.SCHEMAS['v41_fact_inventory']=schema({'finished':B,'items':{'type':'array','items':schema({
+    'id':S,'finished':B,'kind':{'type':'string','enum':['unprotected_fact','attributed_opinion','protected_expression','not_supported']},
+    'subject':S,'relation':S,'value':S,'qualifiers':{'type':'array','items':S},'reason':S})}})
+
+READER_REVIEW_SCOPE='title_teaser_body_v2'
+INDEPENDENCE_REVIEW_SCOPE='all_sources_title_teaser_body_v2'
+news.SCHEMAS['v41_header']=schema({'finished':B,'title':S,'teaser':S})
+
+
+def review_parts(article,record):
+    metadata=[{'id':'reader-meta/title','kind':'title','text':article['title']}]
+    if article.get('teaser','').strip():metadata.append({'id':'reader-meta/teaser','kind':'paragraph','text':article['teaser']})
+    parts=chunks(metadata)
+    if record['mode']=='FULL_TRANSLATION':
+        parts += [{'id':piece['id'],'block_id':piece['block_id'],'kind':piece['kind'],
+                   'text':record['progress']['translated'][piece['id']],'source_piece':piece}
+                  for piece in chunks(record['source']['blocks'])]
+    else:parts += chunks(article['blocks'])
+    for item in article.get('activities',[]):
+        parts.extend(dict(part,section_id=item.get('section_id')) for part in chunks([
+            {'id':'activity/'+item['id'],'kind':'paragraph','text':json.dumps(item,ensure_ascii=False)}]))
+    return parts
+
 # Required in real model responses; legacy accepted checkpoints retain their original covered IDs.
 news.SCHEMAS['v41_review']['properties']['affected_ids']={'type':'array','items':S}
 news.SCHEMAS['v41_review']['required'].append('affected_ids')
@@ -217,7 +240,7 @@ def validate_section(result,section,record,requirements):
     if (not isinstance(result,dict) or result.get('id')!=section['id'] or result.get('finished') is not True
             or not isinstance(result.get('blocks'),list) or not result['blocks']
             or not isinstance(result.get('activities'),list)):
-        raise policy.Blocked('SECTION_INCOMPLETE')
+        raise policy.Blocked('SECTION_INCOMPLETE',json.dumps({'expected_id':section['id'],'received_id':result.get('id') if isinstance(result,dict) else None,'finished':result.get('finished') if isinstance(result,dict) else None}))
     covered=list(result.get('covered_requirements',[]))
     selected=result.get('covered_requirement_ids',[])
     if not isinstance(selected,list) or not set(selected)<=set(requirements):raise policy.Blocked('SECTION_REQUIREMENT_REFERENCE_INVALID')
@@ -278,11 +301,11 @@ def restore_review_ids(result,aliases):
     return result
 
 
-def validate_outline(outline,record):
+def validate_outline(outline,record,writer_facts=None):
     sections=outline.get('sections',[])
     if not sections or outline.get('category') not in policy.CATEGORIES:raise policy.Blocked('OUTLINE_INVALID')
     if len({s['id'] for s in sections})!=len(sections):raise policy.Blocked('OUTLINE_SECTION_DUPLICATE')
-    facts={c['id'] for c in record['claims']}
+    facts={c['id'] for c in (record['claims'] if writer_facts is None else writer_facts)}
     refs={'r'+str(i+1):text for i,text in enumerate(record['requirements'])}
     reverse={text:key for key,text in refs.items()}
     for section in sections:
@@ -297,3 +320,81 @@ def validate_outline(outline,record):
     if modern and expected is not None and (any(type(s.get('activity_count')) is not int or s['activity_count']<0 for s in sections)
             or sum(s['activity_count'] for s in sections)!=expected):raise policy.Blocked('OUTLINE_ACTIVITY_ALLOCATION_INVALID')
     return True
+
+
+def neutral_fact_inventory(record,call,persist=lambda:None):
+    """Every grounded item is checkpointed; the C writer receives no source prose."""
+    raw=[];seen=set()
+    for claim in record['claims']:
+        key=policy.digest(claim)
+        if key not in seen:raw.append(dict(claim,_inventory_key=key));seen.add(key)
+    if not raw:raise policy.Blocked('INDEPENDENT_FACT_BASE_EMPTY')
+    metadata=[{key:source.get(key,'') for key in ('id','url','title','publisher','author','published','language')}
+              for source in [record.get('source',{})]+record.get('supporting_sources',[])]
+    signature=policy.digest({'claims':raw,'metadata':metadata})
+    inventory=record['progress'].setdefault('neutral_inventories',{}).setdefault(signature,{'items':{},'attempts':{},'failure_counts':{}})
+    failures=inventory.setdefault('failure_counts',{})
+    pending=[claim for claim in raw if claim['_inventory_key'] not in inventory['items']]
+    groups=[];group=[];size=0
+    for claim in pending:
+        length=len(json.dumps(claim,ensure_ascii=False))
+        if group and size+length>policy.CONFIG['technical']['review_operation_characters']:
+            groups.append(group);group=[];size=0
+        group.append(claim);size+=length
+    if group:groups.append(group)
+    for original_group in groups:
+        identity=policy.digest([item['_inventory_key'] for item in original_group])
+        attempt=inventory['attempts'].setdefault(identity,{'failures':0})
+        while True:
+            group=[claim for claim in original_group if claim['_inventory_key'] not in inventory['items']]
+            if not group:break
+            if any(failures.get(claim['_inventory_key'],0)>=policy.CONFIG['technical']['content_attempts'] for claim in group):
+                raise policy.Blocked('NEUTRAL_FACT_PROTOCOL_EXHAUSTED')
+            aliases={'f'+str(i+1):claim for i,claim in enumerate(group)}
+            result=call('Исследовательская стадия, НЕ написание и не рерайт статьи. '
+                'Для каждого входного утверждения верни item с точным коротким id fN. '
+                'Отдели неохраняемые факты/общие идеи и методы от охраняемой авторской формы. '
+                'Общие игровые методы и факты не требуют разрешения автора; не объявляй их защищёнными только потому, что они описаны в источнике. '
+                'unprotected_fact — нейтральная тройка subject,relation,value и необходимые фактические qualifiers; '
+                'без авторского голоса, метафор, готовых абзацев и порядка исходной статьи. '
+                'attributed_opinion — явно чьё мнение/намерение, не установленный научный факт. '
+                'protected_expression — только охраняемая конкретная форма/оригинальный авторский пример, не сама общая идея. '
+                'not_supported — значение не следует из свидетельства. Не выдумывай недостающие данные и не меняй числа. '
+                'reason для исключений остаётся исследовательским пояснением; пишущая модель его не получит. '
+                'У каждого item finished=true только если эта тройка/классификация полностью завершена. '
+                'Весь ответ finished=true только после всех id. При нехватке ответа верни законченные items с их finished=true, '
+                'а общий finished=false: принятые items не придётся повторять. '
+                'Входные утверждения с доказательствами: '+json.dumps([
+                    {**{key:value for key,value in claim.items() if key!='_inventory_key'},'id':alias} for alias,claim in aliases.items()],ensure_ascii=False)+
+                '\nМетаданные источников (не путать дату публикации с датой события): '+json.dumps(metadata,ensure_ascii=False)+
+                '\nПредыдущий исследовательский/редакционный отказ: '+json.dumps(record.get('rejected_part',{}),ensure_ascii=False)+
+                '\nРедакционное задание: '+json.dumps(record.get('commission',{}),ensure_ascii=False)+
+                '\nПредыдущая ошибка формата: '+str(attempt.get('code','')),
+                output_tokens=10000,schema='v41_fact_inventory')
+            items=result.get('items',[]) if isinstance(result,dict) else []
+            valid_response=isinstance(result,dict) and type(result.get('finished')) is bool and isinstance(items,list)
+            if not valid_response:items=[]
+            counts={alias:sum(isinstance(item,dict) and item.get('id')==alias for item in items) for alias in aliases}
+            accepted={}
+            for item in items:
+                if not isinstance(item,dict) or item.get('id') not in aliases or counts[item['id']]!=1 or item.get('finished') is not True:continue
+                kind=item.get('kind')
+                if kind not in ('unprotected_fact','attributed_opinion','protected_expression','not_supported'):continue
+                if kind in ('unprotected_fact','attributed_opinion'):
+                    if (any(not isinstance(item.get(key),str) or not item[key].strip() for key in ('subject','relation','value'))
+                            or not isinstance(item.get('qualifiers'),list) or any(not isinstance(q,str) for q in item['qualifiers'])):continue
+                elif not isinstance(item.get('reason'),str) or not item['reason'].strip():continue
+                original=aliases[item['id']]
+                accepted[original['_inventory_key']]={'source_claim_id':original['id'],'source_id':original['source_id'],
+                    'kind':kind,**{key:item.get(key,'') for key in ('subject','relation','value','qualifiers','reason')}}
+            if accepted:
+                inventory['items'].update(accepted);persist()
+            else:
+                attempt['failures']+=1;attempt['code']='NEUTRAL_FACT_COVERAGE_INVALID';attempt['last_result']=result
+                for claim in group:failures[claim['_inventory_key']]=failures.get(claim['_inventory_key'],0)+1
+                print('[neutral-facts] '+json.dumps({'code':attempt['code'],'attempt':attempt['failures']}),flush=True);persist()
+    facts=[{key:item[key] for key in ('source_claim_id','source_id','kind','subject','relation','value','qualifiers')}
+           for item in inventory['items'].values() if item['kind'] in ('unprotected_fact','attributed_opinion')]
+    if not facts:raise policy.Blocked('INDEPENDENT_FACT_BASE_EMPTY')
+    ordered=sorted(facts,key=lambda item:(item['subject'].casefold(),item['relation'].casefold(),item['value'].casefold(),item['source_id'],item['source_claim_id']))
+    return [dict({key:value for key,value in item.items() if key!='source_claim_id'},id='fact'+str(i+1)) for i,item in enumerate(ordered)]

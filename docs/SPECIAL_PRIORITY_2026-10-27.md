@@ -168,3 +168,50 @@ approvals, approved literary reviews of every body/activity chunk, full-source
 scope provenance, semantic structure and the special slot constraints. Any
 missing criterion, changed body, real concern or missing prior gate prevents
 local recovery. No verdict is fabricated and no quota reservation is removed.
+
+## Next-quota preparation: neutral factual inventory
+
+Protected diagnostic run 40461811032 confirmed five substantive negative
+independence verdicts (not merely acknowledgment errors). None was overridden.
+The current shared project guard is exhausted at 220/220: 48 daily reservations
+and 172 special reservations. The original site remains unchanged.
+
+Independent writing now has a resumable research representation between verified
+claims and the outline: source-bound subject/relation/value/qualifiers, with
+explicit attributed opinion and separately retained protected/unsupported items.
+Research sees the evidence; the C outline and section writer receive only the
+neutral inventory in canonical order, not the source's narrative fact wording,
+source quotation or source arrangement. Short fact aliases are bound by the
+program; equal local claim IDs from different sources cannot overwrite facts.
+An empty supported inventory rejects the topic instead of inventing material.
+Completed individual items from incomplete responses survive across runs; only
+missing items are requested, and nonproductive retries remain bounded per fact.
+Every factual, completeness, language, full-source independence and issue audit
+remains mandatory.
+
+One preparation revision archives only the five independent works that received
+substantive independence vetoes. Their source research, prior drafts, all usage
+and repair counters stay retained. The changed representation has its own plan
+namespace and does not consume the old failed section identities. There is no
+new quota, key, model or cron. The new stage cannot be tested with real inference
+until the unchanged daily guard allows requests again; diagnostics record that
+limitation explicitly. The next nominal eligible existing cron after the current
+UTC accounting day is 28 October at 03:17 Moscow (provider cooldown/429 can defer
+it further). Later scheduled wake-ups may inspect/save without model calls.
+
+## Reader metadata is part of editorial content
+
+Title and teaser are now explicit review parts at factual, completeness and
+literary gates. Full-source independence also compares the teaser. Previously the
+title was supplied as context, but the teaser was not an explicitly reviewed part.
+A rejected header is attributed to the header and can be repaired within the
+existing local-repair bound without regenerating accepted body sections. All
+checks repeat against the changed fingerprint. Production special validation
+requires the new review scope; old body-only approvals cannot silently authorize
+an unreviewed teaser. Header scope migration preserves accepted body text.
+
+The neutral-source merge also retains distinct facts when two sources reuse the
+same local claim ID. Existing accepted source analyses and companion evidence
+recover those facts without another research API call. All raw claims and prior
+preparations remain in the encrypted checkpoint; only the representation supplied
+to the C writer changes.

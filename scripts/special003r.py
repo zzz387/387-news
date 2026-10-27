@@ -194,9 +194,18 @@ def probe():
 
 
 
+
+def merge_claims(*groups):
+    result=[];seen=set()
+    for group in groups:
+        for claim in group:
+            key=p.digest(claim)
+            if key not in seen:result.append(copy.deepcopy(claim));seen.add(key)
+    return result
+
 def neutral_fact_base(plan,evidence):
     if not set(plan['fact_base_urls'])<=set(evidence):raise p.Blocked('SPECIAL_NEUTRAL_FACT_BASE_INCOMPLETE')
-    return [copy.deepcopy(claim) for url in plan['fact_base_urls'] for claim in evidence[url]['claims']]
+    return merge_claims(*[evidence[url]['claims'] for url in plan['fact_base_urls']])
 
 def unsupported_palette(text):
     return bool(re.search(r'(?i)(?:100|сотн\w*|ста|сто)\s+(?:[\w-]+\s+){0,2}(?:оттен\w*|расцвет\w*|цветов\w*\s+(?:решен\w*|вариант\w*))',text))
@@ -226,8 +235,7 @@ class Editor(e.Editor):
                 evidence[url]={'source':source,'claims':item['claims']};self.persist()
         record['supporting_sources']=[item['source'] for item in evidence.values()]
         if record['mode']=='INDEPENDENT_ARTICLE':
-            primary=list(record['claims']);ids={x['id'] for x in primary}
-            record['claims']=primary+[c for item in evidence.values() for c in item['claims'] if c['id'] not in ids]
+            record['claims']=merge_claims(record['claims'],*[item['claims'] for item in evidence.values()])
         if plan.get('fact_base_urls'):
             record['primary_analysis_claims']=copy.deepcopy(record['claims'])
             record['claims']=neutral_fact_base(plan,evidence)
@@ -377,9 +385,11 @@ def run():
     priority_first=os.getenv('SPECIAL_PRIORITY_FIRST')=='true'
     if priority_first:
         from scripts import special_priority41 as priority_queue
+        priority_queue.enable_header_review_v2(state)
         priority_queue.repair_real_run_v2(state)
         priority_queue.repair_protocol_v3(state)
         priority_queue.repair_independence_protocol_v4(state)
+        priority_queue.enable_neutral_writer_v1(state)
         news.runtime.merge_snapshot(ledger,state.get('_quota_snapshot',{}))
         if daily:news.runtime.merge_snapshot(ledger,daily.get('_quota_snapshot',{}))
         priority_active,priority_reason=priority_queue.reconcile(state)
@@ -409,7 +419,9 @@ def run():
     admitted,reason=admit(root,daily,ledger,priority=priority_first)
     daily_used=int(os.getenv('NEWS_DAILY_RUN_USED','24'))
     if priority_first and not priority_active:admitted,reason=False,priority_reason
-    if remaining_run_limit(daily_used,ledger,priority=priority_first)==0:admitted,reason=False,'DAILY_USED_RUN_BUDGET'
+    if remaining_run_limit(daily_used,ledger,priority=priority_first)==0:
+        reason='DAILY_QUOTA' if ledger.get('day')==datetime.now(timezone.utc).date().isoformat() and ledger.get('requests',0)>=220 else 'DAILY_USED_RUN_BUDGET'
+        admitted=False
     if stale_shared:admitted,reason=False,'SPECIAL_SHARED_LEDGER_STALE'
     if os.getenv('SPECIAL_INITIALIZE_ONLY')=='true':admitted,reason=False,'INITIALIZED_ONLY_NO_GEMINI'
     if admitted and not priority_first:

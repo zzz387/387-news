@@ -1,6 +1,6 @@
 """One owner-authorized priority, stored inside the existing special checkpoint."""
 from datetime import datetime,timedelta
-import json,os
+import copy,json,os
 from scripts import policy41 as p,special_contract41 as sc
 
 
@@ -56,7 +56,10 @@ def emit(state,used=0):
         'slots':[{'slot':r['special_slot'],'status':r['status'],
                   'sections':len(r.get('progress',{}).get('sections',{})),
                   'code':(r.get('history') or [{}])[-1].get('code')} for r in state['candidates']],
-        'run_used':used,'publication_verified':bool(state.get('publication_verified'))}
+        'run_used':used,'publication_verified':bool(state.get('publication_verified')),
+        'quota_day':state.get('_quota_snapshot',{}).get('day'),'requests_used':state.get('_quota_snapshot',{}).get('requests'),
+        'next_scheduled_attempt':next_scheduled_attempt(state.get('_quota_snapshot',{}))}
+    state['next_attempt']=value['next_scheduled_attempt']
     print('[special-priority] '+json.dumps(value),flush=True)
     with open(os.environ['GITHUB_OUTPUT'],'a') as stream:
         stream.write('hold_daily='+str(hold).lower()+'\nrun_used='+str(used)+'\n')
@@ -141,6 +144,7 @@ def recover_complete_independence(state,record):
     from scripts import editorial41 as e,content41 as c,rights41
     from scripts.special003r import unsupported_palette
     result=c.legacy_independence_response(record.get('rejected_part',{}).get('result',{}))
+    if state.get('header_review_revision')==2:return False  # old response did not compare the teaser
     if result is None or state.get('all_sources_independence_revision')!=1 or not record.get('article'):return False
     article=record['article'];source=record['source'];fp=e.article_hash(article,source,record['rights'])
     if any(not e.valid_gate(record,name,fp) for name in ('content_prepared','fact_checked','completeness_checked')):return False
@@ -166,3 +170,56 @@ def recover_complete_independence(state,record):
     record['status']='ready';state['articles'][record['id']]=article
     e.event(state,record,'independence_protocol','approved','COMPLETE_POSITIVE_AUDIT_REVALIDATED')
     return True
+
+
+def enable_neutral_writer_v1(state):
+    if state.get('neutral_writer_revision')==1:return
+    changed=[]
+    for record in state['candidates']:
+        rejection=record.get('rejected_part',{});verdict=rejection.get('result',{})
+        if (record.get('status')=='needs_review' and record.get('mode')=='INDEPENDENT_ARTICLE'
+                and rejection.get('scope')=='article_independence' and verdict.get('approve') is False):
+            progress=record['progress']
+            progress.setdefault('prior_writer_bases',[]).append({'article':record.pop('article',None),
+                'outline':progress.pop('outline',None),'sections':progress.pop('sections',{}),
+                'reviews':progress.pop('reviews',{}),'claims':copy.deepcopy(record.get('claims',[])),
+                'refusal':copy.deepcopy(rejection)})
+            from scripts.special003r import merge_claims,neutral_fact_base
+            evidence=record.get('special_evidence',{});plan=record.get('evidence_plan',{})
+            if plan.get('fact_base_urls') and set(plan['fact_base_urls'])<=set(evidence):
+                record['claims']=neutral_fact_base(plan,evidence)
+            elif record.get('source'):
+                primary=[claim for value in progress.get('analysis',{}).values() for claim in value.get('claims',[])]
+                if not primary:primary=[claim for claim in record.get('claims',[]) if claim.get('source_id')==record['source']['id']]
+                record['claims']=merge_claims(primary,*[item['claims'] for item in evidence.values()])
+            progress['writer_basis_revision']='neutral-v1'
+            for name in p.STAGES:
+                if name!='source_verified':record['checks'].pop(name,None)
+            record['status']='preparing';state['articles'].pop(record['id'],None);changed.append(record['special_slot'])
+    priority=state.get('production_priority',{})
+    if changed and priority.get('reason')=='SPECIAL_TOPIC_NEEDS_REVIEW':
+        priority.setdefault('repair_history',[]).append({'neutral_writer_revision':1,'slots':changed})
+        priority['status']='ACTIVE';priority.pop('reason',None)
+        if state.get('block_code')=='SPECIAL_EIGHT_FIXED_TOPICS_NOT_READY':state['status']='RETRY_PENDING';state.pop('block_code',None)
+    state['neutral_writer_revision']=1
+    print('[neutral-writer-migration] '+json.dumps({'slots':changed,'prior_text_and_counters_preserved':True}),flush=True)
+
+
+def next_scheduled_attempt(ledger,now=None):
+    from scripts import pipeline
+    from datetime import timezone
+    now=now or datetime.now(p.TZ);earliest=now
+    if ledger.get('day')==now.astimezone(timezone.utc).date().isoformat() and ledger.get('requests',0)>=220:
+        day=now.astimezone(timezone.utc).date()+timedelta(days=1)
+        earliest=datetime.combine(day,datetime.min.time(),tzinfo=timezone.utc).astimezone(p.TZ)
+    for until in ledger.get('cooldowns',{}).values():earliest=max(earliest,datetime.fromtimestamp(until,p.TZ))
+    return pipeline.next_wake(earliest)
+
+
+def enable_header_review_v2(state):
+    if state.get('header_review_revision')==2:return
+    changed=[]
+    for record in state['candidates']:
+        if record.get('status')=='ready':record['status']='preparing';changed.append(record['special_slot'])
+    state['header_review_revision']=2
+    print('[reader-header-scope] '+json.dumps({'recheck_slots':changed,'accepted_body_preserved':True}),flush=True)

@@ -317,11 +317,18 @@ class Editor:
             article={'title':next(b['text'] for b in blocks if b['kind']=='title'),'teaser':'','blocks':blocks,'activities':[]}
         else:
             if not record['claims']: raise policy.Blocked('INDEPENDENT_FACT_BASE_EMPTY')
+            neutral=progress.get('writer_basis_revision')=='neutral-v1' or 'outline' not in progress
+            if neutral:
+                progress['writer_basis_revision']='neutral-v1';self.persist()
+                writer_facts=content.neutral_fact_inventory(record,self.call,self.persist)
+            else:writer_facts=record['claims']  # unchanged legacy accepted partial outline
             requirement_refs={'r'+str(i+1):text for i,text in enumerate(record['requirements'])}
+            writer_feedback=('INDEPENDENCE: новая собственная композиция по нейтральным данным; не использовать авторскую форму или прежний порядок примеров' if neutral and progress.get('outline_feedback') else progress.get('outline_feedback',''))
             if 'outline' not in progress:
                 progress['outline']=self.call('Создай самостоятельную статью непосредственно по-русски. '
                     'Не перевод и не рерайт. Самостоятельные композиция, примеры и подбор. '
-                    'Только проверенные факты: '+json.dumps([{k:v for k,v in fact.items() if k!='quote'} for fact in record['claims']],ensure_ascii=False)+
+                    'Только проверенные факты: '+json.dumps([{k:v for k,v in fact.items() if k!='quote'} for fact in writer_facts],ensure_ascii=False)+
+                    '\nНейтральные тройки — данные, а не готовые абзацы. Создай свою композицию; attributed_opinion всегда атрибутируй.'+
                     '\nПолезные вопросы: '+json.dumps(record['requirements'],ensure_ascii=False)+
                     '\nРедакционное задание: '+json.dumps(record.get('commission',{}),ensure_ascii=False)+
                     '\nКатегории: '+json.dumps(policy.CATEGORIES,ensure_ascii=False)+
@@ -329,7 +336,7 @@ class Editor:
                     '\n2–3 глубоких очерка — предпочтение, не квота объёма. Никаких норм длины. '
                     'Если тема обещает '+str(content.promised_activities(source['title']) or 'конкретные')+
                     ' занятий, запланируй применимые самостоятельные инструкции и безопасность. '
-                    'Предыдущие причины отказа статьи (если есть): '+str(progress.get('outline_feedback',''))+'\n'
+                    'Предыдущие причины отказа статьи (если есть): '+str(writer_feedback)+'\n'
                     'Верни title,teaser,category,kind,sections[id,heading,purpose,fact_ids,requirement_ids,activity_count]. '
                     'requirement_ids — распределённые по разделам id требований из таблицы '+json.dumps(requirement_refs,ensure_ascii=False)+
                     '. Каждое требование назначь хотя бы одному разделу. activity_count — точное число самостоятельных занятий в разделе (0 если их нет). '
@@ -337,12 +344,14 @@ class Editor:
                 if progress.get('article_repair_count'):
                     for section in progress['outline']['sections']:section['id']='revision'+str(progress['article_repair_count'])+'-'+section['id']
                 if contract.is_special(state) and progress['outline'].get('kind','').casefold()=='новость':progress['outline']['kind']='неоперативная статья'
+                if progress.get('writer_basis_revision')=='neutral-v1':
+                    for section in progress['outline']['sections']:section['id']='neutral-v1-'+section['id']
                 revision=record.get('evidence_plan',{}).get('commission_revision')
                 if revision:
                     for section in progress['outline']['sections']:section['id']=revision+'-'+section['id']
                 self.persist()
             outline=progress['outline']
-            try:content.validate_outline(outline,record)
+            try:content.validate_outline(outline,record,writer_facts)
             except policy.Blocked as exc:
                 attempts=progress.get('outline_protocol_attempts',0)
                 if attempts>=policy.CONFIG['technical']['content_attempts'] or progress.get('sections'):raise
@@ -354,7 +363,7 @@ class Editor:
             if outline.get('category') not in policy.CATEGORIES or not outline.get('sections'): raise policy.Blocked('OUTLINE_INVALID')
             ids=[s['id'] for s in outline['sections']]
             if len(ids)!=len(set(ids)): raise policy.Blocked('OUTLINE_SECTION_DUPLICATE')
-            facts={c['id']:c for c in record['claims']}
+            facts={c['id']:c for c in writer_facts}
             for section in outline['sections']:
                 if not section.get('fact_ids') or not set(section['fact_ids'])<=set(facts): raise policy.Blocked('OUTLINE_FACT_REFERENCE_INVALID')
                 done=progress.setdefault('sections',{})
@@ -381,7 +390,7 @@ class Editor:
                         '\nУже принятые занятия других разделов (не повторять): '+json.dumps([{'title':a['title'],'steps':a['steps']} for value in done.values() for a in value.get('activities',[])],ensure_ascii=False)+
                         '\nВерни id,finished,blocks[kind,text],activities,covered_requirements,covered_requirement_ids. '
                         'covered_requirement_ids — точные rN реально раскрытых требований из таблицы. '
-                        'finished=true только если все задачи раздела раскрыты. Предыдущая диагностика: '+str(progress.get('section_error','')),
+                        'finished=true только если все задачи раздела раскрыты. Предыдущая диагностика: '+('REVIEW_REJECTED: подготовь затронутый раздел заново по нейтральным данным без заимствования выражений' if neutral and str(progress.get('section_error','')).lstrip().startswith('{') else str(progress.get('section_error',''))),
                         output_tokens=16000,schema='v41_section')
                     try:
                         content.validate_section(result,section,record,requirement_refs)
@@ -457,8 +466,9 @@ class Editor:
     def review(self,state,record,stage):
         self.active_stage=stage
         article=record['article']; source=record['source']; fp=article_hash(article,source,record['rights'])
-        all_sources_review=record['progress'].get('reviews',{}).get(stage,{}).get('independence_scope')=='all_commissioned_sources_v1'
-        if valid_gate(record,stage,fp) and (stage!='editorial_checked' or record['mode']!='INDEPENDENT_ARTICLE' or all_sources_review): return
+        all_sources_review=record['progress'].get('reviews',{}).get(stage,{}).get('independence_scope')==content.INDEPENDENCE_REVIEW_SCOPE
+        reader_scope=record.get('checks',{}).get(stage,{}).get('review_scope')==content.READER_REVIEW_SCOPE
+        if valid_gate(record,stage,fp) and reader_scope and (stage!='editorial_checked' or record['mode']!='INDEPENDENT_ARTICLE' or all_sources_review): return
         record.pop('rejected_part',None)
         if stage=='completeness_checked' and record['mode']!='INDEPENDENT_ARTICLE': self.practical_manifest(record)
         content.semantic_structure(article,source,practical=record['mode']=='INDEPENDENT_ARTICLE' or stage!='fact_checked')
@@ -479,15 +489,7 @@ class Editor:
                 reference_record={'source':additional,'progress':analysis}
                 self.analyse(reference_record)
                 support_facts.extend({'source_url':additional['url'],**claim} for claim in reference_record['claims'])
-        parts=content.chunks(article['blocks'])
-        if record['mode']=='FULL_TRANSLATION':
-            # Review every accepted translation operation against its exact full source part,
-            # even when the translation expands beyond the source's character boundaries.
-            parts=[{'id':piece['id'],'block_id':piece['block_id'],'kind':piece['kind'],
-                    'text':record['progress']['translated'][piece['id']], 'source_piece':piece}
-                   for piece in content.chunks(source['blocks'])]
-        for item in article.get('activities',[]):
-            parts.extend(dict(part,section_id=item.get('section_id')) for part in content.chunks([{'id':'activity/'+item['id'],'kind':'paragraph','text':json.dumps(item,ensure_ascii=False)}]))
+        parts=content.review_parts(article,record)
         progress=record['progress'].setdefault('reviews',{}).setdefault(stage,{})
         if progress.get('input_hash')!=fp: progress.clear(); progress.update(input_hash=fp,parts={})
         pending=[part for part in parts if part['id'] not in progress['parts']]
@@ -510,7 +512,7 @@ class Editor:
             transport=progress.setdefault('protocol_attempts',{}).setdefault(transport_id,{'failures':0})
             while True:
                 if transport['failures']>=policy.CONFIG['technical']['content_attempts']:raise policy.Blocked('REVIEW_PROTOCOL_INVALID')
-                result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nЧасть: '+json.dumps(wire,ensure_ascii=False)+
+                result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nМетаданные первоисточника: '+json.dumps({key:source.get(key,'') for key in ('url','title','author','published')},ensure_ascii=False)+'\nЧасть: '+json.dumps(wire,ensure_ascii=False)+
                 '\nПроверенные сведения/оригинал: '+json.dumps(references,ensure_ascii=False)+
                 '\nНезависимые проверенные цитаты: '+json.dumps(support_facts,ensure_ascii=False)+
                 '\nИсходная композиция (для выявления скрытого рерайта): '+json.dumps([b for b in source['blocks'] if b['kind'] in ('title','heading','item')] if record['mode']=='INDEPENDENT_ARTICLE' else [],ensure_ascii=False)+
@@ -532,13 +534,14 @@ class Editor:
                 scoped=[member for member in group if member['id'] in affected]
                 scopes={member.get('section_id') or member['block_id'].split('/')[0] for member in scoped}
                 block_id=(next(iter(scopes))+'/repair') if len(scopes)==1 and set(affected)<={m['id'] for m in group} else ''
-                record['rejected_part']={'stage':stage,'block_id':block_id,'result':result}
+                record['rejected_part']={'stage':stage,'block_id':block_id,'result':result,
+                    'scope':'reader_header' if scopes=={'reader-meta'} else 'section' if block_id else 'article'}
                 review_diagnostic(stage,result,scoped=bool(block_id))
                 self.persist()
                 raise
             for member in group: progress['parts'][member['id']]=result
             self.persist()
-        if stage=='editorial_checked' and record['mode']=='INDEPENDENT_ARTICLE' and (progress.get('independence_hash')!=fp or progress.get('independence_scope')!='all_commissioned_sources_v1'):
+        if stage=='editorial_checked' and record['mode']=='INDEPENDENT_ARTICLE' and (progress.get('independence_hash')!=fp or progress.get('independence_scope')!=content.INDEPENDENCE_REVIEW_SCOPE):
             transport=progress.setdefault('independence_protocol',{'failures':0})
             while True:
                 if transport['failures']>=policy.CONFIG['technical']['content_attempts']:raise policy.Blocked('INDEPENDENCE_PROTOCOL_INVALID')
@@ -551,8 +554,8 @@ class Editor:
                 'checked=true означает, что соответствующая проверка действительно выполнена, а не что текст одобрен. '
                 'При проблеме сохрани checked=true, но approve=false и конкретную причину в issues/unresolved. '
                 'Не возвращай covered_ids или идентификаторы фактов. '
-                '\nПолные оригиналы ВСЕХ использованных материалов (проверь самостоятельность относительно каждого): '+json.dumps([{'url':original['url'],'blocks':original['blocks']} for original in [source]+supporting],ensure_ascii=False)+
-                '\nСамостоятельная статья: '+json.dumps({'title':article['title'],'blocks':article['blocks'],'activities':article.get('activities',[])},ensure_ascii=False),
+                '\nПолные оригиналы ВСЕХ использованных материалов (проверь самостоятельность относительно каждого): '+json.dumps([{**{key:original.get(key,'') for key in ('url','title','publisher','author','published','language')},'blocks':original['blocks']} for original in [source]+supporting],ensure_ascii=False)+
+                '\nСамостоятельная статья: '+json.dumps({'title':article['title'],'teaser':article.get('teaser',''),'blocks':article['blocks'],'activities':article.get('activities',[])},ensure_ascii=False),
                 output_tokens=5000,schema='v41_independence')
                 try:result=content.independence_response(raw)
                 except policy.Blocked:
@@ -563,8 +566,8 @@ class Editor:
             except policy.Blocked:
                 record['rejected_part']={'stage':stage,'block_id':'','result':result,'scope':'article_independence'}; review_diagnostic(stage,result,independence=True); self.persist()
                 raise
-            progress['independence_hash']=fp; progress['independence_result']=result; progress['independence_scope']='all_commissioned_sources_v1'; self.persist()
-        record['checks'][stage]={'approved':True,'input_hash':fp,'checked_at':datetime.now(policy.TZ).isoformat()}
+            progress['independence_hash']=fp; progress['independence_result']=result; progress['independence_scope']=content.INDEPENDENCE_REVIEW_SCOPE; self.persist()
+        record['checks'][stage]={'approved':True,'input_hash':fp,'review_scope':content.READER_REVIEW_SCOPE,'checked_at':datetime.now(policy.TZ).isoformat()}
         self.active_stage=None
         event(state,record,stage,'approved'); self.persist()
     def finish(self,state,record):
@@ -584,6 +587,26 @@ class Editor:
                 progress=record['progress']
                 section_id=next((s['id'] for s in progress.get('outline',{}).get('sections',[])
                                  if rejected.get('block_id','').startswith(s['id']+'/')),None)
+                if (exc.code=='REVIEW_REJECTED' and rejected.get('scope')=='reader_header'
+                        and record['mode']=='INDEPENDENT_ARTICLE' and progress.get('repair_count',0)<policy.CONFIG['technical']['repair_attempts']):
+                    facts=content.neutral_fact_inventory(record,self.call,self.persist)
+                    result=self.call('Исправь только заголовок и анонс самостоятельной русской статьи по нейтральным данным. '
+                        'Не меняй уже принятые разделы; не добавляй неподтверждённых обещаний и выводов. '
+                        'Нейтральные данные: '+json.dumps(facts,ensure_ascii=False)+
+                        '\nТекущий заголовок и анонс: '+json.dumps({key:record['article'].get(key,'') for key in ('title','teaser')},ensure_ascii=False),
+                        output_tokens=2000,schema='v41_header')
+                    progress['repair_count']=progress.get('repair_count',0)+1
+                    progress.setdefault('repair_history',[]).append(copy.deepcopy(rejected));self.persist()
+                    if (result.get('finished') is not True or not isinstance(result.get('title'),str) or not result['title'].strip()
+                            or not isinstance(result.get('teaser'),str)):raise policy.Blocked('HEADER_REPAIR_INCOMPLETE')
+                    article=record['article'];previous=article['title'];article.update(title=result['title'],teaser=result['teaser'])
+                    for block in article['blocks']:
+                        if block['kind']=='title' and block['text']==previous:block['text']=result['title']
+                    content.semantic_structure(article,record['source'])
+                    for name in policy.STAGES:
+                        if name!='source_verified':record['checks'].pop(name,None)
+                    record['checks']['content_prepared']={'approved':True,'input_hash':article_hash(article,record['source'],record['rights'])}
+                    event(state,record,'repair','retry','ATTRIBUTED_HEADER_REPAIR');self.persist();continue
                 if exc.code=='REVIEW_REJECTED' and not section_id and begin_article_repair(state,record):
                     self.persist();continue
                 if (exc.code!='REVIEW_REJECTED' or record['mode']!='INDEPENDENT_ARTICLE' or not section_id
