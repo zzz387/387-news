@@ -126,3 +126,22 @@ class ContinuationTests(unittest.TestCase):
         self.assertFalse(continuation.decision(dict(ledger,cooldowns={'lite':now.timestamp()+10}),runs,1,now)[0])
         self.assertFalse(continuation.decision(ledger,runs+[{'id':2,'status':'queued'}],1,now)[0])
         self.assertFalse(continuation.decision(dict(ledger,day='2026-10-26'),runs,1,now)[0])
+
+
+class DeliveryTests(unittest.TestCase):
+    def test_https_requires_exact_deployed_article_and_preserves_original(self):
+        from scripts import special_publication41 as pub,special_contract41 as sc
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);folder=root/'issues'/sc.SLUG;folder.mkdir(parents=True)
+            overview='data-special-edition="003-R" data-article-count="8"'+''.join('<a href="/issues/'+sc.SLUG+'/articles/article-'+str(i)+'/"></a>' for i in range(8))
+            (folder/'index.html').write_text(overview)
+            original=root/'issues'/sc.ORIGINAL;original.mkdir();(original/'index.html').write_text('immutable original')
+            pages={'https://387.su/issues/'+sc.SLUG+'/':overview,'https://387.su/issues/'+sc.ORIGINAL+'/':'immutable original',
+                   'https://387.su/archive/':'/issues/'+sc.SLUG+'/','https://387.su/':'daily homepage'}
+            for i in range(8):
+                path=folder/'articles'/('article-'+str(i));path.mkdir(parents=True);(path/'index.html').write_text('real final '+str(i))
+                pages['https://387.su/issues/'+sc.SLUG+'/articles/article-'+str(i)+'/']='real final '+str(i)
+            with patch.object(pub.pub,'validate_page',return_value=True):
+                self.assertEqual(pub.check_public(root,pages.__getitem__)['status'],'PUBLISHED')
+                pages['https://387.su/issues/'+sc.SLUG+'/articles/article-3/']='old cached different article'
+                with self.assertRaisesRegex(p.Blocked,'SPECIAL_HTTPS_ARTICLE_VERSION_MISMATCH'):pub.check_public(root,pages.__getitem__)
