@@ -47,3 +47,11 @@ class RealRepairTests(unittest.TestCase):
         self.assertEqual(state['candidates'][0]['progress']['section_attempts'],{'kept':2})
         state['candidates'][0]['status']='needs_review';q.repair_real_run_v2(state)
         self.assertEqual(state['candidates'][0]['status'],'needs_review')
+
+
+    def test_section_refusal_keeps_specific_missing_ids_for_private_feedback(self):
+        from scripts.test_special_priority41 import SectionTests
+        r,section,result=SectionTests().fixture();result['covered_requirement_ids']=[]
+        with self.assertRaises(p.Blocked) as raised:c.validate_section(result,section,r,{'r1':'Вопрос'})
+        self.assertEqual(raised.exception.code,'SECTION_REQUIRED_COVERAGE_MISSING')
+        self.assertIn('r1',raised.exception.detail);self.assertNotIn('Вопрос',str(raised.exception))

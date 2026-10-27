@@ -203,9 +203,9 @@ def validate_section(result,section,record,requirements):
     if not set(covered)<=set(requirements.values()):raise policy.Blocked('SECTION_REQUIREMENT_REFERENCE_INVALID')
     result['covered_requirements']=covered
     if section.get('requirement_ids') and not set(section['requirement_ids'])<=set(selected):
-        raise policy.Blocked('SECTION_REQUIRED_COVERAGE_MISSING')
+        raise policy.Blocked('SECTION_REQUIRED_COVERAGE_MISSING',json.dumps({'required_ids':section['requirement_ids'],'covered_ids':selected,'missing_ids':sorted(set(section['requirement_ids'])-set(selected))},ensure_ascii=False))
     if 'activity_count' in section and len(result['activities'])!=section['activity_count']:
-        raise policy.Blocked('SECTION_ACTIVITY_COUNT_MISMATCH')
+        raise policy.Blocked('SECTION_ACTIVITY_COUNT_MISMATCH',json.dumps({'required_activities':section['activity_count'],'received_activities':len(result['activities'])}))
     # Validate a section without imposing the whole article's promised activity count.
     source=dict(record['source'],title='')
     semantic_structure({'title':'Самостоятельный раздел','mode':'INDEPENDENT_ARTICLE',

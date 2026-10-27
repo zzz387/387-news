@@ -352,7 +352,7 @@ class Editor:
                         progress.setdefault('section_rejections',[]).append({'section_id':section['id'],'code':exc.code,'result':done.pop(section['id'])})
                         previous=progress.setdefault('section_attempts',{})
                         previous[section['id']]=previous.get(section['id'],0)+1
-                        progress['section_error']=exc.code;self.persist()
+                        progress['section_error']=exc.code+(': '+exc.detail if exc.detail else '');self.persist()
                     else:continue
                 failures=progress.setdefault('section_attempts',{})
                 while failures.get(section['id'],0)<policy.CONFIG['technical']['content_attempts']:
@@ -375,7 +375,7 @@ class Editor:
                         content.validate_section(result,section,record,requirement_refs)
                     except policy.Blocked as exc:
                         failures[section['id']]=failures.get(section['id'],0)+1
-                        progress['section_error']=exc.code
+                        progress['section_error']=exc.code+(': '+exc.detail if exc.detail else '')
                         progress.setdefault('section_rejections',[]).append({'section_id':section['id'],'code':exc.code,'result':copy.deepcopy(result)})
                         event(state,record,'section','retry_pending',exc.code);self.persist();continue
                     done[section['id']]=result; self.persist(); break
