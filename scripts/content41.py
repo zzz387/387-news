@@ -236,3 +236,42 @@ def witnessed_event_date(value,quote):
         if re.search(rf'(?<!\d)0?{date.day}\s+{month}\s*,?\s*{date.year}(?!\d)',text):return True
         if re.search(rf'\b{month}\s+0?{date.day}\s*,?\s*{date.year}(?!\d)',text):return True
     return False
+
+
+def review_wire(group):
+    aliases={'p'+str(i+1):part['id'] for i,part in enumerate(group)}
+    payload=[dict(part,id=alias) for alias,part in zip(aliases,group)]
+    return operation_payload(payload),aliases
+
+
+def restore_review_ids(result,aliases):
+    result=dict(result)
+    for field in ('covered_ids','affected_ids'):
+        values=result.get(field,[])
+        if not isinstance(values,list):raise policy.Blocked('REVIEW_PROTOCOL_INVALID')
+        if len(values)!=len(set(values)):raise policy.Blocked('REVIEW_PROTOCOL_INVALID')
+        if set(values)<=set(aliases):result[field]=[aliases[value] for value in values]
+        elif not set(values)<=set(aliases.values()):raise policy.Blocked('REVIEW_PROTOCOL_INVALID')
+    if set(result.get('covered_ids',[]))!=set(aliases.values()):raise policy.Blocked('REVIEW_PROTOCOL_INVALID')
+    return result
+
+
+def validate_outline(outline,record):
+    sections=outline.get('sections',[])
+    if not sections or outline.get('category') not in policy.CATEGORIES:raise policy.Blocked('OUTLINE_INVALID')
+    if len({s['id'] for s in sections})!=len(sections):raise policy.Blocked('OUTLINE_SECTION_DUPLICATE')
+    facts={c['id'] for c in record['claims']}
+    refs={'r'+str(i+1):text for i,text in enumerate(record['requirements'])}
+    reverse={text:key for key,text in refs.items()}
+    for section in sections:
+        if not section.get('fact_ids') or not set(section['fact_ids'])<=facts:raise policy.Blocked('OUTLINE_FACT_REFERENCE_INVALID')
+        if 'requirement_ids' in section:
+            section['requirement_ids']=[reverse.get(value,value) for value in section['requirement_ids']]
+            if not set(section['requirement_ids'])<=set(refs):raise policy.Blocked('OUTLINE_REQUIREMENT_REFERENCE_INVALID')
+    modern=any('requirement_ids' in s for s in sections)
+    if modern and set(refs)-{key for section in sections for key in section.get('requirement_ids',[])}:
+        raise policy.Blocked('OUTLINE_REQUIREMENT_COVERAGE_MISSING')
+    expected=promised_activities(record.get('commission',{}).get('original_topic','')) or promised_activities(record['source']['title'])
+    if modern and expected is not None and (any(type(s.get('activity_count')) is not int or s['activity_count']<0 for s in sections)
+            or sum(s['activity_count'] for s in sections)!=expected):raise policy.Blocked('OUTLINE_ACTIVITY_ALLOCATION_INVALID')
+    return True
