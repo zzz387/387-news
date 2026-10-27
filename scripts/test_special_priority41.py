@@ -92,3 +92,25 @@ class SectionTests(unittest.TestCase):
         self.assertTrue(c.witnessed_event_date('2026-10-26','October 26, 2026 marked the event.'))
         self.assertFalse(c.witnessed_event_date('2026-10-27','The study was conducted in 2026.'))
         self.assertFalse(c.witnessed_event_date('2026-10-27','26 октября 2026 года.'))
+
+    def test_addressed_migration_keeps_accepted_sections_and_counters_once(self):
+        state=e.new_state('2026-10-27');r=record();r['status']='rejected'
+        r['history']=[{'code':'TOPIC_REQUIREMENTS_NOT_COVERED'}]
+        r['progress']={'sections':{'kept':{'text':'Accepted'}},'section_attempts':{'kept':2}}
+        other=record(1);state['candidates']=[r,other];state['_quota_snapshot']={'requests':48}
+        before=copy.deepcopy(other);e.restore_preparation_repairs(state)
+        self.assertEqual(r['status'],'preparing');self.assertEqual(r['progress']['section_attempts'],{'kept':2})
+        self.assertEqual(other,before);self.assertEqual(state['_quota_snapshot']['requests'],48)
+        r['status']='rejected';e.restore_preparation_repairs(state);self.assertEqual(r['status'],'rejected')
+
+    def test_section_writer_receives_facts_without_protected_literal_quotes(self):
+        r=record();r.pop('article');r['mode']='INDEPENDENT_ARTICLE';r['requirements']=[]
+        r['rights']=e.rights41.decision(r['source'],r['mode'])
+        r['claims']=[{'id':'f','fact':'Учебный проверенный факт','quote':'PRIVATE_LITERAL_SYNTHETIC','source_id':r['source']['id']}]
+        r['progress']['outline']={'title':'Собственная статья','teaser':'','category':'Наука','kind':'статья',
+            'sections':[{'id':'s','heading':'Раздел','purpose':'Объяснение','fact_ids':['f']}]}
+        def call(prompt,**kwargs):
+            self.assertNotIn('PRIVATE_LITERAL_SYNTHETIC',prompt)
+            return {'id':'s','finished':True,'blocks':[{'kind':'paragraph','text':'Самостоятельное учебное объяснение.'}],
+                    'activities':[],'covered_requirements':[]}
+        e.Editor(call=call).prepare(e.new_state('2026-10-27'),r)

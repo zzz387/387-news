@@ -344,7 +344,7 @@ class Editor:
                         'Не называй источники, не вставляй URLs или редакционные комментарии. '
                         'Не копируй охраняемую форму и подборку первоисточника. '
                         'План раздела: '+json.dumps(section,ensure_ascii=False)+
-                        '\nФакты: '+json.dumps([facts[i] for i in section['fact_ids']],ensure_ascii=False)+
+                        '\nФакты: '+json.dumps([{k:v for k,v in facts[i].items() if k not in ('quote','evidence_id')} for i in section['fact_ids']],ensure_ascii=False)+
                         '\nВопросы всей статьи: '+json.dumps(record['requirements'],ensure_ascii=False)+
                         '\ncovered_requirements — только дословные вопросы из этого списка, реально раскрытые данным разделом. Не повторяй чужие разделы ради покрытия.'
                         '\nВ практических activities нужны: уникальный id,title,age/предпосылки,materials,steps,benefit,safety. '
