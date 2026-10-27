@@ -1,4 +1,4 @@
-name: 387 News — 003-R after daily production
+name: 387 News — 003-R protected production
 
 on:
   workflow_call:
@@ -6,9 +6,18 @@ on:
       daily_run_used:
         type: number
         default: 24
+      priority_first:
+        type: boolean
+        default: false
       initialize_only:
         type: boolean
         default: false
+
+    outputs:
+      hold_daily:
+        value: ${{ jobs.prepare.outputs.hold_daily }}
+      run_used:
+        value: ${{ jobs.prepare.outputs.run_used }}
 
 permissions:
   contents: write
@@ -23,9 +32,12 @@ jobs:
     timeout-minutes: 25
     outputs:
       ready: ${{ steps.commit.outputs.ready }}
+      hold_daily: ${{ steps.special.outputs.hold_daily }}
+      run_used: ${{ steps.special.outputs.run_used }}
     env:
       GH_TOKEN: ${{ github.token }}
       NEWS_SPECIAL_EDITION: 003-R
+      SPECIAL_PRIORITY_FIRST: ${{ inputs.priority_first }}
       SPECIAL_INITIALIZE_ONLY: ${{ inputs.initialize_only }}
       NEWS_DAILY_RUN_USED: ${{ inputs.daily_run_used }}
       NEWS_MAX_REQUESTS_PER_RUN: '24'
@@ -75,7 +87,7 @@ jobs:
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/special-quota
           merge-multiple: true
-      - name: Admit only after the daily issue and reserve quota are protected
+      - name: Restore protected progress and apply the owner-authorized production priority
         id: special
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}

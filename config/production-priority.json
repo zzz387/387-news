@@ -1,0 +1,8 @@
+{
+  "id": "003-R-first-2026-10-27",
+  "edition": "003-R",
+  "enabled": true,
+  "maximum_active_hours": 72,
+  "maximum_productive_runs": 64,
+  "maximum_stalled_runs": 4
+}

@@ -89,6 +89,7 @@ def evaluate(root,status,now=None,check_public=site_checks.check_site):
 def main():
     raw=json.loads(os.getenv('PIPELINE_STATUS','{}') or '{}')
     result=evaluate(news.ROOT,raw)
+    result['waiting_for_authorized_special_priority']=os.getenv('SPECIAL_PRIORITY_HOLD')=='true'
     try:
         if result['verified'] or result['alert']:
             result['incident']=incident(result['date'],result['code'],result['verified'])
@@ -101,7 +102,7 @@ def main():
     if summary:
         with open(summary,'a') as stream:
             stream.write('### Public delivery\n\n```json\n'+json.dumps(result,indent=2)+'\n```\n')
-    if not result['verified'] and not result.get('not_due'):
+    if not result['verified'] and not result.get('not_due') and not result['waiting_for_authorized_special_priority']:
         raise RuntimeError('Daily edition is not verified on the public site; incident/retry status recorded')
 
 if __name__=='__main__': main()

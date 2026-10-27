@@ -67,7 +67,7 @@ def build(state,root):
     if not sc.is_special(state):raise p.Blocked('SPECIAL_STATE_REQUIRED')
     e.validate_issue(state);root=Path(root);sc.check_original(root)
     if not state.get('published_at'):state['published_at']=datetime.now(p.TZ).isoformat()
-    moment=datetime.fromisoformat(state['published_at']);date=moment.date().isoformat()
+    moment=datetime.fromisoformat(state['published_at']).astimezone(p.TZ);date=moment.date().isoformat();clock=moment.strftime('%H:%M')+' МСК'
     records={r['id']:r for r in state['candidates']}
     articles=[]
     for identity in state['selected_ids']:
@@ -84,12 +84,12 @@ def build(state,root):
             path=issue/'articles'/article['slug']/'index.html';path.parent.mkdir(parents=True)
             html=pub.render_article(date,3,article,root,moment=moment).replace('/issues/'+date+'/', '/issues/'+sc.SLUG+'/')
             html=html.replace('№ 003','№003-R').replace('№003<','№003-R<')
-            html=html.replace('<main class="wrap">','<main class="wrap"><p class="special-edition">387 News №003-R · переиздание от26октября2026 · опубликовано '+date+'</p>',1)
+            html=html.replace('<main class="wrap">','<main class="wrap"><p class="special-edition">387 News №003-R · переиздание от 26 октября 2026 · опубликовано '+date+' '+clock+'</p>',1)
             path.write_text(html);path.with_name('article.md').write_text(pub.markdown(article))
         title='387 News №003-R — внеочередное переиздание от 26 октября 2026 года'
         html=news.page_header(title,'Восемь заново подготовленных статей по редакционной политике4.1','/issues/'+sc.SLUG+'/',moment,3)
         html+='<main class="wrap" data-policy-version="4.1" data-special-edition="003-R" data-issue-number="3" data-article-count="8" data-published-at="'+escape(moment.isoformat(),quote=True)+'">'
-        html+='<h1>'+title+'</h1><p>Опубликовано '+date+'. <a href="/issues/2026-10-26/">Оригинальный выпуск№003</a></p><section class="contents">'
+        html+='<h1>'+title+'</h1><p>Опубликовано '+date+' в '+clock+'. <a href="/issues/2026-10-26/">Оригинальный выпуск№003</a></p><section class="contents">'
         for a in articles:html+='<article class="toc"><div><h2><a href="/issues/'+sc.SLUG+'/articles/'+a['slug']+'/">'+escape(a['title'])+'</a></h2><p>'+escape(a['teaser'])+'</p></div></article>'
         html+='</section><p><a href="/archive/">Все выпуски</a> · <a href="/">Текущая ежедневная газета</a></p></main>'+news.page_footer()
         (issue/'index.html').write_text(html)
@@ -111,18 +111,27 @@ def build(state,root):
     return True
 
 
-def check_public():
+def check_public(root=None,fetch=None):
     try:from scripts import site_checks
     except ImportError:import site_checks
+    root=Path(root or p.ROOT);fetch=fetch or site_checks.fetch
     base='https://387.su/issues/'+sc.SLUG+'/'
-    overview=site_checks.fetch(base)
+    overview=fetch(base)
+    if overview!=(root/'issues'/sc.SLUG/'index.html').read_text(encoding='utf-8'):
+        raise p.Blocked('SPECIAL_HTTPS_OVERVIEW_VERSION_MISMATCH')
     if 'data-special-edition="003-R"' not in overview or 'data-article-count="8"' not in overview:
         raise p.Blocked('SPECIAL_HTTPS_OVERVIEW_INVALID')
     links=set(re.findall(r'href="(/issues/'+re.escape(sc.SLUG)+r'/articles/[^/]+/)"',overview))
     if len(links)!=8:raise p.Blocked('SPECIAL_HTTPS_INCOMPLETE')
-    for link in links:pub.validate_page(site_checks.fetch('https://387.su'+link))
-    if '/issues/'+sc.SLUG+'/' not in site_checks.fetch('https://387.su/archive/'):
+    for link in links:
+        page=fetch('https://387.su'+link);pub.validate_page(page)
+        if page!=(root/link.lstrip('/')/'index.html').read_text(encoding='utf-8'):
+            raise p.Blocked('SPECIAL_HTTPS_ARTICLE_VERSION_MISMATCH')
+    original=fetch('https://387.su/issues/'+sc.ORIGINAL+'/')
+    if original!=(root/'issues'/sc.ORIGINAL/'index.html').read_text(encoding='utf-8'):
+        raise p.Blocked('SPECIAL_ORIGINAL_HTTPS_CHANGED')
+    if '/issues/'+sc.SLUG+'/' not in fetch('https://387.su/archive/'):
         raise p.Blocked('SPECIAL_HTTPS_ARCHIVE_MISSING')
-    if 'data-special-edition="003-R"' in site_checks.fetch('https://387.su/'):
+    if 'data-special-edition="003-R"' in fetch('https://387.su/'):
         raise p.Blocked('SPECIAL_REPLACED_DAILY_HOMEPAGE')
     return {'id':sc.ID,'articles':8,'https':'verified','status':'PUBLISHED'}

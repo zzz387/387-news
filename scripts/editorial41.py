@@ -66,6 +66,18 @@ def restore_analysis_repairs(state):
     state['analysis_repair_revision']=ANALYSIS_REPAIR_REVISION
 
 
+
+def restore_preparation_repairs(state):
+    """One versioned retry for failures addressed by the section protocol; keep all counters."""
+    if state.get('preparation_protocol_revision')==2:return
+    addressed={'TOPIC_REQUIREMENTS_NOT_COVERED','ARTICLE_BLOCK_INVALID','DUPLICATED_ACTIVITY'}
+    for record in state.get('candidates',[]):
+        last=(record.get('history') or [{}])[-1]
+        if record.get('status') in ('rejected','needs_review') and last.get('code') in addressed:
+            record.setdefault('progress',{})['prior_preparation_refusal']=copy.deepcopy(last)
+            record['status']='preparing'
+    state['preparation_protocol_revision']=2
+
 def event(state,record,stage,decision,code='',detail=''):
     entry={'at':datetime.now(policy.TZ).isoformat(),'stage':stage,'decision':decision,'code':code}
     if detail: entry['detail']=detail
@@ -207,7 +219,7 @@ class Editor:
                         event_evidence=by_evidence.get(result['event_evidence_id'])
                         if event_evidence is None:raise policy.Blocked('EVENT_DATE_UNVERIFIED')
                         result['event_date_quote']=event_evidence['text']
-                    if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in part['text'] for part in group)):
+                    if result.get('event_date') and (not result.get('event_date_quote') or not any(result['event_date_quote'] in part['text'] for part in group) or not content.witnessed_event_date(result['event_date'],result['event_date_quote'])):
                         raise policy.Blocked('EVENT_DATE_UNVERIFIED')
                     assigned={part['id']:[] for part in group}
                     for claim in result['claims']:
@@ -293,6 +305,7 @@ class Editor:
             article={'title':next(b['text'] for b in blocks if b['kind']=='title'),'teaser':'','blocks':blocks,'activities':[]}
         else:
             if not record['claims']: raise policy.Blocked('INDEPENDENT_FACT_BASE_EMPTY')
+            requirement_refs={'r'+str(i+1):text for i,text in enumerate(record['requirements'])}
             if 'outline' not in progress:
                 progress['outline']=self.call('Создай самостоятельную статью непосредственно по-русски. '
                     'Не перевод и не рерайт. Самостоятельные композиция, примеры и подбор. '
@@ -304,7 +317,10 @@ class Editor:
                     '\n2–3 глубоких очерка — предпочтение, не квота объёма. Никаких норм длины. '
                     'Если тема обещает '+str(content.promised_activities(source['title']) or 'конкретные')+
                     ' занятий, запланируй применимые самостоятельные инструкции и безопасность. '
-                    'Верни title,teaser,category,kind,sections[id,heading,purpose,fact_ids].',output_tokens=6000,schema='v41_outline')
+                    'Верни title,teaser,category,kind,sections[id,heading,purpose,fact_ids,requirement_ids,activity_count]. '
+                    'requirement_ids — распределённые по разделам id требований из таблицы '+json.dumps(requirement_refs,ensure_ascii=False)+
+                    '. Каждое требование назначь хотя бы одному разделу. activity_count — точное число самостоятельных занятий в разделе (0 если их нет). '
+                    'Суммарно нужно ровно '+str(content.promised_activities(record.get('commission',{}).get('original_topic','')) or content.promised_activities(source['title']) or 0)+' занятий, если тема обещает занятия; не повторяй их между разделами.',output_tokens=6000,schema='v41_outline')
                 self.persist()
             outline=progress['outline']
             if outline.get('category') not in policy.CATEGORIES or not outline.get('sections'): raise policy.Blocked('OUTLINE_INVALID')
@@ -314,35 +330,58 @@ class Editor:
             for section in outline['sections']:
                 if not section.get('fact_ids') or not set(section['fact_ids'])<=set(facts): raise policy.Blocked('OUTLINE_FACT_REFERENCE_INVALID')
                 done=progress.setdefault('sections',{})
-                if section['id'] in done: continue
+                if section['id'] in done:
+                    try:content.validate_section(done[section['id']],section,record,requirement_refs)
+                    except policy.Blocked as exc:
+                        progress.setdefault('section_rejections',[]).append({'section_id':section['id'],'code':exc.code,'result':done.pop(section['id'])})
+                        previous=progress.setdefault('section_attempts',{})
+                        previous[section['id']]=previous.get(section['id'],0)+1
+                        progress['section_error']=exc.code;self.persist()
+                    else:continue
                 failures=progress.setdefault('section_attempts',{})
                 while failures.get(section['id'],0)<policy.CONFIG['technical']['content_attempts']:
                     result=self.call('Напиши законченный самостоятельный раздел по-русски, без лимита длины и без воды. '
                         'Не называй источники, не вставляй URLs или редакционные комментарии. '
                         'Не копируй охраняемую форму и подборку первоисточника. '
                         'План раздела: '+json.dumps(section,ensure_ascii=False)+
-                        '\nФакты: '+json.dumps([facts[i] for i in section['fact_ids']],ensure_ascii=False)+
+                        '\nФакты: '+json.dumps([{k:v for k,v in facts[i].items() if k not in ('quote','evidence_id')} for i in section['fact_ids']],ensure_ascii=False)+
                         '\nВопросы всей статьи: '+json.dumps(record['requirements'],ensure_ascii=False)+
                         '\ncovered_requirements — только дословные вопросы из этого списка, реально раскрытые данным разделом. Не повторяй чужие разделы ради покрытия.'
                         '\nВ практических activities нужны: уникальный id,title,age/предпосылки,materials,steps,benefit,safety. '
-                        'Верни id,finished,blocks[kind,text],activities,covered_requirements. '
+                        'kind допускает только title, heading, paragraph, item, quote, table. '
+                        'Таблица требований: '+json.dumps(requirement_refs,ensure_ascii=False)+
+                        '\nУже принятые занятия других разделов (не повторять): '+json.dumps([{'title':a['title'],'steps':a['steps']} for value in done.values() for a in value.get('activities',[])],ensure_ascii=False)+
+                        '\nВерни id,finished,blocks[kind,text],activities,covered_requirements,covered_requirement_ids. '
+                        'covered_requirement_ids — точные rN реально раскрытых требований из таблицы. '
                         'finished=true только если все задачи раздела раскрыты. Предыдущая диагностика: '+str(progress.get('section_error','')),
                         output_tokens=16000,schema='v41_section')
-                    if (result.get('id')==section['id'] and result.get('finished') is True
-                            and result.get('blocks') and all(b.get('text','').strip() for b in result['blocks'])):
-                        done[section['id']]=result; self.persist(); break
-                    failures[section['id']]=failures.get(section['id'],0)+1
-                    progress['section_error']='Incomplete section; supply complete content, not a summary'
-                    self.persist()
+                    try:
+                        content.validate_section(result,section,record,requirement_refs)
+                    except policy.Blocked as exc:
+                        failures[section['id']]=failures.get(section['id'],0)+1
+                        progress['section_error']=exc.code
+                        progress.setdefault('section_rejections',[]).append({'section_id':section['id'],'code':exc.code,'result':copy.deepcopy(result)})
+                        event(state,record,'section','retry_pending',exc.code);self.persist();continue
+                    done[section['id']]=result; self.persist(); break
                 if section['id'] not in done: raise policy.Blocked('SECTION_ATTEMPTS_EXHAUSTED')
             article={'title':outline['title'],'teaser':outline['teaser'],'blocks':[], 'activities':[]}
             for section in outline['sections']:
                 result=progress['sections'][section['id']]
                 if section['heading']: article['blocks'].append({'id':section['id']+'/heading','kind':'heading','text':section['heading']})
                 article['blocks'].extend(dict(b,id=f'{section["id"]}/{i}') for i,b in enumerate(result['blocks']))
-                article['activities'].extend(dict(item,section_id=section['id']) for item in result['activities'])
+                article['activities'].extend(dict(item,id=section['id']+'/'+item['id'],section_id=section['id']) for item in result['activities'])
             covered={question for section in progress['sections'].values() for question in section.get('covered_requirements',[])}
-            if not set(record['requirements'])<=covered: raise policy.Blocked('TOPIC_REQUIREMENTS_NOT_COVERED')
+            missing=set(record['requirements'])-covered
+            if missing:
+                repairs=progress.get('coverage_repairs',0)
+                if repairs>=policy.CONFIG['technical']['repair_attempts']:raise policy.Blocked('TOPIC_REQUIREMENTS_NOT_COVERED')
+                progress['coverage_repairs']=repairs+1
+                identity='coverage-repair-'+str(repairs+1)
+                outline['sections'].append({'id':identity,'heading':'Дополнительные практические пояснения',
+                    'purpose':'Раскрыть пропущенные вопросы по фактической базе без повторения принятых разделов',
+                    'fact_ids':list(facts),'requirement_ids':[key for key,text in requirement_refs.items() if text in missing]})
+                progress['section_error']='TOPIC_REQUIREMENTS_NOT_COVERED';self.persist()
+                return self.prepare(state,record)
             record['category']=outline['category']; record['kind']=outline['kind']
         article.update(mode=mode,source_id=source['id'],policy_version=policy.VERSION,
                        category=record.get('category') or (record.get('category_hint') if record.get('category_hint') in policy.CATEGORIES else 'Наука'),
@@ -681,7 +720,8 @@ def advance(state,date,preview,ops,persist,now=None,check_public=None,editor=Non
     if (ops.ROOT/'issues'/date/'index.html').is_file():
         return pipeline.published_delivery(state,date,ops,preview,current,check_public or pipeline.site_checks.check_site)
     editor=editor or Editor(persist=persist)
-    restore_analysis_repairs(state); persist()
+    restore_analysis_repairs(state)
+    restore_preparation_repairs(state); persist()
     rights_signature=policy.digest({'grants':editor.grants,'images':editor.image_grants,'source_profiles':rights41.source_profiles()})
     if state.get('rights_config_hash')!=rights_signature:
         for record in state['candidates']:

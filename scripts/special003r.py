@@ -1,4 +1,4 @@
-"""003-R production, isolated ciphertext and shared quota; daily production first."""
+"""003-R production, isolated ciphertext and shared quota; owner-authorized one-shot special priority."""
 import argparse
 import copy
 from datetime import datetime,timedelta,timezone
@@ -63,8 +63,14 @@ def refresh_definition(state):
     return state
 
 
-def admit(root,daily,ledger,now=None):
+def admit(root,daily,ledger,now=None,priority=False):
     now=(now or datetime.now(p.TZ)).astimezone(p.TZ)
+    if priority:
+        current_day=now.astimezone(timezone.utc).date().isoformat()
+        if ledger.get('day','')>current_day:return False,'FUTURE_SHARED_LEDGER'
+        if any(until>now.timestamp() for until in ledger.get('cooldowns',{}).values()):return False,'GEMINI_COOLDOWN'
+        if ledger.get('day')==current_day and ledger.get('requests',220)>=220:return False,'DAILY_QUOTA'
+        return True,'SPECIAL_FIRST_OWNER_AUTHORIZED'
     if not 12<=now.hour<22:return False,'OUTSIDE_SPARE_DAYTIME_WINDOW'
     today=now.date().isoformat();upcoming=(now.date()+timedelta(days=1)).isoformat()
     if not release_queue.edition_exists(root,today):return False,'CURRENT_DAILY_NOT_PUBLISHED'
@@ -83,9 +89,10 @@ def admit(root,daily,ledger,now=None):
     return True,'DAILY_APPROVED_AND_SPARE_QUOTA'
 
 
-def remaining_run_limit(daily_used,ledger):
+def remaining_run_limit(daily_used,ledger,priority=False):
     if type(daily_used) is not int or not 0<=daily_used<=24:raise RuntimeError('DAILY_RUN_ACCOUNTING_INVALID')
-    return max(0,min(24-daily_used,220-ledger.get('requests',220)-sc.definition()['daily_reserve_requests']))
+    used=ledger.get('requests',0) if not priority or ledger.get('day')==datetime.now(timezone.utc).date().isoformat() else 0
+    return max(0,min(24-daily_used,220-used-(0 if priority else sc.definition()['daily_reserve_requests'])))
 
 
 def study_links(source):
@@ -183,7 +190,7 @@ class Editor(e.Editor):
             if url not in evidence:
                 source=self.cached_fetch(url)
                 decision=rights41.decision(source,'INDEPENDENT_ARTICLE');rights41.require(source,'INDEPENDENT_ARTICLE',decision)
-                item={'source':source,'progress':{}}
+                item=record['progress'].setdefault('special_support',{}).setdefault(url,{'source':source,'progress':{}})
                 self.analyse(item)
                 evidence[url]={'source':source,'claims':item['claims']};self.persist()
         record['supporting_sources']=[item['source'] for item in evidence.values()]
@@ -262,11 +269,12 @@ def advance(state,editor,root,persist):
 
 def select_artifacts():
     now=datetime.now(p.TZ);day=now.astimezone(timezone.utc).date().isoformat();upcoming=(now.date()+timedelta(days=1)).isoformat()
-    labels={'special':LABEL,'daily':'387news31-production-'+upcoming,'quota':'387news31-quota-'+day}
+    date=release_queue.unfinished_date(p.ROOT,release_queue.target_date(p.ROOT,now),release_queue.production_artifacts())
+    labels={'special':LABEL,'daily':'387news31-production-'+date,'quota':'387news31-quota-'+day}
     output={}
     for kind,label in labels.items():
         records=[]
-        for candidate_label in (news.runtime.quota_labels(day) if kind=='quota' else (label,)):
+        for candidate_label in ((news.runtime.quota_labels(day)+news.runtime.quota_labels((now.astimezone(timezone.utc).date()-timedelta(days=1)).isoformat())) if kind=='quota' else (label,)):
             for page in range(1,101):
                 batch=stage.request_json('https://api.github.com/repos/zzz387/387-news/actions/artifacts?per_page=100&name='+quote(candidate_label)+'&page='+str(page))['artifacts']
                 records.extend(r for r in batch if r['name']==candidate_label)
@@ -275,7 +283,7 @@ def select_artifacts():
         valid=[r for r in records if not r['expired']]
         if records and not valid:raise RuntimeError('SPECIAL_RESTORE_EXPIRED')
         if valid:
-            item=max(valid,key=lambda r:(r['created_at'],r['id']));run=item.get('workflow_run',{})
+            item=max(valid,key=lambda r:((r['name'][len('387news31-quota-'):][:10] if kind=='quota' else ''),r['created_at'],r['id']));run=item.get('workflow_run',{})
             if run.get('head_branch')!='main' or type(run.get('id')) is not int:raise RuntimeError('SPECIAL_ARTIFACT_ORIGIN_INVALID')
             output.update({kind+'_found':'true',kind+'_id':str(item['id']),kind+'_run':str(run['id'])})
         else:output[kind+'_found']='false'
@@ -286,10 +294,11 @@ def select_artifacts():
 def recover_delivery(state,persist,check=None):
     check=check or publication.check_public
     try:
-        result=check();state['publication_verified']=True;persist()
+        result=check();state['publication_verified']=True;state['status']='PUBLISHED';state['publication_verified_at']=datetime.now(p.TZ).isoformat();persist()
         print('[special-status] '+json.dumps(result));return False
     except Exception:
         if state.get('delivery_attempts',0)>=5:
+            state.update(status='BLOCKED',block_code='SPECIAL_DELIVERY_RETRY_LIMIT');persist()
             print('[special-status] BLOCKED code=SPECIAL_DELIVERY_RETRY_LIMIT');return False
         state['delivery_attempts']=state.get('delivery_attempts',0)+1;persist()
         return True
@@ -307,12 +316,25 @@ def run():
     state=refresh_definition(stage.decipher(files['special'].read_bytes(),key)) if files['special'].is_file() else new_state()
     if not sc.is_special(state) or state.get('branch')!='main' or state.get('preview') is not False:raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
     ledger=json.loads(files['quota'].read_text()) if files['quota'].is_file() else {}
-    daily=stage.decipher(files['daily'].read_bytes(),key) if files['daily'].is_file() else None
+    daily_bytes=files['daily'].read_bytes() if files['daily'].is_file() else None
+    daily=stage.decipher(daily_bytes,key) if daily_bytes is not None else None
+    print('[special-restore] '+json.dumps({'restored':files['special'].is_file(),'articles':sum(r.get('status')=='ready' for r in state['candidates']),
+        'sections':sum(len(r.get('progress',{}).get('sections',{})) for r in state['candidates']),
+        'priority_restored':bool(state.get('production_priority')),'daily_date':daily.get('date') if daily else None,
+        'daily_articles':sum(r.get('status')=='ready' for r in daily.get('candidates',[])) if daily else None}))
+    e.restore_preparation_repairs(state)
+    priority_first=os.getenv('SPECIAL_PRIORITY_FIRST')=='true'
+    if priority_first:
+        from scripts import special_priority41 as priority_queue
+        news.runtime.merge_snapshot(ledger,state.get('_quota_snapshot',{}))
+        if daily:news.runtime.merge_snapshot(ledger,daily.get('_quota_snapshot',{}))
+        priority_active,priority_reason=priority_queue.reconcile(state)
     budget=None
     prior_snapshot=copy.deepcopy(state.get('_quota_snapshot',{}))
     stale_shared=(prior_snapshot.get('day','')>ledger.get('day','') or
         prior_snapshot.get('day')==ledger.get('day') and prior_snapshot.get('requests',0)>ledger.get('requests',0))
     def persist():
+        if daily_bytes is not None and files['daily'].read_bytes()!=daily_bytes:raise RuntimeError('DAILY_CHECKPOINT_CHANGED_DURING_SPECIAL')
         if not stale_shared:state['_quota_snapshot']=copy.deepcopy(ledger)
         file=Path(os.environ['RUNNER_TEMP'])/'special-003-r.enc';temp=file.with_suffix('.tmp')
         temp.write_bytes(stage.cipher(state,key));temp.chmod(0o600);temp.replace(file)
@@ -328,26 +350,31 @@ def run():
             except ImportError:import production_preflight41
             production_preflight41.require_pages()
             with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('ready=true\n')
+        if priority_first:priority_queue.emit(state);persist()
         return
-    admitted,reason=admit(root,daily,ledger)
+    admitted,reason=admit(root,daily,ledger,priority=priority_first)
     daily_used=int(os.getenv('NEWS_DAILY_RUN_USED','24'))
-    if remaining_run_limit(daily_used,ledger)==0:admitted,reason=False,'DAILY_USED_RUN_BUDGET'
+    if priority_first and not priority_active:admitted,reason=False,priority_reason
+    if remaining_run_limit(daily_used,ledger,priority=priority_first)==0:admitted,reason=False,'DAILY_USED_RUN_BUDGET'
     if stale_shared:admitted,reason=False,'SPECIAL_SHARED_LEDGER_STALE'
     if os.getenv('SPECIAL_INITIALIZE_ONLY')=='true':admitted,reason=False,'INITIALIZED_ONLY_NO_GEMINI'
-    if admitted:
+    if admitted and not priority_first:
         runs=stage.request_json('https://api.github.com/repos/zzz387/387-news/actions/workflows/daily-v31.yml/runs?branch=main&per_page=30')['workflow_runs']
         if any(str(r['id'])!=os.environ['GITHUB_RUN_ID'] and r['status'] in ('queued','pending','waiting','in_progress') for r in runs):
             admitted,reason=False,'ANOTHER_DAILY_RUN_WAITING'
-    if admitted:
+    if admitted and not priority_first:
         try:site_checks.check_site(expected_date=datetime.now(p.TZ).date().isoformat())
         except Exception:admitted,reason=False,'CURRENT_DAILY_HTTPS_UNVERIFIED'
     persist()
     if not admitted:
-        print('[special-status] '+json.dumps({'id':sc.ID,'stage':'DEFERRED','reason':reason,'articles':sum(r['status']=='ready' for r in state['candidates']),'gemini_requests':0}));return
+        print('[special-status] '+json.dumps({'id':sc.ID,'stage':'DEFERRED','reason':reason,'articles':sum(r['status']=='ready' for r in state['candidates']),'gemini_requests':0}))
+        if priority_first:priority_queue.emit(state);persist()
+        return
     # Independent state, identical global request budget/cooldown; never mutate the daily file.
-    budget=news.runtime.RequestBudget(ledger,persist,run_limit=remaining_run_limit(daily_used,ledger))
+    budget=news.runtime.RequestBudget(ledger,persist,run_limit=remaining_run_limit(daily_used,ledger,priority=priority_first))
     news.runtime.ACTIVE_BUDGET=budget;news.runtime.CHECKPOINT=persist
     previous=signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(news.runtime.GenerationPaused('Special runner stopped')))
+    before=priority_queue.fingerprint(state) if priority_first else None
     try:
         persist();ready=advance(state,Editor(persist=persist),root,persist)
         if ready:
@@ -366,8 +393,10 @@ def run():
     except p.Blocked as exc:
         state['status']='BLOCKED';state['block_code']=exc.code;print('[special-status] BLOCKED code='+exc.code)
     finally:
+        if priority_first:
+            priority_queue.finish_run(state,before,budget.used);priority_queue.emit(state,budget.used)
         persist();print('[special-metrics] '+json.dumps({'id':sc.ID,'articles':sum(r['status']=='ready' for r in state['candidates']),
-            'requests_used':ledger.get('requests'),'run_used':budget.used,'workflow_run_used':daily_used+budget.used,'stages':quota41.actual_usage(state)}))
+            'requests_used':ledger.get('requests'),'run_used':budget.used,'workflow_run_used':daily_used+budget.used,'stages':quota41.actual_usage(state),'daily_checkpoint_unchanged':daily_bytes is None or files['daily'].read_bytes()==daily_bytes}))
         news.runtime.ACTIVE_BUDGET=news.runtime.CHECKPOINT=None;signal.signal(signal.SIGTERM,previous)
 
 
