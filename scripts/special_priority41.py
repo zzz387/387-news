@@ -78,3 +78,33 @@ def repair_real_run_v2(state):
         priority['status']='ACTIVE';priority.pop('reason',None)
     state['special_real_repair_revision']=2
     print('[special-repair-migration] '+json.dumps({'revision':2,'slots':changed,'quota_and_attempts_preserved':True}),flush=True)
+
+
+def repair_protocol_v3(state):
+    if state.get('special_protocol_repair_revision')==3:return
+    changed=[]
+    for record in state['candidates']:
+        from scripts import content41 as content
+        rejection=record.get('rejected_part',{});rejected=rejection.get('result',{})
+        if record.get('status')=='needs_review' and (record.get('history') or [{}])[-1].get('code')=='REVIEW_REJECTED' and rejection.get('scope')!='article_independence':
+            article=record.get('article')
+            if article:
+                parts=content.chunks(article['blocks'])
+                for item in article.get('activities',[]):
+                    parts.extend(content.chunks([{'id':'activity/'+item['id'],'kind':'paragraph','text':json.dumps(item,ensure_ascii=False)}]))
+                completed=record['progress'].get('reviews',{}).get(rejection.get('stage'),{}).get('parts',{})
+                pending=[part for part in parts if part['id'] not in completed]
+                groups=content.operation_groups(pending,limit=p.CONFIG['technical']['review_operation_characters'])
+                ids=rejected.get('covered_ids',[])
+                mismatch=bool(groups) and (not isinstance(ids,list) or len(ids)!=len(set(ids)) or set(ids)!={part['id'] for part in groups[0]})
+                print('[special-refusal-diagnostic] '+json.dumps({'slot':record['special_slot'],'approve':rejected.get('approve'),
+                    'issues_count':len(rejected.get('issues',[])),'unresolved_count':len(rejected.get('unresolved',[])),
+                    'protocol_mismatch':mismatch}),flush=True)
+                if mismatch:
+                    record['status']='preparing';changed.append(record['special_slot'])
+    priority=state.get('production_priority',{})
+    if changed and priority.get('reason')=='SPECIAL_TOPIC_NEEDS_REVIEW' and not any(r.get('status')=='needs_review' for r in state['candidates']):
+        priority.setdefault('repair_history',[]).append({'revision':3,'reason':priority['reason'],'slots':changed})
+        priority['status']='ACTIVE';priority.pop('reason',None)
+    state['special_protocol_repair_revision']=3
+    print('[special-protocol-migration] '+json.dumps({'revision':3,'slots':changed,'counters_preserved':True}),flush=True)

@@ -339,6 +339,15 @@ class Editor:
                 if contract.is_special(state) and progress['outline'].get('kind','').casefold()=='новость':progress['outline']['kind']='неоперативная статья'
                 self.persist()
             outline=progress['outline']
+            try:content.validate_outline(outline,record)
+            except policy.Blocked as exc:
+                attempts=progress.get('outline_protocol_attempts',0)
+                if attempts>=policy.CONFIG['technical']['content_attempts'] or progress.get('sections'):raise
+                progress['outline_protocol_attempts']=attempts+1
+                progress.setdefault('outline_protocol_history',[]).append({'code':exc.code,'outline':progress.pop('outline')})
+                progress['outline_feedback']=exc.code+': fact_ids — только известные id фактов; requirement_ids — только rN из таблицы; сумма activity_count должна совпасть с обещанным числом занятий.'
+                event(state,record,'outline_protocol','retry_pending',exc.code);self.persist()
+                return self.prepare(state,record)
             if outline.get('category') not in policy.CATEGORIES or not outline.get('sections'): raise policy.Blocked('OUTLINE_INVALID')
             ids=[s['id'] for s in outline['sections']]
             if len(ids)!=len(set(ids)): raise policy.Blocked('OUTLINE_SECTION_DUPLICATE')
@@ -492,7 +501,12 @@ class Editor:
               'completeness_checked':'Проверь смысловую полноту: все обещания заголовка, инструкции, примеры, числа, оговорки и выводы. Для A/B сравни полный оригинал с данной частью, не допускай сокращение. Если существенный смысл зависит от отсутствующей иллюстрации/таблицы, unresolved; не считай лицензию текста разрешением на каждую картинку. Для C оцени полноту самостоятельной темы и применимость действий, а не копирование чужой композиции.',
               'editorial_checked':'Отдельная литературная проверка, включая самостоятельность режима C: сравни исходную подборку и расположение идей с новым текстом. Лёгкий рерайт/перевод/копирование авторской подборки запрещены, даже при иных словах. Если самостоятельность не установлена — unresolved. Законченность мысли, ясный живой русский язык, связность, отсутствие воды, дублей, канцелярита и метатекста. Практические действия действительно выполнимы. Никаких нормативов длины.',
             }[stage]
-            result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nЧасть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
+            wire,aliases=content.review_wire(group)
+            transport_id=policy.digest([m['id'] for m in group])
+            transport=progress.setdefault('protocol_attempts',{}).setdefault(transport_id,{'failures':0})
+            while True:
+                if transport['failures']>=policy.CONFIG['technical']['content_attempts']:raise policy.Blocked('REVIEW_PROTOCOL_INVALID')
+                result=self.call(instructions+'\nЗаголовок: '+article['title']+'\nЧасть: '+json.dumps(wire,ensure_ascii=False)+
                 '\nПроверенные сведения/оригинал: '+json.dumps(references,ensure_ascii=False)+
                 '\nНезависимые проверенные цитаты: '+json.dumps(support_facts,ensure_ascii=False)+
                 '\nИсходная композиция (для выявления скрытого рерайта): '+json.dumps([b for b in source['blocks'] if b['kind'] in ('title','heading','item')] if record['mode']=='INDEPENDENT_ARTICLE' else [],ensure_ascii=False)+
@@ -501,7 +515,13 @@ class Editor:
                 '\nСоседние части для проверки связности: '+json.dumps(parts[max(0,part_index-1):part_index]+parts[part_index+1:part_index+2],ensure_ascii=False)+
                 '\nПроверяй локальные факты/полноту именно этой части; другие вопросы могут быть раскрыты в других разделах. Не требуй всей статьи внутри одной технической части.'+
                 '\nПри отказе affected_ids — только точные id частей с доказанной проблемой; при общей проблеме без адресного основания оставь пустой список. Не выбирай случайный раздел.'+
-                '\nВерни approve,issues,unresolved,covered_ids=[точные id ВСЕХ проверенных pieces или одной части].',output_tokens=5000,schema='v41_review')
+                '\nДля covered_ids и affected_ids используй только короткие id pN из поля id проверяемых pieces; не block_id, не id фактов или исходника. '
+                'Верни covered_ids всех переданных pN ровно по одному разу. Предыдущая ошибка протокола: '+str(transport.get('code','')),output_tokens=5000,schema='v41_review')
+                try:result=content.restore_review_ids(result,aliases)
+                except policy.Blocked as exc:
+                    transport['failures']+=1;transport['code']=exc.code;transport['last_result']=copy.deepcopy(result)
+                    event(state,record,'review_protocol','retry_pending',exc.code);self.persist();continue
+                break
             try: content.approved_review(result,[member['id'] for member in group])
             except policy.Blocked:
                 affected=result.get('affected_ids',[]) if isinstance(result,dict) else []

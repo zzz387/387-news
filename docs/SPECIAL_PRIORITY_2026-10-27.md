@@ -74,3 +74,24 @@ independence gates repeat for the changed article. Public diagnostics contain
 only predefined reason categories and scope. A single explicit repair migration
 requeues only the demonstrated date/review failures and reactivates the existing
 priority without resetting its lifetime, productive-run count, attempts or quota.
+
+## Review wire protocol
+
+Run 40455454793 restored two saved sections and the existing priority, locally
+revalidated the historical response without a new API call, and completed slot 1.
+It preserved daily bytes and counted another 24 reservations, reaching 96/220.
+Slot 2 subsequently hit an unclassified review refusal; slot 3 still had a
+section-coverage hold. Before any further recomposition, distinguish exact
+review coverage acknowledgment from editorial rejection. Short pN wire IDs map
+back to immutable native chunk IDs only after complete, unique coverage is
+validated. Transport-only retries have their own persisted cap of three and
+never approve content or consume an article-recomposition attempt. Existing
+accepted review parts remain cached. A versioned migration requeues only a
+provable mismatch between the rejected acknowledgment and actual pending group.
+
+Outline requirement references are checked before writing. Exact full question
+strings may canonicalize to the matching rN; unknown references fail. All
+requirements and the promised activity allocation must be represented. Invalid
+unwritten plans receive bounded diagnosed repair, retaining prior plans and
+attempt counters. Existing accepted sections are never discarded to repair an
+unattributed plan failure.
