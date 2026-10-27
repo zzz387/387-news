@@ -108,3 +108,27 @@ def repair_protocol_v3(state):
         priority['status']='ACTIVE';priority.pop('reason',None)
     state['special_protocol_repair_revision']=3
     print('[special-protocol-migration] '+json.dumps({'revision':3,'slots':changed,'counters_preserved':True}),flush=True)
+
+
+def repair_independence_protocol_v4(state):
+    if state.get('independence_protocol_revision')==4:return
+    changed=[]
+    expected={'composition','wording','examples','explanations'}
+    for record in state['candidates']:
+        rejection=record.get('rejected_part',{});result=rejection.get('result',{})
+        if rejection.get('scope')=='article_independence':
+            formal=(result.get('approve') is True and not result.get('issues') and not result.get('unresolved') and set(result.get('covered_ids',[]))!=expected)
+            print('[independence-refusal-diagnostic] '+json.dumps({'slot':record['special_slot'],
+                'approve':result.get('approve') is True,'issues_count':len(result.get('issues',[])),
+                'unresolved_count':len(result.get('unresolved',[])),'coverage_complete':set(result.get('covered_ids',[]))==expected,
+                'formal_only':formal}),flush=True)
+            if record.get('status')=='needs_review' and formal:
+                record['status']='preparing';changed.append(record['special_slot'])
+    priority=state.get('production_priority',{})
+    if changed and priority.get('reason')=='SPECIAL_TOPIC_NEEDS_REVIEW':
+        priority.setdefault('repair_history',[]).append({'revision':4,'formal_recheck_slots':changed})
+        priority['status']='ACTIVE';priority.pop('reason',None)
+        if state.get('block_code')=='SPECIAL_EIGHT_FIXED_TOPICS_NOT_READY':
+            state['status']='RETRY_PENDING';state.pop('block_code',None)
+    state['independence_protocol_revision']=4
+    print('[independence-protocol-migration] '+json.dumps({'revision':4,'slots':changed,'articles_and_counters_preserved':True}),flush=True)

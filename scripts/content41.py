@@ -28,6 +28,17 @@ news.SCHEMAS.update({
                      'covered_ids':{'type':'array','items':S}}),
 })
 
+INDEPENDENCE_FIELDS=('composition','wording','examples','explanations')
+news.SCHEMAS['v41_independence']=schema({'approve':B,'issues':{'type':'array','items':S},
+    'unresolved':{'type':'array','items':S},**{name+'_checked':B for name in INDEPENDENCE_FIELDS}})
+
+
+def independence_response(result):
+    if not isinstance(result,dict) or any(result.get(name+'_checked') is not True for name in INDEPENDENCE_FIELDS):
+        raise policy.Blocked('INDEPENDENCE_PROTOCOL_INVALID')
+    # Normalize explicit completed checks, preserving the actual verdict and every concern.
+    return dict(result,covered_ids=list(INDEPENDENCE_FIELDS),affected_ids=[])
+
 # Required in real model responses; legacy accepted checkpoints retain their original covered IDs.
 news.SCHEMAS['v41_review']['properties']['affected_ids']={'type':'array','items':S}
 news.SCHEMAS['v41_review']['required'].append('affected_ids')
