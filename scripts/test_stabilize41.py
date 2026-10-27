@@ -56,14 +56,15 @@ class StabilizeTests(unittest.TestCase):
         config=copy.deepcopy(sc.definition())
         for slot in config['slots']:
             slot.pop('evidence_plan',None);slot.pop('replacement_topic',None)
+        config['slots'][1]['requirements']=config['slots'][1]['requirements'][:1]
         config['slots'][6]['requirements'].pop();config['slots'][7]['requirements'].pop()
         self.assertEqual(p.digest(config),runner.PREVIOUS_DEFINITION_HASH)
         with patch.object(sc,'definition',return_value=config):old=runner.new_state()
-        accepted=old['candidates'][2];accepted['status']='ready';accepted['article']={'title':'Synthetic accepted article'}
+        accepted=old['candidates'][5];accepted['status']='ready';accepted['article']={'title':'Synthetic accepted article'}
         accepted['progress']={'saved':'synthetic stage'}
         old['_quota_snapshot']={'day':'2026-10-26','requests':207,'models':{'lite':207},'cooldowns':{'lite':9999999999}}
         before=copy.deepcopy(old['_quota_snapshot']);runner.refresh_definition(old)
-        self.assertIs(old['candidates'][2],accepted);self.assertEqual(accepted['progress'],{'saved':'synthetic stage'})
+        self.assertIs(old['candidates'][5],accepted);self.assertEqual(accepted['progress'],{'saved':'synthetic stage'})
         self.assertEqual(old['_quota_snapshot'],before);self.assertTrue(sc.is_special(old))
         self.assertIn('https://www.mos.ru/news/item/177660073/',old['candidates'][1]['unused_original_urls'])
         self.assertNotEqual(old['candidates'][1]['url'],config['slots'][1]['url'])

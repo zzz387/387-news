@@ -41,16 +41,25 @@
       ],
       "verification_urls": [],
       "requirements": [
-        "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения."
+        "Раскрыть подтверждённый исторический, архитектурный и культурный контекст; не придумывать сведения.",
+        "Почти 100 цветов из стеклофибробетона — декоративные цветы, не 100 оттенков палитры. Подтверждённый цветовой акцент — синий. Не превращать эту неоднозначность в неподтверждённое утверждение о расцветках.",
+        "Собственная композиция от задач школьников и организации помещений к архитектуре фасада; не повторять новостной порядок исходников. Исторические сведения включать только при наличии документального подтверждения."
       ],
       "evidence_plan": {
         "primary": "https://www.mskagency.ru/materials/3571841",
         "support": [
-          "https://www.mskagency.ru/materials/3555954"
+          "https://www.mskagency.ru/materials/3555954",
+          "https://vm.ru/moscow/1340223-vizualnaya-otkrytost-i-mnogo-sveta-kak-budet-vyglyadet-novaya-shkola-v-presnenskom-rajone"
         ],
         "studies": [],
-        "mode": "INDEPENDENT_ARTICLE"
-      }
+        "mode": "INDEPENDENT_ARTICLE",
+        "public_citation_urls": [
+          "https://www.mskagency.ru/materials/3555954",
+          "https://vm.ru/moscow/1340223-vizualnaya-otkrytost-i-mnogo-sveta-kak-budet-vyglyadet-novaya-shkola-v-presnenskom-rajone"
+        ],
+        "commission_revision": "independent-basis-v1"
+      },
+      "replacement_topic": "Как спроектирована школа на улице Климашкина: пространства для учёбы, материалы и декоративные цветы на фасаде"
     },
     {
       "slot": 3,
@@ -67,7 +76,31 @@
       ],
       "requirements": [
         "Ровно 21 полноценная самостоятельная инструкция: возраст, материалы, действия, польза и безопасность; не копировать подборку и форму UNICEF."
-      ]
+      ],
+      "evidence_plan": {
+        "primary": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+        "support": [
+          "https://www.unicef.org/parenting/child-development/baby-tips",
+          "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+        ],
+        "studies": [],
+        "mode": "INDEPENDENT_ARTICLE",
+        "fact_base_urls": [
+          "https://www.unicef.org/parenting/child-development/baby-tips",
+          "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+        ],
+        "public_citation_urls": [
+          "https://www.unicef.org/parenting/child-development/baby-tips",
+          "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more"
+        ],
+        "commission_revision": "independent-basis-v1",
+        "writer_requirements": [
+          "Ровно 21 собственное практическое занятие до двух лет; каждое содержит подходящий возраст/предпосылки, материалы, последовательность действий, пользу и безопасность.",
+          "Своя организация по навыкам и ситуациям семейной жизни, а не семь возрастных групп по три занятия из исходной подборки UNICEF.",
+          "Собственные примеры и комбинации действий на основе общих подтверждённых принципов развития; не переводить и не сохранять авторскую подборку из 21 занятия.",
+          "Учитывать индивидуальную готовность ребёнка, непрерывное участие взрослого, безопасные материалы и прекращение занятия при усталости; не обещать медицинских эффектов."
+        ]
+      }
     },
     {
       "slot": 4,

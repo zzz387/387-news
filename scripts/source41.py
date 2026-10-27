@@ -96,6 +96,13 @@ def extract(html,url):
             if not re.search(r'methods',headings) or not re.search(r'results',headings):raise policy.Blocked('SOURCE_ABSTRACT_ONLY')
             regions,method=explicit,'frontiers_complete_research'
         else:regions,method=dom.choose_region(document)
+    elif urlparse(base).hostname=='vm.ru' and re.match(r'^/(?:moscow|news)/[0-9]+-',urlparse(base).path):
+        # Observed full VM publication: first article owns its complete, end-marked
+        # body. Separate topic/swiper/lazy articles are recommendations, not continuations.
+        owners=[node for node in document.root.all() if 'marticle_first' in node.attrs.get('class','').split()]
+        explicit=[node for owner in owners for node in owner.all()
+                  if {'article-view','with-end-mark'}<=set(node.attrs.get('class','').split())]
+        regions,method=(explicit,'vm_complete_publication') if len(owners)==len(explicit)==1 else ([], 'vm_ambiguous_or_incomplete')
     elif base.startswith('https://dmtya.ru/theatre/news/'):
         explicit=[n for n in document.root.all() if 'studio-content' in n.attrs.get('class','').split()]
         regions,method=(explicit,'dmtya_complete_news') if len(explicit)==1 else dom.choose_region(document)

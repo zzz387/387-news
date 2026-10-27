@@ -38,7 +38,9 @@ class PriorityTests(unittest.TestCase):
         self.assertEqual(q.reconcile(state)[1],'SPECIAL_PRIORITY_STALLED')
         state['production_priority']['stalled_runs']=0
         self.assertFalse(q.reconcile(state)[0])
-        other=runner.new_state();q.reconcile(other);other['candidates'][0]['status']='needs_review'
+        other=runner.new_state();q.reconcile(other)
+        for r in other['candidates']:r['status']='ready'
+        other['candidates'][0]['status']='needs_review'
         self.assertEqual(q.reconcile(other)[1],'SPECIAL_TOPIC_NEEDS_REVIEW')
 
     def test_budget_wait_does_not_count_as_stall_and_time_limit_survives_restore(self):

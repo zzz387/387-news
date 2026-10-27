@@ -38,27 +38,36 @@ def new_state():
 
 
 PREVIOUS_DEFINITION_HASH='5921ed0c3b6f8750294f2336f71f290f4f5e104df7d932a123781086b3eaac98'
+PREVIOUS_BASIS_HASH='2ea5e5239ee5937d5922e2f3eac9f05f5db27ab63999b77ea8f187d8289873d8'
 
 
 def refresh_definition(state):
     identity=state.get('special_edition',{})
     if identity=={'id':sc.ID,'definition_hash':p.digest(sc.definition())}:return state
-    if identity!={'id':sc.ID,'definition_hash':PREVIOUS_DEFINITION_HASH}:raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
+    if identity.get('id')!=sc.ID or identity.get('definition_hash') not in (PREVIOUS_DEFINITION_HASH,PREVIOUS_BASIS_HASH):raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
     replacement=new_state();old={r['special_slot']:r for r in state['candidates']}
     changed=[]
     for index,fresh in enumerate(replacement['candidates']):
         previous=old[fresh['special_slot']]
-        previous_support=list(dict.fromkeys(previous['original_urls'][1:]+previous['verification_urls']))
-        if previous['url']==fresh['url'] and previous_support==fresh['evidence_plan']['support']:
+        previous_plan=previous.get('evidence_plan') or {'primary':previous['url'],'support':list(dict.fromkeys(previous['original_urls'][1:]+previous['verification_urls'])),'studies':[],'mode':None}
+        if previous_plan==fresh['evidence_plan']:
             previous.update(evidence_plan=fresh['evidence_plan'],unused_original_urls=fresh['unused_original_urls'])
             replacement['candidates'][index]=previous
         else:
             state.setdefault('prior_source_plans',[]).append(copy.deepcopy(previous))
+            fresh['history']=copy.deepcopy(previous.get('history',[]))
+            fresh['model_usage']=copy.deepcopy(previous.get('model_usage',{}))
+            for key in ('article_repair_count','repair_count','section_attempts','analysis_repairs','coverage_repairs'):
+                if key in previous.get('progress',{}):fresh['progress'][key]=copy.deepcopy(previous['progress'][key])
             state.get('articles',{}).pop(previous['id'],None);state.get('dossiers',{}).pop(previous['id'],None)
             changed.append(previous['special_slot'])
     state['candidates']=replacement['candidates'];state['special_edition']=replacement['special_edition']
     if changed:
         state['audit_passed']=False;state.pop('issue_approval_hash',None);state['selected_ids']=[]
+        priority=state.get('production_priority',{})
+        if priority.get('reason')=='SPECIAL_TOPIC_NEEDS_REVIEW':
+            priority.setdefault('repair_history',[]).append({'reason':priority['reason'],'new_evidence_slots':changed})
+            priority['status']='ACTIVE';priority.pop('reason',None)
     print('[special-source-migration] '+json.dumps({'changed_slots':changed,'quota_preserved':True,'unrelated_progress_preserved':True}))
     return state
 
@@ -123,7 +132,7 @@ def study_links(source):
 def probe():
     config=sc.definition();urls=list(dict.fromkeys(u for slot in config['slots'] for u in slot['original_urls']+[sc.evidence_plan(slot)['primary']]+sc.evidence_plan(slot)['support']+sc.evidence_plan(slot)['studies']))
     from scripts.public_sources41 import Session
-    fetch=Session().fetch
+    public_session=Session();fetch=public_session.fetch
     def inspect(url):
         try:
             source=fetch(url);mode,decision=rights41.select_mode(source)
@@ -133,6 +142,19 @@ def probe():
                 'metadata_status':source['metadata_status'],'study_urls':study_links(source)}
         except Exception as exc:
             row={'url':url,'status':'blocked','code':getattr(exc,'code',None) if isinstance(exc,p.Blocked) else type(exc).__name__}
+            if row['code']=='SOURCE_EXTRACTION_PARTIAL' and urlparse(url).hostname=='vm.ru':
+                from scripts import source_dom41 as dom
+                html=public_session.cache.get(url)
+                if isinstance(html,str):
+                    document=dom.Document();document.feed(html);document.close()
+                    regions,method=dom.choose_region(document)
+                    row['public_dom']={'method':method,'regions':len(regions),'nodes':[
+                        {'tag':node.tag,'class':node.attrs.get('class','')[:180],'id':node.attrs.get('id','')[:100],
+                         'itemprop':node.attrs.get('itemprop',''),'closed':node.closed,'characters':len(node.text()),
+                         'headings':sum(child.tag in ('h1','h2','h3') for child in node.all())}
+                        for node in document.root.all() if node.tag in ('article','main') or
+                        re.search(r'article|content|text-body',node.attrs.get('class',''),re.I)][:120]}
+
             if 'source' in locals():
                 try:
                     row['metadata']={key:source.get(key) for key in ('title','canonical','language','author','published','publisher','metadata_gaps','metadata_status','extraction_method')}
@@ -170,6 +192,15 @@ def probe():
     return report
 
 
+
+
+def neutral_fact_base(plan,evidence):
+    if not set(plan['fact_base_urls'])<=set(evidence):raise p.Blocked('SPECIAL_NEUTRAL_FACT_BASE_INCOMPLETE')
+    return [copy.deepcopy(claim) for url in plan['fact_base_urls'] for claim in evidence[url]['claims']]
+
+def unsupported_palette(text):
+    return bool(re.search(r'(?i)(?:100|сотн\w*|ста|сто)\s+(?:[\w-]+\s+){0,2}(?:оттен\w*|расцвет\w*|цветов\w*\s+(?:решен\w*|вариант\w*))',text))
+
 class Editor(e.Editor):
     def source_verified(self,state,record):
         # Resolve full originals, rights and studies before spending a single model request.
@@ -197,6 +228,17 @@ class Editor(e.Editor):
         if record['mode']=='INDEPENDENT_ARTICLE':
             primary=list(record['claims']);ids={x['id'] for x in primary}
             record['claims']=primary+[c for item in evidence.values() for c in item['claims'] if c['id'] not in ids]
+        if plan.get('fact_base_urls'):
+            record['primary_analysis_claims']=copy.deepcopy(record['claims'])
+            record['claims']=neutral_fact_base(plan,evidence)
+            record['requirements']=list(plan['writer_requirements'])
+        if record['special_slot']==2:
+            rejected=[claim for claim in record['claims'] if unsupported_palette(claim['fact'])]
+            if rejected:
+                record.setdefault('excluded_ambiguous_claims',[]).extend(copy.deepcopy(rejected))
+                record['claims']=[claim for claim in record['claims'] if claim not in rejected]
+                print('[special-fact-diagnostic] '+json.dumps({'slot':2,'code':'UNSUPPORTED_HUNDRED_SHADES','excluded':len(rejected)}))
+        record['public_reference_urls']=list(dict.fromkeys(plan.get('public_citation_urls',[])+studies))
         record['special_study_urls']=studies
         record['checks']['source_verified']['special_evidence_complete']=True
         self.persist()
@@ -206,6 +248,7 @@ class Editor(e.Editor):
             self.source_verified(state,record)
         result=super().finish(state,record)
         if result['category']!=record['category_hint']:raise p.Blocked('SPECIAL_TOPIC_CATEGORY_CHANGED')
+        if record['special_slot']==2 and unsupported_palette(e.content.body(result)):raise p.Blocked('UNSUPPORTED_HUNDRED_SHADES')
         if record['special_slot']==3 and len(result.get('activities',[]))!=21:raise p.Blocked('SPECIAL_21_COMPLETE_ACTIVITIES_REQUIRED')
         return result
 
@@ -322,6 +365,14 @@ def run():
         'sections':sum(len(r.get('progress',{}).get('sections',{})) for r in state['candidates']),
         'priority_restored':bool(state.get('production_priority')),'daily_date':daily.get('date') if daily else None,
         'daily_articles':sum(r.get('status')=='ready' for r in daily.get('candidates',[])) if daily else None}))
+    if state.get('all_sources_independence_revision')!=1:
+        rechecks=[]
+        for record in state['candidates']:
+            if record.get('status')=='ready' and record.get('mode')=='INDEPENDENT_ARTICLE':
+                record['status']='preparing';record['checks'].pop('editorial_checked',None);record['checks'].pop('ready_to_publish',None)
+                rechecks.append(record['special_slot'])
+        state['all_sources_independence_revision']=1
+        print('[special-independence-scope] '+json.dumps({'recheck_slots':rechecks,'accepted_text_preserved':True}))
     e.restore_preparation_repairs(state)
     priority_first=os.getenv('SPECIAL_PRIORITY_FIRST')=='true'
     if priority_first:
