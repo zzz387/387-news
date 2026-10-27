@@ -44,3 +44,11 @@ approved articles, the source/rights gates, final issue audit, real-page browser
 checks, Pages deployment, and HTTPS verification of overview/archive/eight pages.
 Original 003 and the daily homepage remain unchanged. The next queue wake verifies
 the delivered issue and persists COMPLETED before daily generation resumes.
+
+After saved progress, `special-continue` can dispatch the SAME workflow once,
+under the same root mutex. It has scoped `actions: write`, but no Gemini or draft
+key. It restores counts-only accounting, checks quota/cooldown and other queued
+production, and never dispatches after zero requests or a terminal priority hold.
+The persisted priority lifetime/productive-run/stall limits also bound the chain.
+No cron or request limit changes. The existing cron remains the fallback after
+cooldown, quota exhaustion, or dispatch failure.

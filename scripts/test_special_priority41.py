@@ -114,3 +114,15 @@ class SectionTests(unittest.TestCase):
             return {'id':'s','finished':True,'blocks':[{'kind':'paragraph','text':'Самостоятельное учебное объяснение.'}],
                     'activities':[],'covered_requirements':[]}
         e.Editor(call=call).prepare(e.new_state('2026-10-27'),r)
+
+
+class ContinuationTests(unittest.TestCase):
+    def test_one_same_workflow_continuation_respects_quota_cooldown_and_existing_run(self):
+        from scripts import special_continue41 as continuation
+        now=datetime(2026,10,27,6,tzinfo=timezone.utc);ledger={'day':'2026-10-27','requests':72,'models':{'lite':72}}
+        runs=[{'id':1,'status':'in_progress'}];before=copy.deepcopy(ledger)
+        self.assertTrue(continuation.decision(ledger,runs,1,now)[0]);self.assertEqual(ledger,before)
+        self.assertFalse(continuation.decision(dict(ledger,requests=220),runs,1,now)[0])
+        self.assertFalse(continuation.decision(dict(ledger,cooldowns={'lite':now.timestamp()+10}),runs,1,now)[0])
+        self.assertFalse(continuation.decision(ledger,runs+[{'id':2,'status':'queued'}],1,now)[0])
+        self.assertFalse(continuation.decision(dict(ledger,day='2026-10-26'),runs,1,now)[0])

@@ -540,7 +540,7 @@ jobs:
         run: python scripts/site_checks.py --expected-date "$EXPECTED_DATE" --attempts 5
 
   monitor:
-    needs: [prepare, deploy]
+    needs: [special-003-r, prepare, deploy]
     if: ${{ always() && github.ref == 'refs/heads/main' && !(github.event_name == 'push' && (contains(github.event.head_commit.message, '[special setup]') || contains(github.event.head_commit.message, '[maintenance only]'))) && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -558,6 +558,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PIPELINE_STATUS: ${{ needs.prepare.outputs.pipeline_status }}
+          SPECIAL_PRIORITY_HOLD: ${{ needs.special-003-r.outputs.hold_daily }}
         run: python scripts/release_monitor.py
 
   special-003-r:
@@ -568,6 +569,43 @@ jobs:
       daily_run_used: 0
       priority_first: true
     secrets: inherit
+
+  special-continue:
+    needs: [special-003-r, prepare, deploy, monitor]
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.special-003-r.result == 'success' && needs.special-003-r.outputs.hold_daily == 'true' && needs.special-003-r.outputs.run_used != '0' && needs.special-003-r.outputs.run_used != '' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      SPECIAL_HOLD_DAILY: ${{ needs.special-003-r.outputs.hold_daily }}
+      SPECIAL_RUN_USED: ${{ needs.special-003-r.outputs.run_used }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'cryptography>=44,<49'
+      - name: Locate the current counts-only shared ledger
+        id: locate
+        run: python -m scripts.special003r --locate
+      - name: Restore shared accounting with the official action
+        if: ${{ steps.locate.outputs.quota_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.locate.outputs.quota_id }}
+          run-id: ${{ steps.locate.outputs.quota_run }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/continuation-quota
+          merge-multiple: true
+      - name: Continue once only when no other producer is waiting and quota permits
+        env:
+          QUOTA_CHECKPOINT_FILE: ${{ runner.temp }}/continuation-quota/quota.json
+        run: python -m scripts.special_continue41
 
   special-initialize:
     # Single setup wake-up: no daily generation, no Gemini, no ledger writes.
