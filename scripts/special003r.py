@@ -132,7 +132,7 @@ def study_links(source):
 def probe():
     config=sc.definition();urls=list(dict.fromkeys(u for slot in config['slots'] for u in slot['original_urls']+[sc.evidence_plan(slot)['primary']]+sc.evidence_plan(slot)['support']+sc.evidence_plan(slot)['studies']))
     from scripts.public_sources41 import Session
-    fetch=Session().fetch
+    public_session=Session();fetch=public_session.fetch
     def inspect(url):
         try:
             source=fetch(url);mode,decision=rights41.select_mode(source)
@@ -142,6 +142,19 @@ def probe():
                 'metadata_status':source['metadata_status'],'study_urls':study_links(source)}
         except Exception as exc:
             row={'url':url,'status':'blocked','code':getattr(exc,'code',None) if isinstance(exc,p.Blocked) else type(exc).__name__}
+            if row['code']=='SOURCE_EXTRACTION_PARTIAL' and urlparse(url).hostname=='vm.ru':
+                from scripts import source_dom41 as dom
+                html=public_session.cache.get(url)
+                if isinstance(html,str):
+                    document=dom.Document();document.feed(html);document.close()
+                    regions,method=dom.choose_region(document)
+                    row['public_dom']={'method':method,'regions':len(regions),'nodes':[
+                        {'tag':node.tag,'class':node.attrs.get('class','')[:180],'id':node.attrs.get('id','')[:100],
+                         'itemprop':node.attrs.get('itemprop',''),'closed':node.closed,'characters':len(node.text()),
+                         'headings':sum(child.tag in ('h1','h2','h3') for child in node.all())}
+                        for node in document.root.all() if node.tag in ('article','main') or
+                        re.search(r'article|content|text-body',node.attrs.get('class',''),re.I)][:120]}
+
             if 'source' in locals():
                 try:
                     row['metadata']={key:source.get(key) for key in ('title','canonical','language','author','published','publisher','metadata_gaps','metadata_status','extraction_method')}
