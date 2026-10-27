@@ -72,3 +72,24 @@ class IndependentBasisTests(unittest.TestCase):
             return {'approve':True,'issues':[],'unresolved':[],'covered_ids':[x['id'] for x in part.get('pieces',[part])],'affected_ids':[]}
         with self.assertRaisesRegex(p.Blocked,'REVIEW_REJECTED'):e.Editor(call=model).review(e.new_state('2026-10-27'),r,'editorial_checked')
         self.assertNotIn('editorial_checked',r['checks'])
+
+
+    def test_vm_complete_end_marked_body_excludes_recommendation_and_lazy_articles(self):
+        from scripts import source41
+        url='https://vm.ru/moscow/1340223-publication'
+        html='<html lang="ru"><head><title>Full publication</title><meta property="og:title" content="Full publication"></head><body><main>'
+        html+='<article class="topic"><p>Unrelated recommendation</p></article>'
+        html+='<div class="article marticle_first"><h1>Full publication</h1><div class="article-view with-end-mark"><p>Full introduction.</p>'
+        html+=''.join('<h3>Section '+str(i)+'</h3><p>Complete section '+str(i)+'.</p>' for i in range(7))+'<p>FINAL_FULL_BODY</p></div></div>'
+        html+='<div class="article lazyarticle"><article><p>Not part of this article</p></article></div></main></body></html>'
+        result=source41.extract(html,url);text=' '.join(b['text'] for b in result['blocks'])
+        self.assertIn('FINAL_FULL_BODY',text);self.assertIn('Complete section 6.',text)
+        self.assertNotIn('Unrelated recommendation',text);self.assertNotIn('Not part of this article',text)
+        self.assertEqual(result['extraction_method'],'vm_complete_publication')
+
+    def test_vm_missing_end_marker_or_truncated_body_never_becomes_full_original(self):
+        from scripts import source41
+        url='https://vm.ru/moscow/1340223-publication'
+        for html in ('<html><body><div class="marticle_first"><div class="article-view"><p>Only a fragment.</p></div></div></body></html>',
+                     '<html><body><div class="marticle_first"><div class="article-view with-end-mark"><p>Truncated'):
+            with self.assertRaisesRegex(p.Blocked,'SOURCE_EXTRACTION_PARTIAL'):source41.extract(html,url)
