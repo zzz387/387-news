@@ -25,7 +25,9 @@ def public_article(record):
     return {**{k:copy.deepcopy(a.get(k,'')) for k in ('title','teaser','category','kind','mode','slug','blocks','activities')},
             'primary_source':{k:source[k] for k in ('url','title','publisher','author','published')},
             'attribution':copy.deepcopy(record['rights'].get('attribution',{})),
-            'images':copy.deepcopy(record.get('images',[]))}
+            'images':copy.deepcopy(record.get('images',[])),
+            'public_references':[{k:item.get(k,'') for k in ('url','title','publisher','author','published')}
+                for item in record.get('supporting_sources',[]) if item.get('full_text_verified') and item['url'] in record.get('public_reference_urls',[]) and item['url']!=source['url']]}
 
 
 def images_valid(article,root):
@@ -43,6 +45,8 @@ def source_block(article):
     prefix='Перевод. ' if mode=='FULL_TRANSLATION' else 'Самостоятельная статья на основе материалов. ' if mode=='INDEPENDENT_ARTICLE' else ''
     text=(f'<aside class="source-primary"><p>{prefix}Источник: {escape(s["publisher"])} — '
           f'<a href="{escape(s["url"],quote=True)}" rel="noopener noreferrer">«{escape(s["title"])}»</a>.</p>')
+    for ref in article.get('public_references',[]):
+        text+='<p>'+escape(ref['publisher'])+' — <a href="'+escape(ref['url'],quote=True)+'" rel="noopener noreferrer">«'+escape(ref['title'])+'»</a>.</p>'
     attribution=article.get('attribution') or {}
     if attribution:
         text+='<p class="license-attribution">'+escape(attribution.get('author') or s['author'])
@@ -154,6 +158,8 @@ def markdown(article):
     source=article['primary_source']
     prefix='Перевод. ' if article['mode']=='FULL_TRANSLATION' else 'Самостоятельная статья на основе материалов. ' if article['mode']=='INDEPENDENT_ARTICLE' else ''
     out.append(prefix+'Источник: '+source['publisher']+' — ['+source['title']+']('+source['url']+').')
+    for ref in article.get('public_references',[]):
+        out.append(ref['publisher']+' — ['+ref['title']+']('+ref['url']+').')
     att=article.get('attribution') or {}
     if att: out.append((att.get('author') or source['author'])+' · '+att.get('license','')+' '+att.get('license_url',''))
     return '\n'.join(out)+'\n'

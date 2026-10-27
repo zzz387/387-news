@@ -26,7 +26,7 @@ def reconcile(state,now=None):
     if now-datetime.fromisoformat(priority['started_at'])>=timedelta(hours=cfg['maximum_active_hours']):reason='SPECIAL_PRIORITY_TIME_LIMIT'
     elif priority['productive_runs']>=cfg['maximum_productive_runs']:reason='SPECIAL_PRIORITY_RUN_LIMIT'
     elif priority['stalled_runs']>=cfg['maximum_stalled_runs']:reason='SPECIAL_PRIORITY_STALLED'
-    elif any(r.get('status')=='needs_review' for r in state['candidates']):reason='SPECIAL_TOPIC_NEEDS_REVIEW'
+    elif any(r.get('status')=='needs_review' for r in state['candidates']) and not any(r.get('status') in ('discovered','preparing','retryable_error') for r in state['candidates']):reason='SPECIAL_TOPIC_NEEDS_REVIEW'
     elif state.get('status')=='BLOCKED':reason=state.get('block_code','SPECIAL_BLOCKED')
     if reason:
         priority.update(status='BLOCKED',reason=reason)

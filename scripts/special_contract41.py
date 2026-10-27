@@ -38,6 +38,7 @@ def validate_slots(state):
     if sorted(r.get('special_slot',0) for r in selected)!=list(range(1,9)):raise p.Blocked('SPECIAL_EIGHT_TOPICS_REQUIRED')
     for r in selected:
         expected=config['slots'][r['special_slot']-1]
+        if state.get('all_sources_independence_revision')==1 and r['article']['mode']=='INDEPENDENT_ARTICLE' and r.get('progress',{}).get('reviews',{}).get('editorial_checked',{}).get('independence_scope')!='all_commissioned_sources_v1':raise p.Blocked('SPECIAL_ALL_SOURCE_INDEPENDENCE_REQUIRED')
         plan=evidence_plan(expected)
         if (r['url']!=plan['primary'] or r['source']['url']!=plan['primary'] or
                 r.get('original_urls')!=expected['original_urls'] or r['article']['category']!=expected['category']):
@@ -46,6 +47,10 @@ def validate_slots(state):
         if not r['checks'].get('source_verified',{}).get('special_evidence_complete') or not set(plan['support'])<=set(evidence):
             raise p.Blocked('SPECIAL_ORIGINAL_COMPANIONS_REQUIRED')
         if plan.get('mode') and r['article']['mode']!=plan['mode']:raise p.Blocked('SPECIAL_INDEPENDENT_ALTERNATIVE_REQUIRED')
+        if plan.get('fact_base_urls'):
+            allowed={evidence[url].get('id') for url in plan['fact_base_urls']}
+            if None in allowed:raise p.Blocked('SPECIAL_NEUTRAL_FACT_BASE_INCOMPLETE')
+            if not r['claims'] or any(claim['source_id'] not in allowed for claim in r['claims']):raise p.Blocked('SPECIAL_WRITER_FACT_BASE_CHANGED')
         if expected['category']=='Здоровье и движение':
             studies=r.get('special_study_urls',[])
             evidence[r['source']['url']]=r['source']

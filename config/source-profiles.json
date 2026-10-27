@@ -85,6 +85,10 @@
     "vatican.va": {
       "publisher": "The Holy See",
       "evidence_url": "https://www.vatican.va/content/vatican/en.html"
+    },
+    "vm.ru": {
+      "publisher": "Вечерняя Москва",
+      "evidence_url": "https://vm.ru/about"
     }
   }
 }

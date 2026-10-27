@@ -337,6 +337,9 @@ class Editor:
                 if progress.get('article_repair_count'):
                     for section in progress['outline']['sections']:section['id']='revision'+str(progress['article_repair_count'])+'-'+section['id']
                 if contract.is_special(state) and progress['outline'].get('kind','').casefold()=='новость':progress['outline']['kind']='неоперативная статья'
+                revision=record.get('evidence_plan',{}).get('commission_revision')
+                if revision:
+                    for section in progress['outline']['sections']:section['id']=revision+'-'+section['id']
                 self.persist()
             outline=progress['outline']
             try:content.validate_outline(outline,record)
@@ -454,7 +457,8 @@ class Editor:
     def review(self,state,record,stage):
         self.active_stage=stage
         article=record['article']; source=record['source']; fp=article_hash(article,source,record['rights'])
-        if valid_gate(record,stage,fp): return
+        all_sources_review=record['progress'].get('reviews',{}).get(stage,{}).get('independence_scope')=='all_commissioned_sources_v1'
+        if valid_gate(record,stage,fp) and (stage!='editorial_checked' or record['mode']!='INDEPENDENT_ARTICLE' or all_sources_review): return
         record.pop('rejected_part',None)
         if stage=='completeness_checked' and record['mode']!='INDEPENDENT_ARTICLE': self.practical_manifest(record)
         content.semantic_structure(article,source,practical=record['mode']=='INDEPENDENT_ARTICLE' or stage!='fact_checked')
@@ -534,20 +538,20 @@ class Editor:
                 raise
             for member in group: progress['parts'][member['id']]=result
             self.persist()
-        if stage=='editorial_checked' and record['mode']=='INDEPENDENT_ARTICLE' and progress.get('independence_hash')!=fp:
+        if stage=='editorial_checked' and record['mode']=='INDEPENDENT_ARTICLE' and (progress.get('independence_hash')!=fp or progress.get('independence_scope')!='all_commissioned_sources_v1'):
             result=self.call('Проверка самостоятельности режима C. Отдельно проверь композицию, формулировки, '
                 'подбор примеров и объяснения. Использование общих неохраняемых фактов допустимо без разрешения автора. '
                 'Но перевод, синонимический рерайт или сохранение охраняемой подборки не превращают произведение в самостоятельное. '
                 'Сомнения — unresolved. Для темы21 занятия нужен собственный набор и организация применимых действий, '
                 'а не перевод той же подборки. covered_ids=[composition,wording,examples,explanations]. '
-                '\nПолный оригинал: '+json.dumps(source['blocks'],ensure_ascii=False)+
+                '\nПолные оригиналы ВСЕХ использованных материалов (проверь самостоятельность относительно каждого): '+json.dumps([{'url':original['url'],'blocks':original['blocks']} for original in [source]+supporting],ensure_ascii=False)+
                 '\nСамостоятельная статья: '+json.dumps({'title':article['title'],'blocks':article['blocks'],'activities':article.get('activities',[])},ensure_ascii=False),
                 output_tokens=5000,schema='v41_review')
             try: content.approved_review(result,['composition','wording','examples','explanations'])
             except policy.Blocked:
                 record['rejected_part']={'stage':stage,'block_id':'','result':result,'scope':'article_independence'}; review_diagnostic(stage,result,independence=True); self.persist()
                 raise
-            progress['independence_hash']=fp; progress['independence_result']=result; self.persist()
+            progress['independence_hash']=fp; progress['independence_result']=result; progress['independence_scope']='all_commissioned_sources_v1'; self.persist()
         record['checks'][stage]={'approved':True,'input_hash':fp,'checked_at':datetime.now(policy.TZ).isoformat()}
         self.active_stage=None
         event(state,record,stage,'approved'); self.persist()

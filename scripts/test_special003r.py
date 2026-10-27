@@ -23,7 +23,8 @@ def complete_special():
         r['article']['blocks']=[{'kind':'paragraph','text':'Самостоятельное вымышленное объяснение с подробностью '+str(index)}]
         r['article']['category']=slot['category'];r['article']['activities']=[]
         r['rights']=rights41.decision(r['source'],r['mode']);r['article']['attribution']=r['rights'].get('attribution',{})
-        r['supporting_sources']=[{'url':u,'full_text_verified':True} for u in plan['support']]
+        r['supporting_sources']=[{'id':p.digest(u),'url':u,'full_text_verified':True} for u in plan['support']]
+        if plan.get('fact_base_urls'):r['claims']=[{'id':'fixture-fact','source_id':p.digest(plan['fact_base_urls'][0]),'fact':'Synthetic verified fact'}]
         if slot['category']=='Здоровье и движение':
             r['special_study_urls']=plan['studies'] or ['https://doi.org/10.synthetic/'+str(index)]
             r['supporting_sources'] += [{'url':r['special_study_urls'][0],'full_text_verified':True}]
