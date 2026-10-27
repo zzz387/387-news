@@ -183,14 +183,18 @@ class Editor:
             if piece['id'] not in progress and piece['id'] in shared:
                 progress[piece['id']]=copy.deepcopy(shared[piece['id']])
         pending=[piece for piece in pieces if piece['id'] not in progress]
+        historical=contract.is_special(getattr(self,'state',{}))
         repairs=record['progress'].setdefault('analysis_repairs',{})
         for group in content.operation_groups(pending):
             group_id=policy.digest([part['id'] for part in group])
             attempt=repairs.setdefault(group_id,{'failures':record['progress'].pop('_prior_analysis_failures',0),'code':''})
             evidence=content.evidence_units(group);by_evidence={item['id']:item for item in evidence}
             while True:
+                cached=None
                 if attempt['failures']>=policy.CONFIG['technical']['content_attempts']:
-                    raise policy.Blocked(attempt['code'] or 'SOURCE_ANALYSIS_INCOMPLETE')
+                    if historical and attempt.get('code')=='EVENT_DATE_UNVERIFIED' and not attempt.get('historical_revalidation_v1') and attempt.get('last_rejected_result'):
+                        cached=copy.deepcopy(attempt['last_rejected_result']);attempt['historical_revalidation_v1']=True
+                    else:raise policy.Blocked(attempt['code'] or 'SOURCE_ANALYSIS_INCOMPLETE')
                 prompt=('Изучи полный оригинал по последовательным частям. Эта часть: '+json.dumps(content.operation_payload(group),ensure_ascii=False)+
                 '\nМетаданные: '+json.dumps({k:source[k] for k in ('id','url','title','author','published','language')},ensure_ascii=False)+
                 '\nДословные свидетельства: '+json.dumps(evidence,ensure_ascii=False)+
@@ -209,7 +213,15 @@ class Editor:
                         'covered_ids — все id переданных частей. Не выдумывай подтверждение. Если факт нельзя '
                         'подтвердить точной цитатой, не включай его в claims. Дату не указывай без дословного свидетельства. '
                         'Предпочитай существующий evidence_id из таблицы qN: цитату и source_id программа привяжет сама; quote можно оставить пустым. Не придумывай идентификатор.')
-                result=self.call(prompt,output_tokens=8000,schema='v41_analysis')
+                if historical:prompt+='\nЭто фактическая база явно обозначенного неоперативного переиздания, а не новая новость. event_date, event_date_quote, event_evidence_id оставь пустыми. Даты внутри утверждений всё равно требуют точного подтверждения.'
+                result=cached if cached is not None else self.call(prompt,output_tokens=8000,schema='v41_analysis')
+                if historical:
+                    if result.get('event_date') or result.get('event_evidence_id'):
+                        attempt['quarantined_event_date']=copy.deepcopy({k:result.get(k) for k in ('event_date','event_date_quote','event_evidence_id')})
+                        print('[analysis-diagnostic] '+json.dumps({'code':'HISTORICAL_EVENT_DATE_NOT_USED','cached_revalidation':cached is not None}),flush=True)
+                    result.update(event_date='',event_date_quote='',event_evidence_id='')
+                    if result.get('kind','').casefold()=='новость':result['kind']='неоперативная статья'
+
                 diagnosis='UNKNOWN'
                 try:
                     diagnosis='COVERAGE_MISMATCH'
@@ -317,10 +329,14 @@ class Editor:
                     '\n2–3 глубоких очерка — предпочтение, не квота объёма. Никаких норм длины. '
                     'Если тема обещает '+str(content.promised_activities(source['title']) or 'конкретные')+
                     ' занятий, запланируй применимые самостоятельные инструкции и безопасность. '
+                    'Предыдущие причины отказа статьи (если есть): '+str(progress.get('outline_feedback',''))+'\n'
                     'Верни title,teaser,category,kind,sections[id,heading,purpose,fact_ids,requirement_ids,activity_count]. '
                     'requirement_ids — распределённые по разделам id требований из таблицы '+json.dumps(requirement_refs,ensure_ascii=False)+
                     '. Каждое требование назначь хотя бы одному разделу. activity_count — точное число самостоятельных занятий в разделе (0 если их нет). '
                     'Суммарно нужно ровно '+str(content.promised_activities(record.get('commission',{}).get('original_topic','')) or content.promised_activities(source['title']) or 0)+' занятий, если тема обещает занятия; не повторяй их между разделами.',output_tokens=6000,schema='v41_outline')
+                if progress.get('article_repair_count'):
+                    for section in progress['outline']['sections']:section['id']='revision'+str(progress['article_repair_count'])+'-'+section['id']
+                if contract.is_special(state) and progress['outline'].get('kind','').casefold()=='новость':progress['outline']['kind']='неоперативная статья'
                 self.persist()
             outline=progress['outline']
             if outline.get('category') not in policy.CATEGORIES or not outline.get('sections'): raise policy.Blocked('OUTLINE_INVALID')
@@ -336,7 +352,7 @@ class Editor:
                         progress.setdefault('section_rejections',[]).append({'section_id':section['id'],'code':exc.code,'result':done.pop(section['id'])})
                         previous=progress.setdefault('section_attempts',{})
                         previous[section['id']]=previous.get(section['id'],0)+1
-                        progress['section_error']=exc.code;self.persist()
+                        progress['section_error']=exc.code+(': '+exc.detail if exc.detail else '');self.persist()
                     else:continue
                 failures=progress.setdefault('section_attempts',{})
                 while failures.get(section['id'],0)<policy.CONFIG['technical']['content_attempts']:
@@ -359,7 +375,7 @@ class Editor:
                         content.validate_section(result,section,record,requirement_refs)
                     except policy.Blocked as exc:
                         failures[section['id']]=failures.get(section['id'],0)+1
-                        progress['section_error']=exc.code
+                        progress['section_error']=exc.code+(': '+exc.detail if exc.detail else '')
                         progress.setdefault('section_rejections',[]).append({'section_id':section['id'],'code':exc.code,'result':copy.deepcopy(result)})
                         event(state,record,'section','retry_pending',exc.code);self.persist();continue
                     done[section['id']]=result; self.persist(); break
@@ -493,6 +509,7 @@ class Editor:
                 scopes={member.get('section_id') or member['block_id'].split('/')[0] for member in scoped}
                 block_id=(next(iter(scopes))+'/repair') if len(scopes)==1 and set(affected)<={m['id'] for m in group} else ''
                 record['rejected_part']={'stage':stage,'block_id':block_id,'result':result}
+                review_diagnostic(stage,result,scoped=bool(block_id))
                 self.persist()
                 raise
             for member in group: progress['parts'][member['id']]=result
@@ -508,7 +525,7 @@ class Editor:
                 output_tokens=5000,schema='v41_review')
             try: content.approved_review(result,['composition','wording','examples','explanations'])
             except policy.Blocked:
-                record['rejected_part']={'stage':stage,'block_id':'','result':result}; self.persist()
+                record['rejected_part']={'stage':stage,'block_id':'','result':result,'scope':'article_independence'}; review_diagnostic(stage,result,independence=True); self.persist()
                 raise
             progress['independence_hash']=fp; progress['independence_result']=result; self.persist()
         record['checks'][stage]={'approved':True,'input_hash':fp,'checked_at':datetime.now(policy.TZ).isoformat()}
@@ -531,6 +548,8 @@ class Editor:
                 progress=record['progress']
                 section_id=next((s['id'] for s in progress.get('outline',{}).get('sections',[])
                                  if rejected.get('block_id','').startswith(s['id']+'/')),None)
+                if exc.code=='REVIEW_REJECTED' and not section_id and begin_article_repair(state,record):
+                    self.persist();continue
                 if (exc.code!='REVIEW_REJECTED' or record['mode']!='INDEPENDENT_ARTICLE' or not section_id
                         or progress.get('repair_count',0)>=policy.CONFIG['technical']['repair_attempts']): raise
                 progress['repair_count']=progress.get('repair_count',0)+1
@@ -554,6 +573,36 @@ class Editor:
         event(state,record,'ready_to_publish','approved'); self.persist()
         return article
 
+
+
+def review_diagnostic(stage,result,scoped=False,independence=False):
+    text=json.dumps(result,ensure_ascii=False).casefold()
+    classes=[]
+    for code,pattern in [('INDEPENDENCE',r'копир|рерайт|перевод|композиц|подборк|самостоятель|copyright|independ'),
+                         ('FACTS',r'факт|достовер|подтвержд|evidence|fact'),
+                         ('COMPLETENESS',r'полнот|не раскры|инструкц|complete'),
+                         ('LANGUAGE',r'язык|стил|канцеляр|language'),('DATE',r'дат|date')]:
+        if re.search(pattern,text):classes.append(code)
+    if independence and 'INDEPENDENCE' not in classes:classes.append('INDEPENDENCE')
+    print('[review-diagnostic] '+json.dumps({'stage':stage,'scope':'section' if scoped else 'article',
+        'categories':classes or ['UNCLASSIFIED']}),flush=True)
+
+
+def begin_article_repair(state,record):
+    rejected=record.get('rejected_part',{});progress=record['progress']
+    if (record.get('mode')!='INDEPENDENT_ARTICLE' or not rejected or rejected.get('block_id')
+            or progress.get('article_repair_count',0)>=policy.CONFIG['technical']['repair_attempts']):return False
+    progress.setdefault('article_repair_history',[]).append({'refusal':copy.deepcopy(rejected),
+        'article':copy.deepcopy(record.get('article')),'outline':progress.get('outline'),
+        'sections':progress.get('sections',{}),'reviews':progress.get('reviews',{})})
+    progress['article_repair_count']=progress.get('article_repair_count',0)+1
+    progress['outline_feedback']=json.dumps(rejected,ensure_ascii=False)
+    for key in ('outline','sections','reviews'):progress.pop(key,None)
+    record.pop('article',None)
+    for name in policy.STAGES:
+        if name!='source_verified':record['checks'].pop(name,None)
+    event(state,record,'repair','retry','WHOLE_ARTICLE_REPAIR_WITH_DIAGNOSIS')
+    return True
 
 def duplicate(article,record,others):
     def shingles(text):

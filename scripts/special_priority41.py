@@ -51,7 +51,7 @@ def finish_run(state,before,used):
 
 def emit(state,used=0):
     hold,reason=reconcile(state)
-    value={'id':sc.ID,'priority':state['production_priority']['status'],'hold_daily':hold,'reason':reason,
+    value={'id':sc.ID,'priority':state.get('production_priority',{}).get('status','DISABLED'),'hold_daily':hold,'reason':reason,
         'articles':sum(r.get('status')=='ready' for r in state['candidates']),
         'slots':[{'slot':r['special_slot'],'status':r['status'],
                   'sections':len(r.get('progress',{}).get('sections',{})),
@@ -61,3 +61,20 @@ def emit(state,used=0):
     with open(os.environ['GITHUB_OUTPUT'],'a') as stream:
         stream.write('hold_daily='+str(hold).lower()+'\nrun_used='+str(used)+'\n')
     return value
+
+
+def repair_real_run_v2(state):
+    """Address only failures demonstrated in run 40454216057; no accounting resets."""
+    if state.get('special_real_repair_revision')==2:return
+    changed=[]
+    for record in state['candidates']:
+        code=(record.get('history') or [{}])[-1].get('code')
+        if record.get('status')=='needs_review' and code in ('EVENT_DATE_UNVERIFIED','REVIEW_REJECTED'):
+            record['status']='preparing';changed.append(record['special_slot'])
+            record['commission']['kind']='Явно обозначенная неоперативная статья переиздания. Не выдавать старое событие за новую новость. Все даты и факты внутри текста требуют независимой проверки.'
+    priority=state.get('production_priority',{})
+    if changed and priority.get('reason')=='SPECIAL_TOPIC_NEEDS_REVIEW' and not any(r.get('status')=='needs_review' for r in state['candidates']):
+        priority.setdefault('repair_history',[]).append({'revision':2,'previous_status':priority['status'],'reason':priority['reason'],'slots':changed})
+        priority['status']='ACTIVE';priority.pop('reason',None)
+    state['special_real_repair_revision']=2
+    print('[special-repair-migration] '+json.dumps({'revision':2,'slots':changed,'quota_and_attempts_preserved':True}),flush=True)

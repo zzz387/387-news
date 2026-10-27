@@ -52,3 +52,25 @@ production, and never dispatches after zero requests or a terminal priority hold
 The persisted priority lifetime/productive-run/stall limits also bound the chain.
 No cron or request limit changes. The existing cron remains the fallback after
 cooldown, quota exhaustion, or dispatch failure.
+
+## Real run 40454216057
+
+The first protected run restored daily 27 October read-only and reserved exactly
+24 requests (shared UTC-day total 48 -> 72), with unchanged daily ciphertext.
+It exposed a date-only analysis refusal in the explicitly historical reissue and
+a whole-article independence refusal after an attributed local repair. Neither
+article was approved or published. The new historical protocol does not use an
+inferred event-date field for news admission: the output is explicitly a
+non-operational reissue, and every date inside its actual factual claims/article
+still faces literal evidence and independent fact review. An exhausted date-only
+response can be revalidated locally once, keeping the original failure counter
+and quarantined date inside the checkpoint; no HTTP reservation is erased.
+Daily news freshness and date-witness checks remain unchanged.
+
+Whole-article refusals now receive at most the existing two diagnosed new
+compositions of that article, preserving previous versions, accepted source
+analysis and every other article. All factual, completeness, language and
+independence gates repeat for the changed article. Public diagnostics contain
+only predefined reason categories and scope. A single explicit repair migration
+requeues only the demonstrated date/review failures and reactivates the existing
+priority without resetting its lifetime, productive-run count, attempts or quota.
