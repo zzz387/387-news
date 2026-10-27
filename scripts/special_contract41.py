@@ -38,7 +38,12 @@ def validate_slots(state):
     if sorted(r.get('special_slot',0) for r in selected)!=list(range(1,9)):raise p.Blocked('SPECIAL_EIGHT_TOPICS_REQUIRED')
     for r in selected:
         expected=config['slots'][r['special_slot']-1]
-        if state.get('all_sources_independence_revision')==1 and r['article']['mode']=='INDEPENDENT_ARTICLE' and r.get('progress',{}).get('reviews',{}).get('editorial_checked',{}).get('independence_scope')!='all_commissioned_sources_v1':raise p.Blocked('SPECIAL_ALL_SOURCE_INDEPENDENCE_REQUIRED')
+        if state.get('header_review_revision')==2:
+            from scripts import content41
+            if any(r['checks'].get(name,{}).get('review_scope')!=content41.READER_REVIEW_SCOPE for name in ('fact_checked','completeness_checked','editorial_checked')):raise p.Blocked('SPECIAL_READER_HEADER_REVIEW_REQUIRED')
+            if r['article']['mode']=='INDEPENDENT_ARTICLE' and r.get('progress',{}).get('reviews',{}).get('editorial_checked',{}).get('independence_scope')!=content41.INDEPENDENCE_REVIEW_SCOPE:raise p.Blocked('SPECIAL_READER_HEADER_INDEPENDENCE_REQUIRED')
+
+        if state.get('all_sources_independence_revision')==1 and r['article']['mode']=='INDEPENDENT_ARTICLE' and r.get('progress',{}).get('reviews',{}).get('editorial_checked',{}).get('independence_scope') not in ('all_commissioned_sources_v1','all_sources_title_teaser_body_v2'):raise p.Blocked('SPECIAL_ALL_SOURCE_INDEPENDENCE_REQUIRED')
         plan=evidence_plan(expected)
         if (r['url']!=plan['primary'] or r['source']['url']!=plan['primary'] or
                 r.get('original_urls')!=expected['original_urls'] or r['article']['category']!=expected['category']):

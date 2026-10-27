@@ -186,7 +186,7 @@ class SemanticTests(unittest.TestCase):
                 e.Editor(call=model,fetch=lambda url:s).finish(e.new_state('2026-10-27'),r)
                 self.assertEqual(r['mode'],mode); self.assertEqual(r['status'],'ready')
                 self.assertTrue(all(r['checks'][name]['approved'] for name in p.STAGES))
-                self.assertEqual(calls.count('v41_review'),6)
+                self.assertEqual(calls.count('v41_review'),9)  # title metadata + two original parts, at all three gates
 
     def test_technical_context_limit_never_sends_truncated_input(self):
         editor=e.Editor(call=lambda *a,**k:self.fail('Oversized operation must not be sent'))
