@@ -41,6 +41,7 @@ class RealRepairTests(unittest.TestCase):
         for index,code in enumerate(('EVENT_DATE_UNVERIFIED','REVIEW_REJECTED')):
             state['candidates'][index].update(status='needs_review',history=[{'code':code}])
             state['candidates'][index]['progress']['section_attempts']={'kept':2}
+        for r in state['candidates'][2:]:r['status']='ready'
         self.assertFalse(q.reconcile(state)[0]);untouched=copy.deepcopy(state['candidates'][2:])
         q.repair_real_run_v2(state);self.assertTrue(q.reconcile(state)[0])
         self.assertEqual(state['_quota_snapshot']['requests'],72);self.assertEqual(state['candidates'][2:],untouched)
