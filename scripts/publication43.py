@@ -93,7 +93,7 @@ def build(state,root,reserve=(),preview=False):
         try:
             no=news.get_next_number();issue=working/'issues'/date;issue.mkdir()
             data={'date':date,'number':no,'policy_version':'4.3','article_count':len(articles),
-                  'kind':'articles' if articles else 'source_digest','pages':{},'published_at':datetime.now(p.TZ).isoformat()}
+                  'kind':'articles' if articles else 'source_digest','pages':{},'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
                 file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version='4.3')))

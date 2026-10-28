@@ -266,3 +266,21 @@ class ModePreservation43Tests(unittest.TestCase):
             return verdict(prompt,r)
         e.Editor(call=model).finish(state(),r)
         self.assertEqual(calls,['v43_article','v43_final']);self.assertTrue(e.eligible(r))
+
+
+class ReleaseTime43Tests(unittest.TestCase):
+    def test_final_window_prepares_private_files_and_never_calls_gemini(self):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_RELEASE_APPROVED='true',GITHUB_REF_NAME='main'),patch.object(d,'reserve_catalog',return_value=[RESERVE_FIXTURE]):
+            r=root(temp);s=state();editor=Mock();editor.finish.side_effect=AssertionError('No new generation in delivery window')
+            self.assertTrue(d.advance(s,s['date'],False,SimpleNamespace(ROOT=r),now=NOW.replace(hour=5,minute=54),editor=editor))
+            editor.finish.assert_not_called();self.assertEqual(s['pipeline_status'],'PUBLISHING')
+            meta=pub.validate(r,s['date']);self.assertNotIn('published_at',meta);self.assertIn('prepared_at',meta)
+            workflow=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
+            self.assertLess(workflow.index('python -m scripts.release_queue --wait-until'),workflow.index('git add index.html'))
+
+    def test_commit_wait_gate_crosses_six_without_model_or_early_commit(self):
+        samples=iter([NOW.replace(hour=5,minute=59,second=59),NOW.replace(hour=6,minute=0,second=0)]);slept=[]
+        release_queue.wait_until_release('2026-10-27',clock=lambda:next(samples),sleep=slept.append)
+        self.assertEqual(slept,[1])
+        with self.assertRaisesRegex(RuntimeError,'OUTSIDE_FINAL_WINDOW'):
+            release_queue.wait_until_release('2026-10-28',clock=lambda:NOW,sleep=lambda seconds:self.fail('Do not park workflow for a day'))

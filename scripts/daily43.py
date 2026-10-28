@@ -1,5 +1,5 @@
 """Small daily controller using existing encryption, quota, mutex and Pages delivery."""
-import copy,json,os
+import copy,json,os,time
 from datetime import datetime,timedelta
 from pathlib import Path
 try:
@@ -63,12 +63,13 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     release=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
     budget=news.runtime.ACTIVE_BUDGET
     # Delivery has first claim on every due window; never wait for more model work.
-    if current<release:
+    if current<release-timedelta(minutes=10):
+        if budget:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
         discover(state);persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
         for record in state['candidates']:
             if len(e.select_ready(state))>=e.CONFIG['article_target']:break
-            if clock()>=release or not budget or not budget.can_request():break
+            if clock()>=release-timedelta(minutes=10) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
             if record['url'] in prior:record['status']='deferred';persist();continue
@@ -91,7 +92,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     state['public_article_count']=len(selected);persist()
     if not selected and not reserve:
         pipeline.status(state,'BLOCKED','refresh_verified_reserve','NO_SAFE_RESERVE');persist();return False
-    if clock()<release and not preview:
+    if clock()<release-timedelta(minutes=10) and not preview:
         pipeline.status(state,'APPROVED','publish_when_due');state['audit_passed']=True;persist();return False
     if preview:
         publication43.build(state,root,reserve,preview=True)

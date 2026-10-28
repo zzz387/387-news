@@ -37,7 +37,13 @@ they no longer impose their count/depth/audit rules on new 4.3 daily production.
   Eight C notes: 16 operations before transport retries. Actual HTTP attempts,
   including malformed answers and 429/503, still use the one global ledger.
 
-Before 06:00 the controller prepares useful material. At/after the release time,
+Before 05:50 the controller can prepare useful material. In the final ten minutes
+it only builds the admitted release privately and runs the existing browser gate;
+the commit step waits until 06:00 before publishing any files. Thus the existing
+05:54 window can deliver without deliberately waiting for the 06:17 wake-up.
+Metadata records preparation time and a not-before time, not a fabricated actual
+publication timestamp. HTTPS verification remains the proof of delivery.
+At/after the release time,
 it immediately uses every admitted article (1, 3, 8, 12, 13, etc.). If none is
 admitted, it uses a source digest without Gemini. Eight is only a preparation
 orientation. Due delivery never waits for the next candidate or API allowance.

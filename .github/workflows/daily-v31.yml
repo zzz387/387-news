@@ -485,7 +485,10 @@ jobs:
         id: commit
         if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}
         shell: bash
+        env:
+          ISSUE_DATE: ${{ steps.stage.outputs.issue_date }}
         run: |
+          python -m scripts.release_queue --wait-until "$ISSUE_DATE"
           git add index.html archive/index.html issues/ sitemap.xml
           if git diff --cached --quiet; then
             echo 'Approved issue already committed; retry deployment without changing the archive.'
