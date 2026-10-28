@@ -38,6 +38,7 @@ def target_date(root, now=None, check_public=None):
     if now.strftime('%H:%M')>=policy41.RELEASE_TIME and check_public is not None:
         try:
             check_public(expected_date=today)
+            if os.getenv('NEWS_POLICY_VERSION')=='4.3':return (now.date()+timedelta(days=1)).isoformat()
         except Exception:
             print('[release-context] today committed but HTTPS delivery unverified; recover deployment',flush=True)
             return today

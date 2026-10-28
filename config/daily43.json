@@ -4,7 +4,8 @@
   "article_target": 8,
   "minimum_articles": 1,
   "release_time": "06:00",
-  "special_paused": true,
+  "special_paused": false,
   "repair_attempts": 2,
-  "reserve_max_age_days": 14
+  "reserve_max_age_days": 14,
+  "special43_enabled": true
 }

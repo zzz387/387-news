@@ -89,6 +89,14 @@ def evaluate(root,status,now=None,check_public=site_checks.check_site):
 def main():
     raw=json.loads(os.getenv('PIPELINE_STATUS','{}') or '{}')
     result=evaluate(news.ROOT,raw)
+    output=os.getenv('GITHUB_OUTPUT')
+    if output:
+        with open(output,'a') as stream:stream.write('verified='+str(result['verified']).lower()+'\n')
+    if os.getenv('NEWS_POLICY_VERSION')=='4.3':
+        try:
+            workflow=github('GET','actions/workflows/daily-v31.yml')
+            print('[daily-workflow] '+json.dumps({'state':workflow['state'],'path':workflow['path'],'release_target':'06:00 Europe/Moscow'}),flush=True)
+        except Exception as exc:print('[daily-workflow] '+json.dumps({'code':'METADATA_UNAVAILABLE','error':type(exc).__name__}),flush=True)
     result['waiting_for_authorized_special_priority']=os.getenv('SPECIAL_PRIORITY_HOLD')=='true'
     try:
         if result['verified'] or result['alert']:

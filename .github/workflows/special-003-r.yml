@@ -14,6 +14,8 @@ on:
         default: false
 
     outputs:
+      continue_special:
+        value: ${{ jobs.prepare.outputs.continue_special }}
       hold_daily:
         value: ${{ jobs.prepare.outputs.hold_daily }}
       run_used:
@@ -31,6 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     outputs:
+      continue_special: ${{ steps.special.outputs.continue_special }}
       ready: ${{ steps.commit.outputs.ready }}
       hold_daily: ${{ steps.special.outputs.hold_daily }}
       run_used: ${{ steps.special.outputs.run_used }}

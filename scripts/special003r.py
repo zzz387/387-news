@@ -363,12 +363,18 @@ def run():
     if (os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REF_NAME')!='main' or
         os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('NEWS_SPECIAL_EDITION')!=sc.ID):
         raise RuntimeError('SPECIAL_PROTECTED_ACTIONS_MAIN_REQUIRED')
+    use43=os.getenv('NEWS_POLICY_VERSION')=='4.3'
+    if use43:from scripts import special43
     root=p.ROOT;sc.check_original(root)
     key=stage.validate_key(os.environ['DRAFT_ENCRYPTION_KEY'])
     files={kind:Path(os.environ[kind.upper()+'_CHECKPOINT_FILE']) for kind in ('special','daily','quota')}
     for kind,path in files.items():
         if os.getenv(kind.upper()+'_EXPECTED')=='true' and not path.is_file():raise RuntimeError('SPECIAL_OFFICIAL_RESTORE_MISSING')
+    if use43 and not files['special'].is_file():raise RuntimeError('SPECIAL43_EXISTING_CHECKPOINT_REQUIRED')
     state=refresh_definition(stage.decipher(files['special'].read_bytes(),key)) if files['special'].is_file() else new_state()
+    if use43:
+        state=special43.migrate(state)
+        state['review_date']=datetime.now(p.TZ).date().isoformat()
     if not sc.is_special(state) or state.get('branch')!='main' or state.get('preview') is not False:raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
     ledger=json.loads(files['quota'].read_text()) if files['quota'].is_file() else {}
     daily_bytes=files['daily'].read_bytes() if files['daily'].is_file() else None
@@ -386,7 +392,7 @@ def run():
         state['all_sources_independence_revision']=1
         print('[special-independence-scope] '+json.dumps({'recheck_slots':rechecks,'accepted_text_preserved':True}))
     e.restore_preparation_repairs(state)
-    priority_first=os.getenv('SPECIAL_PRIORITY_FIRST')=='true'
+    priority_first=os.getenv('SPECIAL_PRIORITY_FIRST')=='true' and not use43
     if priority_first:
         from scripts import special_priority41 as priority_queue
         priority_queue.enable_header_review_v2(state)
@@ -397,6 +403,9 @@ def run():
         news.runtime.merge_snapshot(ledger,state.get('_quota_snapshot',{}))
         if daily:news.runtime.merge_snapshot(ledger,daily.get('_quota_snapshot',{}))
         priority_active,priority_reason=priority_queue.reconcile(state)
+    if use43:
+        news.runtime.merge_snapshot(ledger,state.get('_quota_snapshot',{}))
+        if daily:news.runtime.merge_snapshot(ledger,daily.get('_quota_snapshot',{}))
     budget=None
     prior_snapshot=copy.deepcopy(state.get('_quota_snapshot',{}))
     stale_shared=(prior_snapshot.get('day','')>ledger.get('day','') or
@@ -419,8 +428,9 @@ def run():
             production_preflight41.require_pages()
             with open(os.environ['GITHUB_OUTPUT'],'a') as stream:stream.write('ready=true\n')
         if priority_first:priority_queue.emit(state);persist()
+        if use43:special43.emit(state);persist()
         return
-    admitted,reason=admit(root,daily,ledger,priority=priority_first)
+    admitted,reason=special43.admit(root,daily,ledger) if use43 else admit(root,daily,ledger,priority=priority_first)
     daily_used=int(os.getenv('NEWS_DAILY_RUN_USED','24'))
     if priority_first and not priority_active:admitted,reason=False,priority_reason
     if remaining_run_limit(daily_used,ledger,priority=priority_first)==0:
@@ -439,6 +449,7 @@ def run():
     if not admitted:
         print('[special-status] '+json.dumps({'id':sc.ID,'stage':'DEFERRED','reason':reason,'articles':sum(r['status']=='ready' for r in state['candidates']),'gemini_requests':0}))
         if priority_first:priority_queue.emit(state);persist()
+        if use43:special43.emit(state);persist()
         return
     # Independent state, identical global request budget/cooldown; never mutate the daily file.
     budget=news.runtime.RequestBudget(ledger,persist,run_limit=remaining_run_limit(daily_used,ledger,priority=priority_first))
@@ -446,9 +457,9 @@ def run():
     previous=signal.signal(signal.SIGTERM,lambda *_:(_ for _ in ()).throw(news.runtime.GenerationPaused('Special runner stopped')))
     before=priority_queue.fingerprint(state) if priority_first else None
     try:
-        persist();ready=advance(state,Editor(persist=persist),root,persist)
+        persist();ready=(special43.advance(state,special43.Editor(persist=persist),root,persist) if use43 else advance(state,Editor(persist=persist),root,persist))
         if ready:
-            verify_sources(state,persist)
+            special43.verify_sources(state,persist) if use43 else verify_sources(state,persist)
             try:from scripts import browser41,production_preflight41
             except ImportError:import browser41,production_preflight41
             production_preflight41.require_pages()
@@ -461,10 +472,12 @@ def run():
     except news.runtime.GenerationPaused:
         state['status']='RETRY_PENDING';print('[special-status] RETRY_PENDING; checkpoint and shared quota retained')
     except p.Blocked as exc:
-        state['status']='BLOCKED';state['block_code']=exc.code;print('[special-status] BLOCKED code='+exc.code)
+        state['status']='RETRY_PENDING' if use43 and exc.code=='SPECIAL43_SOURCE_CHANGED_REVIEW_REQUIRED' else 'BLOCKED'
+        state['block_code']=exc.code;print('[special-status] '+state['status']+' code='+exc.code)
     finally:
         if priority_first:
             priority_queue.finish_run(state,before,budget.used);priority_queue.emit(state,budget.used)
+        if use43:special43.emit(state,budget.used)
         persist();print('[special-metrics] '+json.dumps({'id':sc.ID,'articles':sum(r['status']=='ready' for r in state['candidates']),
             'requests_used':ledger.get('requests'),'run_used':budget.used,'workflow_run_used':daily_used+budget.used,'stages':quota41.actual_usage(state),'daily_checkpoint_unchanged':daily_bytes is None or files['daily'].read_bytes()==daily_bytes}))
         news.runtime.ACTIVE_BUDGET=news.runtime.CHECKPOINT=None;signal.signal(signal.SIGTERM,previous)

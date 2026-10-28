@@ -550,10 +550,13 @@ jobs:
   monitor:
     needs: [prepare, deploy]
     if: ${{ always() && github.ref == 'refs/heads/main' && !(github.event_name == 'push' && (contains(github.event.head_commit.message, '[special setup]') || contains(github.event.head_commit.message, '[maintenance only]'))) && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
+    outputs:
+      verified: ${{ steps.verify.outputs.verified }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
     permissions:
       contents: read
+      actions: read
       issues: write
     steps:
       - uses: actions/checkout@v4
@@ -563,23 +566,26 @@ jobs:
         with:
           python-version: '3.12'
       - name: Verify today's public release and reconcile one incident
+        id: verify
         env:
+          NEWS_POLICY_VERSION: "4.3"
           GH_TOKEN: ${{ github.token }}
           PIPELINE_STATUS: ${{ needs.prepare.outputs.pipeline_status }}
         run: python scripts/release_monitor.py
 
   special-003-r:
-    # Policy 4.3: pause special generation; preserve existing ciphertext/history unchanged.
-    if: ${{ false }}
+    needs: [prepare, deploy, monitor]
+    # Daily owns the shared mutex first; this call never holds or delays daily preparation.
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.prepare.result == 'success' && needs.monitor.outputs.verified == 'true' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' && !startsWith(inputs.phase, 'trial') && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.preview == false && (inputs.phase == 'run' || inputs.phase == 'resume'))) }}
     uses: ./.github/workflows/special-003-r.yml
     with:
-      daily_run_used: 0
-      priority_first: true
+      daily_run_used: ${{ fromJSON(needs.prepare.outputs.pipeline_status || '{"run_used":24}').run_used }}
+      priority_first: false
     secrets: inherit
 
   special-continue:
     needs: [special-003-r, prepare, deploy, monitor]
-    if: ${{ false }}  # Paused with special generation; no self-dispatch or extra quota use.
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.special-003-r.result == 'success' && needs.special-003-r.outputs.continue_special == 'true' && needs.special-003-r.outputs.run_used != '' && (needs.special-003-r.outputs.run_used != '0' || fromJSON(needs.prepare.outputs.pipeline_status || '{"run_used":0}').run_used > 0) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -587,8 +593,10 @@ jobs:
       actions: write
     env:
       GH_TOKEN: ${{ github.token }}
-      SPECIAL_HOLD_DAILY: ${{ needs.special-003-r.outputs.hold_daily }}
+      NEWS_POLICY_VERSION: '4.3'
+      SPECIAL_CONTINUE_ALLOWED: ${{ needs.special-003-r.outputs.continue_special }}
       SPECIAL_RUN_USED: ${{ needs.special-003-r.outputs.run_used }}
+      NEWS_DAILY_RUN_USED: ${{ fromJSON(needs.prepare.outputs.pipeline_status || '{"run_used":24}').run_used }}
     steps:
       - uses: actions/checkout@v4
         with:
