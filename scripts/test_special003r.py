@@ -162,7 +162,9 @@ class SpecialTests(unittest.TestCase):
         self.assertNotIn('cron:',text);self.assertNotIn('workflow_dispatch:',text)
         self.assertNotIn('path: ${{ runner.temp }}/read-only-daily/news-draft.enc',text)
         main=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
-        self.assertIn('needs: special-003-r',main);self.assertIn("needs.special-003-r.outputs.hold_daily == 'false'",main);self.assertIn("'387-news-stage-v31'",main)
+        prepare=main.split("  prepare:\n",1)[1].split("  deploy:\n",1)[0]
+        self.assertNotIn("needs.special-003-r",prepare)
+        self.assertIn("'387-news-stage-v31'",main)
 
     def test_initialize_writes_only_independent_ciphertext_and_no_api_or_ledger_updates(self):
         import base64,os
