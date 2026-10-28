@@ -117,6 +117,9 @@ def select_ready(state):
 
 
 class Editor(old.Editor):
+    def writing_basis(self,record):
+        return [record['source']]+record.get('supporting_sources',[])
+
     def verify_source(self,record):
         if not record.get('source'):record['source']=self.cached_fetch(record['url']);self.persist()
         source=record['source']
@@ -164,7 +167,7 @@ class Editor(old.Editor):
                             'не придумывай цифры и даты, различай дату публикации и события, корреляцию и причинность. '
                             'Для медицинских исследований укажи дизайн и ограничения, не подменяй исследование пресс-релизом. '
                             'finished=true только для законченной заметки. URL только в служебном блоке источника, не в тексте. '
-                            '\nПолные материалы: '+json.dumps([record['source']]+record.get('supporting_sources',[]),ensure_ascii=False)+
+                            '\nПолные материалы: '+json.dumps(self.writing_basis(record),ensure_ascii=False)+
                             '\nПредыдущий отказ: '+json.dumps(progress.get('feedback',{}),ensure_ascii=False),output_tokens=12000,schema='v43_article')
                     except news.runtime.GenerationPaused:
                         progress['write_attempts']-=1;self.persist();raise
@@ -207,7 +210,7 @@ class Editor(old.Editor):
                     'В evidence_sufficient отметь достаточность независимой базы, для советов и исследований особенно строго. '
                     'approve=true только когда все семь критериев true, issues и unresolved пусты. '
                     'В input_hash верни точно '+fp+'\nРежим и права: '+json.dumps(record['rights'],ensure_ascii=False)+
-                    '\nПовышенная проверка: '+str(record['high_risk'])+'\nСтатья: '+json.dumps(article,ensure_ascii=False)+
+                    '\nКонтекст переиздания (если есть): '+json.dumps(record.get('commission',{}),ensure_ascii=False)+'\nПовышенная проверка: '+str(record['high_risk'])+'\nСтатья: '+json.dumps(article,ensure_ascii=False)+
                     '\nПолные оригиналы и подтверждения: '+json.dumps(sources,ensure_ascii=False),output_tokens=8000,schema='v43_final')
             except news.runtime.GenerationPaused:
                 reviews[fp]=count;self.persist();raise
@@ -217,7 +220,7 @@ class Editor(old.Editor):
             if result.get('is_news') is True:
                 try:
                     date=datetime.fromisoformat(result['event_date']);date=date.replace(tzinfo=p.TZ) if date.tzinfo is None else date.astimezone(p.TZ)
-                    release=datetime.fromisoformat(state['date']+'T06:00').replace(tzinfo=p.TZ)
+                    release=datetime.fromisoformat(state.get('review_date',state['date'])+'T06:00').replace(tzinfo=p.TZ)
                     literal=evidence.get(result['event_source_id'],{}).get(result['event_evidence_id'],'')
                     if not (timedelta(0)<=release-date<=timedelta(hours=72) and result['event_quote'] and result['event_quote'] in literal and content41.witnessed_event_date(result['event_date'],result['event_quote'])):good=False
                     if not next((s.get('published') for s in sources if s['id']==result['event_source_id']),None):good=False

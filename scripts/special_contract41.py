@@ -1,4 +1,4 @@
-"""Narrow owner-authorized 003-R contract. Daily editions always retain twelve."""
+"""Stable 003-R identity and legacy gates; 4.3 uses its own per-article admission."""
 import json
 from pathlib import Path
 try:

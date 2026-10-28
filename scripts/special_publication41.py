@@ -22,11 +22,11 @@ def metadata(path):
         found=re.search(r'\b'+key+r'="([^"]+)"',text)
         if not found:raise p.Blocked('SPECIAL_PUBLIC_METADATA_MISSING')
         return found[1]
-    if Path(path).parent.name!=sc.SLUG or value('data-article-count')!='8' or value('data-policy-version')!='4.1':
+    if Path(path).parent.name!=sc.SLUG or value('data-article-count')!='8' or value('data-policy-version') not in ('4.1','4.3'):
         raise p.Blocked('SPECIAL_PUBLIC_CONTRACT_INVALID')
     moment=datetime.fromisoformat(value('data-published-at'))
     if moment.tzinfo is None:raise p.Blocked('SPECIAL_PUBLIC_DATE_INVALID')
-    return {'id':sc.ID,'slug':sc.SLUG,'published_at':moment.isoformat(),'date':moment.astimezone(p.TZ).date().isoformat(),'count':8}
+    return {'id':sc.ID,'slug':sc.SLUG,'published_at':moment.isoformat(),'date':moment.astimezone(p.TZ).date().isoformat(),'count':8,'policy_version':value('data-policy-version')}
 
 
 def archive_cards(root):
@@ -36,7 +36,7 @@ def archive_cards(root):
     if not meta:raise p.Blocked('SPECIAL_PUBLIC_CONTRACT_INVALID')
     return ('<section class="special-editions"><h2>Специальные выпуски</h2><div class="archive-card"><div>'
         '<div class="meta">№003-R · '+meta['date']+'</div><h2><a href="/issues/'+sc.SLUG+'/">'
-        'Внеочередное переиздание от 26 октября 2026 года</a></h2><p>8 материалов · редакция4.1</p></div>'
+        'Внеочередное переиздание от 26 октября 2026 года</a></h2><p>8 материалов · редакция'+meta['policy_version']+'</p></div>'
         '<a href="/issues/'+sc.SLUG+'/">Читать переиздание →</a></div></section>')
 
 
@@ -53,7 +53,7 @@ def validate(root):
     if not meta:raise p.Blocked('SPECIAL_PUBLIC_CONTRACT_INVALID')
     pages=list((path.parent/'articles').glob('*/index.html'))
     if len(pages)!=8:raise p.Blocked('SPECIAL_EIGHT_PUBLIC_PAGES_REQUIRED')
-    for page in pages:pub.validate_page(page.read_text())
+    for page in pages:pub.validate_page(page.read_text().replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
     if any((path.parent/name).exists() for name in ('issue.json','dossier.json','news-draft.enc')):
         raise p.Blocked('SPECIAL_PRIVATE_DATA_IN_PUBLIC_TREE')
     previous=news.ROOT
@@ -65,13 +65,18 @@ def validate(root):
 
 def build(state,root):
     if not sc.is_special(state):raise p.Blocked('SPECIAL_STATE_REQUIRED')
-    e.validate_issue(state);root=Path(root);sc.check_original(root)
+    version=state.get('policy_version','4.1')
+    if version=='4.3':
+        from scripts import special43,publication43
+        special43.validate_ready(state)
+    else:e.validate_issue(state)
+    root=Path(root);sc.check_original(root)
     if not state.get('published_at'):state['published_at']=datetime.now(p.TZ).isoformat()
     moment=datetime.fromisoformat(state['published_at']).astimezone(p.TZ);date=moment.date().isoformat();clock=moment.strftime('%H:%M')+' МСК'
     records={r['id']:r for r in state['candidates']}
     articles=[]
     for identity in state['selected_ids']:
-        record=records[identity];a=pub.public_article(record);a['slug']='article-'+str(record['special_slot']).zfill(2);articles.append(a)
+        record=records[identity];a=(publication43.public_article(record) if version=='4.3' else pub.public_article(record));a['slug']='article-'+str(record['special_slot']).zfill(2);articles.append(a)
     with tempfile.TemporaryDirectory(prefix='387-special-final-') as temp:
         work=Path(temp)
         for name in ('issues','archive','assets'):shutil.copytree(root/name,work/name)
@@ -82,13 +87,13 @@ def build(state,root):
         issue.mkdir()
         for article in articles:
             path=issue/'articles'/article['slug']/'index.html';path.parent.mkdir(parents=True)
-            html=pub.render_article(date,3,article,root,moment=moment).replace('/issues/'+date+'/', '/issues/'+sc.SLUG+'/')
+            html=pub.render_article(date,3,article,root,moment=moment,policy_version=version).replace('/issues/'+date+'/', '/issues/'+sc.SLUG+'/')
             html=html.replace('№ 003','№003-R').replace('№003<','№003-R<')
             html=html.replace('<main class="wrap">','<main class="wrap"><p class="special-edition">387 News №003-R · переиздание от 26 октября 2026 · опубликовано '+date+' '+clock+'</p>',1)
             path.write_text(html);path.with_name('article.md').write_text(pub.markdown(article))
         title='387 News №003-R — внеочередное переиздание от 26 октября 2026 года'
-        html=news.page_header(title,'Восемь заново подготовленных статей по редакционной политике4.1','/issues/'+sc.SLUG+'/',moment,3)
-        html+='<main class="wrap" data-policy-version="4.1" data-special-edition="003-R" data-issue-number="3" data-article-count="8" data-published-at="'+escape(moment.isoformat(),quote=True)+'">'
+        html=news.page_header(title,'Восемь самостоятельных материалов по редакционной политике'+version,'/issues/'+sc.SLUG+'/',moment,3)
+        html+='<main class="wrap" data-policy-version="'+version+'" data-special-edition="003-R" data-issue-number="3" data-article-count="8" data-published-at="'+escape(moment.isoformat(),quote=True)+'">'
         html+='<h1>'+title+'</h1><p>Опубликовано '+date+' в '+clock+'. <a href="/issues/2026-10-26/">Оригинальный выпуск№003</a></p><section class="contents">'
         for a in articles:html+='<article class="toc"><div><h2><a href="/issues/'+sc.SLUG+'/articles/'+a['slug']+'/">'+escape(a['title'])+'</a></h2><p>'+escape(a['teaser'])+'</p></div></article>'
         html+='</section><p><a href="/archive/">Все выпуски</a> · <a href="/">Текущая ежедневная газета</a></p></main>'+news.page_footer()
@@ -124,7 +129,7 @@ def check_public(root=None,fetch=None):
     links=set(re.findall(r'href="(/issues/'+re.escape(sc.SLUG)+r'/articles/[^/]+/)"',overview))
     if len(links)!=8:raise p.Blocked('SPECIAL_HTTPS_INCOMPLETE')
     for link in links:
-        page=fetch('https://387.su'+link);pub.validate_page(page)
+        page=fetch('https://387.su'+link);pub.validate_page(page.replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
         if page!=(root/link.lstrip('/')/'index.html').read_text(encoding='utf-8'):
             raise p.Blocked('SPECIAL_HTTPS_ARTICLE_VERSION_MISMATCH')
     original=fetch('https://387.su/issues/'+sc.ORIGINAL+'/')

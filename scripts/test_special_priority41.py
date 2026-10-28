@@ -57,7 +57,7 @@ class PriorityTests(unittest.TestCase):
         self.assertNotIn('needs.special-003-r',prepare)
         self.assertNotIn('needs: special-003-r',prepare)
         self.assertIn("always() && needs.prepare.result == 'success'",daily)
-        self.assertIn('if: ${{ false }}',daily)
+        self.assertIn("needs.monitor.outputs.verified == 'true'",daily)
         self.assertIn("|| '387-news-stage-v31'",daily)
         self.assertEqual(daily.count('- cron:'),6)
         self.assertIn("cron: '54 2 * * *'",daily)

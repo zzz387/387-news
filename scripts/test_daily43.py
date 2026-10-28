@@ -174,10 +174,10 @@ class Daily43Tests(unittest.TestCase):
 
     def test_policy43_pauses_all_special_entrypoints_before_loading_private_state(self):
         from scripts import special003r,special_continue41
-        with patch.dict(os.environ,NEWS_POLICY_VERSION='4.3'),patch.object(stage,'decipher',side_effect=AssertionError('Special must remain untouched')):
+        with patch.dict(e.CONFIG,special_paused=True),patch.dict(os.environ,NEWS_POLICY_VERSION='4.3'),patch.object(stage,'decipher',side_effect=AssertionError('Special must remain untouched')):
             special003r.run();special_continue41.main()
         workflow=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
-        self.assertIn('special-003-r:\n    # Policy 4.3',workflow);self.assertIn('if: ${{ false }}',workflow)
+        self.assertIn('needs.monitor.outputs.verified',workflow);self.assertIn('priority_first: false',workflow)
         self.assertIn("cron: '54 2 * * *'",workflow);self.assertIn('NEWS_MAX_REQUESTS_PER_DAY: "220"',workflow)
 
     def test_preflight43_allows_gemini_absence_for_fallback_but_requires_safe_recovery(self):
