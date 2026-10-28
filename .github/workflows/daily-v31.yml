@@ -449,7 +449,7 @@ jobs:
           arguments=(--phase "$PHASE")
           if [[ "$PREVIEW" == 'true' ]]; then arguments+=(--preview); fi
           if [[ -n "$TARGET_DATE" ]]; then arguments+=(--target-date "$TARGET_DATE"); fi
-          python scripts/staged_news.py "${arguments[@]}"
+          python -m scripts.staged_news "${arguments[@]}"
       - name: Save encrypted checkpoint only (never plain draft)
         if: ${{ always() && steps.stage.outputs.checkpoint == 'true' }}
         uses: actions/upload-artifact@v4
