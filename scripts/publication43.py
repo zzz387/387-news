@@ -108,7 +108,7 @@ def build(state,root,reserve=(),preview=False):
             data['homepage_hash']=digest_bytes((working/'index.html').read_bytes())
             data.update(overview_hash=digest_bytes((issue/'index.html').read_bytes()),markdown_hash=digest_bytes((issue/'overview.md').read_bytes()))
             (issue/'release.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
-            (working/'archive/index.html').write_text(news.render_archive())
+            (working/'archive/index.html').write_text(reader_chrome(news.render_archive()).replace('Редакция 2.0','Редакция 4.3'))
             (working/'sitemap.xml').write_text(news.sitemap());validate(working,date)
         finally:news.ROOT=previous
         if not preview:

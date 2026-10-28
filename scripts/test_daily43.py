@@ -8,6 +8,7 @@ from scripts import editorial43 as e,daily43 as d,publication43 as pub,policy41 
 from scripts.test_policy41 import record,source
 
 NOW=datetime(2026,10,27,8,tzinfo=p.TZ)
+RESERVE_FIXTURE={'url':'https://example.org/verified-source','title':'Проверенный учебный источник','publisher':'Издатель фикстуры','published':'2026-10-20','checked_at':'2026-10-26T12:00:00+00:00','content_hash':'f'*64}
 
 
 def ready(i=0):
@@ -46,6 +47,9 @@ def verdict(prompt,r,approve=True):
 
 
 class Daily43Tests(unittest.TestCase):
+    def setUp(self):
+        catalog=patch.object(d,'reserve_catalog',return_value=[copy.deepcopy(RESERVE_FIXTURE)]);catalog.start();self.addCleanup(catalog.stop)
+
     def test_dynamic_counts_and_zero_digest_are_valid_and_honest_over_https(self):
         for count in (0,1,3,7,8,12,13):
             with self.subTest(count=count),tempfile.TemporaryDirectory() as temp:
@@ -227,3 +231,20 @@ class Preparation43Tests(unittest.TestCase):
         r=record();r['source'].pop('declared_license');r['mode']=r['article']['mode']='INDEPENDENT_ARTICLE';r['category_hint']='Наука'
         r['rights']=rights41.decision(r['source'],r['mode'])
         with self.assertRaises(p.Blocked):e.Editor(call=lambda *a,**k:self.fail('Copied layout')).finish(state(),r)
+
+
+class SafetyScope43Tests(unittest.TestCase):
+    def test_medical_advice_cannot_hide_in_ordinary_category_even_with_positive_gate(self):
+        r=ready();r['source'].pop('declared_license');r['article']['blocks'][0]['text']='Принимайте препарат ежедневно без консультации врача.'
+        r['checks']['final43'].update(input_hash=e.fingerprint(r),**{k:True for k in e.CHECKS})
+        self.assertFalse(e.eligible(r))
+        with self.assertRaisesRegex(p.Blocked,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):
+            e.Editor(call=lambda *a,**k:self.fail('Safety evidence missing')).finish(state(),r)
+
+    def test_risk_in_newly_generated_body_requires_evidence_before_final_review(self):
+        r=record();r.pop('article');r['source'].pop('declared_license');r['category_hint']='Наука';calls=[]
+        def model(prompt,**kwargs):
+            calls.append(kwargs['schema']);self.assertEqual(kwargs['schema'],'v43_article')
+            return {'finished':True,'title':'Обычная тема','teaser':'','blocks':[{'kind':'paragraph','text':'Давайте ребёнку лекарство в двойной дозе.'}]}
+        with self.assertRaisesRegex(p.Blocked,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):e.Editor(call=model).finish(state(),r)
+        self.assertEqual(calls,['v43_article'])

@@ -76,7 +76,24 @@ def fingerprint(record):
         'rights':record['rights']})
 
 
+
+def high_risk(record):
+    article=record.get('article',{})
+    text=' '.join(str(value) for value in [record.get('source',{}).get('title',''),article.get('title',''),article.get('teaser','')]+[b.get('text','') for b in article.get('blocks',[])])
+    return (record.get('category') in ('Семья','Здоровье и движение','Экономика и бизнес') or
+            record.get('category_hint') in ('Семья','Здоровье и движение','Экономика и бизнес') or
+            bool(re.search(r'(?i)медицин|лечени|дозиров|малыш|ребен|ребён|детям|здоров|юридич|инвестиц|лекарств|таблет|препарат|беремен|доз[ауые]|child|toddler|infant|medical|treatment',text)))
+
+
+def safety_sources_valid(record):
+    if not high_risk(record):return True
+    sources=[record.get('source',{})]+record.get('supporting_sources',[])
+    return (all(s.get('full_text_verified') and s.get('metadata_status')=='verified' for s in sources)
+            and len({old.publisher_identity(s['url']) for s in sources})>=2
+            and any(old.host_matches(s['url'],old.TRUSTED) for s in sources))
+
 def eligible(record):
+    if not safety_sources_valid(record):return False
     if record.get('status')!='ready' or not record.get('article') or not record.get('source'):return False
     try:structure(record)
     except (p.Blocked,KeyError,TypeError):return False
@@ -111,7 +128,7 @@ class Editor(old.Editor):
         if record.get('article') and record['article'].get('mode')!=mode:
             record.setdefault('previous_mode_preparations',[]).append(record.pop('article'));self.persist()
         record.update(mode=mode,rights=grant,category=record.get('category_hint') or record.get('category') or 'История и культура',kind='Самостоятельная заметка' if mode=='INDEPENDENT_ARTICLE' else 'Перевод' if mode=='FULL_TRANSLATION' else 'Оригинал')
-        sensitive=record['category'] in ('Семья','Здоровье и движение','Экономика и бизнес') or bool(re.search(r'(?i)медицин|лечени|дозиров|малыш|ребен|ребён|здоров|юридич|инвестиц',source['title']))
+        sensitive=high_risk(record)
         record['high_risk']=sensitive
         if sensitive:
             extra=record.setdefault('supporting_sources',[]);known={s['url'] for s in extra}
@@ -160,6 +177,8 @@ class Editor(old.Editor):
             article=record['article']
             if record['mode']=='INDEPENDENT_ARTICLE':normalize(article)
             structure(record)
+            # Generated advice can introduce risk absent from the source title/category.
+            self.verify_source(record)
             article.setdefault('mode',record['mode']);article.setdefault('category',record['category']);article.setdefault('kind',record['kind'])
             fp=fingerprint(record)
             if eligible(record):return

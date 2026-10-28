@@ -11,10 +11,14 @@ except ImportError:
 def enabled():return e.CONFIG.get('enabled') is True
 
 
+def reserve_catalog():
+    return json.loads((p.ROOT/'config/fallback-sources43.json').read_text())['sources']
+
+
 def reserve_rows(state,now,fetch=None,refresh=False):
     """Only public bibliographic metadata. Cached checks are explicitly dated, not news."""
     rows=[];refresh_attempts=0
-    catalog=json.loads((p.ROOT/'config/fallback-sources43.json').read_text())['sources']
+    catalog=reserve_catalog()
     cache=state.setdefault('source_digest_cache',{})
     if fetch is None:
         from scripts.public_sources41 import Session
