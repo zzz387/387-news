@@ -340,10 +340,9 @@ jobs:
           if-no-files-found: error
 
   prepare:
-    needs: special-003-r
     # Owner authorized direct v4.1 production rollout on 2026-10-26.
     # Repository variables and all technical/editorial publication gates remain mandatory.
-    if: ${{ github.ref == 'refs/heads/main' && always() && (needs.special-003-r.result == 'skipped' || (needs.special-003-r.result == 'success' && needs.special-003-r.outputs.hold_daily == 'false' && needs.special-003-r.outputs.run_used == '0')) && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && !contains(github.event.head_commit.message, '[maintenance only]') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
+    if: ${{ github.ref == 'refs/heads/main' && always() && !startsWith(inputs.phase, 'trial') && ((github.event_name == 'push' && !contains(github.event.head_commit.message, '[special setup]') && !contains(github.event.head_commit.message, '[maintenance only]') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true') || (github.event_name == 'workflow_dispatch' && inputs.phase != 'status') || (github.event_name == 'schedule' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true')) }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -505,7 +504,7 @@ jobs:
     # Only fully verified issues go to Pages. A separate job avoids GH Pages
     # environment restrictions applying to research/writing stages.
     needs: prepare
-    if: ${{ github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
+    if: ${{ always() && needs.prepare.result == 'success' && github.ref == 'refs/heads/main' && !startsWith(inputs.phase, 'trial') && needs.prepare.outputs.ready == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -549,7 +548,7 @@ jobs:
         run: python scripts/site_checks.py --expected-date "$EXPECTED_DATE" --attempts 5
 
   monitor:
-    needs: [special-003-r, prepare, deploy]
+    needs: [prepare, deploy]
     if: ${{ always() && github.ref == 'refs/heads/main' && !(github.event_name == 'push' && (contains(github.event.head_commit.message, '[special setup]') || contains(github.event.head_commit.message, '[maintenance only]'))) && !startsWith(inputs.phase, 'trial') && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && (github.event_name == 'schedule' || github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.preview == false)) }}
     runs-on: ubuntu-latest
     timeout-minutes: 8
@@ -567,7 +566,6 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           PIPELINE_STATUS: ${{ needs.prepare.outputs.pipeline_status }}
-          SPECIAL_PRIORITY_HOLD: ${{ needs.special-003-r.outputs.hold_daily }}
         run: python scripts/release_monitor.py
 
   special-003-r:
