@@ -73,6 +73,8 @@ class Special43Tests(unittest.TestCase):
             self.assertEqual(original,{str(f.relative_to(root)):f.read_bytes() for f in (root/'issues/2026-10-26').rglob('*') if f.is_file()})
             self.assertEqual(len(list((root/'issues/2026-10-26-v41/articles').glob('*/article.md'))),8)
             self.assertIn('редакция4.3',(root/'archive/index.html').read_text())
+            for file in [root/'archive/index.html',root/'issues/2026-10-26-v41/index.html']+list((root/'issues/2026-10-26-v41/articles').glob('*/index.html')):
+                self.assertNotIn('/#family',file.read_text())
             def fetch(url):
                 path=root/url.split('https://387.su/',1)[1]
                 if url.endswith('/'):path=path/'index.html'

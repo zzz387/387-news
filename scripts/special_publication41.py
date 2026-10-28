@@ -90,6 +90,7 @@ def build(state,root):
             html=pub.render_article(date,3,article,root,moment=moment,policy_version=version).replace('/issues/'+date+'/', '/issues/'+sc.SLUG+'/')
             html=html.replace('№ 003','№003-R').replace('№003<','№003-R<')
             html=html.replace('<main class="wrap">','<main class="wrap"><p class="special-edition">387 News №003-R · переиздание от 26 октября 2026 · опубликовано '+date+' '+clock+'</p>',1)
+            if version=='4.3':html=publication43.reader_chrome(html)
             path.write_text(html);path.with_name('article.md').write_text(pub.markdown(article))
         title='387 News №003-R — внеочередное переиздание от 26 октября 2026 года'
         html=news.page_header(title,'Восемь самостоятельных материалов по редакционной политике'+version,'/issues/'+sc.SLUG+'/',moment,3)
@@ -97,11 +98,14 @@ def build(state,root):
         html+='<h1>'+title+'</h1><p>Опубликовано '+date+' в '+clock+'. <a href="/issues/2026-10-26/">Оригинальный выпуск№003</a></p><section class="contents">'
         for a in articles:html+='<article class="toc"><div><h2><a href="/issues/'+sc.SLUG+'/articles/'+a['slug']+'/">'+escape(a['title'])+'</a></h2><p>'+escape(a['teaser'])+'</p></div></article>'
         html+='</section><p><a href="/archive/">Все выпуски</a> · <a href="/">Текущая ежедневная газета</a></p></main>'+news.page_footer()
+        if version=='4.3':html=publication43.reader_chrome(html).replace('Редакция 2.0','Редакция 4.3')
         (issue/'index.html').write_text(html)
         previous=news.ROOT
         try:
             news.ROOT=work
-            (work/'archive/index.html').write_text(news.render_archive())
+            archive=news.render_archive()
+            if version=='4.3':archive=publication43.reader_chrome(archive).replace('Редакция 2.0','Редакция 4.3')
+            (work/'archive/index.html').write_text(archive)
             (work/'sitemap.xml').write_text(news.sitemap())
         finally:news.ROOT=previous
         validate(work)
