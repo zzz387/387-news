@@ -117,8 +117,14 @@ def select_ready(state):
 
 
 class Editor(old.Editor):
+    context_characters=int(CONFIG.get('context_characters',120000))
+    def model_sources(self,record):
+        # Complete originals and structural blocks, without unrelated image/transport inventories.
+        return [{**{key:source.get(key,'') for key in ('id','url','title','publisher','author','published','language')},
+                 'blocks':source['blocks']} for source in [record['source']]+record.get('supporting_sources',[])]
+
     def writing_basis(self,record):
-        return [record['source']]+record.get('supporting_sources',[])
+        return self.model_sources(record)
 
     def verify_source(self,record):
         if not record.get('source'):record['source']=self.cached_fetch(record['url']);self.persist()
@@ -211,7 +217,7 @@ class Editor(old.Editor):
                     'approve=true только когда все семь критериев true, issues и unresolved пусты. '
                     'В input_hash верни точно '+fp+'\nРежим и права: '+json.dumps(record['rights'],ensure_ascii=False)+
                     '\nКонтекст переиздания (если есть): '+json.dumps(record.get('commission',{}),ensure_ascii=False)+'\nПовышенная проверка: '+str(record['high_risk'])+'\nСтатья: '+json.dumps(article,ensure_ascii=False)+
-                    '\nПолные оригиналы и подтверждения: '+json.dumps(sources,ensure_ascii=False),output_tokens=8000,schema='v43_final')
+                    '\nПолные оригиналы и подтверждения: '+json.dumps(self.model_sources(record),ensure_ascii=False),output_tokens=8000,schema='v43_final')
             except news.runtime.GenerationPaused:
                 reviews[fp]=count;self.persist();raise
             good=(result.get('input_hash')==fp and result.get('approve') is True and all(result.get(k) is True for k in CHECKS)

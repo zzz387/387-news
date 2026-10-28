@@ -139,7 +139,9 @@ class Editor:
         model=call or news.gemini
         def checked_call(prompt,**kwargs):
             # API context is a transport constraint, never a reason to shorten an article.
-            if len(prompt)>policy.CONFIG['technical']['context_characters']:
+            context_limit=getattr(self,'context_characters',policy.CONFIG['technical']['context_characters'])
+            if len(prompt)>context_limit:
+                print('[context-transport] '+json.dumps({'schema':kwargs.get('schema'),'input_characters':len(prompt),'limit':context_limit}),flush=True)
                 raise policy.Blocked('OPERATION_CONTEXT_NEEDS_REVIEW','No input was clipped or sent; reduce the scope of this operation')
             usage=getattr(self,'usage_record',None)
             stage=(getattr(self,'active_stage',None) if kwargs.get('schema') in ('v41_review','v41_issue','v41_independence') else None) or kwargs.get('schema','unknown')
