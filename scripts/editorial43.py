@@ -171,6 +171,25 @@ def bind_review(result,record,aliases,fp):
     return result,sorted(set(errors))
 
 
+def news_errors(result,record,state):
+    if type(result.get('is_news')) is not bool:return ['NEWS_CLASSIFICATION_MISSING']
+    if not result['is_news']:return []
+    errors=[]
+    try:
+        date=datetime.fromisoformat(result['event_date']);date=date.replace(tzinfo=p.TZ) if date.tzinfo is None else date.astimezone(p.TZ)
+        release=datetime.fromisoformat(state.get('review_date',state['date'])+'T06:00').replace(tzinfo=p.TZ)
+        if release-date<timedelta(0):errors.append('NEWS_EVENT_IN_FUTURE')
+        elif release-date>timedelta(hours=72):errors.append('NEWS_EVENT_TOO_OLD')
+        sources=[record['source']]+record.get('supporting_sources',[])
+        source=next((s for s in sources if s['id']==result['event_source_id']),{})
+        literal=next((b['text'] for b in source.get('blocks',[]) if b['id']==result['event_evidence_id']),'')
+        if not result.get('event_quote') or result['event_quote'] not in literal:errors.append('NEWS_EVENT_WITNESS_MISSING')
+        elif not content41.witnessed_event_date(result['event_date'],result['event_quote']):errors.append('NEWS_EVENT_DATE_NOT_IN_WITNESS')
+        if not source.get('published'):errors.append('NEWS_PUBLICATION_DATE_MISSING')
+    except (ValueError,KeyError,TypeError):errors.append('NEWS_EVENT_FIELDS_INVALID')
+    return errors
+
+
 class Editor(old.Editor):
     context_characters=int(CONFIG.get('context_characters',120000))
     def model_sources(self,record):
@@ -280,19 +299,12 @@ class Editor(old.Editor):
             result,protocol_errors=bind_review(result,record,aliases,fp)
             good=(not protocol_errors and result.get('input_hash')==fp and result.get('approve') is True and all(result.get(k) is True for k in CHECKS)
                   and result.get('issues')==[] and result.get('unresolved')==[] and bool(result.get('claims')))
-            validation_errors=[]
-            if type(result.get('is_news')) is not bool:good=False;validation_errors.append('NEWS_CLASSIFICATION_MISSING')
-            if result.get('is_news') is True:
-                try:
-                    date=datetime.fromisoformat(result['event_date']);date=date.replace(tzinfo=p.TZ) if date.tzinfo is None else date.astimezone(p.TZ)
-                    release=datetime.fromisoformat(state.get('review_date',state['date'])+'T06:00').replace(tzinfo=p.TZ)
-                    literal=evidence.get(result['event_source_id'],{}).get(result['event_evidence_id'],'')
-                    if not (timedelta(0)<=release-date<=timedelta(hours=72) and result['event_quote'] and result['event_quote'] in literal and content41.witnessed_event_date(result['event_date'],result['event_quote'])):good=False;validation_errors.append('NEWS_EVENT_DATE_UNVERIFIED_OR_STALE')
-                    if not next((s.get('published') for s in sources if s['id']==result['event_source_id']),None):good=False;validation_errors.append('NEWS_PUBLICATION_DATE_MISSING')
-                except (ValueError,KeyError,TypeError):good=False;validation_errors.append('NEWS_EVENT_FIELDS_INVALID')
+            validation_errors=news_errors(result,record,state)
+            if validation_errors:good=False
             for claim in result.get('claims',[]):
                 literal=evidence.get(claim.get('source_id'),{}).get(claim.get('evidence_id'),'')
                 if not claim.get('quote','').strip() or claim['quote'] not in literal or not claim.get('fact','').strip():good=False
+            result['validation_errors']=validation_errors
             progress['history'].append(copy.deepcopy(result));self.persist()
             if good:
                 record['checks']['final43']=dict(result,approved=True);record['status']='ready';self.persist();return

@@ -81,4 +81,42 @@ class ReviewWireTests(unittest.TestCase):
                         self.assertEqual(target['status'],'preparing');self.assertNotIn('article',target)
                 self.assertEqual(issue['candidates'][1:],before)
 
+
+class DatedContextRepairTests(unittest.TestCase):
+    def fixture(self):
+        r=ready(5);r.update(special_slot=6,status='needs_review',category='Наука',kind='Самостоятельная заметка',high_risk=False,commission={})
+        v={'approve':True,**{k:True for k in e.CHECKS},'issues':[],'unresolved':[],
+           'is_news':True,'event_date':'2020-01-01','event_source_id':r['source']['id'],
+           'event_evidence_id':r['source']['blocks'][-1]['id'],'event_quote':r['source']['blocks'][-1]['text']}
+        r['progress']['v43']={'write_attempts':3,'review_attempts':{'old':3},'history':[v]}
+        issue=state();issue.update(candidates=[r],status='BLOCKED',block_code='SPECIAL43_TOPICS_NEED_REVIEW',_quota_snapshot={'requests':46})
+        return issue,r
+
+    def test_true_news_date_is_still_required_and_reason_is_precise(self):
+        issue,r=self.fixture();codes=e.news_errors(r['progress']['v43']['history'][-1],r,issue)
+        self.assertIn('NEWS_EVENT_TOO_OLD',codes);self.assertIn('NEWS_EVENT_DATE_NOT_IN_WITNESS',codes)
+        v=copy.deepcopy(r['progress']['v43']['history'][-1]);v['is_news']=False
+        self.assertEqual(e.news_errors(v,r,issue),[])
+
+    def test_one_addressed_write_then_fresh_review_preserves_all_old_counters(self):
+        issue,r=self.fixture();s.repair_dated_context_v1(issue);calls=[];before=copy.deepcopy(r['article'])
+        def model(prompt,**kw):
+            calls.append(kw['schema'])
+            if kw['schema']=='v43_article':return {'finished':True,'title':'Датированный разбор','teaser':'','blocks':[{'kind':'paragraph','text':'Самостоятельное ретроспективное объяснение результатов.'}]}
+            return verdict(prompt,r)
+        with patch.object(s.Editor,'verify_source',return_value=None):s.Editor(call=model).finish(issue,r)
+        self.assertEqual(calls,['v43_article','v43_final']);self.assertTrue(e.eligible(r));self.assertEqual(r['progress']['v43']['write_attempts'],3)
+        self.assertEqual(r['progress']['v43']['review_attempts']['old'],3);self.assertIn(before,r['progress']['v43']['previous_articles'])
+        self.assertEqual(r['special43_dated_context_v1']['attempts'],1);self.assertEqual(issue['_quota_snapshot'],{'requests':46})
+        r['status']='needs_review';s.repair_dated_context_v1(issue);self.assertEqual(r['status'],'needs_review')
+
+    def test_substantive_veto_cannot_get_extra_repair_and_incomplete_repair_cannot_repeat(self):
+        issue,r=self.fixture();r['progress']['v43']['history'][-1]['facts']=False;s.repair_dated_context_v1(issue)
+        self.assertNotIn('special43_dated_context_v1',r)
+        r['progress']['v43']['history'][-1]['facts']=True;s.repair_dated_context_v1(issue);calls=[]
+        with patch.object(s.Editor,'verify_source',return_value=None):
+            for code in ('DATED_CONTEXT_REPAIR_INCOMPLETE','DATED_CONTEXT_REPAIR_EXHAUSTED'):
+                with self.assertRaisesRegex(p.Blocked,code):s.Editor(call=lambda *a,**k:(calls.append(1) or {'finished':False})).finish(issue,r)
+        self.assertEqual(len(calls),1);self.assertEqual(r['progress']['v43']['write_attempts'],3)
+
 if __name__=='__main__':unittest.main()

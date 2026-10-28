@@ -376,6 +376,7 @@ def run():
         state=special43.migrate(state)
         special43.repair_review_protocol_v2(state)
         state['review_date']=datetime.now(p.TZ).date().isoformat()
+        special43.repair_dated_context_v1(state)
     if not sc.is_special(state) or state.get('branch')!='main' or state.get('preview') is not False:raise RuntimeError('SPECIAL_STATE_PROVENANCE_INVALID')
     ledger=json.loads(files['quota'].read_text()) if files['quota'].is_file() else {}
     daily_bytes=files['daily'].read_bytes() if files['daily'].is_file() else None

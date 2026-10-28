@@ -60,7 +60,46 @@ def repair_review_protocol_v2(state):
     print('[special43-review-protocol] '+json.dumps({'slots':changed,'automatic_approval':False,'drafts_and_counters_preserved':True}),flush=True)
 
 
+def repair_dated_context_v1(state):
+    """One addressed rewrite of the observed news-date failure, never a local approval."""
+    row=next((r for r in state['candidates'] if r['special_slot']==6),None)
+    if not row or row.get('special43_dated_context_v1'):return
+    progress=row.get('progress',{}).get('v43',{});history=progress.get('history',[])
+    last=history[-1] if history else {}
+    if (row.get('status')!='needs_review' or not row.get('article') or not e.positive_semantics(last)
+            or not e.news_errors(last,row,state)):return
+    row['special43_dated_context_v1']={'pending':True,'attempts':0,'reason_codes':e.news_errors(last,row,state)}
+    row['status']='preparing';state['status']='RETRY_PENDING';state.pop('block_code',None)
+    print('[special43-dated-context] '+json.dumps({'slot':6,'action':'ONE_ADDRESSED_REPAIR','reason_codes':e.news_errors(last,row,state),'all_prior_counters_preserved':True}),flush=True)
+
+
 class Editor(e.Editor):
+    def finish(self,state,r):
+        repair=r.get('special43_dated_context_v1',{})
+        if repair.get('pending'):
+            self.state=state;self.usage_record=r;self.verify_source(r)
+            if repair['attempts']>=1:raise p.Blocked('DATED_CONTEXT_REPAIR_EXHAUSTED')
+            repair['attempts']+=1;self.persist()
+            try:
+                article=self.call('Исправь только временную подачу сохранённой самостоятельной медицинской заметки. '
+                    'Проверка фактов, безопасности и прав положительна, но подача оперативной новости не имеет подтверждённой свежей даты события. '
+                    'Подготовь законченное ретроспективное объяснение проверенного исследования: ясно укажи настоящую дату научной работы, '
+                    'дизайн, результаты и ограничения. Не называй его сегодняшней новостью или новым открытием. Не выдумывай дату; '
+                    'если дата исследования отсутствует, не приписывай её. Не меняй чисел, выборки и выводов; корреляция не причинность. '
+                    'Не добавляй лечебных советов, обещаний и фактов без источников. Сохрани полезный аспект, собственную форму C. '
+                    'Никакой обязательной длины, глубины или количества разделов. '
+                    'Схема finished/title/teaser/blocks, URL только в служебных источниках. '
+                    'Независимая итоговая проверка затем заново оценит, является ли итоговый текст новостью, и все критерии допуска. '
+                    '\nДиагностика: '+json.dumps(repair['reason_codes'])+'\nСохранённая статья: '+json.dumps(r['article'],ensure_ascii=False)+
+                    '\nПолные проверенные оригиналы: '+json.dumps(self.writing_basis(r),ensure_ascii=False),output_tokens=12000,schema='v43_article')
+            except runtime.GenerationPaused:
+                repair['attempts']-=1;self.persist();raise
+            if article.get('finished') is not True:raise p.Blocked('DATED_CONTEXT_REPAIR_INCOMPLETE')
+            normalized=e.normalize(dict(article,category=r['category'],kind=r['kind'],mode=r['mode'],activities=[]))
+            r['progress']['v43'].setdefault('previous_articles',[]).append(r['article'])
+            r['article']=normalized;r['checks'].pop('final43',None);repair['pending']=False;self.persist()
+        return super().finish(state,r)
+
     def verify_source(self,r):
         # Reuse complete cached companion originals, fetching missing sources only once.
         for url,row in r.get('special_evidence',{}).items():
