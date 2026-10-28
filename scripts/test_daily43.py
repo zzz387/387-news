@@ -38,7 +38,7 @@ def web(root):
 
 
 def verdict(prompt,r,approve=True):
-    fp=prompt.split('В input_hash верни точно ')[1].split('\n')[0]
+    fp=prompt.split('Идентификатор запроса (заполняется программой, не возвращай его): ')[1].split('\n')[0]
     b=r['source']['blocks'][-1]
     return {'input_hash':fp,'approve':approve,**{key:approve for key in e.CHECKS},'is_news':False,
         'event_date':'','event_source_id':'','event_evidence_id':'','event_quote':'',
