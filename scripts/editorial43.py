@@ -12,7 +12,7 @@ S={'type':'string'}; B={'type':'boolean'}
 news.SCHEMAS['v43_article']=content41.schema({'finished':B,'title':S,'teaser':S,
     'blocks':{'type':'array','items':content41.schema({'kind':{'type':'string','enum':['heading','paragraph','item']},'text':S})}})
 CHECKS=('facts','safety','rights','independence','title_matches','complete','evidence_sufficient')
-news.SCHEMAS['v43_final']=content41.schema({'input_hash':S,'approve':B,**{name:B for name in CHECKS},
+news.SCHEMAS['v43_final']=content41.schema({'approve':B,**{name:B for name in CHECKS},
     'is_news':B,'event_date':S,'event_source_id':S,'event_evidence_id':S,'event_quote':S,
     'issues':{'type':'array','items':S},'unresolved':{'type':'array','items':S},
     'claims':{'type':'array','items':content41.schema({'fact':S,'source_id':S,'evidence_id':S,'quote':S})}})
@@ -116,6 +116,61 @@ def select_ready(state):
     return result
 
 
+def review_wire(record):
+    sources=[record['source']]+record.get('supporting_sources',[]);wire=[];aliases={}
+    for i,source in enumerate(sources,1):
+        sid='s'+str(i);blocks=[];refs={}
+        for j,block in enumerate(source['blocks'],1):
+            bid='q'+str(j);blocks.append(dict(block,id=bid));refs[bid]=block
+        aliases[sid]=(source,refs)
+        wire.append({**{key:source.get(key,'') for key in ('url','title','publisher','author','published','language')},'id':sid,'blocks':blocks})
+    return wire,aliases
+
+
+def bind_witness(source_id,evidence_id,quote,sources,aliases):
+    if not isinstance(quote,str) or not quote.strip():return None
+    source=None;block=None
+    if source_id in aliases:
+        source,refs=aliases[source_id];block=refs.get(evidence_id)
+    else:
+        source=next((s for s in sources if s['id']==source_id),None)
+        if source:block=next((b for b in source['blocks'] if b['id']==evidence_id),None)
+    def exact(block):
+        if quote in block['text']:return quote
+        pattern=r'\s+'.join(re.escape(piece) for piece in quote.split())
+        match=re.search(pattern,block['text']) if pattern else None
+        return match.group(0) if match else None
+    if block:
+        literal=exact(block)
+        if literal:return source['id'],block['id'],literal
+    # A unique literal location can repair a malformed ID; it never proves the claim's meaning.
+    matches=[]
+    for candidate in ([source] if source else sources):
+        for piece in candidate['blocks']:
+            literal=exact(piece)
+            if literal:matches.append((candidate['id'],piece['id'],literal))
+    return matches[0] if len(matches)==1 else None
+
+
+def positive_semantics(result):
+    return (result.get('approve') is True and all(result.get(k) is True for k in CHECKS)
+            and result.get('issues')==[] and result.get('unresolved')==[])
+
+
+def bind_review(result,record,aliases,fp):
+    result=copy.deepcopy(result);sources=[record['source']]+record.get('supporting_sources',[]);errors=[]
+    result['input_hash']=fp  # bound by the synchronous call, never echoed/attested by the model
+    if not result.get('claims'):errors.append('CLAIMS_MISSING')
+    for claim in result.get('claims',[]):
+        found=bind_witness(claim.get('source_id'),claim.get('evidence_id'),claim.get('quote'),sources,aliases)
+        if not found or not isinstance(claim.get('fact'),str) or not claim['fact'].strip():errors.append('WITNESS_NOT_BOUND');continue
+        claim.update(source_id=found[0],evidence_id=found[1],quote=found[2])
+    if result.get('is_news') is True:
+        found=bind_witness(result.get('event_source_id'),result.get('event_evidence_id'),result.get('event_quote'),sources,aliases)
+        if found:result.update(event_source_id=found[0],event_evidence_id=found[1],event_quote=found[2])
+    return result,sorted(set(errors))
+
+
 class Editor(old.Editor):
     context_characters=int(CONFIG.get('context_characters',120000))
     def model_sources(self,record):
@@ -195,11 +250,12 @@ class Editor(old.Editor):
             article.setdefault('mode',record['mode']);article.setdefault('category',record['category']);article.setdefault('kind',record['kind'])
             fp=fingerprint(record)
             if eligible(record):return
-            reviews=progress['review_attempts'];count=reviews.get(fp,0)
+            reviews=progress['review_attempts'];review_key='wire2:'+fp;count=reviews.get(review_key,0)
             if count>=1+CONFIG['repair_attempts']:raise p.Blocked('FINAL_REVIEW_ATTEMPTS_EXHAUSTED')
             sources=[record['source']]+record.get('supporting_sources',[])
             evidence={s['id']:{b['id']:b['text'] for b in s['blocks']} for s in sources}
-            reviews[fp]=count+1;self.persist()
+            wire,aliases=review_wire(record)
+            reviews[review_key]=count+1;self.persist()
             try:
                 result=self.call('Одна независимая итоговая содержательная проверка политики 4.3. '
                     'Проверь ВСЮ статью, включая заголовок/анонс: существенные факты, безопасность, законность режима, '
@@ -212,25 +268,28 @@ class Editor(old.Editor):
                     'Не путай дату публикации с датой события. Для новости event_date ISO, event_source_id, event_evidence_id и '
                     'event_quote должны прямо подтверждать дату события; для неоперативного материала эти четыре поля пусты. '
                     'Каждый существенный проверяемый факт перечисли в claims: fact,source_id,evidence_id (id блока источника), '
-                    'quote (непустая непрерывная дословная цитата этого блока). Сам id не доказывает смысл. '
+                    'quote (непустая непрерывная дословная цитата этого блока). source_id — короткий sN из источников, evidence_id — короткий qN этого источника. Сам id не доказывает смысл. '
                     'В evidence_sufficient отметь достаточность независимой базы, для советов и исследований особенно строго. '
                     'approve=true только когда все семь критериев true, issues и unresolved пусты. '
-                    'В input_hash верни точно '+fp+'\nРежим и права: '+json.dumps(record['rights'],ensure_ascii=False)+
+                    'Идентификатор запроса (заполняется программой, не возвращай его): '+fp+'\nПредыдущая диагностика протокола: '+json.dumps(progress.get('review_protocol_feedback',{}),ensure_ascii=False)+'\nРежим и права: '+json.dumps(record['rights'],ensure_ascii=False)+
                     '\nКонтекст переиздания (если есть): '+json.dumps(record.get('commission',{}),ensure_ascii=False)+'\nПовышенная проверка: '+str(record['high_risk'])+'\nСтатья: '+json.dumps(article,ensure_ascii=False)+
-                    '\nПолные оригиналы и подтверждения: '+json.dumps(self.model_sources(record),ensure_ascii=False),output_tokens=8000,schema='v43_final')
+                    '\nПолные оригиналы и подтверждения: '+json.dumps(wire,ensure_ascii=False),output_tokens=8000,schema='v43_final')
             except news.runtime.GenerationPaused:
-                reviews[fp]=count;self.persist();raise
-            good=(result.get('input_hash')==fp and result.get('approve') is True and all(result.get(k) is True for k in CHECKS)
+                reviews[review_key]=count;self.persist();raise
+            if fingerprint(record)!=fp:raise p.Blocked('REVIEW_INPUT_CHANGED')
+            result,protocol_errors=bind_review(result,record,aliases,fp)
+            good=(not protocol_errors and result.get('input_hash')==fp and result.get('approve') is True and all(result.get(k) is True for k in CHECKS)
                   and result.get('issues')==[] and result.get('unresolved')==[] and bool(result.get('claims')))
-            if type(result.get('is_news')) is not bool:good=False
+            validation_errors=[]
+            if type(result.get('is_news')) is not bool:good=False;validation_errors.append('NEWS_CLASSIFICATION_MISSING')
             if result.get('is_news') is True:
                 try:
                     date=datetime.fromisoformat(result['event_date']);date=date.replace(tzinfo=p.TZ) if date.tzinfo is None else date.astimezone(p.TZ)
                     release=datetime.fromisoformat(state.get('review_date',state['date'])+'T06:00').replace(tzinfo=p.TZ)
                     literal=evidence.get(result['event_source_id'],{}).get(result['event_evidence_id'],'')
-                    if not (timedelta(0)<=release-date<=timedelta(hours=72) and result['event_quote'] and result['event_quote'] in literal and content41.witnessed_event_date(result['event_date'],result['event_quote'])):good=False
-                    if not next((s.get('published') for s in sources if s['id']==result['event_source_id']),None):good=False
-                except (ValueError,KeyError,TypeError):good=False
+                    if not (timedelta(0)<=release-date<=timedelta(hours=72) and result['event_quote'] and result['event_quote'] in literal and content41.witnessed_event_date(result['event_date'],result['event_quote'])):good=False;validation_errors.append('NEWS_EVENT_DATE_UNVERIFIED_OR_STALE')
+                    if not next((s.get('published') for s in sources if s['id']==result['event_source_id']),None):good=False;validation_errors.append('NEWS_PUBLICATION_DATE_MISSING')
+                except (ValueError,KeyError,TypeError):good=False;validation_errors.append('NEWS_EVENT_FIELDS_INVALID')
             for claim in result.get('claims',[]):
                 literal=evidence.get(claim.get('source_id'),{}).get(claim.get('evidence_id'),'')
                 if not claim.get('quote','').strip() or claim['quote'] not in literal or not claim.get('fact','').strip():good=False
@@ -238,6 +297,9 @@ class Editor(old.Editor):
             if good:
                 record['checks']['final43']=dict(result,approved=True);record['status']='ready';self.persist();return
             progress['feedback']=copy.deepcopy(result)
-            print('[editorial43] '+json.dumps({'code':'FINAL_REJECTED','candidate':record['id'],'attempt':count+1,'issues_count':len(result.get('issues',[]))}),flush=True)
+            print('[editorial43] '+json.dumps({'code':'FINAL_REJECTED','candidate':record['id'],'attempt':count+1,'approve':result.get('approve'),'failed_checks':[key for key in CHECKS if result.get(key) is not True],'issues_count':len(result.get('issues',[])),'unresolved_count':len(result.get('unresolved',[])),'protocol_errors':protocol_errors,'validation_errors':validation_errors}),flush=True)
+            if positive_semantics(result) and (protocol_errors or validation_errors):
+                progress['review_protocol_feedback']={'codes':protocol_errors+validation_errors,'instruction':'Уточни проверку без изменения статьи: sN и qN, дословная цитата. Для дат отличай публикацию от события и текущую новость от неоперативного объяснения; контекст переиздания сам по себе не отменяет актуальность реальной новости. Если факт/дата не подтверждаются или текст выдаёт старое за новое, отклони; не выдумывай свидетельство и не меняй дату.'}
+                self.persist();continue
             if record['mode']!='INDEPENDENT_ARTICLE' or progress['write_attempts']>=1+CONFIG['repair_attempts']:raise p.Blocked('FINAL_REJECTED')
             progress.setdefault('previous_articles',[]).append(record.pop('article'));self.persist()

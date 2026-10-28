@@ -43,6 +43,23 @@ def migrate(state):
     return state
 
 
+def repair_review_protocol_v2(state):
+    if state.get('special43_review_v2')==1:return
+    changed=[]
+    for row in state['candidates']:
+        progress=row.get('progress',{}).get('v43',{});history=progress.get('history',[])
+        last=history[-1] if history else {}
+        if row.get('status')=='needs_review':
+            print('[special43-review-diagnostic] '+json.dumps({'slot':row['special_slot'],'approve':last.get('approve'),
+                'failed_checks':[key for key in e.CHECKS if last.get(key) is not True],'issues_count':len(last.get('issues',[])),
+                'unresolved_count':len(last.get('unresolved',[]))}),flush=True)
+        if row.get('status')=='needs_review' and row.get('article') and e.positive_semantics(last):
+            row['status']='preparing';changed.append(row['special_slot'])
+    if changed and state.get('block_code')=='SPECIAL43_TOPICS_NEED_REVIEW':state['status']='RETRY_PENDING';state.pop('block_code',None)
+    state['special43_review_v2']=1
+    print('[special43-review-protocol] '+json.dumps({'slots':changed,'automatic_approval':False,'drafts_and_counters_preserved':True}),flush=True)
+
+
 class Editor(e.Editor):
     def verify_source(self,r):
         # Reuse complete cached companion originals, fetching missing sources only once.
@@ -129,11 +146,26 @@ def advance(state,editor,root,persist):
     return False
 
 
+
+def material_source(source):
+    return {**{k:source.get(k) for k in ('url','title','author','published','declared_license','language','metadata_status')},
+        'blocks':[{k:block.get(k) for k in ('kind','text','heading_level','list_kind','list_index','list_depth')} for block in source['blocks']]}
+
+
 def verify_sources(state,persist):
     for r in validate_ready(state):
         for source in [r['source']]+r.get('supporting_sources',[]):
             current=source41.fetch(source['url'])
-            if any(current.get(k)!=source.get(k) for k in ('content_hash','title','published','declared_license')):
+            changed=[k for k in ('content_hash','title','published','declared_license') if current.get(k)!=source.get(k)]
+            if changed==['content_hash'] and r['mode']=='INDEPENDENT_ARTICLE' and material_source(current)==material_source(source):
+                grant=rights41.decision(current,'INDEPENDENT_ARTICLE')
+                rights41.require(current,'INDEPENDENT_ARTICLE',grant)
+                r.setdefault('current_source_checks',{})[source['url']]={'content_hash':current['content_hash'],'material_unchanged':True,'checked_at':datetime.now(timezone.utc).isoformat()}
+                persist()
+                print('[special43-source-change] '+json.dumps({'slot':r['special_slot'],'code':'NONEDITORIAL_TRANSPORT_ONLY'}),flush=True)
+                continue
+            if changed:
+                print('[special43-source-change] '+json.dumps({'slot':r['special_slot'],'url':source['url'],'fields':changed,'same_text':[b['text'] for b in source['blocks']]==[b['text'] for b in current['blocks']]}),flush=True)
                 r.setdefault('previous_preparations',[]).append({'article':r.pop('article'),'source':r['source']})
                 r['source']=current if source['url']==r['url'] else r['source']
                 r['supporting_sources']=[current if item['url']==source['url'] else item for item in r.get('supporting_sources',[])]
