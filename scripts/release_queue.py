@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import os
 import re
+import time
 from pathlib import Path
 try:
     from scripts import news, site_checks, policy41
@@ -20,7 +21,7 @@ def edition_exists(root,date):
     root=Path(root)
     if (root/'issues'/date/'issue.json').is_file(): return True  # immutable legacy edition
     path=root/'issues'/date/'index.html'
-    return path.is_file() and 'data-policy-version="4.1"' in path.read_text(encoding='utf-8')
+    return path.is_file() and any('data-policy-version="'+v+'"' in path.read_text(encoding='utf-8') for v in ('4.1','4.3'))
 
 
 def pending_date(root, now):
@@ -93,15 +94,34 @@ def production_artifacts():
     raise RuntimeError('PRODUCTION_ARTIFACT_PAGINATION_LIMIT')
 
 
+
+def wait_until_release(date,clock=None,sleep=time.sleep):
+    """Final files stay private until the release gate; never wait for a whole day."""
+    datetime.strptime(date,'%Y-%m-%d')
+    clock=clock or moscow
+    release=datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=news.TZ)
+    while True:
+        current=moscow(clock());remaining=(release-current).total_seconds()
+        if remaining<=0:return
+        if remaining>600:raise RuntimeError('RELEASE_WAIT_OUTSIDE_FINAL_WINDOW')
+        sleep(min(15,remaining))
+
+
 def main():
     phase,preview,date = context(os.environ.get('PHASE','run'),os.environ.get('PREVIEW','false')=='true',
                                 os.environ.get('TARGET_DATE',''),os.environ['GITHUB_EVENT_NAME'],
                                 check_public=site_checks.check_site)
     if (not preview and phase in ('run','resume') and not os.environ.get('TARGET_DATE','').strip()
             and os.environ.get('GITHUB_REF_NAME')=='main'):
-        date=unfinished_date(news.ROOT,date,production_artifacts())
+        if os.getenv('NEWS_POLICY_VERSION')=='4.3':
+            # Keep old ciphertext artifacts under their original dates; don't relabel as today.
+            print('[release-context] policy43 serves current date; older checkpoints retained under original labels')
+        else:date=unfinished_date(news.ROOT,date,production_artifacts())
     with open(os.environ['GITHUB_OUTPUT'],'a') as output:
         output.write(f'phase={phase}\npreview={str(preview).lower()}\ntarget_date={date}\n')
     print(f'[release-context] phase={phase} preview={preview} target_date={date}',flush=True)
 
-if __name__=='__main__': main()
+if __name__=='__main__':
+    import sys
+    if len(sys.argv)==3 and sys.argv[1]=='--wait-until':wait_until_release(sys.argv[2])
+    else:main()

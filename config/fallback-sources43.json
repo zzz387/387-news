@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "description": "Public bibliographic metadata only; no source body, advice or generated summary.",
+  "sources": [
+    {
+      "url": "https://www.unicef.org/parenting/child-development/baby-tips",
+      "title": "Parenting tips for the first two years of life",
+      "publisher": "UNICEF Parenting",
+      "published": "",
+      "content_hash": "07766ef284444c3aefb27a5c68728601095235c0d36bc355a5d6e56ad23c4b84",
+      "checked_at": "2026-10-28T04:19:28.410746+00:00"
+    },
+    {
+      "url": "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more",
+      "title": "To grow up healthy, children need to sit less and play more",
+      "publisher": "World Health Organization",
+      "published": "",
+      "content_hash": "1914950d658e9204f5469cb42cd3164f83936b55d2410322a7697072902106ae",
+      "checked_at": "2026-10-28T04:19:30.026174+00:00"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "title": "How play strengthens your child’s mental health",
+      "publisher": "UNICEF Parenting",
+      "published": "",
+      "content_hash": "a57d93fcb7ace6dfbdce075a8ca92c1bdb5aab56ff07150c9f580812dec536d2",
+      "checked_at": "2026-10-28T04:19:30.134791+00:00"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "title": "21 learning activities for babies and toddlers",
+      "publisher": "UNICEF Parenting",
+      "published": "",
+      "content_hash": "994cfa7267c0c2f296add394e912d2eee6346769f30fcbd9f3d0f716ea15ad27",
+      "checked_at": "2026-10-28T04:19:31.629498+00:00"
+    },
+    {
+      "url": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
+      "title": "Four Ways to Refresh Your Relationship",
+      "publisher": "Greater Good",
+      "published": "",
+      "content_hash": "b5300d02cd8eb77fe4df47d7d933cd418b4778796b4960b7e3f2c6c03e82a6db",
+      "checked_at": "2026-10-28T04:19:35.018415+00:00"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "title": "Было-Стало. Как реставрировали царицынский дворцовый ансамбль – Музей-заповедник «Царицыно»",
+      "publisher": "Музей-заповедник «Царицыно»",
+      "published": "",
+      "content_hash": "2f6cd77c2a547a549dabe5b94de1f1b3b8c082a1501853e9af83735531e72f47",
+      "checked_at": "2026-10-28T04:19:38.618488+00:00"
+    }
+  ]
+}

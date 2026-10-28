@@ -32,6 +32,12 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
                 if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HOMEPAGE_HORIZONTAL_OVERFLOW')
                 urls=page.locator(f'a[href^="/issues/{date}/articles/"]').evaluate_all('(nodes)=>[...new Set(nodes.map(n=>n.getAttribute("href")))]')
                 if len(urls)!=expected_count: raise ValueError('BROWSER_ARTICLE_COUNT_MISMATCH')
+                if expected_count==0:
+                    digest=page.locator('.source-digest')
+                    if digest.count()!=1 or digest.locator('li').count()<1 or not digest.is_visible():raise ValueError('BROWSER_EMPTY_DIGEST')
+                    if page.locator('h1').inner_text()!='Обзор источников':raise ValueError('BROWSER_MISLABELLED_DIGEST')
+                    if digest.locator('a').evaluate_all('(nodes)=>nodes.some(n=>!n.getAttribute("href").startsWith("https://"))'):raise ValueError('BROWSER_DIGEST_LINK_INVALID')
+                    page.screenshot(path=str(output/f'{width}-digest.png'));report['pages']+=1
                 for index,url in enumerate(urls):
                     page.goto(base+url,wait_until='networkidle')
                     if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HORIZONTAL_OVERFLOW')

@@ -95,13 +95,13 @@ def render_blocks(article):
     return ''.join(out)
 
 
-def render_article(date,no,article,root,*,moment=None):
+def render_article(date,no,article,root,*,moment=None,policy_version="4.1"):
     images_valid(article,root)
     moment=moment or datetime.fromisoformat(date+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
     link=f'/issues/{date}/articles/{article["slug"]}/'
     author=(article['primary_source']['author'] or article['primary_source']['publisher']+' · автор не указан') if article['mode']!='INDEPENDENT_ARTICLE' else 'Редакция 387 News'
-    out=[news.page_header(article['title'],article['teaser'],link,moment,no).replace('Редакция 2.0','Редакция 4.1'),
-         '<main class="wrap"><article class="article-shell" data-policy-version="4.1">',
+    out=[news.page_header(article['title'],article['teaser'],link,moment,no).replace('Редакция 2.0','Редакция '+policy_version),
+         '<main class="wrap"><article class="article-shell" data-policy-version="'+policy_version+'">',
          '<div class="meta">'+escape(article['category'])+' · '+escape(article['kind'])+'</div>',
          '<h1>'+escape(article['title'])+'</h1>']
     if article['teaser']: out.append('<p class="dek">'+escape(article['teaser'])+'</p>')
@@ -124,11 +124,11 @@ def render_article(date,no,article,root,*,moment=None):
     return ''.join(out)
 
 
-def render_overview(date,no,articles,permanent=False):
+def render_overview(date,no,articles,permanent=False,*,policy_version="4.1"):
     moment=datetime.fromisoformat(date+'T'+policy.RELEASE_TIME).replace(tzinfo=policy.TZ)
     title=f'Выпуск № {no:03d} · {date}'
-    out=[news.page_header(title,'Двенадцать законченных статей 387 News',f'/issues/{date}/' if permanent else '/',moment,no).replace('Редакция 2.0','Редакция 4.1'),
-        f'<main class="wrap" data-policy-version="4.1" data-issue-date="{date}" data-issue-number="{no}" data-article-count="{len(articles)}">',
+    out=[news.page_header(title,str(len(articles))+' готовых материалов 387 News',f'/issues/{date}/' if permanent else '/',moment,no).replace('Редакция 2.0','Редакция '+policy_version),
+        f'<main class="wrap" data-policy-version="{policy_version}" data-issue-date="{date}" data-issue-number="{no}" data-article-count="{len(articles)}">',
         '<section class="front-intro"><div><h1>Обзор номера</h1><p>Истории, знания и практические открытия. Все статьи доступны целиком.</p></div></section>',
         '<section class="front-grid">']
     for i,a in enumerate(articles[:2]):

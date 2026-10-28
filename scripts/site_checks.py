@@ -65,6 +65,8 @@ def check_site(base='https://387.su', expected_date=None):
         raise RuntimeError('Public health check requires verified HTTPS')
     base = base.rstrip('/')
     home = fetch(base+'/')
+    if 'data-policy-version="4.3"' in home:
+        return check_v43(base,home,expected_date)
     links = set(re.findall(r"href=[\"']/?issues/(\d{4}-\d{2}-\d{2})/articles/([a-z0-9-]+)/",home))
     if not links:
         raise RuntimeError('Homepage has no complete issue article links')
@@ -138,6 +140,10 @@ def main():
 def validate_local_release(root, date):
     """Validate the immutable public archive without opening a private checkpoint."""
     root=Path(root)
+    if (root/'issues'/date/'release.json').is_file():
+        try: from scripts import publication43
+        except ImportError: import publication43
+        return publication43.validate(root,date)
     if (root/'issues'/date/'index.html').is_file() and 'data-policy-version="4.1"' in (root/'issues'/date/'index.html').read_text(encoding='utf-8'):
         try: from scripts import publication41
         except ImportError: import publication41
@@ -170,6 +176,42 @@ def validate_local_release(root, date):
     finally:
         news.ROOT=previous
     return issue
+
+
+def check_v43(base,home,expected_date=None):
+    try:from scripts import publication43,publication41
+    except ImportError:import publication43,publication41
+    found=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',home)
+    if not found:raise RuntimeError('PUBLIC_DATE_MISSING')
+    date=found[1]
+    if expected_date and date!=expected_date:raise RuntimeError('PUBLIC_DATE_MISMATCH')
+    data=json.loads(fetch(base+'/issues/'+date+'/release.json'))
+    if data.get('date')!=date or data.get('policy_version')!='4.3':raise RuntimeError('PUBLIC_METADATA_INVALID')
+    if publication43.digest_bytes(home.encode())!=data.get('homepage_hash'):raise RuntimeError('PUBLIC_HOME_CHANGED')
+    count=data.get('article_count');pages=data.get('pages',{})
+    if type(count) is not int or count<0 or len(pages)!=count:raise RuntimeError('PUBLIC_COUNT_INVALID')
+    overview=fetch(base+'/issues/'+date+'/')
+    if publication43.digest_bytes(overview.encode())!=data.get('overview_hash'):raise RuntimeError('PUBLIC_OVERVIEW_CHANGED')
+    markdown=fetch(base+'/issues/'+date+'/overview.md')
+    if publication43.digest_bytes(markdown.encode())!=data.get('markdown_hash'):raise RuntimeError('PUBLIC_MARKDOWN_CHANGED')
+    if '/issues/'+date+'/' not in fetch(base+'/archive/'):raise RuntimeError('PUBLIC_ARCHIVE_LINK_MISSING')
+    slugs=set(re.findall(r'href="/issues/'+re.escape(date)+r'/articles/([a-z0-9-]+)/"',home))
+    if slugs!=set(pages):raise RuntimeError('PUBLIC_LINK_COUNT_MISMATCH')
+    if count==0:
+        if data.get('kind')!='source_digest' or not data.get('sources') or 'Обзор источников' not in overview:raise RuntimeError('EMPTY_OR_MISLABELLED_RESERVE')
+        for row in data['sources']:
+            try:from scripts import source41
+            except ImportError:import source41
+            source41.safe_url(row['url'])
+            if not all(row.get(k) for k in ('title','publisher','checked_at')) or row['url'] not in unescape(overview):raise RuntimeError('PUBLIC_RESERVE_INVALID')
+    elif data.get('kind')!='articles':raise RuntimeError('PUBLIC_KIND_MISMATCH')
+    for slug,hashes in pages.items():
+        if not re.fullmatch(r'[a-z0-9-]+',slug):raise RuntimeError('PUBLIC_SLUG_INVALID')
+        page=fetch(base+'/issues/'+date+'/articles/'+slug+'/')
+        md=fetch(base+'/issues/'+date+'/articles/'+slug+'/article.md')
+        if publication43.digest_bytes(page.encode())!=hashes['html'] or publication43.digest_bytes(md.encode())!=hashes['markdown']:raise RuntimeError('PUBLIC_CONTENT_CHANGED')
+        publication41.validate_page(page.replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
+    return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':'4.3','expected_date':expected_date,'status':'ok'}
 
 
 if __name__=='__main__': main()

@@ -87,7 +87,7 @@ def validate_ready(state, require_review=False):
 
 def published_delivery(state, date, ops, preview, now, check_public):
     metadata=site_checks.validate_local_release(ops.ROOT,date)
-    state['public_article_count']=metadata.get('count',len(metadata.get('articles',[])))
+    state['public_article_count']=metadata.get('article_count',metadata.get('count',len(metadata.get('articles',[]))))
     if preview:
         status(state,'APPROVED','preview_archive_validated')
         return False
@@ -210,6 +210,7 @@ def report(state,ledger,now=None):
         retry=next_wake(tomorrow_utc.astimezone(news.TZ))
     ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version')==41 else len(state.get('articles',{}))
     return dict(date=state['date'],policy_version=state.get('policy_version','3.2'),
+                issue_kind=state.get('issue_kind','articles'),reserve_links=state.get('reserve_count',0),
                 article_target=policy41.ARTICLE_COUNT if state.get('version')==41 else 8,articles=max(ready_count,state.get('public_article_count',0)),
                 segments=segments,dossiers=len(state.get('dossiers',{})),audit_passed=bool(state.get('audit_passed')),
                 quota_day=ledger.get('day'),requests_used=ledger.get('requests',0),

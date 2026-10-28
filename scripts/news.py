@@ -564,7 +564,7 @@ def render_archive():
             number=re.search(r'data-issue-number="(\d+)"',text)
             count=re.search(r'data-article-count="(\d+)"',text)
             if number and count:
-                no=int(number.group(1)); title='Выпуск 387 News'; desc=count.group(1)+' материалов'
+                no=int(number.group(1)); title='Обзор источников' if 'data-issue-kind="source_digest"' in text else 'Выпуск 387 News'; desc='Проверенные ссылки · без новых статей' if 'data-issue-kind="source_digest"' in text else count.group(1)+' материалов'
             else:
                 no, title, desc = 1, 'Пилотный выпуск 387 News', '10 материалов'
         entries.append((directory.name,no,title,desc))
