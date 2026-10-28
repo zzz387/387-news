@@ -20,7 +20,7 @@ def edition_exists(root,date):
     root=Path(root)
     if (root/'issues'/date/'issue.json').is_file(): return True  # immutable legacy edition
     path=root/'issues'/date/'index.html'
-    return path.is_file() and 'data-policy-version="4.1"' in path.read_text(encoding='utf-8')
+    return path.is_file() and any('data-policy-version="'+v+'"' in path.read_text(encoding='utf-8') for v in ('4.1','4.3'))
 
 
 def pending_date(root, now):
@@ -99,7 +99,10 @@ def main():
                                 check_public=site_checks.check_site)
     if (not preview and phase in ('run','resume') and not os.environ.get('TARGET_DATE','').strip()
             and os.environ.get('GITHUB_REF_NAME')=='main'):
-        date=unfinished_date(news.ROOT,date,production_artifacts())
+        if os.getenv('NEWS_POLICY_VERSION')=='4.3':
+            # Keep old ciphertext artifacts under their original dates; don't relabel as today.
+            print('[release-context] policy43 serves current date; older checkpoints retained under original labels')
+        else:date=unfinished_date(news.ROOT,date,production_artifacts())
     with open(os.environ['GITHUB_OUTPUT'],'a') as output:
         output.write(f'phase={phase}\npreview={str(preview).lower()}\ntarget_date={date}\n')
     print(f'[release-context] phase={phase} preview={preview} target_date={date}',flush=True)

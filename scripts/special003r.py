@@ -356,6 +356,10 @@ def recover_delivery(state,persist,check=None):
 
 
 def run():
+    try:from scripts import daily43
+    except ImportError:import daily43
+    if os.getenv("NEWS_POLICY_VERSION")=="4.3" and daily43.enabled() and daily43.e.CONFIG.get("special_paused"):
+        print("[special-status] PAUSED_POLICY43; existing ciphertext and quota unchanged");return
     if (os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REF_NAME')!='main' or
         os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('NEWS_SPECIAL_EDITION')!=sc.ID):
         raise RuntimeError('SPECIAL_PROTECTED_ACTIONS_MAIN_REQUIRED')

@@ -13,8 +13,10 @@ class PriorityTests(unittest.TestCase):
         before=copy.deepcopy(ledger)
         self.assertEqual(runner.admit(p.ROOT,None,ledger,now,priority=True),(True,'SPECIAL_FIRST_OWNER_AUTHORIZED'))
         self.assertEqual(ledger,before)
-        self.assertEqual(runner.remaining_run_limit(0,dict(ledger,requests=219),priority=True),1)
-        self.assertEqual(runner.remaining_run_limit(24,ledger,priority=True),0)
+        with patch.object(runner,'datetime',wraps=datetime) as clock:
+            clock.now.return_value=now
+            self.assertEqual(runner.remaining_run_limit(0,dict(ledger,requests=219),priority=True),1)
+            self.assertEqual(runner.remaining_run_limit(24,ledger,priority=True),0)
 
     def test_priority_never_overrides_quota_or_cooldown(self):
         now=datetime(2026,10,27,5,tzinfo=p.TZ)

@@ -40,6 +40,13 @@ jobs:
       - run: python -m pip install 'cryptography>=44,<49'
       - name: Verify proposed full sources and independent references without Gemini
         run: python -m scripts.source_reserve41 --output '${{ runner.temp }}/source-reserve.json'
+      - name: Verify real policy 4.3 fallback bibliographic metadata without Gemini
+        run: python -m scripts.daily43 --check-reserve --output '${{ runner.temp }}/daily43-reserve.json'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: policy43-public-reserve
+          path: ${{ runner.temp }}/daily43-reserve.json
+          retention-days: 30
       - uses: actions/upload-artifact@v4
         with:
           name: daily-public-source-reserve

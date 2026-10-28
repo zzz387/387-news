@@ -535,7 +535,7 @@ def main():
     label = artifact_label(date, args.preview)
     state = fetch_latest_checkpoint(label, key)
     branch = os.getenv('GITHUB_REF_NAME', 'main')
-    if state and (state.get('date') != date or state.get('version') not in (31,41)
+    if state and (state.get('date') != date or state.get('version') not in (31,41,43)
                   or state.get('branch', branch) != branch
                   or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
@@ -545,8 +545,11 @@ def main():
         count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[resume] {vetted_count(state)}/{target_count} verified articles; {count} accepted segments; '
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
+    try:from scripts import daily43,editorial43
+    except ImportError:import daily43,editorial43
+    use43=os.getenv('NEWS_POLICY_VERSION')=='4.3' and daily43.enabled()
     if args.phase not in ('check','inspect') and not release_queue.edition_exists(ROOT,date):
-        state=editorial41.migrate(state,date)
+        state=editorial43.migrate(state,date) if use43 else editorial41.migrate(state,date)
     if args.phase in ('check','inspect'):
         if state is None:
             raise RuntimeError('No saved checkpoint found for this date and preview mode')
@@ -580,7 +583,7 @@ def main():
                     f.write(f'checkpoint=true\nartifact_name={label}\n')
 
     if state is None and args.phase in ('run','resume','write','audit','auto','plan'):
-        state=editorial41.new_state(date)
+        state=editorial43.migrate(None,date) if use43 else editorial41.new_state(date)
 
     PERSIST = RUNTIME.CHECKPOINT = persist
     RUNTIME.ACTIVE_BUDGET = RUNTIME.RequestBudget(ledger, persist)
@@ -590,7 +593,9 @@ def main():
         if state is None:
             raise RuntimeError('Encrypted draft missing; run plan first')
         ready=False
-        if state.get('version')==41:
+        if state.get('version')==43:
+            ready=daily43.advance(state,date,args.preview,sys.modules[__name__],persist)
+        elif state.get('version')==41:
             ready=pipeline.advance(state,date,args.preview,sys.modules[__name__],persist)
         elif args.phase=='plan':
             pipeline.status(state,'PLANNING','research')

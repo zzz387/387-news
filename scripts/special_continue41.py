@@ -16,6 +16,8 @@ def decision(ledger,runs,run_id,now=None):
 
 
 def main():
+    if os.getenv("NEWS_POLICY_VERSION")=="4.3":
+        print("[special-continuation] PAUSED_POLICY43");return
     if (os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REF_NAME')!='main'
             or os.environ.get('GITHUB_REPOSITORY')!='zzz387/387-news'
             or os.environ.get('SPECIAL_HOLD_DAILY')!='true' or not 1<=int(os.environ.get('SPECIAL_RUN_USED','0'))<=24):

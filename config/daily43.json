@@ -1,0 +1,10 @@
+{
+  "version": "4.3",
+  "enabled": true,
+  "article_target": 8,
+  "minimum_articles": 1,
+  "release_time": "06:00",
+  "special_paused": true,
+  "repair_attempts": 2,
+  "reserve_max_age_days": 14
+}
