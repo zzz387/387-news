@@ -8,7 +8,7 @@
       "publisher": "UNICEF Parenting",
       "published": "",
       "content_hash": "07766ef284444c3aefb27a5c68728601095235c0d36bc355a5d6e56ad23c4b84",
-      "checked_at": "2026-10-28T04:14:26.658890+00:00"
+      "checked_at": "2026-10-28T04:19:28.410746+00:00"
     },
     {
       "url": "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more",
@@ -16,7 +16,7 @@
       "publisher": "World Health Organization",
       "published": "",
       "content_hash": "1914950d658e9204f5469cb42cd3164f83936b55d2410322a7697072902106ae",
-      "checked_at": "2026-10-28T04:14:28.247851+00:00"
+      "checked_at": "2026-10-28T04:19:30.026174+00:00"
     },
     {
       "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
@@ -24,7 +24,7 @@
       "publisher": "UNICEF Parenting",
       "published": "",
       "content_hash": "a57d93fcb7ace6dfbdce075a8ca92c1bdb5aab56ff07150c9f580812dec536d2",
-      "checked_at": "2026-10-28T04:14:28.345953+00:00"
+      "checked_at": "2026-10-28T04:19:30.134791+00:00"
     },
     {
       "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
@@ -32,15 +32,7 @@
       "publisher": "UNICEF Parenting",
       "published": "",
       "content_hash": "994cfa7267c0c2f296add394e912d2eee6346769f30fcbd9f3d0f716ea15ad27",
-      "checked_at": "2026-10-28T04:14:29.859514+00:00"
-    },
-    {
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8846430/",
-      "title": "Empty Nest Status, Marital Closeness, and Perceived Health: Testing Couples’ Direct and Moderated Associations with an Actor-Partner Interdependence Model",
-      "publisher": "PubMed Central (PMC)",
-      "published": "",
-      "content_hash": "4d797f748167b1d2ee2ca2df178feb1afad314be3a3224536245e904ad4f6d7b",
-      "checked_at": "2026-10-28T04:14:31.663092+00:00"
+      "checked_at": "2026-10-28T04:19:31.629498+00:00"
     },
     {
       "url": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
@@ -48,15 +40,7 @@
       "publisher": "Greater Good",
       "published": "",
       "content_hash": "b5300d02cd8eb77fe4df47d7d933cd418b4778796b4960b7e3f2c6c03e82a6db",
-      "checked_at": "2026-10-28T04:14:33.451933+00:00"
-    },
-    {
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5927157/",
-      "title": "Is an Empty Nest Best?: Coresidence With Adult Children and Parental Marital Quality Before and After the Great Recession",
-      "publisher": "PubMed Central (PMC)",
-      "published": "",
-      "content_hash": "ecda6cb207950ff314d57574e62560b9464a238937a6ff2d281d1ae1111fa890",
-      "checked_at": "2026-10-28T04:14:33.782049+00:00"
+      "checked_at": "2026-10-28T04:19:35.018415+00:00"
     },
     {
       "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
@@ -64,271 +48,7 @@
       "publisher": "Музей-заповедник «Царицыно»",
       "published": "",
       "content_hash": "2f6cd77c2a547a549dabe5b94de1f1b3b8c082a1501853e9af83735531e72f47",
-      "checked_at": "2026-10-28T04:14:37.611469+00:00"
-    },
-    {
-      "url": "https://tsaritsyno-museum.ru/park/architecture/",
-      "title": "Архитектурный ансамбль – Музей-заповедник «Царицыно»",
-      "publisher": "Музей-заповедник «Царицыно»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "ad2170a8c50a8b38e6fc268741d2001f5412474d0331b8dbf28442891c3c70b5"
-    },
-    {
-      "url": "https://tsaritsyno-museum.ru/the_museum/about/",
-      "title": "История – Музей-заповедник «Царицыно»",
-      "publisher": "Музей-заповедник «Царицыно»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "dc5ac5864ca9b0bc52bea61126fbca45f565b1ff3bb48d171c3e25e9a0dc8512"
-    },
-    {
-      "url": "https://www.nps.gov/subjects/healthandsafety/trip-planning-guide.htm",
-      "title": "Trip Planning Guide",
-      "publisher": "National Park Service",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "a47a5745a8784da43a33091bef951e1da02c175721e2c3e4af000a3b31e2a2e6"
-    },
-    {
-      "url": "https://www.mskagency.ru/materials/3571845",
-      "title": "Дорожное покрытие и освещение обновили в Напрудном переулке",
-      "publisher": "Агентство городских новостей «Москва»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "d031bd66994fdfb97477476f0822046f34e2d19f794300493ddaa6d80ff15e3b"
-    },
-    {
-      "url": "https://www.mskagency.ru/materials/3555954",
-      "title": "Собянин: Футуристическое здание «школы будущего» появится в Пресненском районе",
-      "publisher": "Агентство городских новостей «Москва»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "393b0cde29b9c621006df91f88cb7ebd86d99fc07925f3ac4225666c4ea78610"
-    },
-    {
-      "url": "https://www.mskagency.ru/materials/3571841",
-      "title": "Школу будущего в Пресненском районе украсят почти 100 цветов из стеклофибробетона",
-      "publisher": "Агентство городских новостей «Москва»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "2d864d9a8147e2d79f8ee0eb38bfb53e4d9cb1cd650012ac4f52fe2180d07909"
-    },
-    {
-      "url": "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
-      "title": "Healthy diet",
-      "publisher": "World Health Organization",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "2f0c23b0c98eb38ab5fd2fe263a84e409e3f7cff5c3cc78637d495fc15ea2639"
-    },
-    {
-      "url": "https://www.niddk.nih.gov/health-information/weight-management/healthy-eating-physical-activity-for-life/health-tips-for-adults",
-      "title": "Health Tips for Adults",
-      "publisher": "National Institutes of Health",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "1e0581ad27048f0be5cf89435d5df41e6d78079f8969caeddfef8437e34ff952"
-    },
-    {
-      "url": "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
-      "title": "Physical activity",
-      "publisher": "World Health Organization",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "bfa41c474493f6e94789beb881b0e44170bda48471ff210f748151ac893ba205"
-    },
-    {
-      "url": "https://www.nps.gov/subjects/biking/safety.htm",
-      "title": "Safety",
-      "publisher": "National Park Service",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "40a22c164de7c147bc3db16f81b69e1aec7f794bc35901101445d06b836fadae"
-    },
-    {
-      "url": "https://www.nccih.nih.gov/health/yoga-effectiveness-and-safety",
-      "title": "Yoga: Effectiveness and Safety",
-      "publisher": "National Institutes of Health",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "72e84752205e64447dfb957347d9e94e5a5167999ad5782724f20ec5ee2ce9fa"
-    },
-    {
-      "url": "https://www.nccih.nih.gov/health/tai-chi-what-you-need-to-know",
-      "title": "Tai Chi: What You Need To Know",
-      "publisher": "National Institutes of Health",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "31dd0855979c36322cc1298eed42d11266b416c4aed2f8dfcaf1b97c956634ef"
-    },
-    {
-      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0336748",
-      "title": "Brief daily functional strength training to improve functional performance in older adults with mobility disability: A randomized trial",
-      "publisher": "journals.plos.org",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "179be505c6d05ecb72cbae96e1d9e983c83b53633aa83a968cecf5fb0cf89e2b"
-    },
-    {
-      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10739774/",
-      "title": "Changes in Coffee Intake, Added Sugar and Long-Term Weight Gain - Results from Three Large Prospective US Cohort Studies",
-      "publisher": "National Institutes of Health",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "f09cece4c06e8ecde952fccd343be0aee793da21b213f00f9e8aae3d18689122"
-    },
-    {
-      "url": "https://science.nasa.gov/mission/osiris-rex/",
-      "title": "OSIRIS-REx",
-      "publisher": "NASA",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "8392c2ef2aa554abbbb669bbf58c89ed1972cf707d5b9d0d478c291b3a09e996"
-    },
-    {
-      "url": "https://science.nasa.gov/people/katherine-johnson/",
-      "title": "Katherine Johnson (1918-2020)",
-      "publisher": "NASA",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "a061c09a8f6ac97649221132220bbdcb9da69067a2ad373e9aded009265fd2d6"
-    },
-    {
-      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080109.html",
-      "title": "General Audience of 9 January 2008: Saint Augustine of Hippo (1)",
-      "publisher": "The Holy See",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "465bee124fe763d52ebb92e84a9f932e989e7c7f3a1607b147657c54782027f6"
-    },
-    {
-      "url": "https://www.vatican.va/content/benedict-xvi/en/audiences/2008/documents/hf_ben-xvi_aud_20080116.html",
-      "title": "General Audience of 16 January 2008: Saint Augustine of Hippo (2)",
-      "publisher": "The Holy See",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "80b4f2e66c1f940f91e67c6ba57f662d72515c167e8331484a7d260aee27a7b0"
-    },
-    {
-      "url": "https://science.nasa.gov/solar-system/",
-      "title": "Solar System Exploration",
-      "publisher": "NASA",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "c4c58e9654e1300db8e9e6a98741dbf15c1776add65197638c580b02f1fa4dd6"
-    },
-    {
-      "url": "https://science.nasa.gov/mars/",
-      "title": "Mars",
-      "publisher": "NASA",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "bef50f2c7e01905df9bc1b7dd56fffb7149623b7e5297567af49b48cdd44c94c"
-    },
-    {
-      "url": "https://www.cbr.ru/dkp/about_inflation/",
-      "title": "Что такое инфляция",
-      "publisher": "Банк России",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "68ffb759ffdcd2a06b6e69c93618032cad4f94e778be90de94ddfbbbb63d6d72"
-    },
-    {
-      "url": "https://www.nist.gov/additive-manufacturing/what-additive-manufacturing",
-      "title": "What is Additive Manufacturing?",
-      "publisher": "National Institute of Standards and Technology",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "ae233f84e481890e00119027c26bed711a081c9b803a0d9c57339f064cc908eb"
-    },
-    {
-      "url": "https://www.nist.gov/additive-manufacturing/additive-manufacturing-faqs",
-      "title": "Additive Manufacturing FAQs",
-      "publisher": "National Institute of Standards and Technology",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "d57b904a7f59aca49283cb120aaef3785b5eb303babf677b253c3317c7445b52"
-    },
-    {
-      "url": "https://tsaritsyno-museum.ru/park/locations/bashnya-ruina/",
-      "title": "Башня-руина – Музей-заповедник «Царицыно»",
-      "publisher": "Музей-заповедник «Царицыно»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "a97fa3c7bd9441027c439e95906fb11689e53ffb404ebfb59c861a27a174db61"
-    },
-    {
-      "url": "https://tsaritsyno-museum.ru/park/greenhouses/",
-      "title": "Оранжереи в Москве – Музей-заповедник «Царицыно»",
-      "publisher": "Музей-заповедник «Царицыно»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "613388a5dcc1467566e59ca69eda3e5d11db74b09b4acea91f4bd6f1d16878a6"
-    },
-    {
-      "url": "https://tsaritsyno-museum.ru/fakty/f-a-q/",
-      "title": "Часто задаваемые вопросы – Музей-заповедник «Царицыно»",
-      "publisher": "Музей-заповедник «Царицыно»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "648ba1d7f8a086b79f11b43f3372713fe95b86e19c0790a6991b44b72aa70dab"
-    },
-    {
-      "url": "https://tsaritsyno-museum.ru/fakty/decorative-and-applied-arts/",
-      "title": "Декоративно-прикладное искусство – Музей-заповедник «Царицыно»",
-      "publisher": "Музей-заповедник «Царицыно»",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "6e7e3fe747c6481388e4062e78ceaa6cfc0249239b9d933b6f3afc6ee2ff459e"
-    },
-    {
-      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2022.619716",
-      "title": "Keeping an Eye on Water Quality From the Sky",
-      "publisher": "Frontiers for Young Minds",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "1a159c2e1af13c28d83502ed778c713c24c70d3144131aaf27727516735af268"
-    },
-    {
-      "url": "https://science.nasa.gov/earth/",
-      "title": "Earth",
-      "publisher": "NASA",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "b3cb2ac7fb3307f3fe9c31a452013b04830e1ab80c4dc2641d70e0025f82047e"
-    },
-    {
-      "url": "https://kids.frontiersin.org/articles/10.3389/frym.2026.1751528/full",
-      "title": "Why Light Going Backward Can Help us go Forward",
-      "publisher": "Frontiers for Young Minds",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "78e31260100d2f7f2e93169b78f06a84775daca7981fcbb2d7cfefc64188e103"
-    },
-    {
-      "url": "https://dmtya.ru/theatre/news/theatre/premera-spektaklya-vasilisa-prekrasnaya1/",
-      "title": "Премьера спектакля «Василиса Прекрасная»",
-      "publisher": "Детский музыкальный театр юного актёра",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "21411a1545c2882d8ad0aee410cfebf87c772e2ee310e2fd7f8e797ad0181477"
-    },
-    {
-      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291231",
-      "title": "Health and wellbeing among the empty nest and non-empty nest elderly in China—Results from a national cross-sectional study",
-      "publisher": "journals.plos.org",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "90db0c1ed9126be6082cbdc6a3786dec45a6e1481166b122e6292b583b86267f"
-    },
-    {
-      "url": "https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1673677/full",
-      "title": "Differential impact of coffee quantity and sweetening on body composition parameters and inflammation",
-      "publisher": "www.frontiersin.org",
-      "published": "",
-      "checked_at": "2026-10-26T21:54:09.220085+00:00",
-      "content_hash": "90d5e0f1c6281dbd421539f30f37bb03bd3bfa48cb8f42fa241df5338f001d60"
+      "checked_at": "2026-10-28T04:19:38.618488+00:00"
     }
   ]
 }
