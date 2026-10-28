@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-28",
+  "number": 4,
+  "policy_version": "4.3",
+  "article_count": 0,
+  "kind": "source_digest",
+  "pages": {},
+  "prepared_at": "2026-10-28T08:11:02.165408+03:00",
+  "release_not_before": "2026-10-28T06:00:00+03:00",
+  "sources": [
+    {
+      "url": "https://www.unicef.org/parenting/child-development/baby-tips",
+      "title": "Parenting tips for the first two years of life",
+      "publisher": "UNICEF Parenting",
+      "published": "",
+      "checked_at": "2026-10-28T04:19:28.410746+00:00"
+    },
+    {
+      "url": "https://www.who.int/news/item/24-04-2019-to-grow-up-healthy-children-need-to-sit-less-and-play-more",
+      "title": "To grow up healthy, children need to sit less and play more",
+      "publisher": "World Health Organization",
+      "published": "",
+      "checked_at": "2026-10-28T04:19:30.026174+00:00"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-development/how-play-strengthens-your-childs-mental-health",
+      "title": "How play strengthens your child’s mental health",
+      "publisher": "UNICEF Parenting",
+      "published": "",
+      "checked_at": "2026-10-28T04:19:30.134791+00:00"
+    },
+    {
+      "url": "https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers",
+      "title": "21 learning activities for babies and toddlers",
+      "publisher": "UNICEF Parenting",
+      "published": "",
+      "checked_at": "2026-10-28T04:19:31.629498+00:00"
+    },
+    {
+      "url": "https://greatergood.berkeley.edu/article/item/four_ways_to_refresh_your_relationship",
+      "title": "Four Ways to Refresh Your Relationship",
+      "publisher": "Greater Good",
+      "published": "",
+      "checked_at": "2026-10-28T04:19:35.018415+00:00"
+    },
+    {
+      "url": "https://tsaritsyno-museum.ru/events/special/p/palace-complex-restoration/",
+      "title": "Было-Стало. Как реставрировали царицынский дворцовый ансамбль – Музей-заповедник «Царицыно»",
+      "publisher": "Музей-заповедник «Царицыно»",
+      "published": "",
+      "checked_at": "2026-10-28T04:19:38.618488+00:00"
+    }
+  ],
+  "homepage_hash": "0d4b5e0584121ddcd1ca8193c89b414e3a6ac0cb62c7c5f6d18a9967735f00d2",
+  "overview_hash": "dacc8fa97f2bc92a0138febbd0f30a9b9e7c5561d6b9e344e826991a7e383961",
+  "markdown_hash": "9133196a9471b17b0305741452a6bfe9a18299c4bce2c11a24a0eb21d13ff5ce"
+}
