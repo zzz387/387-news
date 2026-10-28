@@ -103,3 +103,35 @@ class SharedContinuation43Tests(unittest.TestCase):
         self.assertEqual(continuation.run_calls(8,16),24)
         self.assertEqual(continuation.run_calls(16,0),16)
         with self.assertRaisesRegex(RuntimeError,'SHARED_RUN_ACCOUNTING_INVALID'):continuation.run_calls(1,24)
+
+
+class LongResearch43Tests(unittest.TestCase):
+    def test_unseen_candidates_have_history_and_source_errors_do_not_abort_other_topics(self):
+        s=old.new_state();r.migrate(s)
+        for row in s['candidates']:self.assertIsInstance(row['history'],list)
+        class RejectSources:
+            def finish(self,state,row):raise p.Blocked('SYNTHETIC_SOURCE_UNAVAILABLE')
+        editor=RejectSources()
+        self.assertFalse(r.advance(s,editor,p.ROOT,lambda:None))
+        self.assertTrue(all(row['history'][-1]['code']=='SYNTHETIC_SOURCE_UNAVAILABLE' for row in s['candidates']))
+
+    def test_complete_scientific_context_is_not_clipped_and_does_not_change_api_budgets(self):
+        from scripts import editorial41
+        prompt='X'*120001;received=[]
+        result=e.Editor(call=lambda text,**kw:(received.append(text) or {'ok':True})).call(prompt,schema='v43_final')
+        self.assertTrue(result['ok']);self.assertEqual(received,[prompt])
+        with self.assertRaisesRegex(p.Blocked,'OPERATION_CONTEXT_NEEDS_REVIEW'):
+            editorial41.Editor(call=lambda *a,**k:self.fail('Legacy guard unchanged')).call(prompt)
+        with self.assertRaisesRegex(p.Blocked,'OPERATION_CONTEXT_NEEDS_REVIEW'):
+            e.Editor(call=lambda *a,**k:self.fail('No truncation')).call('X'*(e.Editor.context_characters+1))
+        workflow=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
+        self.assertIn('NEWS_MAX_REQUESTS_PER_RUN: "24"',workflow);self.assertIn('NEWS_MAX_REQUESTS_PER_DAY: "220"',workflow)
+
+
+class SourceTransport43Tests(unittest.TestCase):
+    def test_model_projection_keeps_the_entire_original_without_unlicensed_image_transport(self):
+        row=ready_issue()['candidates'][0];row['source']['blocks'][-1]['text']+=' END_OF_COMPLETE_ORIGINAL'
+        row['source']['images']=[{'url':'data:image/png;base64,'+'X'*150000}]
+        projected=e.Editor(call=lambda *a,**k:self.fail('Projection needs no API')).model_sources(row)
+        self.assertNotIn('images',projected[0]);self.assertEqual(projected[0]['blocks'],row['source']['blocks'])
+        self.assertIn('END_OF_COMPLETE_ORIGINAL',json.dumps(projected))

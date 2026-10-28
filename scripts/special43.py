@@ -37,6 +37,7 @@ def migrate(state):
         r.setdefault('progress',{}).setdefault('v43',{'write_attempts':int('article' in r),'review_attempts':{},'history':[]})
         if r.get('status') in ('ready','needs_review','rejected'):r['status']='preparing'
         r.setdefault('checks',{}).pop('final43',None)
+        r.setdefault('history',[])
     state['articles']={};state['status']='RETRY_PENDING'
     print('[special43-migration] '+json.dumps({'slots':8,'prior_state_preserved':True,'old_verdicts_not_overridden':True,'quota_preserved':True}),flush=True)
     return state
@@ -62,7 +63,7 @@ class Editor(e.Editor):
 
     def writing_basis(self,r):
         sources=[r['source']]+r.get('supporting_sources',[]);by_id={s['id']:s for s in sources}
-        if r['special_slot'] in (6,7):return {'full_originals':sources,'commission':r['commission']}
+        if r['special_slot'] in (6,7):return {'full_originals':self.model_sources(r),'commission':r['commission']}
         allowed_urls=r.get('evidence_plan',{}).get('fact_base_urls') or [s['url'] for s in sources]
         neutral=[]
         for inventory in r.get('progress',{}).get('neutral_inventories',{}).values():
@@ -78,7 +79,7 @@ class Editor(e.Editor):
         metadata=[{k:s.get(k,'') for k in ('id','url','title','publisher','published')} for s in sources]
         if neutral or facts:return {'neutral_facts':neutral,'previously_grounded_facts':facts,'sources':metadata,'commission':r['commission']}
         # New research content was never analysed: use the actual full originals, not snippets.
-        return {'full_originals':[s for s in sources if s['url'] in allowed_urls],'commission':r['commission']}
+        return {'full_originals':[s for s in self.model_sources(r) if s['url'] in allowed_urls],'commission':r['commission']}
 
 
 def admit(root,daily,ledger,now=None):
@@ -120,7 +121,7 @@ def advance(state,editor,root,persist):
         except runtime.GenerationPaused:persist();raise
         except Exception as exc:
             count=r.get('special43_failures',0)+1;r['special43_failures']=count
-            r['history'].append({'stage':'special43','code':getattr(exc,'code',type(exc).__name__)})
+            r.setdefault('history',[]).append({'stage':'special43','code':getattr(exc,'code',type(exc).__name__)})
             r['status']='needs_review' if isinstance(exc,p.Blocked) or count>=2 else 'retryable_error'
             print('[special43-refusal] '+json.dumps({'slot':r['special_slot'],'code':getattr(exc,'code',type(exc).__name__),'status':r['status']}),flush=True);persist()
     if len(e.select_ready(state))==8:validate_ready(state);persist();return True

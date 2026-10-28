@@ -7,5 +7,6 @@
   "special_paused": false,
   "repair_attempts": 2,
   "reserve_max_age_days": 14,
-  "special43_enabled": true
+  "special43_enabled": true,
+  "context_characters": 480000
 }
