@@ -51,12 +51,13 @@ class PriorityTests(unittest.TestCase):
         self.assertEqual(state['production_priority']['stalled_runs'],0)
         self.assertEqual(q.reconcile(copy.deepcopy(state),now+timedelta(hours=72))[1],'SPECIAL_PRIORITY_TIME_LIMIT')
 
-    def test_workflow_routes_special_first_under_original_mutex_and_cron(self):
+    def test_policy43_daily_has_no_disabled_special_ancestor_and_keeps_mutex_and_cron(self):
         daily=(p.ROOT/'.github/workflows/daily-v31.yml').read_text()
-        self.assertIn('needs: special-003-r',daily)
-        self.assertIn("needs.special-003-r.outputs.hold_daily == 'false'",daily)
-        self.assertIn("needs.special-003-r.outputs.run_used == '0'",daily)
-        self.assertIn('priority_first: true',daily)
+        prepare=daily.split('  prepare:\n',1)[1].split('  deploy:\n',1)[0]
+        self.assertNotIn('needs.special-003-r',prepare)
+        self.assertNotIn('needs: special-003-r',prepare)
+        self.assertIn("always() && needs.prepare.result == 'success'",daily)
+        self.assertIn('if: ${{ false }}',daily)
         self.assertIn("|| '387-news-stage-v31'",daily)
         self.assertEqual(daily.count('- cron:'),6)
         self.assertIn("cron: '54 2 * * *'",daily)
