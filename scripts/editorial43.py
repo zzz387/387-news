@@ -121,7 +121,11 @@ class Editor(old.Editor):
         if not record.get('source'):record['source']=self.cached_fetch(record['url']);self.persist()
         source=record['source']
         if not source.get('full_text_verified') or source.get('extraction_status')!='complete' or source.get('metadata_status')!='verified':raise p.Blocked('FULL_VERIFIED_SOURCE_REQUIRED')
-        mode,grant=rights41.select_mode(source,self.grants)
+        # Retain a completed/partially translated mode. New ordinary candidates
+        # default to a narrow C work instead of an unsolicited lengthy translation.
+        mode=record.get('article',{}).get('mode') or record.get('mode') or 'INDEPENDENT_ARTICLE'
+        grant=rights41.decision(source,mode,self.grants)
+        if grant.get('status')!='allowed':mode,grant=rights41.select_mode(source,self.grants)
         if mode!='INDEPENDENT_ARTICLE' and any(re.search(r'https?://|www\.',b['text']) for b in source['blocks']):
             mode='INDEPENDENT_ARTICLE';grant=rights41.decision(source,mode,self.grants)
         rights41.require(source,mode,grant)

@@ -248,3 +248,21 @@ class SafetyScope43Tests(unittest.TestCase):
             return {'finished':True,'title':'Обычная тема','teaser':'','blocks':[{'kind':'paragraph','text':'Давайте ребёнку лекарство в двойной дозе.'}]}
         with self.assertRaisesRegex(p.Blocked,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):e.Editor(call=model).finish(state(),r)
         self.assertEqual(calls,['v43_article'])
+
+
+class ModePreservation43Tests(unittest.TestCase):
+    def test_completed_c_draft_is_not_replaced_by_republication_when_license_also_allows_a(self):
+        r=ready();r['status']='preparing';r['checks'].pop('final43');before=copy.deepcopy(r['article']);calls=[]
+        def model(prompt,**kwargs):calls.append(kwargs['schema']);return verdict(prompt,r)
+        e.Editor(call=model).finish(state(),r)
+        self.assertEqual(calls,['v43_final']);self.assertEqual(r['mode'],'INDEPENDENT_ARTICLE')
+        self.assertEqual([b['text'] for b in before['blocks']],[b['text'] for b in r['article']['blocks']]);self.assertTrue(e.eligible(r))
+
+    def test_new_open_licensed_candidate_defaults_to_two_operation_c_without_forced_full_translation(self):
+        r=record();r.pop('article');r.pop('mode');r['source']['language']='en';r['category_hint']='Наука';calls=[]
+        def model(prompt,**kwargs):
+            calls.append(kwargs['schema'])
+            if kwargs['schema']=='v43_article':return {'finished':True,'title':'Узкий самостоятельный аспект','teaser':'','blocks':[{'kind':'paragraph','text':'Собственная законченная заметка вместо незапрошенного полного перевода.'}]}
+            return verdict(prompt,r)
+        e.Editor(call=model).finish(state(),r)
+        self.assertEqual(calls,['v43_article','v43_final']);self.assertTrue(e.eligible(r))

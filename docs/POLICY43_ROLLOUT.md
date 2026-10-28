@@ -20,6 +20,8 @@ they no longer impose their count/depth/audit rules on new 4.3 daily production.
 ## Smaller active path
 
 * Source and rights: existing full-source extractor and documented rights rules.
+* Existing complete drafts and chosen A/B/C modes are retained. New ordinary
+  candidates default to C rather than an unsolicited long full translation.
 * C: one complete independently written narrow aspect, followed by one combined
   substantive audit of all reader content, facts, safety, rights and headline.
   It need not reproduce all source topics, a source's activity count or style.
