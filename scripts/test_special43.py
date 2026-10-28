@@ -95,3 +95,11 @@ class Special43Tests(unittest.TestCase):
             (root/'issues/2026-10-28/index.html').write_text('data-policy-version="4.3"')
             self.assertEqual(queue.target_date(root,now,lambda **k:{'https':'verified'}),'2026-10-29')
             self.assertEqual(queue.target_date(root,now,lambda **k:(_ for _ in ()).throw(OSError('not delivered'))),'2026-10-28')
+
+
+class SharedContinuation43Tests(unittest.TestCase):
+    def test_daily_run_budget_boundary_can_resume_same_controller_without_fake_special_calls(self):
+        self.assertEqual(continuation.run_calls(0,24),24)
+        self.assertEqual(continuation.run_calls(8,16),24)
+        self.assertEqual(continuation.run_calls(16,0),16)
+        with self.assertRaisesRegex(RuntimeError,'SHARED_RUN_ACCOUNTING_INVALID'):continuation.run_calls(1,24)

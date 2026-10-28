@@ -585,7 +585,7 @@ jobs:
 
   special-continue:
     needs: [special-003-r, prepare, deploy, monitor]
-    if: ${{ always() && github.ref == 'refs/heads/main' && needs.special-003-r.result == 'success' && needs.special-003-r.outputs.continue_special == 'true' && needs.special-003-r.outputs.run_used != '0' && needs.special-003-r.outputs.run_used != '' }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.special-003-r.result == 'success' && needs.special-003-r.outputs.continue_special == 'true' && needs.special-003-r.outputs.run_used != '' && (needs.special-003-r.outputs.run_used != '0' || fromJSON(needs.prepare.outputs.pipeline_status || '{"run_used":0}').run_used > 0) }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -596,6 +596,7 @@ jobs:
       NEWS_POLICY_VERSION: '4.3'
       SPECIAL_CONTINUE_ALLOWED: ${{ needs.special-003-r.outputs.continue_special }}
       SPECIAL_RUN_USED: ${{ needs.special-003-r.outputs.run_used }}
+      NEWS_DAILY_RUN_USED: ${{ fromJSON(needs.prepare.outputs.pipeline_status || '{"run_used":24}').run_used }}
     steps:
       - uses: actions/checkout@v4
         with:

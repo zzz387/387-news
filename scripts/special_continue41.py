@@ -16,15 +16,21 @@ def decision(ledger,runs,run_id,now=None,reserve=0):
     return True,'SAVED_PROGRESS_AND_FREE_QUOTA'
 
 
+def run_calls(special,daily=0):
+    if type(special) is not int or type(daily) is not int or not 0<=special<=24 or not 0<=daily<=24 or special+daily>24:raise RuntimeError('SHARED_RUN_ACCOUNTING_INVALID')
+    return special+daily
+
+
 def main():
     use43=os.getenv('NEWS_POLICY_VERSION')=='4.3'
     if use43:
         from scripts import daily43,special_contract41
         if daily43.e.CONFIG.get('special_paused') or not daily43.e.CONFIG.get('special43_enabled'):
             print('[special-continuation] PAUSED_POLICY43');return
+    used=run_calls(int(os.environ.get('SPECIAL_RUN_USED','0')),int(os.environ.get('NEWS_DAILY_RUN_USED','0')) if use43 else 0)
     if (os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REF_NAME')!='main'
             or os.environ.get('GITHUB_REPOSITORY')!='zzz387/387-news'
-            or (os.environ.get('SPECIAL_CONTINUE_ALLOWED')!='true' if use43 else os.environ.get('SPECIAL_HOLD_DAILY')!='true') or not 1<=int(os.environ.get('SPECIAL_RUN_USED','0'))<=24):
+            or (os.environ.get('SPECIAL_CONTINUE_ALLOWED')!='true' if use43 else os.environ.get('SPECIAL_HOLD_DAILY')!='true') or not 1<=used<=24):
         raise RuntimeError('SPECIAL_CONTINUATION_GUARD')
     # Counts-only ledger, restored by the official action; no Gemini key or decryption key here.
     ledger=json.load(open(os.environ['QUOTA_CHECKPOINT_FILE']))

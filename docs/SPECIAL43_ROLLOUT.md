@@ -32,7 +32,8 @@ source. Dates, samples, causality limits and safety remain substantive checks.
 Only eight admitted works can build the special release. One bad topic does not
 erase the others. Repairs retain their existing finite 4.3 bounds; source failures
 are bounded and the adapter stops automatic productive continuation after 32 runs.
-The same controller can dispatch one serial continuation after saved model work,
+The same controller can dispatch one serial continuation after saved daily or
+special model work (including a daily-only per-run boundary),
 only with free shared budget, protected daily reserve, no active cooldown, and no
 other production waiting. Otherwise the existing scheduled windows resume it.
 A technical context limit or substantive refusal is a block, not permission to
