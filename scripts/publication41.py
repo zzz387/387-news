@@ -9,13 +9,14 @@ import shutil
 import tempfile
 from datetime import datetime
 try:
-    from scripts import policy41 as policy, rights41, content41, editorial41, news
+    from scripts import policy41 as policy, rights41, content41, editorial41, news, source_links43
 except ImportError:
     import policy41 as policy
     import rights41
     import content41
     import editorial41
     import news
+    import source_links43
 
 
 def public_article(record):
@@ -23,7 +24,7 @@ def public_article(record):
     editorial41.content.semantic_structure(a,source)
     rights41.require(source,a['mode'],record['rights'])
     return {**{k:copy.deepcopy(a.get(k,'')) for k in ('title','teaser','category','kind','mode','slug','blocks','activities')},
-            'primary_source':{k:source[k] for k in ('url','title','publisher','author','published')},
+            'primary_source':{k:source.get(k,'') for k in ('url','title','publisher','author','published','language')},
             'attribution':copy.deepcopy(record['rights'].get('attribution',{})),
             'images':copy.deepcopy(record.get('images',[])),
             'public_references':[{k:item.get(k,'') for k in ('url','title','publisher','author','published')}
@@ -43,8 +44,7 @@ def images_valid(article,root):
 def source_block(article):
     s=article['primary_source']; mode=article['mode']
     prefix='Перевод. ' if mode=='FULL_TRANSLATION' else 'Самостоятельная статья на основе материалов. ' if mode=='INDEPENDENT_ARTICLE' else ''
-    text=(f'<aside class="source-primary"><p>{prefix}Источник: {escape(s["publisher"])} — '
-          f'<a href="{escape(s["url"],quote=True)}" rel="noopener noreferrer">«{escape(s["title"])}»</a>.</p>')
+    text='<aside class="source-primary">'+source_links43.html_source(s,prefix)
     for ref in article.get('public_references',[]):
         text+='<p>'+escape(ref['publisher'])+' — <a href="'+escape(ref['url'],quote=True)+'" rel="noopener noreferrer">«'+escape(ref['title'])+'»</a>.</p>'
     attribution=article.get('attribution') or {}
@@ -157,7 +157,7 @@ def markdown(article):
         out.extend(['','Смысл: '+item['benefit'],'Безопасность: '+item['safety'],''])
     source=article['primary_source']
     prefix='Перевод. ' if article['mode']=='FULL_TRANSLATION' else 'Самостоятельная статья на основе материалов. ' if article['mode']=='INDEPENDENT_ARTICLE' else ''
-    out.append(prefix+'Источник: '+source['publisher']+' — ['+source['title']+']('+source['url']+').')
+    out.append(source_links43.markdown_source(source,prefix))
     for ref in article.get('public_references',[]):
         out.append(ref['publisher']+' — ['+ref['title']+']('+ref['url']+').')
     att=article.get('attribution') or {}
@@ -219,6 +219,7 @@ def build(state,root,preview=False):
 
 
 def validate_page(page):
+    source_links43.validate(page)
     if 'data-policy-version="4.1"' not in page or not page.rstrip().endswith('</html>'):
         raise policy.Blocked('PUBLIC_HTML_INCOMPLETE')
     if len(re.findall(r'class="source-primary"',page))!=1: raise policy.Blocked('PUBLIC_SOURCE_BLOCK_COUNT')

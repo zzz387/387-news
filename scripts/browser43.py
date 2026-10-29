@@ -9,9 +9,17 @@ def main():
     parser=argparse.ArgumentParser();parser.add_argument('--synthetic',action='store_true',required=True);parser.add_argument('--output',required=True);args=parser.parse_args()
     from scripts.test_daily43 import root,state,RESERVE_FIXTURE
     report={}
-    for count in (0,1,3):
+    for count in (0,1,3,12):
         with tempfile.TemporaryDirectory(prefix='387-browser43-synthetic-') as temp:
-            working=root(temp);s=state(count);publication43.build(s,working,[RESERVE_FIXTURE])
+            working=root(temp);s=state(count)
+            if count==12:
+                from scripts import editorial43
+                languages=['ru','en','de','fr',None,'es','it','zh-Hans','uk','ja','pt','sv']
+                for row,language in zip(s['candidates'],languages):
+                    row['source']['language']=language
+                    row['source']['title']='Название источника с длиннымсловом'*5
+                    row['checks']['final43']['input_hash']=editorial43.fingerprint(row)
+            publication43.build(s,working,[RESERVE_FIXTURE])
             with tempfile.TemporaryDirectory(prefix='387-browser43-shots-') as images:
                 report[str(count)]=browser41.check(working,s['date'],images,expected_count=count)
     Path(args.output).write_text(json.dumps(report,indent=2)+'\n');print('[browser43-synthetic] '+json.dumps(report))

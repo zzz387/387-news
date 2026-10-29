@@ -23,7 +23,7 @@ def check(env=os.environ):
         try:from scripts import editorial43
         except ImportError:import editorial43
         if not editorial43.CONFIG['enabled']:raise RuntimeError('POLICY43_DISABLED')
-        result.update(policy_version='4.3',article_target=8,minimum_articles=1,reserve_without_gemini=True,gemini_secret_present=bool(env.get('GEMINI_API_KEY','').strip()))
+        result.update(policy_version='4.3',article_target=editorial43.CONFIG['article_target'],minimum_articles=1,reserve_without_gemini=True,gemini_secret_present=bool(env.get('GEMINI_API_KEY','').strip()))
     if not result['automation_enabled']:raise RuntimeError('AUTOMATION_VARIABLE_NOT_ENABLED')
     if not result['release_approved']:raise RuntimeError('RELEASE_VARIABLE_NOT_ENABLED')
     return result

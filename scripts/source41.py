@@ -19,9 +19,9 @@ def safe_url(url):
         raise policy.Blocked('SOURCE_URL_UNSAFE')
     if parsed.hostname in ('localhost','metadata.google.internal') or parsed.hostname.endswith(('.local','.internal')):
         raise policy.Blocked('SOURCE_URL_UNSAFE')
-    try:
-        if not ipaddress.ip_address(parsed.hostname).is_global: raise policy.Blocked('SOURCE_URL_UNSAFE')
-    except ValueError: pass
+    try:address=ipaddress.ip_address(parsed.hostname)
+    except ValueError:address=None
+    if address is not None and not address.is_global:raise policy.Blocked('SOURCE_URL_UNSAFE')
     return url
 
 

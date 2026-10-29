@@ -82,8 +82,17 @@ jobs:
           fi
       - name: Check 12 synthetic pages at mobile and desktop widths (no Secrets or Gemini)
         run: python -m scripts.browser41 --synthetic --output '${{ runner.temp }}/browser-report.json'
-      - name: Check policy 4.3 zero one and three articles on mobile and desktop (synthetic, no Gemini)
+      - name: Check policy 4.3 zero one three and twelve articles and source languages (synthetic, no Gemini)
         run: python -m scripts.browser43 --synthetic --output '${{ runner.temp }}/browser43-report.json'
+      - name: Verify actual translated originals in a public browser (no Secrets or Gemini)
+        run: python -m scripts.translation_browser43 --output '${{ runner.temp }}/translation43-report.json'
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: v43-public-translation-browser-diagnostics
+          path: ${{ runner.temp }}/translation43-report.json
+          retention-days: 7
+          if-no-files-found: warn
       - uses: actions/upload-artifact@v4
         with:
           name: v43-synthetic-browser-diagnostics

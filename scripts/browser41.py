@@ -48,6 +48,13 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
                         if metrics['overflow']!='visible': raise ValueError('BROWSER_BODY_CLIPPED')
                         report['visible_overflow_pages']+=1
                     if page.locator('.source-primary').count()!=1: raise ValueError('BROWSER_SOURCE_BLOCK_COUNT')
+                    source=page.locator('.source-primary')
+                    if source.locator('[data-source-links-version="1"]').count():
+                        from scripts import source_links43
+                        source_links43.validate(source.inner_html(),required=True)
+                        if source.evaluate('(n)=>n.scrollWidth>n.clientWidth+1'):raise ValueError('BROWSER_SOURCE_HORIZONTAL_OVERFLOW')
+                        if not source.locator('.source-original').is_visible():raise ValueError('BROWSER_SOURCE_LINK_HIDDEN')
+                        if source.locator('.source-translation').count() and not source.locator('.source-translation').is_visible():raise ValueError('BROWSER_TRANSLATION_LINK_HIDDEN')
                     if body.locator('p,li,h2,h3,blockquote').evaluate_all('(nodes)=>nodes.some(n=>{const s=getComputedStyle(n);return s.display==="none"||s.visibility==="hidden"||(n.scrollHeight>n.clientHeight+1&&s.overflowY!=="visible")})'):
                         raise ValueError('BROWSER_BODY_HIDDEN')
                     if page.evaluate('Math.max(...[...document.querySelectorAll(".article-body p,.article-body li,.article-body h2,.article-body h3,.article-body blockquote")].map(n=>n.getBoundingClientRect().bottom))>document.querySelector(".source-primary").getBoundingClientRect().top+1'):
