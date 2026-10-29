@@ -89,6 +89,16 @@ class TargetTwelve43Tests(unittest.TestCase):
         with patch.object(preflight.stage,'validate_key',return_value=b'x'*32):self.assertEqual(preflight.check(env)['article_target'],12)
         text=(p.ROOT/'.github/workflows/daily-v31.yml').read_text();self.assertIn('NEWS_MAX_REQUESTS_PER_RUN: "24"',text);self.assertIn('NEWS_MAX_REQUESTS_PER_DAY: "220"',text)
 
+    def test_reports_and_checkpoint_counters_use_the_same_target_by_policy_version(self):
+        from scripts import pipeline,staged_news
+        s=state(10)
+        self.assertEqual(staged_news.vetted_count(s),10)
+        self.assertEqual(pipeline.report(s,{})['article_target'],12)
+        self.assertEqual(pipeline.report(s,{})['articles'],10)
+        self.assertEqual(pipeline.article_target({'version':31}),8)
+        self.assertEqual(pipeline.article_target({'version':41}),12)
+        with patch.dict(e.CONFIG,article_target=13):self.assertEqual(pipeline.article_target(s),13)
+
     def test_restored_eight_accepted_articles_extend_to_twelve_without_reprocessing_them(self):
         s=state(8);accepted=copy.deepcopy(s['candidates'])
         for i in range(8,15):

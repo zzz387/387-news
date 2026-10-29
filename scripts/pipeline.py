@@ -198,6 +198,14 @@ def advance(state, date, preview, ops, persist=lambda:None, now=None, check_publ
     return False
 
 
+def article_target(state):
+    if state.get('version')==43:
+        try:from scripts import editorial43
+        except ImportError:import editorial43
+        return editorial43.CONFIG['article_target']
+    return policy41.ARTICLE_COUNT if state.get('version')==41 else 8
+
+
 def report(state,ledger,now=None):
     now=now or now_moscow()
     segments=sum(len(d.get(k,{}).get('parts',[])) for d in state.get('dossiers',{}).values()
@@ -208,10 +216,10 @@ def report(state,ledger,now=None):
     if state.get('block_code')=='DAILY_QUOTA':
         tomorrow_utc=datetime.combine(datetime.now(timezone.utc).date()+timedelta(days=1),datetime.min.time(),tzinfo=timezone.utc)
         retry=next_wake(tomorrow_utc.astimezone(news.TZ))
-    ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version')==41 else len(state.get('articles',{}))
+    ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version') in (41,43) else len(state.get('articles',{}))
     return dict(date=state['date'],policy_version=state.get('policy_version','3.2'),
                 issue_kind=state.get('issue_kind','articles'),reserve_links=state.get('reserve_count',0),
-                article_target=policy41.ARTICLE_COUNT if state.get('version')==41 else 8,articles=max(ready_count,state.get('public_article_count',0)),
+                article_target=article_target(state),articles=max(ready_count,state.get('public_article_count',0)),
                 segments=segments,dossiers=len(state.get('dossiers',{})),audit_passed=bool(state.get('audit_passed')),
                 quota_day=ledger.get('day'),requests_used=ledger.get('requests',0),
                 requests_used_today=ledger.get('requests',0) if ledger.get('day')==datetime.now(timezone.utc).date().isoformat() else 0,
