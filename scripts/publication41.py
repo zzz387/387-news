@@ -51,7 +51,7 @@ def source_block(article):
     if attribution:
         text+='<p class="license-attribution">'+escape(attribution.get('author') or s['author'])
         if attribution.get('license_url'):
-            text+=' · <a rel="license" href="'+escape(attribution['license_url'],quote=True)+'">'+escape(attribution.get('license','Лицензия'))+'</a>'
+            text+=' · <a target="_blank" rel="license noopener noreferrer" href="'+escape(attribution['license_url'],quote=True)+'">'+escape(attribution.get('license','Лицензия'))+'</a>'
         text+='</p>'
     for image in article.get('images',[]):
         grant=rights41.image_decision(image)

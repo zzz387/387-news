@@ -6,6 +6,11 @@ from urllib.parse import quote,urlencode,urlparse
 try:from scripts import source41,policy41 as p
 except ImportError:import source41,policy41 as p
 
+# CI run40935566613: Yandex content unconfirmed/challenged, Google 3/3 verified.
+# The requested primary remains supported; use its tested fallback for new releases.
+DEFAULT_PROVIDER='google'
+PROVIDER_NAMES={'yandex':'Яндекс Переводчике','google':'Google Переводчике'}
+
 LANGUAGES={'ru':'русский','en':'английский','de':'немецкий','fr':'французский','es':'испанский',
  'it':'итальянский','pt':'португальский','zh':'китайский','ja':'японский','ko':'корейский',
  'uk':'украинский','be':'белорусский','pl':'польский','cs':'чешский','sk':'словацкий',
@@ -35,8 +40,8 @@ def safe_source_url(url):
     return url
 
 
-def translation_url(url,language=None,*,provider='yandex'):
-    url=safe_source_url(url);code=language_code(language)
+def translation_url(url,language=None,*,provider=None):
+    url=safe_source_url(url);code=language_code(language);provider=provider or DEFAULT_PROVIDER
     if code=='ru':return None
     if provider=='yandex':
         # Target-only direction requests automatic detection; never assume English.
@@ -52,7 +57,7 @@ def html_source(source,prefix=''):
           escape(source['publisher'])+' — «'+escape(source['title'])+'» ('+language_name(language)+'): '+
           '<a class="source-original" href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">Оригинал</a>.</p>')
     translated=translation_url(url,language)
-    if translated:html+='<p>Перевод оригинала: <a class="source-translation" href="'+escape(translated,quote=True)+'" target="_blank" rel="noopener noreferrer">Читать на русском в Яндекс Переводчике</a>.</p>'
+    if translated:html+='<p>Перевод оригинала: <a class="source-translation" href="'+escape(translated,quote=True)+'" target="_blank" rel="noopener noreferrer">Читать на русском в '+PROVIDER_NAMES[DEFAULT_PROVIDER]+'</a>.</p>'
     return html
 
 
@@ -64,7 +69,7 @@ def markdown_source(source,prefix=''):
     target=quote(url,safe=":/?#[]@!$&'*+,;=%")
     text=prefix+'Источник: '+md_escape(source['publisher'])+' — «'+md_escape(source['title'])+'» ('+language_name(language)+'): [Оригинал](<'+target+'>).'
     translated=translation_url(url,language)
-    if translated:text+='\n\nПеревод оригинала: [Читать на русском в Яндекс Переводчике](<'+translated+'>).'
+    if translated:text+='\n\nПеревод оригинала: [Читать на русском в '+PROVIDER_NAMES[DEFAULT_PROVIDER]+'](<'+translated+'>).'
     return text
 
 

@@ -21,23 +21,32 @@ class SourceLinks43Tests(unittest.TestCase):
                 self.assertIn('Original &lt;title&gt; &amp; &quot;name&quot;',html);self.assertIn('target="_blank"',html)
                 self.assertEqual(html.count('class="source-original"'),1);self.assertEqual(html.count('class="source-translation"'),0 if code=='ru' else 1)
                 if code!='ru':
-                    params=parse_qs(urlsplit(links.translation_url(a['primary_source']['url'],code)).query)
+                    params=parse_qs(urlsplit(links.translation_url(a['primary_source']['url'],code,provider='yandex')).query)
                     self.assertEqual(params['lang'],[links.language_code(code)+'-ru' if links.language_code(code) else 'ru'])
                 else:self.assertNotIn('translate.yandex',md)
 
+    def test_confirmed_fallback_has_correct_label_and_source_direction(self):
+        self.assertEqual(links.DEFAULT_PROVIDER,'google')
+        for language in ('en','de','fr',None):
+            url='https://example.org/original?x=1&y=2'
+            args=parse_qs(urlsplit(links.translation_url(url,language)).query)
+            self.assertEqual(args,{'sl':[language or 'auto'],'tl':['ru'],'u':[url]})
+            html=old.source_block(self.article(language,url))
+            self.assertIn('Google Переводчике',html);self.assertNotIn('Яндекс Переводчике',html)
+
     def test_missing_historical_language_is_never_assumed_english(self):
         a=self.article();a['primary_source'].pop('language');html=old.source_block(a)
-        self.assertIn('(язык не определён)',html);self.assertIn('lang=ru',unescape(html));self.assertNotIn('lang=en-ru',html)
+        self.assertIn('(язык не определён)',html);self.assertIn('sl=auto',unescape(html));self.assertNotIn('sl=en',html)
         self.assertFalse(links.validate('<aside class="source-primary">Historical source</aside>'))
         with self.assertRaisesRegex(p.Blocked,'SOURCE_LINKS_REQUIRED'):links.validate('historical',required=True)
 
     def test_preserves_unicode_queries_fragments_and_literal_parameter_separators(self):
         url='https://пример.рф/наука/(статья)?x=один&x=два&next=%2Fpage%3Fa%3D1#раздел'
-        actual=links.translation_url(url,'en');self.assertEqual(parse_qs(urlsplit(actual).query)['url'],[url])
-        html=old.source_block(self.article('en',url));self.assertIn('&amp;lang=en-ru',html)
+        actual=links.translation_url(url,'en',provider='yandex');self.assertEqual(parse_qs(urlsplit(actual).query)['url'],[url])
+        html=old.source_block(self.article('en',url));self.assertIn('&amp;tl=ru',html)
         self.assertTrue(links.validate(html));self.assertIn('%28',old.markdown(self.article('en',url)))
         example='https://www.unicef.org/parenting/child-care/21-learning-activities-babies-and-toddlers'
-        self.assertEqual(links.translation_url(example,'en'),'https://translate.yandex.ru/translate?url=https%3A%2F%2Fwww.unicef.org%2Fparenting%2Fchild-care%2F21-learning-activities-babies-and-toddlers&lang=en-ru')
+        self.assertEqual(links.translation_url(example,'en',provider='yandex'),'https://translate.yandex.ru/translate?url=https%3A%2F%2Fwww.unicef.org%2Fparenting%2Fchild-care%2F21-learning-activities-babies-and-toddlers&lang=en-ru')
 
     def test_unsafe_original_never_reaches_either_link(self):
         for url in ['javascript:alert(1)','http://example.org/','data:text/html,test','https://user:pass@example.org/','https://127.0.0.1/','https://localhost/','https://example.org/\npath','https://example.org:bad/','https://example.org/a b']:
@@ -50,7 +59,7 @@ class SourceLinks43Tests(unittest.TestCase):
         with patch.object(news,'gemini',side_effect=AssertionError('No model call')),patch('urllib.request.urlopen',side_effect=AssertionError('No translator fetch')):
             html=old.source_block(a)
         self.assertNotIn('javascript:',html);self.assertIn('example.org',html)
-        with self.assertRaisesRegex(p.Blocked,'TRANSLATION_SOURCE_MISMATCH'):links.validate(html.replace('lang=en-ru','lang=de-ru'))
+        with self.assertRaisesRegex(p.Blocked,'TRANSLATION_SOURCE_MISMATCH'):links.validate(html.replace('tl=ru','tl=de'))
         with self.assertRaisesRegex(p.Blocked,'SOURCE_LINK_SECURITY'):links.validate(html.replace('noopener noreferrer','noopener'))
 
     def test_public_projection_preserves_actual_source_language_and_body(self):

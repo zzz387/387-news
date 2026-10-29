@@ -1,6 +1,7 @@
 """Nonblocking public-browser diagnostics. No Secrets, source bodies or model API."""
 import argparse,json,re
 from pathlib import Path
+from urllib.parse import urlsplit,urlunsplit
 from datetime import datetime,timezone
 from scripts import browser41,source_links43 as links
 
@@ -30,7 +31,7 @@ def probe(context,sample,provider):
                     result.update(verified=True,code='TRANSLATED_ORIGINAL_VISIBLE',frame_url=frame.url)
                     return result
             page.wait_for_timeout(1500)
-        result['final_url']=page.url
+        parts=urlsplit(page.url);result['final_url']=urlunsplit((parts.scheme,parts.netloc,parts.path,'',''))
     except Exception as exc:result['code']='BROWSER_'+type(exc).__name__.upper()
     finally:page.close()
     return result
