@@ -210,6 +210,7 @@ def check_v43(base,home,expected_date=None):
         page=fetch(base+'/issues/'+date+'/articles/'+slug+'/')
         md=fetch(base+'/issues/'+date+'/articles/'+slug+'/article.md')
         if publication43.digest_bytes(page.encode())!=hashes['html'] or publication43.digest_bytes(md.encode())!=hashes['markdown']:raise RuntimeError('PUBLIC_CONTENT_CHANGED')
+        publication41.source_links43.validate(page,required=data.get('source_links_version')==1)
         publication41.validate_page(page.replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
     return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':'4.3','expected_date':expected_date,'status':'ok'}
 

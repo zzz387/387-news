@@ -19,7 +19,7 @@ def public_article(record):
     if not e.eligible(record):raise p.Blocked('ARTICLE_NOT_APPROVED')
     a=record['article'];source=record['source'];rights41.require(source,a['mode'],record['rights'])
     return {**{k:copy.deepcopy(a.get(k,'')) for k in ('title','teaser','category','kind','mode','slug','blocks','activities')},
-        'primary_source':{k:source.get(k,'') for k in ('url','title','publisher','author','published')},
+        'primary_source':{k:source.get(k,'') for k in ('url','title','publisher','author','published','language')},
         'attribution':copy.deepcopy(record['rights'].get('attribution',{})),'images':[],'public_references':[]}
 
 
@@ -52,6 +52,7 @@ def validate(root,date):
         if not re.fullmatch(r'[a-z0-9-]+',slug):raise p.Blocked('PUBLIC_SLUG_INVALID')
         file=issue/'articles'/slug/'index.html';md=file.with_name('article.md')
         if digest_bytes(file.read_bytes())!=hashes['html'] or digest_bytes(md.read_bytes())!=hashes['markdown']:raise p.Blocked('PUBLIC_CONTENT_CHANGED')
+        render.source_links43.validate(file.read_text(),required=data.get('source_links_version')==1)
         render.validate_page(file.read_text().replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
     for name,key in (('index.html','overview_hash'),('overview.md','markdown_hash')):
         if digest_bytes((issue/name).read_bytes())!=data[key]:raise p.Blocked('PUBLIC_OVERVIEW_CHANGED')
@@ -93,7 +94,7 @@ def build(state,root,reserve=(),preview=False):
         try:
             no=news.get_next_number();issue=working/'issues'/date;issue.mkdir()
             data={'date':date,'number':no,'policy_version':'4.3','article_count':len(articles),
-                  'kind':'articles' if articles else 'source_digest','pages':{},'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
+                  'kind':'articles' if articles else 'source_digest','pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
                 file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version='4.3')))

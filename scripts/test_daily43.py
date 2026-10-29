@@ -51,7 +51,7 @@ class Daily43Tests(unittest.TestCase):
         catalog=patch.object(d,'reserve_catalog',return_value=[copy.deepcopy(RESERVE_FIXTURE)]);catalog.start();self.addCleanup(catalog.stop)
 
     def test_dynamic_counts_and_zero_digest_are_valid_and_honest_over_https(self):
-        for count in (0,1,3,7,8,12,13):
+        for count in (0,1,3,7,8,10,12,13):
             with self.subTest(count=count),tempfile.TemporaryDirectory() as temp:
                 r=root(temp);s=state(count);reserve=d.reserve_rows(s,NOW)
                 self.assertTrue(pub.build(s,r,reserve));meta=pub.validate(r,s['date'])

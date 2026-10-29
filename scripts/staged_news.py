@@ -116,7 +116,7 @@ def fetch_latest_checkpoint(label: str, key: bytes) -> dict | None:
 
 
 def vetted_count(state):
-    return sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version')==41 else len(state.get('articles',{}))
+    return sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version') in (41,43) else len(state.get('articles',{}))
 
 
 def save(state: dict, key: bytes):
@@ -125,7 +125,7 @@ def save(state: dict, key: bytes):
     temp.write_bytes(cipher(state, key))
     temp.chmod(0o600)
     temp.replace(ARTIFACT_FILE)
-    target=policy41.ARTICLE_COUNT if state.get('version')==41 else 8  # historical schema v31 only
+    target=pipeline.article_target(state)  # preserve v31/v41 while using the v43 configuration
     print(f'[checkpoint] AES-256-GCM encrypted; {vetted_count(state)}/{target} vetted article drafts',flush=True)
 
 
@@ -539,7 +539,7 @@ def main():
                   or state.get('branch', branch) != branch
                   or state.get('preview', args.preview) != args.preview):
         raise RuntimeError('Bad checkpoint metadata')
-    target_count=policy41.ARTICLE_COUNT if state and state.get('version')==41 else 8
+    target_count=pipeline.article_target(state or {})
     if state:
         state.pop('pause_reason', None)
         count = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
@@ -556,8 +556,8 @@ def main():
         segments = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[checkpoint-test] restored {vetted_count(state)}/{target_count} articles, {segments} segments', flush=True)
         if args.phase=='inspect':
-            action='publish_when_due' if state.get('audit_passed') else 'audit' if vetted_count(state)>=(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'continue_saved_writing'
-            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if vetted_count(state)>=(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) else 'RETRY_PENDING',action)
+            action='publish_when_due' if state.get('audit_passed') else 'audit' if vetted_count(state)>=pipeline.article_target(state) else 'continue_saved_writing'
+            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if vetted_count(state)>=pipeline.article_target(state) else 'RETRY_PENDING',action)
             pipeline.emit_report(state,state.get('_quota_snapshot',{}),os.getenv('GITHUB_OUTPUT'))
         return
     quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
@@ -616,7 +616,7 @@ def main():
         print(f'[paused] {exc}', flush=True)
         if state:
             state['pause_reason']=str(exc)
-            pipeline.pause(state,ready=vetted_count(state)>=(policy41.ARTICLE_COUNT if state.get('version')==41 else 8) and not state.get('audit_passed'))
+            pipeline.pause(state,ready=vetted_count(state)>=pipeline.article_target(state) and not state.get('audit_passed'))
             if any(marker in str(exc) for marker in ('429','503','cooldown')):
                 pipeline.status(state,'RETRY_PENDING','resume_after_cooldown','API_COOLDOWN')
     except policy41.Blocked as exc:

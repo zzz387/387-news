@@ -53,6 +53,21 @@ def discover(state):
             state['candidates'].append(dict(item,id=p.digest(item['url']),status='discovered',checks={},progress={},history=[]));known.add(item['url'])
 
 
+def preparation_order(state):
+    """Resume saved work first, then spread attempts across topics without quotas."""
+    from collections import Counter
+    rows=list(state['candidates']);result=[]
+    counts=Counter(r.get('category_hint') or r.get('category','') for r in e.select_ready(state))
+    pending=[r for r in rows if r.get('status') in ('preparing','retryable_error')]
+    result.extend(pending)
+    for r in pending:counts[r.get('category_hint') or r.get('category','')]+=1
+    pending=[r for r in rows if r.get('status')=='discovered']
+    while pending:
+        row=min(pending,key=lambda r:counts[r.get('category_hint') or r.get('category','')])
+        pending.remove(row);result.append(row);counts[row.get('category_hint') or row.get('category','')]+=1
+    return result
+
+
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None):
     clock=(lambda:now) if now is not None else pipeline.now_moscow
     current=clock();root=Path(ops.ROOT)
@@ -67,7 +82,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         if budget:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
         discover(state);persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
-        for record in state['candidates']:
+        for record in preparation_order(state):
             if len(e.select_ready(state))>=e.CONFIG['article_target']:break
             if clock()>=release-timedelta(minutes=10) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break

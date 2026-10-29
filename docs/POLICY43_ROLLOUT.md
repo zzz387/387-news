@@ -45,7 +45,7 @@ Metadata records preparation time and a not-before time, not a fabricated actual
 publication timestamp. HTTPS verification remains the proof of delivery.
 At/after the release time,
 it immediately uses every admitted article (1, 3, 8, 12, 13, etc.). If none is
-admitted, it uses a source digest without Gemini. Eight is only a preparation
+admitted, it uses a source digest without Gemini. Twelve is only a preparation
 orientation. Due delivery never waits for the next candidate or API allowance.
 
 ## Reserve and public format
@@ -106,3 +106,31 @@ keep all already published issues immutable and retain the 4.3 ciphertext. Do no
 feed a 4.3 checkpoint into an older engine, erase accounting, force-push or delete
 artifacts. Keeping delivery of the existing committed public issue available is
 safer than trying to regenerate an archive.
+
+## Twelve-article preparation and source-language links (29 October update)
+
+The target in daily43.json and preflight is 12; accepted partial releases and the
+zero-article source digest still publish when due. Existing checkpoints need no
+migration or regeneration: before the next deadline an eight-article checkpoint
+can continue to twelve. Saved operations resume first; new attempts prefer less
+represented categories without a required topic quota. Current 34 candidates
+include 22 URLs outside the published archive at implementation time.
+
+New final HTML/Markdown carries primary_source.language from verified metadata.
+Source links support Yandex page translation and a Google fallback, HTTPS,
+escaped and encoded source URLs, new tabs and noopener/noreferrer. Unknown
+languages are labelled honestly and use automatic source detection. No translation
+API, extra Gemini calls or automatic import of translated prose is involved.
+Live translator browser diagnostics are nonblocking: an HTTP 200 or Russian UI
+alone never counts as a verified translated original. Historical releases,
+including issue005 on 29 October, are immutable and keep their exact old files.
+The next unpublished daily release (currently 30 October, issue006) adopts this.
+
+Live Chrome check in Actions40935566613 confirmed Russian originals for three
+public pages through Google Translate (UNICEF baby tips, NASA solar-system facts,
+UNICEF21 activities including automatic source detection). Yandex redirects were
+not confirmed as translated content in two cases and challenged in the third.
+Therefore source_links43.DEFAULT_PROVIDER selects the verified Google fallback;
+labels name Google correctly. Yandex's requested URL format remains supported
+by translation_url(provider='yandex'), without copying source text to an API.
+External translator availability is never a production publication gate.

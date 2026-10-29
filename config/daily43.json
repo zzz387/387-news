@@ -1,7 +1,7 @@
 {
   "version": "4.3",
   "enabled": true,
-  "article_target": 8,
+  "article_target": 12,
   "minimum_articles": 1,
   "release_time": "06:00",
   "special_paused": false,
