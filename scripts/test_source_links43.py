@@ -34,6 +34,19 @@ class SourceLinks43Tests(unittest.TestCase):
             html=old.source_block(self.article(language,url))
             self.assertIn('Google Переводчике',html);self.assertNotIn('Яндекс Переводчике',html)
 
+    def test_archive_links_validate_even_if_future_preferred_provider_changes(self):
+        html=old.source_block(self.article('en'))
+        with patch.object(links,'DEFAULT_PROVIDER','yandex'):
+            self.assertTrue(links.validate(html))
+            yandex=old.source_block(self.article('en'));self.assertIn('Яндекс Переводчике',yandex)
+        self.assertTrue(links.validate(yandex))
+
+    def test_other_public_reference_and_license_links_have_safe_new_tabs(self):
+        a=self.article('en');a['public_references']=[{'url':'https://example.org/support','publisher':'Supporting publisher','title':'Original support'}]
+        a['attribution']={'author':'Author','license':'CC BY4.0','license_url':'https://creativecommons.org/licenses/by/4.0/'}
+        for anchor in re.findall(r'<a\b[^>]+>',old.source_block(a)):
+            self.assertIn('target="_blank"',anchor);self.assertIn('noopener',anchor);self.assertIn('noreferrer',anchor)
+
     def test_missing_historical_language_is_never_assumed_english(self):
         a=self.article();a['primary_source'].pop('language');html=old.source_block(a)
         self.assertIn('(язык не определён)',html);self.assertIn('sl=auto',unescape(html));self.assertNotIn('sl=en',html)

@@ -46,7 +46,7 @@ def source_block(article):
     prefix='Перевод. ' if mode=='FULL_TRANSLATION' else 'Самостоятельная статья на основе материалов. ' if mode=='INDEPENDENT_ARTICLE' else ''
     text='<aside class="source-primary">'+source_links43.html_source(s,prefix)
     for ref in article.get('public_references',[]):
-        text+='<p>'+escape(ref['publisher'])+' — <a href="'+escape(ref['url'],quote=True)+'" rel="noopener noreferrer">«'+escape(ref['title'])+'»</a>.</p>'
+        text+='<p>'+escape(ref['publisher'])+' — <a href="'+escape(source_links43.safe_source_url(ref['url']),quote=True)+'" target="_blank" rel="noopener noreferrer">«'+escape(ref['title'])+'»</a>.</p>'
     attribution=article.get('attribution') or {}
     if attribution:
         text+='<p class="license-attribution">'+escape(attribution.get('author') or s['author'])

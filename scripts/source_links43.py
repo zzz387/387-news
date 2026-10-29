@@ -91,6 +91,9 @@ def validate(page,required=False):
     translated=[a for a in reader.links if 'source-translation' in a.get('class','').split()]
     if len(originals)!=1 or len(translated)!=(0 if language=='ru' else 1):raise p.Blocked('SOURCE_LINK_COUNT')
     original=safe_source_url(originals[0].get('href'))
-    if translated and translated[0].get('href')!=translation_url(original,language):raise p.Blocked('TRANSLATION_SOURCE_MISMATCH')
+    if translated:
+        actual=translated[0].get('href','')
+        provider={'translate.yandex.ru':'yandex','translate.google.com':'google'}.get(urlparse(actual).hostname)
+        if not provider or actual!=translation_url(original,language,provider=provider):raise p.Blocked('TRANSLATION_SOURCE_MISMATCH')
     if any(a.get('target')!='_blank' or not {'noopener','noreferrer'}<=set(a.get('rel','').split()) for a in reader.links):raise p.Blocked('SOURCE_LINK_SECURITY')
     return True
