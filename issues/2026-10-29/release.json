@@ -1,0 +1,46 @@
+{
+  "date": "2026-10-29",
+  "number": 5,
+  "policy_version": "4.3",
+  "article_count": 8,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "2b9289d00b37454c359e80a2cb304bf626d4036898efa8777f49b7418a295d52",
+      "markdown": "922dc6f6b6179b6f01fd0cd6db5c44338e99b45d5f332a4f521a52b6151d5659"
+    },
+    "feature-02": {
+      "html": "080865dad0371208fa523a69aeddc9967ab5b357be5b62e222430ad71dbc852f",
+      "markdown": "7fcfc7ed6ace6a33ddcb5d30ee61abc83198edfaf23dd46c3c8ee1a67d36ad46"
+    },
+    "feature-03": {
+      "html": "48a34c7639a23e27f8815b448d9d5562e73a93a41d629c68d599aa8ace54b65f",
+      "markdown": "a066a80d60b1f81b023f2f3f6feef2bfe7cdbfa6666581f66b72cd3074c7ba86"
+    },
+    "feature-04": {
+      "html": "9f005edc55908585866833a93a4e289c1a8c7e73cf1936274f7d8388495ae44b",
+      "markdown": "9fe027870b667173620ac33093aeea85399ae9ea416d38d6a3a72d4229a9c2a1"
+    },
+    "feature-05": {
+      "html": "1f4fc011475335d9f6d721818fbea19849e1fccbd8ca88b461ca145e8f33db10",
+      "markdown": "9e4253a3405026169006b1f3ff018b1c4561f8058d1f08e5741648be7ad86bd9"
+    },
+    "feature-06": {
+      "html": "b85298d1fe2c78e4ecdba3a13ea136b1d63e29fdfc2490c7dadbc901ad687794",
+      "markdown": "4e6802373b9536dc21f5028a750bc600a6eb7debd9b954264a7c055b0aa6e5f0"
+    },
+    "feature-07": {
+      "html": "630a5bd15458538ca74f5ffde1c0f5d11594f46813483de48a091fdfe78c1993",
+      "markdown": "dc162cbd215a87df9b02d03ce750c6662026f105aba9060d054150b0afbaacbb"
+    },
+    "feature-08": {
+      "html": "01ac3751a268848ddf541ac073a04cc42a32773b98e7965b12edf236f5172f91",
+      "markdown": "b66bd3e15877a560e758a4d1df2e512c69de3057d68203480493306805259937"
+    }
+  },
+  "prepared_at": "2026-10-29T08:44:52.354900+03:00",
+  "release_not_before": "2026-10-29T06:00:00+03:00",
+  "homepage_hash": "df75cf60c924a41e7b5606a3a0251d8eb04106e04f8f3ffb969daee93856638c",
+  "overview_hash": "4eb8940272dd3af2b1f7967a757c29d61da28f49ede2a0e44b0955c00bdd4f86",
+  "markdown_hash": "f35a22898e8fe373da5f91955aeecda3ef1edb02308f149031e26128f115c577"
+}
