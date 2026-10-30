@@ -1,0 +1,63 @@
+{
+  "date": "2026-10-30",
+  "number": 6,
+  "policy_version": "4.3",
+  "article_count": 12,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "3bdd3def53086f3f106b628755b7904dc8386e35d4d16b05fbe4483e373c4a1e",
+      "markdown": "98a18c3492427f73409b33934bec679edeaae6c4eea0ddf1498498786473a1db"
+    },
+    "feature-02": {
+      "html": "0a9e2b17ef00822aa274ea2560edd9b39d694301d19ceeaaf3deb57346ec580e",
+      "markdown": "c87b542c43022ae98da34f65622559979dc9c955477aef1e1a5a10de8fbfe279"
+    },
+    "feature-03": {
+      "html": "ca8c03cf6d2155afe472fb8d19151d6804a3b7c2935ddc7c6ce76fd41b0bb1b4",
+      "markdown": "2a0f79a1a68ded3a369937245b559d20793aa725d3c7c4baac5845fc5596d945"
+    },
+    "feature-04": {
+      "html": "b90feb92b786960353dc3df5b20fb20cf6a38bfc32c8f154b67c37ceb4a2b71c",
+      "markdown": "166fede00e43e356f0a17c43a919c501eb63ccd223cab01f3b400bde67ea1722"
+    },
+    "feature-05": {
+      "html": "1aea8917a0006969eb28adf49242c3f5f87cf92005c7b4bebfff1dc45d4cdd9e",
+      "markdown": "e9046e5327c80b8a7960ce33e3970ebfb73b8eac7bcc70a40711ac879cd3ec7f"
+    },
+    "feature-06": {
+      "html": "42659df81ed0faa486c0cacb0355189acf82cfc0051ea1d36588d3affcc78baf",
+      "markdown": "848a043f5f13e81614d6a05736917dfa4440e2d600a4b6e5a3ca6932c893634d"
+    },
+    "feature-07": {
+      "html": "aa4af310d83875d01f95130e33406849eac924521ee93945a3f14e6c9064b369",
+      "markdown": "edd2252ffb63f69dfe4e079ef8c50c5e2ec69e6286de4943a14405da060380b0"
+    },
+    "feature-08": {
+      "html": "44128d55cd0dde90429e69d5990060375013c635dca4799330e85894488e3809",
+      "markdown": "8a64015818a85679898757de991fe60518ebee14a05cdd4e5c473ebc6fd78d7b"
+    },
+    "feature-09": {
+      "html": "62b9c42444c565d8cea782e91fc94e92f0159d23ebd0b7b002c967113c9efb38",
+      "markdown": "e1d2f425368691d21af1835795ead52e8782bb187f58143f7d31ae7e515c5697"
+    },
+    "feature-10": {
+      "html": "682ed4ba63dc4527f8ef626474bacbb746a9b9f78ac43b239cfd79a2aea19f70",
+      "markdown": "18a38113c95c7df5346c01d0547bc536be5ff94196b4c2a34a43a025e9944bb4"
+    },
+    "feature-11": {
+      "html": "bb578367b932042d8fc9402a36d0ca0bf560d0a2169c8917912f1dbc683f75b2",
+      "markdown": "8e7a728c605b7060f4074d11776c1beeaf7ee7e748dcfa31640b79581a782735"
+    },
+    "feature-12": {
+      "html": "7476c9fba9115ca9f4bcd15e8e791fd510961f4c7536747ea50156f95823b86b",
+      "markdown": "57fe228f5839356e6fbde097a405bc11b786978a950e7655af4bd3540c3957f4"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-10-30T07:32:27.462833+03:00",
+  "release_not_before": "2026-10-30T06:00:00+03:00",
+  "homepage_hash": "9b0b27810bd838745d99aa0cd4bf02bf505d3c23b737e051794a3a6dcd778061",
+  "overview_hash": "cab4f8f836b7f790243376d48c59f95b41a8cc7ed77db58b3ae51fcd6f682e62",
+  "markdown_hash": "69e8b53fe5a2225048b7dbb1ef6f78b56a5af6b8592be9088c64be0a02324096"
+}
