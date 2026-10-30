@@ -70,6 +70,9 @@ def preparation_order(state):
 
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None):
     clock=(lambda:now) if now is not None else pipeline.now_moscow
+    save=persist
+    def persist():
+        state['publication_status']=pipeline.delivery_state(state,clock());save()
     current=clock();root=Path(ops.ROOT)
     if date<current.date().isoformat() and not (root/'issues'/date/'index.html').is_file():
         pipeline.status(state,'DEFERRED','preserve_old_checkpoint','SUPERSEDED_UNFINISHED_DATE');persist();return False

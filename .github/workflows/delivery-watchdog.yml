@@ -1,0 +1,46 @@
+name: 387 News — independent delivery watchdog
+
+on:
+  # Different wake-up windows from the producer. UTC = Moscow minus three hours.
+  schedule:
+    - cron: '7,27,47 3-20 * * *'
+    - cron: '43 1,2 * * *'
+  workflow_run:
+    workflows: ['387 News — autonomous daily edition']
+    types: [completed]
+  push:
+    branches: [main]
+    paths: ['.github/workflows/delivery-watchdog.yml', 'scripts/delivery_watchdog.py', 'scripts/release_monitor.py']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  issues: write
+
+concurrency:
+  # Do not hold the production mutex while waiting for 06:00 or for its result.
+  group: 387-news-delivery-watchdog
+  cancel-in-progress: false
+
+jobs:
+  verify-and-recover:
+    # Never execute privileged workflow_run actions for PRs, forks or non-main code.
+    if: ${{ github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.event != 'pull_request')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    env:
+      GH_TOKEN: ${{ github.token }}
+      NEWS_POLICY_VERSION: '4.3'
+      NEWS_AUTOMATION_V31_ENABLED: ${{ vars.NEWS_AUTOMATION_V31_ENABLED }}
+      NEWS_RELEASE_APPROVED: ${{ vars.NEWS_RELEASE_APPROVED }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify public hashes, arm 06:00 appointment, or recover through the original controller
+        run: python -m scripts.delivery_watchdog
