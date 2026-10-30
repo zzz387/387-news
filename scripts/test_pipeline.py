@@ -315,7 +315,7 @@ class MonitorTests(unittest.TestCase):
         def request(method,path,payload=None):
             if method=='GET': return copy.deepcopy(issues)
             if method=='POST':
-                posts.append(payload); issues.append(dict(number=1,state='open',**payload)); return issues[0]
+                posts.append(payload); issues.append(dict(number=1,state='open',user={'login':'github-actions[bot]'},**payload)); return issues[0]
             issues[0].update(payload); return issues[0]
         self.assertEqual(monitor.incident(DATE,'NOT_PREPARED',False,request),'created')
         monitor.incident(DATE,'NOT_PREPARED',False,request)

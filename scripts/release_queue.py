@@ -96,15 +96,16 @@ def production_artifacts():
 
 
 
-def wait_until_release(date,clock=None,sleep=time.sleep):
+def wait_until_release(date,clock=None,sleep=time.sleep,maximum_wait=600):
     """Final files stay private until the release gate; never wait for a whole day."""
     datetime.strptime(date,'%Y-%m-%d')
+    if type(maximum_wait) is not int or not 0<maximum_wait<=5400:raise ValueError('RELEASE_WAIT_BOUND_INVALID')
     clock=clock or moscow
     release=datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=news.TZ)
     while True:
         current=moscow(clock());remaining=(release-current).total_seconds()
         if remaining<=0:return
-        if remaining>600:raise RuntimeError('RELEASE_WAIT_OUTSIDE_FINAL_WINDOW')
+        if remaining>maximum_wait:raise RuntimeError('RELEASE_WAIT_OUTSIDE_FINAL_WINDOW')
         sleep(min(15,remaining))
 
 

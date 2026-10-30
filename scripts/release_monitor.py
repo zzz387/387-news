@@ -14,8 +14,11 @@ except ImportError:
     import release_queue
 
 CODES={'NOT_PREPARED','READY_NOT_PUBLISHED','SITE_NOT_CURRENT','EXTERNAL_SERVICE',
-       'QUOTA_EXHAUSTED','EDITORIAL_HOLD','DELIVERY_RETRY_LIMIT','SETTINGS_BLOCKED','VERIFIED'}
+       'QUOTA_EXHAUSTED','EDITORIAL_HOLD','DELIVERY_RETRY_LIMIT','SETTINGS_BLOCKED','VERIFIED','WATCHDOG_GITHUB_ERROR','PRODUCTION_WORKFLOW_DISABLED',
+       'WATCHDOG_RECOVERY_LIMIT','ACTIVE_PRODUCTION_TIMEOUT','RECOVERY_NOT_VERIFIED','WATCHDOG_DATE_ROLLED_OVER'}
 
+
+PUBLIC_CHECK_CODES={'PUBLIC_DATE_MISSING','PUBLIC_DATE_MISMATCH','PUBLIC_METADATA_INVALID','PUBLIC_HOME_CHANGED','PUBLIC_OVERVIEW_CHANGED','PUBLIC_MARKDOWN_CHANGED','PUBLIC_ARCHIVE_LINK_MISSING','PUBLIC_LINK_COUNT_MISMATCH','PUBLIC_CONTENT_CHANGED','PUBLIC_COUNT_INVALID','PUBLIC_KIND_MISMATCH','EMPTY_OR_MISLABELLED_RESERVE','HTTP_404','HTTP_403','HTTP_503','HTTP_STATUS_OTHER','HTTPS_TRANSPORT_ERROR','PUBLIC_CHECK_FAILED'}
 
 def github(method,path,payload=None):
     repo=os.environ['GITHUB_REPOSITORY']
@@ -28,21 +31,37 @@ def github(method,path,payload=None):
                  'X-GitHub-Api-Version':'2022-11-28','Content-Type':'application/json',
                  'User-Agent':'387-News-Release-Monitor'})
     with urlopen(request,timeout=30) as response:
-        return json.loads(response.read())
+        raw=response.read()
+        return json.loads(raw) if raw else None
 
 
-def incident(date,code,healthy,request=github):
+def incident_attempts(body):
+    match=re.search(r'<!-- 387-news-recoveries: (\d+) -->',body or '')
+    return min(3,int(match[1])) if match else 0
+
+
+def find_incident(date,request=github):
     datetime.strptime(date,'%Y-%m-%d')
-    if code not in CODES: raise ValueError('Unknown public diagnostic code')
     marker=f'<!-- 387-news-release:{date} -->'
     existing=None
     for page in range(1,6):
         batch=request('GET',f'issues?state=all&per_page=100&page={page}')
         if not isinstance(batch,list): raise RuntimeError('Invalid incident list')
-        existing=next((i for i in batch if not i.get('pull_request') and marker in (i.get('body') or '')),None)
+        existing=next((i for i in batch if not i.get('pull_request') and i.get('user',{}).get('login')=='github-actions[bot]' and marker in (i.get('body') or '')),None)
         if existing or len(batch)<100: break
     else:
         raise RuntimeError('Incident pagination limit; refusing uncertain duplicate')
+    return existing
+
+
+def incident(date,code,healthy,request=github,*,recovery_attempts=None,public_check_code=None):
+    datetime.strptime(date,'%Y-%m-%d')
+    if code not in CODES:raise ValueError('Unknown public diagnostic code')
+    marker=f'<!-- 387-news-release:{date} -->'
+    existing=find_incident(date,request)
+    attempts=max(incident_attempts((existing or {}).get('body','')),recovery_attempts or 0)
+    if type(attempts) is not int or not 0<=attempts<=3:raise ValueError('RECOVERY_COUNT_INVALID')
+    if attempts:marker+='\n<!-- 387-news-recoveries: '+str(attempts)+' -->'
     if healthy:
         if existing and existing.get('state')!='closed':
             request('PATCH',f'issues/{existing["number"]}',{'state':'closed',
@@ -51,6 +70,9 @@ def incident(date,code,healthy,request=github):
     body=(marker+f'\n\nRelease {date}: **{code}**.\n\n'
           'The controller retains checkpoints and approved articles. Existing wake-up windows retry within API and delivery limits. '
           'Editorial holds and exhausted delivery retry limits need owner diagnosis. No drafts or secrets are included.\n')
+    if public_check_code in PUBLIC_CHECK_CODES:body+='\nPublic HTTPS check: **'+public_check_code+'**.\n'
+    run_id=os.getenv('GITHUB_RUN_ID','');repo=os.getenv('GITHUB_REPOSITORY','')
+    if repo=='zzz387/387-news' and run_id.isdigit():body+='\nActions: https://github.com/'+repo+'/actions/runs/'+run_id+'\n'
     if existing:
         if existing.get('state')!='open' or existing.get('body')!=body:
             request('PATCH',f'issues/{existing["number"]}',{'state':'open','body':body})
@@ -63,10 +85,10 @@ def evaluate(root,status,now=None,check_public=site_checks.check_site):
     now=now or datetime.now(news.TZ)
     today=now.date().isoformat()
     if now.hour<6:
-        return {'date':today,'code':'NOT_PREPARED','verified':False,'alert':False,'not_due':True}
+        return {'date':today,'code':'NOT_PREPARED','verified':False,'alert':False,'not_due':True,'publication_status':'WAITING_FOR_RELEASE'}
     try:
         check_public(expected_date=today)
-        return {'date':today,'code':'VERIFIED','verified':True,'alert':False}
+        return {'date':today,'code':'VERIFIED','verified':True,'alert':False,'publication_status':'PUBLISHED_VERIFIED'}
     except (HTTPError,URLError,TimeoutError,OSError):
         external=True
     except Exception:
@@ -83,7 +105,7 @@ def evaluate(root,status,now=None,check_public=site_checks.check_site):
         elif status.get('audit_passed') and not exists: code='READY_NOT_PUBLISHED'
     # One-hour grace prevents a transient initial deploy from creating an incident.
     alert=now.hour>=7 or code in ('EDITORIAL_HOLD','DELIVERY_RETRY_LIMIT')
-    return {'date':today,'code':code,'verified':False,'alert':alert}
+    return {'date':today,'code':code,'verified':False,'alert':alert,'publication_status':'PUBLICATION_FAILED'}
 
 
 def main():
@@ -91,13 +113,13 @@ def main():
     result=evaluate(news.ROOT,raw)
     output=os.getenv('GITHUB_OUTPUT')
     if output:
-        with open(output,'a') as stream:stream.write('verified='+str(result['verified']).lower()+'\n')
+        with open(output,'a') as stream:stream.write('verified='+str(result['verified']).lower()+'\npublication_status='+result['publication_status']+'\n')
     if os.getenv('NEWS_POLICY_VERSION')=='4.3':
         try:
             workflow=github('GET','actions/workflows/daily-v31.yml')
             print('[daily-workflow] '+json.dumps({'state':workflow['state'],'path':workflow['path'],'release_target':'06:00 Europe/Moscow'}),flush=True)
         except Exception as exc:print('[daily-workflow] '+json.dumps({'code':'METADATA_UNAVAILABLE','error':type(exc).__name__}),flush=True)
-    result['waiting_for_authorized_special_priority']=os.getenv('SPECIAL_PRIORITY_HOLD')=='true'
+    result['waiting_for_authorized_special_priority']=os.getenv('SPECIAL_PRIORITY_HOLD')=='true' and os.getenv('NEWS_POLICY_VERSION')!='4.3'
     try:
         if result['verified'] or result['alert']:
             result['incident']=incident(result['date'],result['code'],result['verified'])

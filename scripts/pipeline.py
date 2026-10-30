@@ -206,6 +206,19 @@ def article_target(state):
     return policy41.ARTICLE_COUNT if state.get('version')==41 else 8
 
 
+def delivery_state(state,now=None):
+    now=now or now_moscow();stage=state.get('pipeline_status','PREPARING')
+    release=datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=news.TZ)
+    if stage=='PUBLISHED' and state.get('delivery_verified_at'):return 'PUBLISHED_VERIFIED'
+    ready=bool(state.get('articles') or state.get('public_article_count') or state.get('reserve_count') or state.get('audit_passed'))
+    if now<release:
+        if stage=='PUBLISHING':return 'READY_TO_PUBLISH'
+        return 'WAITING_FOR_RELEASE' if ready else 'PREPARING'
+    if stage in ('BLOCKED','DEFERRED'):return 'PUBLICATION_FAILED'
+    if stage=='PUBLISHING':return 'PUBLISHING'
+    return 'READY_TO_PUBLISH' if ready else 'PUBLICATION_FAILED'
+
+
 def report(state,ledger,now=None):
     now=now or now_moscow()
     segments=sum(len(d.get(k,{}).get('parts',[])) for d in state.get('dossiers',{}).values()
@@ -219,6 +232,7 @@ def report(state,ledger,now=None):
     ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version') in (41,43) else len(state.get('articles',{}))
     return dict(date=state['date'],policy_version=state.get('policy_version','3.2'),
                 issue_kind=state.get('issue_kind','articles'),reserve_links=state.get('reserve_count',0),
+                publication_status=delivery_state(state,now),
                 article_target=article_target(state),articles=max(ready_count,state.get('public_article_count',0)),
                 segments=segments,dossiers=len(state.get('dossiers',{})),audit_passed=bool(state.get('audit_passed')),
                 quota_day=ledger.get('day'),requests_used=ledger.get('requests',0),
