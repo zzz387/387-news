@@ -4,6 +4,8 @@ from functools import partial
 from http.server import SimpleHTTPRequestHandler,ThreadingHTTPServer
 from pathlib import Path
 from threading import Thread
+try:from scripts import source_links43
+except ImportError:import source_links43
 
 
 def launch_browser(playwright):
@@ -50,7 +52,6 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
                     if page.locator('.source-primary').count()!=1: raise ValueError('BROWSER_SOURCE_BLOCK_COUNT')
                     source=page.locator('.source-primary')
                     if source.locator('[data-source-links-version="1"]').count():
-                        from scripts import source_links43
                         source_links43.validate(source.inner_html(),required=True)
                         if source.evaluate('(n)=>n.scrollWidth>n.clientWidth+1'):raise ValueError('BROWSER_SOURCE_HORIZONTAL_OVERFLOW')
                         if not source.locator('.source-original').is_visible():raise ValueError('BROWSER_SOURCE_LINK_HIDDEN')

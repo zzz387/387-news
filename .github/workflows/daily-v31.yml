@@ -488,7 +488,7 @@ jobs:
         if: ${{ success() && steps.stage.outputs.published == 'true' }}
         env:
           ISSUE_DATE: ${{ steps.stage.outputs.issue_date }}
-        run: python scripts/release_browser41.py
+        run: python -m scripts.release_browser41
       - name: Commit fully audited and released issue
         id: commit
         if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}
