@@ -129,7 +129,7 @@ def render_overview(date,no,articles,permanent=False,*,policy_version="4.1"):
     title=f'Выпуск № {no:03d} · {date}'
     out=[news.page_header(title,str(len(articles))+' готовых материалов 387 News',f'/issues/{date}/' if permanent else '/',moment,no).replace('Редакция 2.0','Редакция '+policy_version),
         f'<main class="wrap" data-policy-version="{policy_version}" data-issue-date="{date}" data-issue-number="{no}" data-article-count="{len(articles)}">',
-        '<section class="front-intro"><div><h1>Обзор номера</h1><p>Истории, знания и практические открытия. Все статьи доступны целиком.</p></div></section>',
+        '<h1 class="visually-hidden">Обзор номера</h1>',
         '<section class="front-grid">']
     for i,a in enumerate(articles[:2]):
         out.append(f'<article class="{"lead" if i==0 else "mid"}"><div class="meta">{escape(a["category"])}</div><h2><a href="/issues/{date}/articles/{a["slug"]}/">{escape(a["title"])}</a></h2><p>{escape(a["teaser"])}</p></article>')

@@ -1,0 +1,1807 @@
+{
+  "version": 1,
+  "refresh_hours": 6,
+  "publishers_per_run": 5,
+  "article_checks_per_run": 8,
+  "publishers": [
+    {
+      "id": "science",
+      "name": "Science",
+      "homepage": "https://www.science.org/",
+      "domain": "www.science.org",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "physics",
+        "materials"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.science.org/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "nature",
+      "name": "Nature",
+      "homepage": "https://www.nature.com/",
+      "domain": "www.nature.com",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "ecology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.nature.com/nature.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nature.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "pnas",
+      "name": "PNAS",
+      "homepage": "https://www.pnas.org/",
+      "domain": "www.pnas.org",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.pnas.org/action/showFeed?type=etoc&feed=rss&jc=pnas"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.pnas.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "cell",
+      "name": "Cell",
+      "homepage": "https://www.cell.com/",
+      "domain": "www.cell.com",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "neuroscience"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.cell.com/cell/current.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.cell.com/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "plos",
+      "name": "PLOS",
+      "homepage": "https://journals.plos.org/plosone/",
+      "domain": "journals.plos.org",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://journals.plos.org/plosone/feed/atom"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://journals.plos.org/plosone/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "elife",
+      "name": "eLife",
+      "homepage": "https://elifesciences.org/",
+      "domain": "elifesciences.org",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "neuroscience"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://elifesciences.org/rss.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://elifesciences.org/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "ncomms",
+      "name": "Nature Communications",
+      "homepage": "https://www.nature.com/ncomms/",
+      "domain": "www.nature.com",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "materials",
+        "biology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.nature.com/ncomms.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nature.com/ncomms/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "srep",
+      "name": "Scientific Reports",
+      "homepage": "https://www.nature.com/srep/",
+      "domain": "www.nature.com",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "ecology",
+        "behaviour",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.nature.com/srep.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nature.com/srep/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "scientificamerican",
+      "name": "Scientific American",
+      "homepage": "https://www.scientificamerican.com/",
+      "domain": "www.scientificamerican.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "psychology",
+        "biology",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.scientificamerican.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "newscientist",
+      "name": "New Scientist",
+      "homepage": "https://www.newscientist.com/",
+      "domain": "www.newscientist.com",
+      "language": "en",
+      "country": "GB",
+      "type": "science_journalism",
+      "topics": [
+        "physics",
+        "biology",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.newscientist.com/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "sciencenews",
+      "name": "Science News",
+      "homepage": "https://www.sciencenews.org/",
+      "domain": "www.sciencenews.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "animals",
+        "biology",
+        "archaeology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.sciencenews.org/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.sciencenews.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "quanta",
+      "name": "Quanta Magazine",
+      "homepage": "https://www.quantamagazine.org/",
+      "domain": "www.quantamagazine.org",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "physics",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.quantamagazine.org/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.quantamagazine.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "knowable",
+      "name": "Knowable Magazine",
+      "homepage": "https://knowablemagazine.org/",
+      "domain": "knowablemagazine.org",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://knowablemagazine.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "nautilus",
+      "name": "Nautilus",
+      "homepage": "https://nautil.us/",
+      "domain": "nautil.us",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "neuroscience",
+        "history",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://nautil.us/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nautil.us/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "aeon",
+      "name": "Aeon",
+      "homepage": "https://aeon.co/",
+      "domain": "aeon.co",
+      "language": "en",
+      "country": "AU",
+      "type": "popular_science",
+      "topics": [
+        "psychology",
+        "history",
+        "behaviour"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://aeon.co/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "discover",
+      "name": "Discover Magazine",
+      "homepage": "https://www.discovermagazine.com/",
+      "domain": "www.discovermagazine.com",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "archaeology",
+        "animals",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.discovermagazine.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "scientist",
+      "name": "The Scientist",
+      "homepage": "https://www.the-scientist.com/",
+      "domain": "www.the-scientist.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.the-scientist.com/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "physicsworld",
+      "name": "Physics World",
+      "homepage": "https://physicsworld.com/",
+      "domain": "physicsworld.com",
+      "language": "en",
+      "country": "GB",
+      "type": "science_journalism",
+      "topics": [
+        "physics",
+        "engineering",
+        "materials"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://physicsworld.com/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://physicsworld.com/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "mitreview",
+      "name": "MIT Technology Review",
+      "homepage": "https://www.technologyreview.com/",
+      "domain": "www.technologyreview.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "ai",
+        "engineering",
+        "robotics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.technologyreview.com/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "spectrum",
+      "name": "IEEE Spectrum",
+      "homepage": "https://spectrum.ieee.org/",
+      "domain": "spectrum.ieee.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "robotics",
+        "engineering",
+        "ai"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://spectrum.ieee.org/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "bbcfuture",
+      "name": "BBC Future",
+      "homepage": "https://www.bbc.com/future",
+      "domain": "www.bbc.com",
+      "language": "en",
+      "country": "GB",
+      "type": "science_journalism",
+      "topics": [
+        "psychology",
+        "ecology",
+        "animals"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.bbc.com/future"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "conversation",
+      "name": "The Conversation",
+      "homepage": "https://theconversation.com/",
+      "domain": "theconversation.com",
+      "language": "en",
+      "country": "AU",
+      "type": "science_journalism",
+      "topics": [
+        "behaviour",
+        "economics",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://theconversation.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "undark",
+      "name": "Undark",
+      "homepage": "https://undark.org/",
+      "domain": "undark.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "history",
+        "ecology",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://undark.org/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://undark.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "ars",
+      "name": "Ars Technica Science",
+      "homepage": "https://arstechnica.com/science/",
+      "domain": "arstechnica.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "engineering",
+        "biology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://feeds.arstechnica.com/arstechnica/science"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://arstechnica.com/science/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "natgeo",
+      "name": "National Geographic",
+      "homepage": "https://www.nationalgeographic.com/",
+      "domain": "www.nationalgeographic.com",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "ecology",
+        "archaeology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nationalgeographic.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "cosmos",
+      "name": "Cosmos",
+      "homepage": "https://cosmosmagazine.com/",
+      "domain": "cosmosmagazine.com",
+      "language": "en",
+      "country": "AU",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "biology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://cosmosmagazine.com/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://cosmosmagazine.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "eos",
+      "name": "Eos",
+      "homepage": "https://eos.org/",
+      "domain": "eos.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "climate",
+        "ecology",
+        "geology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://eos.org/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://eos.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "phys",
+      "name": "Phys.org",
+      "homepage": "https://phys.org/",
+      "domain": "phys.org",
+      "language": "en",
+      "country": "GB",
+      "type": "research_news",
+      "topics": [
+        "biology",
+        "materials",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://phys.org/rss-feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://phys.org/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "sciencedaily",
+      "name": "ScienceDaily",
+      "homepage": "https://www.sciencedaily.com/",
+      "domain": "www.sciencedaily.com",
+      "language": "en",
+      "country": "US",
+      "type": "research_news",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.sciencedaily.com/rss/all.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.sciencedaily.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "eurekalert",
+      "name": "EurekAlert!",
+      "homepage": "https://www.eurekalert.org/",
+      "domain": "www.eurekalert.org",
+      "language": "en",
+      "country": "US",
+      "type": "press_release",
+      "topics": [
+        "biology",
+        "engineering",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.eurekalert.org/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "nplus1",
+      "name": "N+1",
+      "homepage": "https://nplus1.ru/",
+      "domain": "nplus1.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "archaeology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://nplus1.ru/rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nplus1.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "elementy",
+      "name": "Элементы",
+      "homepage": "https://elementy.ru/",
+      "domain": "elementy.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "mathematics",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://elementy.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "postnauka",
+      "name": "ПостНаука",
+      "homepage": "https://postnauka.org/",
+      "domain": "postnauka.org",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "history",
+        "neuroscience",
+        "mathematics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://postnauka.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "nkj",
+      "name": "Наука и жизнь",
+      "homepage": "https://www.nkj.ru/",
+      "domain": "www.nkj.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "archaeology",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.nkj.ru/rss/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nkj.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "trv",
+      "name": "Троицкий вариант — Наука",
+      "homepage": "https://www.trv-science.ru/",
+      "domain": "www.trv-science.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "history",
+        "physics",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.trv-science.ru/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.trv-science.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "biomolecula",
+      "name": "Биомолекула",
+      "homepage": "https://biomolecula.ru/",
+      "domain": "biomolecula.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "neuroscience",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://biomolecula.ru/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "nakedscience",
+      "name": "Naked Science",
+      "homepage": "https://naked-science.ru/",
+      "domain": "naked-science.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "archaeology",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://naked-science.ru/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://naked-science.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "indicator",
+      "name": "Индикатор",
+      "homepage": "https://indicator.ru/",
+      "domain": "indicator.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "physics",
+        "biology",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://indicator.ru/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "scientificrussia",
+      "name": "Научная Россия",
+      "homepage": "https://scientificrussia.ru/",
+      "domain": "scientificrussia.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "research_news",
+      "topics": [
+        "biology",
+        "history",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://scientificrussia.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "pcr",
+      "name": "PCR.News",
+      "homepage": "https://pcr.news/",
+      "domain": "pcr.news",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://pcr.news/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "antropogenez",
+      "name": "Антропогенез.ру",
+      "homepage": "https://antropogenez.ru/",
+      "domain": "antropogenez.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "anthropology",
+        "archaeology",
+        "evolution"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://antropogenez.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "hij",
+      "name": "Химия и жизнь",
+      "homepage": "https://www.hij.ru/",
+      "domain": "www.hij.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "chemistry",
+        "biology",
+        "materials"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.hij.ru/"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "scfh",
+      "name": "Наука из первых рук",
+      "homepage": "https://scfh.ru/",
+      "domain": "scfh.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "history",
+        "geology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://scfh.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "kvant",
+      "name": "Квант",
+      "homepage": "https://kvant.mccme.ru/",
+      "domain": "kvant.mccme.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kvant.mccme.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "kvantik",
+      "name": "Квантик",
+      "homepage": "https://kvantik.com/",
+      "domain": "kvantik.com",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "education"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kvantik.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "kot",
+      "name": "Кот Шрёдингера",
+      "homepage": "https://kot.sh/",
+      "domain": "kot.sh",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "history",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kot.sh/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "znaniesila",
+      "name": "Знание — сила",
+      "homepage": "https://znanie-sila.su/",
+      "domain": "znanie-sila.su",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "history",
+        "biology",
+        "psychology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://znanie-sila.su/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "sbras",
+      "name": "Наука в Сибири",
+      "homepage": "https://www.sbras.info/",
+      "domain": "www.sbras.info",
+      "language": "ru",
+      "country": "RU",
+      "type": "research_news",
+      "topics": [
+        "ecology",
+        "biology",
+        "geology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.sbras.info/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "etudes",
+      "name": "Математические этюды",
+      "homepage": "https://etudes.ru/",
+      "domain": "etudes.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://etudes.ru/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "kommersant",
+      "name": "Коммерсантъ Наука",
+      "homepage": "https://www.kommersant.ru/publishing/217",
+      "domain": "www.kommersant.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "engineering",
+        "biology",
+        "economics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.kommersant.ru/publishing/217"
+      },
+      "light_suitable": false
+    },
+    {
+      "id": "smithsonian",
+      "name": "Smithsonian Magazine",
+      "homepage": "https://www.smithsonianmag.com/",
+      "domain": "www.smithsonianmag.com",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "history",
+        "archaeology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.smithsonianmag.com/rss/latest_articles/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.smithsonianmag.com/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "guardian",
+      "name": "The Guardian Science",
+      "homepage": "https://www.theguardian.com/science",
+      "domain": "www.theguardian.com",
+      "language": "en",
+      "country": "GB",
+      "type": "science_journalism",
+      "topics": [
+        "animals",
+        "biology",
+        "archaeology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.theguardian.com/science/rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.theguardian.com/science"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "ap",
+      "name": "Associated Press Science",
+      "homepage": "https://apnews.com/hub/science",
+      "domain": "apnews.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "animals",
+        "biology",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://apnews.com/hub/science"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "wwf",
+      "name": "WWF",
+      "homepage": "https://wwf.panda.org/",
+      "domain": "wwf.panda.org",
+      "language": "en",
+      "country": "CH",
+      "type": "official",
+      "topics": [
+        "animals",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://wwf.panda.org/"
+      },
+      "light_suitable": true
+    },
+    {
+      "id": "zoo",
+      "name": "Smithsonian National Zoo",
+      "homepage": "https://nationalzoo.si.edu/news",
+      "domain": "nationalzoo.si.edu",
+      "language": "en",
+      "country": "US",
+      "type": "official",
+      "topics": [
+        "animals",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nationalzoo.si.edu/news"
+      },
+      "light_suitable": true
+    }
+  ]
+}
