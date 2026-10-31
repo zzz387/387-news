@@ -17,7 +17,7 @@ def main():
                 languages=['ru','en','de','fr',None,'es','it','zh-Hans','uk','ja','pt','sv']
                 for row,language in zip(s['candidates'],languages):
                     row['source']['language']=language
-                    row['source']['title']='Название источника с длиннымсловом'*5
+                    row['source']['title']=('Непереносимоедлинноеназваниеисточника'*8)+' '+str(row['id'])
                     row['checks']['final43']['input_hash']=editorial43.fingerprint(row)
             from scripts.test_editorial_visual43 import light_ready
             n={0:0,1:1,8:3,12:5}[count]
