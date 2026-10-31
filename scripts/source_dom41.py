@@ -12,7 +12,7 @@ BODY_NAMES={'article-body','article-content','entry-content','post-content','sto
 
 class Node:
     def __init__(self,tag='',attrs=()):
-        self.tag=tag; self.attrs=dict(attrs); self.children=[]; self.closed=False; self.parent=None
+        self.tag=tag; self.attrs={key:(value if value is not None else '') for key,value in attrs}; self.children=[]; self.closed=False; self.parent=None
     def all(self):
         yield self
         for child in self.children:

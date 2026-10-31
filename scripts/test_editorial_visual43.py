@@ -137,6 +137,12 @@ class CatalogTests(unittest.TestCase):
         report,items=cat.inspect_publisher(self.registry_row(),session,now=NOW)
         self.assertEqual(items,[]);self.assertEqual(report['last_article_code'],'PUBLISHER_PUBLICATION_IN_FUTURE')
 
+    def test_boolean_html_attributes_do_not_crash_metadata_or_invent_license_rights(self):
+        from scripts import source_dom41 as dom
+        doc=dom.Document();doc.feed('<html lang="ru"><a rel href="/article">Read</a><script type></script><article class><p>Original text.</p></article></html>');doc.close()
+        meta=dom.metadata(doc);self.assertNotIn('license',meta)
+        regions,method=dom.choose_region(doc);self.assertEqual(method,'article');self.assertTrue(regions[0].closed)
+
     def test_press_release_type_is_not_promoted_to_peer_reviewed_research(self):
         row=dict(self.registry_row(),type='press_release');_,items=cat.inspect_publisher(row,self.session())
         self.assertEqual(items[0][1]['publisher_type'],'press_release');self.assertEqual(items[0][1]['publication_type'],'unclassified')
