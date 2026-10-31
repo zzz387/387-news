@@ -130,6 +130,16 @@ class CatalogTests(unittest.TestCase):
             cat.refresh(saved,NOW+timedelta(minutes=1),session)
         self.assertEqual(len(session.urls),count);self.assertEqual(len(saved['candidates']),1)
 
+    def test_unavailable_publishers_do_not_spend_full_article_network_allowance(self):
+        config=cat.registry();config['publishers']=[dict(self.registry_row(),id=str(i)) for i in range(5)];config['publishers_per_run']=5;config['article_checks_per_run']=8
+        limits=[];src=source(9)
+        def inspect(row,session,**kw):
+            limits.append(kw['article_limit'])
+            return {'article_checks':0 if row['id']!='4' else 1,'status':'unavailable'},([] if row['id']!='4' else [({},src)])
+        with patch.object(cat,'registry',return_value=config),patch.object(cat,'inspect_publisher',side_effect=inspect):
+            s=state();s['discovery43']={'publishers':{},'cursor':0};cat.refresh(s,NOW,self.session())
+        self.assertEqual(limits,[2,2,2,2,2]);self.assertEqual(len(s['candidates']),1)
+
     def test_stopped_publisher_with_only_old_materials_does_not_enter_active_pool(self):
         session=self.session();original=session.fetch
         session.fetch=lambda url:dict(original(url),published='2000-01-01')
