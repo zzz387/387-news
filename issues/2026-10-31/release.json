@@ -1,0 +1,47 @@
+{
+  "date": "2026-10-31",
+  "number": 7,
+  "policy_version": "4.3",
+  "article_count": 8,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "492655d893e9bbfbb265c0fd8dd16244988f12496360204b299391d731558439",
+      "markdown": "d32c69ceb9b9fc8282d338ae3990a81776305b31358bdf2c902dc05470d26979"
+    },
+    "feature-02": {
+      "html": "6fde1858dbe70102cea914f241121c0b976a090c30ac33949b5ca396e4ad00f8",
+      "markdown": "61b8e9d49e0afcbcc574e2ea1e797f994eee1b75fc4368663942e080395f11b6"
+    },
+    "feature-03": {
+      "html": "d7f920d1746fc3ecad6df3016bfaea046f517a729e93a054bf8b22e24d1670c0",
+      "markdown": "b3c845de2fb35426ccd5aa2083dfe55b7cf9db311788241628a114c7c4958c13"
+    },
+    "feature-04": {
+      "html": "e2163f1c1ea34b76cfa0a811f200f9049b53017a034d7db92ce965fc6915c7de",
+      "markdown": "1ea95917fdd6236116ea2bc2e2224c4b0d889e8ef5b39a0bf39558f82ac9edb9"
+    },
+    "feature-05": {
+      "html": "3b1063de0c43dda62a3c5fc9335cc4688a554710793c299bcc814fccce12a596",
+      "markdown": "992b601932874668d23d6e081b289d5ab47dc3988744eca09bdf5417c0369d27"
+    },
+    "feature-06": {
+      "html": "0ef09dbf1c590a1e4fb6c0e879c920742488e3f2235d920ac9087a4c6231e8b2",
+      "markdown": "81bdbe631c18090bfa8c3a5fbf349d79010f5ef546eb76ab848be00149692a99"
+    },
+    "feature-07": {
+      "html": "1ce20ee793b9a834c0072dac0890b35ec35ff8a65f3c0d9ac476a1b32c79fbdb",
+      "markdown": "e2a71b6a29b4c531ad5a1d7f8171876d09392c3bf85cd7fcfa8eb315758edd38"
+    },
+    "feature-08": {
+      "html": "13ace509c962d42b1d46247ddc36f60e0bd6dafcdd607c4faedd3449aef69012",
+      "markdown": "ef1dc4d493cf15f7006059d5209889e34b9f288db67294b040c135b9eeadb455"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-10-31T06:00:24.737507+03:00",
+  "release_not_before": "2026-10-31T06:00:00+03:00",
+  "homepage_hash": "7185fecc2a7b32f9d7237ba93cf4e4b447e591d1f7d76eb0f3651ea7988d0f7e",
+  "overview_hash": "5851b870a5433ad17d1f8363e5bcc43d09e74be6ae43491cb84a4f9b1c711d6a",
+  "markdown_hash": "c2fb3b68dfbf7559b8cbba0b999a403d1298519716f9bd02c3748041d78939bc"
+}
