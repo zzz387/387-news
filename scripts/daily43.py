@@ -54,21 +54,14 @@ def discover(state):
 
 
 def preparation_order(state):
-    """Resume saved work first, then spread attempts across topics without quotas."""
-    from collections import Counter
-    rows=list(state['candidates']);result=[]
-    counts=Counter(r.get('category_hint') or r.get('category','') for r in e.select_ready(state))
-    pending=[r for r in rows if r.get('status') in ('preparing','retryable_error')]
-    result.extend(pending)
-    for r in pending:counts[r.get('category_hint') or r.get('category','')]+=1
-    pending=[r for r in rows if r.get('status')=='discovered']
-    while pending:
-        row=min(pending,key=lambda r:counts[r.get('category_hint') or r.get('category','')])
-        pending.remove(row);result.append(row);counts[row.get('category_hint') or row.get('category','')]+=1
-    return result
+    try:from scripts import selection43
+    except ImportError:import selection43
+    return selection43.order(state,state.get('_recent43',[]))
 
 
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None):
+    try:from scripts import selection43,catalog43,light43
+    except ImportError:import selection43,catalog43,light43
     clock=(lambda:now) if now is not None else pipeline.now_moscow
     save=persist
     def persist():
@@ -83,16 +76,28 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     # Delivery has first claim on every due window; never wait for more model work.
     if current<release-timedelta(minutes=10):
         if budget:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
-        discover(state);persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
+        discover(state)
+        state['_recent43']=selection43.recent(root,date)
+        if os.getenv('NEWS_CATALOG_REFRESH')=='true' and clock()<release-timedelta(minutes=25):
+            try:catalog43.refresh(state,clock())
+            except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
+        persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
         for record in preparation_order(state):
-            if len(e.select_ready(state))>=e.CONFIG['article_target']:break
+            if len(selection43.ready(state))>=e.CONFIG['article_target']:break
             if clock()>=release-timedelta(minutes=10) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
             if record['url'] in prior:record['status']='deferred';persist();continue
+            if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
+                record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_BEFORE_WRITING'});persist();continue
             record['status']='preparing';persist()
-            try:editor.finish(state,record)
+            try:
+                if isinstance(editor,e.Editor):
+                    editor.state=state;editor.usage_record=record;editor.verify_source(record)
+                    if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
+                        record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
+                editor.finish(state,record)
             except news.runtime.GenerationPaused:
                 record['status']='preparing';persist();break
             except Exception as exc:
@@ -102,7 +107,12 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 record['status']='deferred' if isinstance(exc,p.Blocked) or failures>=2 else 'retryable_error'
                 print('[candidate43] '+json.dumps({'id':record['id'],'status':record['status'],'code':getattr(exc,'code',type(exc).__name__)}),flush=True)
             persist()
-    selected=e.select_ready(state);state['selected_ids']=[r['id'] for r in selected]
+        if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true' and clock()<release-timedelta(minutes=30) and (len(selection43.ready(state))>=e.CONFIG['article_target'] or not any(r.get('status') in ('discovered','preparing','retryable_error') for r in state['candidates'])):
+            light43.prepare(state,persist)
+    selected=selection43.ready(state)
+    state['title_style43']=selection43.title_report(selected)
+    state['selection43']={'selected':[r['id'] for r in selected],'excluded_duplicate_ids':[r['id'] for r in e.select_ready(state) if r not in selected]}
+    state['selected_ids']=[r['id'] for r in selected]
     state['articles']={r['id']:r['article'] for r in selected}
     reserve=[] if selected else reserve_rows(state,clock())
     state['issue_kind']='articles' if selected else 'source_digest'

@@ -12,7 +12,7 @@ BODY_NAMES={'article-body','article-content','entry-content','post-content','sto
 
 class Node:
     def __init__(self,tag='',attrs=()):
-        self.tag=tag; self.attrs=dict(attrs); self.children=[]; self.closed=False; self.parent=None
+        self.tag=tag; self.attrs={key:(value if value is not None else '') for key,value in attrs}; self.children=[]; self.closed=False; self.parent=None
     def all(self):
         yield self
         for child in self.children:
@@ -79,7 +79,7 @@ def metadata(document):
     # Do not treat unrelated recommendation cards as the primary article.
     exact=[v for v in articles if v.get('url')==result.get('canonical')]
     chosen=exact[0] if len(exact)==1 else articles[0] if len(articles)==1 else {}
-    for key in ('headline','datePublished','inLanguage','license','isAccessibleForFree'):
+    for key in ('headline','datePublished','inLanguage','license','isAccessibleForFree','genre'):
         if key in chosen: result['schema_'+key]=chosen[key]
     author=chosen.get('author')
     if isinstance(author,list): author=', '.join(a.get('name','') if isinstance(a,dict) else str(a) for a in author)

@@ -32,6 +32,18 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
                 base=f'http://127.0.0.1:{server.server_port}'
                 page.goto(base+overview_path,wait_until='networkidle')
                 if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HOMEPAGE_HORIZONTAL_OVERFLOW')
+                if page.locator('body.edition-compact').count():
+                    if page.locator('.mast-top,.motto,.front-intro').count():raise ValueError('BROWSER_COMPACT_CHROME_RETIRED_TEXT')
+                    if not page.locator('.logo').is_visible() or '387' not in page.locator('.logo').inner_text():raise ValueError('BROWSER_LOGO_MISSING')
+                    if not page.locator('nav').get_by_text('Обзор номера',exact=True).count():raise ValueError('BROWSER_OVERVIEW_NAV_MISSING')
+                    if page.locator('.front-grid').count():
+                        gap=page.locator('.front-grid').evaluate('(n)=>n.getBoundingClientRect().top-document.querySelector("nav").getBoundingClientRect().bottom')
+                        if gap>45:raise ValueError('BROWSER_COMPACT_HOME_GAP')
+                if page.locator('#light-news').count():
+                    section=page.locator('#light-news')
+                    if not section.is_visible() or not section.locator('.light-item').count():raise ValueError('BROWSER_LIGHT_EMPTY')
+                    cols=section.locator('.light-grid').evaluate('(n)=>getComputedStyle(n).gridTemplateColumns.split(" ").length')
+                    if width<=390 and cols!=1:raise ValueError('BROWSER_LIGHT_MOBILE_COLUMNS')
                 urls=page.locator(f'a[href^="/issues/{date}/articles/"]').evaluate_all('(nodes)=>[...new Set(nodes.map(n=>n.getAttribute("href")))]')
                 if len(urls)!=expected_count: raise ValueError('BROWSER_ARTICLE_COUNT_MISMATCH')
                 if expected_count==0:

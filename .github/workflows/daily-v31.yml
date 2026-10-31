@@ -105,6 +105,27 @@ jobs:
           path: ${{ runner.temp }}/browser-report.json
           retention-days: 7
 
+  catalog-discovery-smoke:
+    if: ${{ github.event_name == 'pull_request' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check publisher discovery robots full-text access and per-article rights (public only no Gemini)
+        run: python -m scripts.catalog43 --output '${{ runner.temp }}/catalog43-report.json'
+      - uses: actions/upload-artifact@v4
+        if: ${{ always() }}
+        with:
+          name: public-catalog43-diagnostics
+          path: ${{ runner.temp }}/catalog43-report.json
+          retention-days: 7
+          if-no-files-found: warn
+
   source-smoke:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
     runs-on: ubuntu-latest
@@ -357,6 +378,8 @@ jobs:
     timeout-minutes: 30
     env:
       NEWS_POLICY_VERSION: "4.3"
+      NEWS_CATALOG_REFRESH: "true"
+      NEWS_LIGHT_NEWS_ENABLED: "true"
       GH_TOKEN: ${{ github.token }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
@@ -368,7 +391,7 @@ jobs:
       GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
     outputs:
       ready: ${{ steps.commit.outputs.ready }}
-      issue_date: ${{ steps.stage.outputs.issue_date }}
+      issue_date: ${{ steps.commit.outputs.issue_date || steps.stage.outputs.issue_date }}
       pipeline_status: ${{ steps.stage.outputs.pipeline_status }}
     steps:
       - name: Read website repository
@@ -475,8 +498,12 @@ jobs:
           path: ${{ runner.temp }}/quota/quota.json
           if-no-files-found: error
           retention-days: 90
+      - name: Project compact current home without modifying immutable editions
+        id: home
+        if: ${{ success() && steps.context.outputs.preview == 'false' && (steps.context.outputs.phase == 'run' || steps.context.outputs.phase == 'resume') && steps.stage.outputs.published != 'true' }}
+        run: python -m scripts.publication43 --refresh-home
       - name: Install browser only for a fully audited release
-        if: ${{ success() && steps.stage.outputs.published == 'true' }}
+        if: ${{ success() && (steps.stage.outputs.published == 'true' || steps.home.outputs.ready == 'true') }}
         run: |
           python -m pip install playwright
           if command -v google-chrome >/dev/null; then
@@ -486,19 +513,25 @@ jobs:
             python -m playwright install --with-deps chromium
           fi
       - name: Verify full release at phone tablet and desktop widths before Git commit
-        if: ${{ success() && steps.stage.outputs.published == 'true' }}
+        if: ${{ success() && (steps.stage.outputs.published == 'true' || steps.home.outputs.ready == 'true') }}
         env:
-          ISSUE_DATE: ${{ steps.stage.outputs.issue_date }}
+          ISSUE_DATE: ${{ steps.stage.outputs.published == 'true' && steps.stage.outputs.issue_date || steps.home.outputs.issue_date }}
         run: python -m scripts.release_browser41
       - name: Commit fully audited and released issue
         id: commit
-        if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && steps.stage.outputs.published == 'true' }}
+        if: ${{ success() && github.ref == 'refs/heads/main' && steps.context.outputs.preview == 'false' && vars.NEWS_RELEASE_APPROVED == 'true' && (steps.stage.outputs.published == 'true' || steps.home.outputs.ready == 'true') }}
         shell: bash
         env:
-          ISSUE_DATE: ${{ steps.stage.outputs.issue_date }}
+          ISSUE_DATE: ${{ steps.stage.outputs.published == 'true' && steps.stage.outputs.issue_date || steps.home.outputs.issue_date }}
         run: |
           python -m scripts.release_queue --wait-until "$ISSUE_DATE"
-          git add index.html archive/index.html issues/ sitemap.xml
+          echo "issue_date=$ISSUE_DATE" >> "$GITHUB_OUTPUT"
+          if [[ '${{ steps.stage.outputs.published }}' == 'true' ]]; then
+            git add index.html archive/index.html issues/ sitemap.xml
+          else
+            git diff --exit-code -- issues/ archive/index.html sitemap.xml
+            git add index.html
+          fi
           if git diff --cached --quiet; then
             echo 'Approved issue already committed; retry deployment without changing the archive.'
             echo 'ready=true' >> "$GITHUB_OUTPUT"

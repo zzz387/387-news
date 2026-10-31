@@ -4,9 +4,9 @@ from datetime import datetime
 from html import escape
 from pathlib import Path
 try:
-    from scripts import policy41 as p,publication41 as render,editorial43 as e,rights41,news,source41
+    from scripts import policy41 as p,publication41 as render,editorial43 as e,rights41,news,source41,selection43,light43,layout43,source_links43
 except ImportError:
-    import policy41 as p,publication41 as render,editorial43 as e,rights41,news,source41
+    import policy41 as p,publication41 as render,editorial43 as e,rights41,news,source41,selection43,light43,layout43,source_links43
 
 
 def digest_bytes(data):return hashlib.sha256(data).hexdigest()
@@ -58,6 +58,9 @@ def validate(root,date):
         if digest_bytes((issue/name).read_bytes())!=data[key]:raise p.Blocked('PUBLIC_OVERVIEW_CHANGED')
     page=(issue/'index.html').read_text()
     if f'data-article-count="{count}"' not in page or f'data-issue-date="{date}"' not in page:raise p.Blocked('PUBLIC_COUNT_INVALID')
+    light=data.get('light_news',[])
+    if data.get('light_count',len(light))!=len(light) or len(light)>5:raise p.Blocked('PUBLIC_LIGHT_COUNT')
+    if render_light(light) and render_light(light) not in page:raise p.Blocked('PUBLIC_LIGHT_CHANGED')
     if count==0:
         rows=data.get('sources',[])
         if not rows or 'Обзор источников' not in page:raise p.Blocked('EMPTY_RESERVE')
@@ -79,7 +82,7 @@ def build(state,root,reserve=(),preview=False):
         except ImportError:import site_checks
         site_checks.validate_local_release(root,date)
         return not preview
-    records=e.select_ready(state);articles=[]
+    records=selection43.ready(state);articles=[]
     for i,r in enumerate(records,1):
         a=public_article(r);a['slug']=news.slugify(a['title'],i);articles.append(a)
     if not articles and not reserve:raise p.Blocked('NO_SAFE_RESERVE')
@@ -100,11 +103,15 @@ def build(state,root,reserve=(),preview=False):
                 file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version='4.3')))
                 md=file.with_name('article.md');md.write_text(render.markdown(a))
                 data['pages'][a['slug']]={'html':digest_bytes(file.read_bytes()),'markdown':digest_bytes(md.read_bytes())}
+            light=public_light(state)
+            data['light_news']=light;data['light_count']=len(light)
             rows=[{k:r.get(k,'') for k in ('url','title','publisher','published','checked_at')} for r in reserve] if not articles else []
             if not articles:data['sources']=rows
             for permanent,target in ((True,issue/'index.html'),(False,working/'index.html')):
-                target.write_text(reader_chrome(render.render_overview(date,no,articles,permanent,policy_version='4.3')) if articles else overview(date,no,rows,permanent))
+                page=reader_chrome(render.render_overview(date,no,articles,permanent,policy_version='4.3')) if articles else overview(date,no,rows,permanent)
+                target.write_text(page.replace('</main>',render_light(light)+'</main>',1))
             markdown=('# Обзор источников\n\nПроверенные ссылки; не полноценные статьи. Без генерации Gemini.\n\n'+'\n'.join('- ['+r['title']+']('+r['url']+') — '+r['publisher']+'; '+(r.get('published') or 'дата не сохранена') for r in rows)) if not articles else '# Выпуск '+date+'\n\n'+'\n'.join('- ['+a['title']+'](/issues/'+date+'/articles/'+a['slug']+'/)' for a in articles)
+            if light:markdown+='\n\n# НЕ ВСЁ ТАК СЕРЬЁЗНО\n\nМаленькие новости, от которых мир становится интереснее\n\n'+'\n\n'.join('## '+x['title']+'\n\n'+x['text']+'\n\nИсточник: ['+x['source']['publisher']+']('+x['source']['url']+')' for x in light)
             (issue/'overview.md').write_text(markdown+'\n')
             data['homepage_hash']=digest_bytes((working/'index.html').read_bytes())
             data.update(overview_hash=digest_bytes((issue/'index.html').read_bytes()),markdown_hash=digest_bytes((issue/'overview.md').read_bytes()))
@@ -117,3 +124,46 @@ def build(state,root,reserve=(),preview=False):
             shutil.move(str(issue),str(root/'issues'/date))
             for name in ('index.html','archive/index.html','sitemap.xml'):(root/name).write_bytes((working/name).read_bytes())
     return not preview
+
+
+def public_light(state):
+    result=[]
+    for row in light43.ready(state):
+        source=row['source']
+        result.append({'title':row['article']['title'],'text':' '.join(b['text'] for b in row['article']['blocks']),
+            'source':{k:source.get(k,'') for k in ('url','title','publisher','language','published')}})
+    return result
+
+
+def render_light(items):
+    if not items:return ''
+    html='<section id="light-news" class="light-news" aria-labelledby="light-news-heading"><h2 id="light-news-heading">НЕ ВСЁ ТАК СЕРЬЁЗНО</h2><p>Маленькие новости, от которых мир становится интереснее</p><div class="light-grid">'
+    for item in items:
+        source=item['source'];url=source_links43.safe_source_url(source['url'])
+        html+='<article class="light-item"><h3>'+escape(item['title'])+'</h3><p>'+escape(item['text'])+'</p><p class="light-source">Источник: <a href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+escape(source['publisher'])+'</a>'
+        if source.get('published'):html+=' · '+escape(source['published'])
+        translated=source_links43.translation_url(url,source.get('language'))
+        if translated:html+=' · <a href="'+escape(translated,quote=True)+'" target="_blank" rel="noopener noreferrer">На русском</a>'
+        html+='</p></article>'
+    return html+'</div></section>'
+
+
+def refresh_home(root=None):
+    root=Path(root or p.ROOT);page=(root/'index.html').read_text()
+    found=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',page)
+    if not found:return False,None
+    date=found[1];validate(root,date);data=metadata(root,date)
+    overview=(root/'issues'/date/'index.html').read_text()
+    target=layout43.homepage(overview,date)
+    if digest_bytes(page.encode())!=data['homepage_hash'] and page!=target:raise p.Blocked('PUBLIC_HOME_CHANGED')
+    if page==target:return False,date
+    (root/'index.html').write_text(target);return True,date
+
+
+if __name__=='__main__':
+    import argparse,os
+    parser=argparse.ArgumentParser();parser.add_argument('--refresh-home',action='store_true',required=True);parser.parse_args()
+    changed,date=refresh_home()
+    if os.getenv('GITHUB_OUTPUT'):
+        with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('ready='+str(changed).lower()+'\nissue_date='+str(date or '')+'\n')
+    print('[home43] '+json.dumps({'changed':changed,'date':date,'archives_unchanged':True}))

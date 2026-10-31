@@ -30,10 +30,10 @@ class ResolvedHTML(str):
         value=super().__new__(cls,text);value.resolved_url=resolved_url;return value
 
 
-def transport(url,limit=None):
+def transport(url,limit=None,timeout=25):
     safe_url(url)
     limit=limit or policy.CONFIG['technical']['source_byte_limit']
-    with urlopen(Request(url,headers={'User-Agent':'387News-Research/4.1'}),timeout=25) as response:
+    with urlopen(Request(url,headers={'User-Agent':'387News-Research/4.1'}),timeout=timeout) as response:
         safe_url(response.geturl())
         if response.status!=200: raise policy.Blocked('SOURCE_UNAVAILABLE')
         data=response.read(limit+1)
@@ -142,6 +142,8 @@ def extract(html,url):
             'access_checked_at':datetime.now(timezone.utc).isoformat(),
             'declared_license':urljoin(base,license_url) if isinstance(license_url,str) else None,
             'images':[dict(image,url=urljoin(base,image['url'])) for image in images],
+            'doi':meta.get('citation_doi') or '',
+            'publication_type':meta.get('citation_article_type') or meta.get('schema_genre') or 'unclassified',
             'institutional_source':bool(profile),'ai_use_restricted':bool((profile or {}).get('ai_use_restricted')),
             'metadata_gaps':[name for name,value in (('author',author),('published',published)) if not value]}
     source['metadata_status']='verified' if language and (bool(author and published) or profile) else 'needs_review'

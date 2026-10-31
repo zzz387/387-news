@@ -123,7 +123,7 @@ def review_wire(record):
         for j,block in enumerate(source['blocks'],1):
             bid='q'+str(j);blocks.append(dict(block,id=bid));refs[bid]=block
         aliases[sid]=(source,refs)
-        wire.append({**{key:source.get(key,'') for key in ('url','title','publisher','author','published','language')},'id':sid,'blocks':blocks})
+        wire.append({**{key:source.get(key,'') for key in ('url','title','publisher','author','published','language','publication_type','doi')},'id':sid,'blocks':blocks})
     return wire,aliases
 
 
@@ -194,8 +194,13 @@ class Editor(old.Editor):
     context_characters=int(CONFIG.get('context_characters',120000))
     def model_sources(self,record):
         # Complete originals and structural blocks, without unrelated image/transport inventories.
-        return [{**{key:source.get(key,'') for key in ('id','url','title','publisher','author','published','language')},
+        return [{**{key:source.get(key,'') for key in ('id','url','title','publisher','author','published','language','publication_type','doi')},
                  'blocks':source['blocks']} for source in [record['source']]+record.get('supporting_sources',[])]
+
+    def issue_context(self,state,record):
+        try:from scripts import selection43
+        except ImportError:import selection43
+        return dict(selection43.prompt_context(state),source_kind=record.get('source_kind','unclassified'),publication_type=record.get('source',{}).get('publication_type','unclassified'),rule='Не выдавай пресс-релиз, обзор или журналистскую статью за первичное исследование. Не повторяй уже выбранный факт/событие/рекомендацию; можно раскрыть другой конкретный сюжет. Стиль заголовка — мягкое пожелание, не литературный запрет.')
 
     def writing_basis(self,record):
         return self.model_sources(record)
@@ -243,12 +248,13 @@ class Editor(old.Editor):
                             'Редакционная политика 4.3: нет минимума длины, глубины, разделов, примеров или пересказа всего источника. '
                             'Собственные формулировки, композиция и объяснения; не поверхностный рерайт и не скрытый перевод. '
                             'Не заимствуй авторские примеры и подборки. Не обещай 21 занятие только потому, что такое число есть в чужом заголовке. '
+                            'Заголовок — естественный, выразительный и точный, в культуре качественного журнала. Чередуй конструкции, не копируй чужой заголовок и не создавай кликбейт. Слово «Как» допустимо, но стремись к2–3 таким началам на12 материалов; стилистика не причина отказа и не требует отдельного запроса. '
                             'Заголовок должен соответствовать фактически раскрытому аспекту. Не давай рискованные советы без доказательной базы; '
                             'не придумывай цифры и даты, различай дату публикации и события, корреляцию и причинность. '
                             'Для медицинских исследований укажи дизайн и ограничения, не подменяй исследование пресс-релизом. '
                             'finished=true только для законченной заметки. URL только в служебном блоке источника, не в тексте. '
                             '\nПолные материалы: '+json.dumps(self.writing_basis(record),ensure_ascii=False)+
-                            '\nПредыдущий отказ: '+json.dumps(progress.get('feedback',{}),ensure_ascii=False),output_tokens=12000,schema='v43_article')
+                            '\nРедакторский контекст текущего номера: '+json.dumps(self.issue_context(state,record),ensure_ascii=False)+'\nПредыдущий отказ: '+json.dumps(progress.get('feedback',{}),ensure_ascii=False),output_tokens=12000,schema='v43_article')
                     except news.runtime.GenerationPaused:
                         progress['write_attempts']-=1;self.persist();raise
                     if result.get('finished') is not True:
@@ -291,7 +297,7 @@ class Editor(old.Editor):
                     'В evidence_sufficient отметь достаточность независимой базы, для советов и исследований особенно строго. '
                     'approve=true только когда все семь критериев true, issues и unresolved пусты. '
                     'Идентификатор запроса (заполняется программой, не возвращай его): '+fp+'\nПредыдущая диагностика протокола: '+json.dumps(progress.get('review_protocol_feedback',{}),ensure_ascii=False)+'\nРежим и права: '+json.dumps(record['rights'],ensure_ascii=False)+
-                    '\nКонтекст переиздания (если есть): '+json.dumps(record.get('commission',{}),ensure_ascii=False)+'\nПовышенная проверка: '+str(record['high_risk'])+'\nСтатья: '+json.dumps(article,ensure_ascii=False)+
+                    '\nДругие материалы и тип источника: '+json.dumps(self.issue_context(state,record),ensure_ascii=False)+'\nКонтекст переиздания (если есть): '+json.dumps(record.get('commission',{}),ensure_ascii=False)+'\nПовышенная проверка: '+str(record['high_risk'])+'\nСтатья: '+json.dumps(article,ensure_ascii=False)+
                     '\nПолные оригиналы и подтверждения: '+json.dumps(wire,ensure_ascii=False),output_tokens=8000,schema='v43_final')
             except news.runtime.GenerationPaused:
                 reviews[review_key]=count;self.persist();raise

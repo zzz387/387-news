@@ -230,6 +230,10 @@ def report(state,ledger,now=None):
         tomorrow_utc=datetime.combine(datetime.now(timezone.utc).date()+timedelta(days=1),datetime.min.time(),tzinfo=timezone.utc)
         retry=next_wake(tomorrow_utc.astimezone(news.TZ))
     ready_count=sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version') in (41,43) else len(state.get('articles',{}))
+    if state.get('version')==43:
+        try:from scripts import selection43
+        except ImportError:import selection43
+        ready_count=len(selection43.ready(state))
     return dict(date=state['date'],policy_version=state.get('policy_version','3.2'),
                 issue_kind=state.get('issue_kind','articles'),reserve_links=state.get('reserve_count',0),
                 publication_status=delivery_state(state,now),
