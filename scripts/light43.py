@@ -1,5 +1,6 @@
 """Optional batched light stories: at most two model calls per issue, never a gate."""
 import copy,json,re
+from collections import Counter
 from datetime import datetime,timezone
 try:from scripts import editorial43 as e,content41,news,policy41 as p,rights41,selection43
 except ImportError:import editorial43 as e,content41,news,policy41 as p,rights41,selection43
@@ -34,6 +35,7 @@ def safe_record(item,source):
 
 def prepare(state,persist=lambda:None,editor=None):
     saved=state.setdefault('light43',{'write_attempts':0,'review_attempts':0,'records':[]})
+    saved.setdefault('write_attempts',0);saved.setdefault('review_attempts',0);saved.setdefault('records',[])
     if saved.get('complete') or saved.get('review_attempts',0)>=1:return
     budget=news.runtime.ACTIVE_BUDGET
     remaining=2-saved.get('http_requests',0);needed=1 if saved.get('draft') else 2
@@ -68,18 +70,30 @@ def prepare(state,persist=lambda:None,editor=None):
             persist()
         sources=saved['sources'];dummy={'source':sources[0],'supporting_sources':sources[1:]};wire,aliases=e.review_wire(dummy)
         by_alias={alias:src for alias,(src,_) in aliases.items()};records=[]
-        for item in saved['draft'].get('items',[])[:5]:
+        items=saved['draft'].get('items',[])[:5]
+        id_counts=Counter(item.get('id') for item in items if isinstance(item,dict) and isinstance(item.get('id'),str))
+        for item in items:
             try:
+                item_id=item.get('id')
+                if not isinstance(item_id,str) or not item_id.strip() or id_counts[item_id]!=1:continue
                 row=safe_record(item,by_alias[item['source_id']])
                 if any(selection43.duplicate(row,r) for r in selection43.ready(state)+records):continue
                 records.append(row)
             except (KeyError,TypeError,ValueError):continue
         if not records:saved['complete']=True;persist();return
+        fingerprints={r['id']:e.fingerprint(r) for r in records}
         before=budget.used;saved['review_attempts']+=1;persist()
         report=editor.call('Одна независимая проверка коротких заметок политики4.3. Для каждого id оцени все семь критериев v43_final, включая факты, безопасность, права C и самостоятельность формулировок/подбора, соответствие заголовка. Никаких фиктивных фактов, насмешек над бедой, опасных советов и ложной свежести. Каждый существенный факт в claims с дословной цитатой и sN/qN; сама ссылка не подтверждает смысл. Для оперативной новости нужна подтверждённая актуальная дата события; для исторического факта не выдавай его за сегодняшнее событие. Плохие заметки отклони отдельно, не блокируй остальные.\nЗаметки: '+json.dumps([{'id':r['id'],'article':r['article']} for r in records],ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False),output_tokens=8000,schema='v43_light_review')
-        by_id={x['id']:x for x in report.get('reviews',[]) if isinstance(x,dict) and 'id' in x}
+        by_id={};ambiguous=set()
+        for result in report.get('reviews',[]):
+            if not isinstance(result,dict) or not isinstance(result.get('id'),str):continue
+            item_id=result['id']
+            if item_id in by_id:ambiguous.add(item_id)
+            by_id[item_id]=result
         for row in records:
-            verdict,errors=e.bind_review(by_id.get(row['id'],{}),row,aliases,e.fingerprint(row))
+            if row['id'] in ambiguous or e.fingerprint(row)!=fingerprints[row['id']]:continue
+            try:verdict,errors=e.bind_review(by_id.get(row['id'],{}),row,aliases,fingerprints[row['id']])
+            except (KeyError,TypeError,ValueError):continue
             if errors or not e.positive_semantics(verdict) or e.news_errors(verdict,row,state):continue
             if any(c.get('source_id')!=row['source']['id'] or not any(c.get('quote','') in b['text'] for b in row['source']['blocks']) for c in verdict.get('claims',[])):continue
             row['checks']['final43']=dict(verdict,approved=True);row['status']='ready';saved['records'].append(row)

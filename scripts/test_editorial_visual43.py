@@ -124,6 +124,19 @@ class CatalogTests(unittest.TestCase):
         report,items=cat.inspect_publisher(self.registry_row(),session,now=NOW)
         self.assertEqual(items,[]);self.assertEqual(report['last_article_code'],'PUBLISHER_ACTIVITY_NOT_CURRENT')
 
+    def test_html_discovery_prefers_story_headings_and_excludes_sections_and_issue_downloads(self):
+        links=cat.Links('https://example.org/')
+        links.feed('<a href="/category/science">Complete science coverage</a><h2><a href="/2026/10/new-study">A newly discovered publication</a></h2><a href="/2026/10/pdf465/">Download our current edition</a>')
+        items=[x for x in links.articles if cat.article_link(x)]
+        self.assertEqual([x['url'] for x in items],['https://example.org/2026/10/new-study'])
+        self.assertTrue(items[0]['heading_link'])
+
+    def test_future_publication_cannot_be_claimed_as_a_current_verified_candidate(self):
+        session=self.session();original=session.fetch
+        session.fetch=lambda url:dict(original(url),published=(NOW+timedelta(days=5)).isoformat())
+        report,items=cat.inspect_publisher(self.registry_row(),session,now=NOW)
+        self.assertEqual(items,[]);self.assertEqual(report['last_article_code'],'PUBLISHER_PUBLICATION_IN_FUTURE')
+
     def test_press_release_type_is_not_promoted_to_peer_reviewed_research(self):
         row=dict(self.registry_row(),type='press_release');_,items=cat.inspect_publisher(row,self.session())
         self.assertEqual(items[0][1]['publisher_type'],'press_release');self.assertEqual(items[0][1]['publication_type'],'unclassified')
@@ -172,6 +185,22 @@ class LightAndLayoutTests(unittest.TestCase):
         with patch.object(news.runtime,'ACTIVE_BUDGET',budget):
             light.prepare(s,editor=Editor());light.prepare(copy.deepcopy(s),editor=Editor())
         self.assertEqual(calls,['v43_light_write','v43_light_review']);self.assertEqual(len(light.ready(s)),1);self.assertEqual(budget.used,2)
+
+    def test_duplicate_light_writer_ids_are_omitted_without_a_review_request(self):
+        s=state(1);extra=named('Необычный факт о воронах',80,'discovered');extra['light_suitable']=True;s['candidates'].append(extra)
+        s['light43']={'records':[],'sources':[extra['source']],'draft':{'items':[{'id':'same','source_id':'s1','title':'Первая история','text':'Первый факт.'},{'id':'same','source_id':'s1','title':'Вторая история','text':'Другой факт.'}]}}
+        ledger={'day':datetime.now(timezone.utc).date().isoformat(),'requests':0,'models':{},'cooldowns':{}};budget=rt.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0)
+        editor=Mock(call=Mock(side_effect=AssertionError('Ambiguous IDs must never reach review')))
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s,editor=editor)
+        editor.call.assert_not_called();self.assertEqual(light.ready(s),[]);self.assertTrue(s['light43']['complete'])
+
+    def test_duplicate_review_ids_cannot_approve_a_light_item(self):
+        s=state(1);extra=named('Необычный факт о воронах',80,'discovered');extra['light_suitable']=True;s['candidates'].append(extra)
+        s['light43']={'records':[],'sources':[extra['source']],'draft':{'items':[{'id':'x','source_id':'s1','title':'Птичья история','text':'Самостоятельный факт.'}]}}
+        ledger={'day':datetime.now(timezone.utc).date().isoformat(),'requests':0,'models':{},'cooldowns':{}};budget=rt.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0)
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(e,'bind_review',side_effect=AssertionError('Duplicate verdict IDs')):
+            light.prepare(s,editor=Mock(call=Mock(return_value={'reviews':[{'id':'x'},{'id':'x'}]})))
+        self.assertEqual(light.ready(s),[]);self.assertTrue(s['light43']['complete'])
 
     def test_light_transport_retries_cannot_spend_more_than_two_real_reservations(self):
         s=state(1);extra=named('Необычный факт о природе',80,'discovered');extra['light_suitable']=True;s['candidates'].append(extra)
