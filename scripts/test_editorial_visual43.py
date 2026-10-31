@@ -34,6 +34,18 @@ class TopicTests(unittest.TestCase):
         self.assertFalse(sel.duplicate(named('Исследование сна'),named('История открытия фазы быстрого сна',1)))
         self.assertFalse(sel.duplicate(named('Недосып с последствиями: почему нам хочется есть больше'),named('История исследования сна в XIX веке',1)))
 
+    def test_literary_headline_keeps_original_story_identity_for_duplicate_detection(self):
+        a=named('Ночной счёт');a['source']['title']='Недостаток сна и лишний вес'
+        b=named('Почему недосыпание усиливает аппетит',1,'discovered')
+        self.assertTrue(sel.duplicate(a,b))
+
+    def test_quoted_new_places_and_organisations_use_soft_preferences(self):
+        self.assertEqual(sel.profile(named('Новая выставка в музее «Гараж»'))['place'],'гараж')
+        selected=named('ЦЕРН открыл выставку',0);second=named('Эксперимент ЦЕРН',1)
+        near=named('Архив ЦЕРН',2,'discovered');other=named('Биология муравьёв',3,'discovered')
+        s=state();s['candidates']=[selected,second,near,other]
+        self.assertIs(sel.order(s)[0],other);s['candidates'].remove(other);self.assertEqual(sel.order(s),[near])
+
     def test_doi_of_one_primary_study_not_all_references_identifies_a_duplicate(self):
         a=named('Поведение птиц');b=named('Новый результат наблюдений за воронами',1)
         a['source']['doi']=b['source']['doi']='10.1234/one-study'

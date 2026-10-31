@@ -35,22 +35,31 @@ def profile(row):
     doi=doi.casefold().removeprefix('https://doi.org/').rstrip('/.,')
     if not re.fullmatch(r'10\.\d{4,9}/\S+',doi):doi=''
     focus='history' if re.search(r'истор|открыти[ея].*фаз|history|discovered.*rem',norm) else 'restoration' if re.search(r'реставр|restor',norm) else 'architecture' if re.search(r'архитект|architect',norm) else 'general'
-    place=row.get('place_hint') or next((v for k,v in PLACES.items() if k in norm),'')
+    quoted=re.search(r'(?:музе[йяею]|парк[аеу]?|усадьб[аыеу])\s+[«"]([^»"]+)[»"]',norm)
+    place=row.get('place_hint') or next((v for k,v in PLACES.items() if k in norm),'') or (quoted[1].strip() if quoted else '')
+    org=row.get('organisation_hint') or next((key for pattern,key in ((r'\bnasa\b|наса','nasa'),(r'\bcern\b|церн','cern'),(r'\bunicef\b|юнисеф','unicef'),(r'\bwho\b|всемирн\w* организац\w* здравоохран','who'),(r'\bunesco\b|юнеско','unesco'),(r'\bмгу\b','msu')) if re.search(pattern,norm)), '')
     space=bool(re.search(r'космо|астроно|галактик|спутник|лун[аыуе]|марс|планет|space|astronom|galax|lunar|planet|nasa',norm)) or row.get('science_domain')=='space'
     return {'title':norm,'words':tokens(text),'doi':doi,'focus':focus,'place':place,
         'publisher':row.get('publisher_id') or source.get('publisher') or (urlparse(url).hostname or '').removeprefix('www.'),
-        'organisation':row.get('organisation_hint') or ('nasa' if 'nasa.gov' in url else ''),'space':space,'url':url}
+        'organisation':org or ('nasa' if 'nasa.gov' in url else ''),'space':space,'url':url}
 
 
 def duplicate(a,b):
     x=profile(a);y=profile(b)
     if x['url'] and x['url']==y['url']:return True
     if x['doi'] and x['doi']==y['doi']:return True
-    if x['focus']!=y['focus']:return False
-    if all(term in x['title'] and term in y['title'] for term in ('sleep_loss','metabolic')):return True
-    if x['title'] and x['title']==y['title']:return True
-    common=x['words']&y['words'];union=x['words']|y['words']
-    return len(common)>=3 and bool(union) and len(common)/len(union)>=0.76
+    # A literary headline must not erase the concrete original story identity.
+    def headings(row):
+        return set(filter(None,(title(row),row.get('title'),row.get('source',{}).get('title'),row.get('topic_key'))))
+    for first in headings(a):
+        for second in headings(b):
+            x=profile({'title':first});y=profile({'title':second})
+            if x['focus']!=y['focus']:continue
+            if all(term in x['title'] and term in y['title'] for term in ('sleep_loss','metabolic')):return True
+            if x['title']==y['title']:return True
+            common=x['words']&y['words'];union=x['words']|y['words']
+            if len(common)>=3 and union and len(common)/len(union)>=0.76:return True
+    return False
 
 
 def usefulness(row):
