@@ -82,7 +82,7 @@ def feed_items(raw,base):
 
 def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
     now=now or datetime.now(p.TZ)
-    report={'publisher':row['id'],'name':row['name'],'homepage':row['homepage'],'status':'unavailable','discovered':0,'eligible':0};sources=[];items=[];feeds=list(row['discovery']['feeds'])
+    report={'publisher':row['id'],'name':row['name'],'homepage':row['homepage'],'status':'unavailable','discovered':0,'eligible':0,'article_checks':0};sources=[];items=[];feeds=list(row['discovery']['feeds'])
     try:
         raw=permitted_get(row['homepage'],session);links=Links(getattr(raw,'resolved_url',row['homepage']));links.feed(raw)
         feeds=list(dict.fromkeys(links.feeds+feeds))
@@ -99,6 +99,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
         report.update(status='discovery_verified',discovered=len(items))
         for item in items[:article_limit]:
             try:
+                report['article_checks']+=1
                 report['last_checked_url']=item['url']
                 src=session.fetch(item['url'])
                 if not owned(src.get('canonical',src['url']),row):raise p.Blocked('PUBLISHER_REDIRECT_UNVERIFIED')
@@ -142,7 +143,7 @@ def refresh(state,now=None,session=None):
     for row in selected:
         if time.monotonic()>=deadline:break
         remaining=config['article_checks_per_run']-checks
-        report,found=inspect_publisher(row,session,article_limit=min(2,max(0,remaining)),exclude=known|published_urls,now=now);checks+=min(2,max(0,remaining))
+        report,found=inspect_publisher(row,session,article_limit=min(2,max(0,remaining)),exclude=known|published_urls,now=now);checks+=report['article_checks']
         cache['publishers'][row['id']]=dict(report,checked_at=now.isoformat())
         for item,src in found:
             if src['url'] in known:continue
