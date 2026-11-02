@@ -1,0 +1,37 @@
+{
+  "date": "2026-11-02",
+  "number": 9,
+  "policy_version": "4.3",
+  "article_count": 5,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "bacb3bb8575eda3689d51dec64c3da32aefc1b8d6288ad425648f053ddbc0e4d",
+      "markdown": "7cf9779e6c622a32a9b3c6409f8879aae41be926a099ba647b3ff79b32cd7269"
+    },
+    "feature-02": {
+      "html": "2cc761d3a39686c97a07d822cc6f7082ed5e79481e6a6f5403881394555f3d40",
+      "markdown": "f390b07ee48cfaf60dde8e129bba170ea7c1d50550b8e5fe5af73971df22d146"
+    },
+    "feature-03": {
+      "html": "a4c278a1270a85dea316eb36c8a139597ff4968cbd9590c47192aea4349ac99e",
+      "markdown": "f7cfd3b40b5e3ee15ebb50b5ef8191fcd6d89e48e2afac36ec7274456e6c1ba5"
+    },
+    "feature-04": {
+      "html": "06b665bf43bc335e733af71b198cf685e16cd35ec000a2c58673bead18ccb287",
+      "markdown": "e26ad0c39f8a094b865d1e494179b795b9554d62726118f4f342a2fecf6a34c3"
+    },
+    "feature-05": {
+      "html": "fddfc6a8ad967cb13953af601b952ccaaa7625b2377f43c5a61d9ad1142b7f1e",
+      "markdown": "f21dc81523f3fd6d23d538b9823667614764425dcf708ac593a15913b50e4fc7"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-02T08:58:34.280661+03:00",
+  "release_not_before": "2026-11-02T06:00:00+03:00",
+  "light_news": [],
+  "light_count": 0,
+  "homepage_hash": "587c1b408054dfb392a5a9300df1a8aa7e34423235fd9ba463c520607461a586",
+  "overview_hash": "7e2a437d20a6f289155fd2f5445051afde9a204cecdfeb37dc92a3219a75886d",
+  "markdown_hash": "5a644115d3b39536517b479573863af9b2a029d19b1c249107911e880e939540"
+}
