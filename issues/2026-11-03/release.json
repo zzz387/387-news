@@ -1,0 +1,33 @@
+{
+  "date": "2026-11-03",
+  "number": 10,
+  "policy_version": "4.3",
+  "article_count": 4,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "ab505ea996d95d711b4e36de66c44ca277b282ac32707b6c2a32fc38772ab34c",
+      "markdown": "c39bf92cb3e220538d62dba0de919786cedcb65d331c0b5b54e7bbc03159588f"
+    },
+    "feature-02": {
+      "html": "e526b12c56b41d081915c734c6b7d29ec75ee9683166788ed804d06972b060e6",
+      "markdown": "a882d9cb837ea8eebadcb8165db683ef9acde17a76a18661736f15b521919f78"
+    },
+    "feature-03": {
+      "html": "eb5df2e97ce1ccef36a4faf1548b7ed766199e079cdca698fdb765153794f1cd",
+      "markdown": "b71c4f2053c8b2419df429cd3449bdd43123ad6a903c7bd8e55905824f792817"
+    },
+    "feature-04": {
+      "html": "959dd21977c9d6bb9fc174242425aa147113f2b5c61860026ba56bfca3f45e5a",
+      "markdown": "3cfc8e633af8eb33bbfe7cdcad359f01c62ecba716b1ad949415a976257e71a0"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-03T05:53:35.836279+03:00",
+  "release_not_before": "2026-11-03T06:00:00+03:00",
+  "light_news": [],
+  "light_count": 0,
+  "homepage_hash": "eb8ec126c704803221eaab764a9aca890aa218dad0da15a72d79484331c28423",
+  "overview_hash": "ade6243ef9c48ec1057d4442a82c2b6f6e264fe15cbe56a920f2beeb7e6ac522",
+  "markdown_hash": "bf1c3161da04ba134cb416322fe8698c387b7a28d9c5a1451de9fe6322fe76a6"
+}
