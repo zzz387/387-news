@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "priority_target": 9,
+  "history_days": 14,
+  "compensation_days": 7,
+  "directions": [
+    {
+      "id": 1,
+      "name": "Воспитание и развитие детей",
+      "group": "A",
+      "category": "Семья",
+      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|обучен|образован|parent|child|toddler|education|learning"
+    },
+    {
+      "id": 2,
+      "name": "Семейные занятия и совместный досуг",
+      "group": "A",
+      "category": "Семья",
+      "pattern": "семейн.{0,20}(досуг|игр|традиц|занят|прогул)|игр.{0,15}деть|family (?:fun|activit|tradition|travel)|play (?:with|and)|weekend with"
+    },
+    {
+      "id": 3,
+      "name": "Супружеские отношения",
+      "group": "A",
+      "category": "Семья",
+      "pattern": "супруж|брак|отношени.{0,15}(партн|супруг)|marriage|couple|relationship|spouse"
+    },
+    {
+      "id": 6,
+      "name": "Московские усадьбы и дворцы",
+      "group": "B",
+      "category": "Москва и путешествия",
+      "pattern": "(?:усадьб|дворц|estate|palace).{0,50}(?:моск|подмос|цариц|кусков|коломен|moscow)|царицын|кусков|архангельск.{0,12}усад|moscow estate|моск.{0,20}усад"
+    },
+    {
+      "id": 7,
+      "name": "Необычные места Москвы и Подмосковья",
+      "group": "B",
+      "category": "Москва и путешествия",
+      "pattern": "необычн.{0,20}(моск|подмос)|моск.{0,20}(мест|маршрут|прогул)|moscow.{0,25}(hidden|walk|place)|подмосков"
+    },
+    {
+      "id": 8,
+      "name": "Путешествия выходного дня",
+      "group": "B",
+      "category": "Москва и путешествия",
+      "pattern": "выходн.{0,20}(поезд|путеше|маршрут)|поездк.{0,15}выходн|путешеств|weekend (?:trip|travel|getaway)|family travel|day trip|travel route"
+    },
+    {
+      "id": 9,
+      "name": "История Москвы",
+      "group": "B",
+      "category": "Москва и путешествия",
+      "pattern": "истори.{0,30}моск|моск.{0,30}(истори|улиц|район|здани)|moscow.{0,30}(history|street|heritage)|history of moscow"
+    },
+    {
+      "id": 10,
+      "name": "Музеи и выставки",
+      "group": "B",
+      "category": "История и культура",
+      "pattern": "музе|выставк|коллекци.{0,20}(картин|искусств)|museum|exhibition|gallery|curator"
+    },
+    {
+      "id": 11,
+      "name": "Архитектура и дизайн интерьеров",
+      "group": "B",
+      "category": "История и культура",
+      "pattern": "архитект|интерьер|architect|interior|historic building|building design"
+    },
+    {
+      "id": 12,
+      "name": "Питание и долголетие",
+      "group": "C",
+      "category": "Здоровье и движение",
+      "pattern": "питан|долголет|здоров.{0,15}привыч|nutrition|longevity|diet|healthy eating"
+    },
+    {
+      "id": 13,
+      "name": "Кардиотренировки и физиология",
+      "group": "C",
+      "category": "Здоровье и движение",
+      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|training|running"
+    },
+    {
+      "id": 14,
+      "name": "Велосипедные путешествия и маршруты",
+      "group": "C",
+      "category": "Здоровье и движение",
+      "pattern": "велосип|веломаршрут|велоспорт|cycl(?:ing|ist)|bicycl|bike route"
+    },
+    {
+      "id": 15,
+      "name": "Йога, подвижность и восстановление",
+      "group": "C",
+      "category": "Здоровье и движение",
+      "pattern": "йог|подвижност|мобильност|гибкост|восстановлен.{0,15}(нагруз|трениров)|yoga|mobility|stretching|recovery after"
+    },
+    {
+      "id": 16,
+      "name": "Современная медицина",
+      "group": "C",
+      "category": "Здоровье и движение",
+      "pattern": "медицин|лечени|клиническ|терапи|профилактик|clinical|treatment|patient|medicine|medical|therapy"
+    },
+    {
+      "id": 17,
+      "name": "Исторические загадки и открытия",
+      "group": "D",
+      "category": "История и культура",
+      "pattern": "историческ|археолог|древн|раскоп|historical|archaeolog|ancient|excavat|historical mystery"
+    },
+    {
+      "id": 18,
+      "name": "Выдающиеся люди и необычные судьбы",
+      "group": "D",
+      "category": "История и культура",
+      "pattern": "биограф|судьб|жизн.{0,20}(уч[её]н|архитектор|художник|мыслител)|biograph|life of|pioneer|portrait of"
+    },
+    {
+      "id": 21,
+      "name": "Христианская история и философия",
+      "group": "D",
+      "category": "История и культура",
+      "pattern": "христиан|монастыр|богослов|раннехристиан|церкв.{0,15}(истори|архитект)|christian|monastery|theolog|church history|christian philosoph"
+    },
+    {
+      "id": 22,
+      "name": "Открытия и загадки природы",
+      "group": "D",
+      "category": "Наука",
+      "pattern": "животн|растени|природ|эколог|птиц|ворон|дерев|лес|animal|wildlife|ecolog|bird|plant|forest|nature conserv"
+    },
+    {
+      "id": 23,
+      "name": "Экономика, предпринимательство и право",
+      "group": "E",
+      "category": "Экономика и бизнес",
+      "pattern": "экономик|предприним|банкрот|долг(?:и|ов|а)|бизнес|законодател|судебн|econom|entrepreneur|business|bankrupt|debt|insolvenc"
+    },
+    {
+      "id": 24,
+      "name": "Инженерия, производство и технологии",
+      "group": "E",
+      "category": "Технологии",
+      "pattern": "инженер|производств|промышлен|материаловед|робот|3d.{0,12}(print|печать)|engineering|manufactur|industr|material science|robot|3d.print|large.format.print"
+    }
+  ]
+}
