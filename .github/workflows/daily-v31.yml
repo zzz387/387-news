@@ -616,6 +616,19 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PIPELINE_STATUS: ${{ needs.prepare.outputs.pipeline_status }}
         run: python scripts/release_monitor.py
+      - name: Save advisory composition of the HTTPS-verified published edition
+        id: composition
+        if: ${{ steps.verify.outputs.verified == 'true' }}
+        continue-on-error: true
+        run: python -m scripts.priorities43 --published-report --output '${{ runner.temp }}/editorial-composition43.json'
+      - uses: actions/upload-artifact@v4
+        if: ${{ steps.composition.outcome == 'success' }}
+        continue-on-error: true
+        with:
+          name: editorial-composition-${{ github.run_id }}
+          path: ${{ runner.temp }}/editorial-composition43.json
+          retention-days: 30
+          if-no-files-found: warn
 
   special-003-r:
     needs: [prepare, deploy, monitor]

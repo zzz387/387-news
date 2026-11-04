@@ -47,7 +47,11 @@ A catalogue quality score is an editorial preference, never a factual approval.
 priority counts/directions/groups,7-day absences, publishers, source languages and
 science/category shares. Published count remains unknown until HTTPS delivery is
 confirmed. This advisory report is never added to the public website/release JSON,
-and failures to prepare it cannot veto publication.
+and failures to prepare it cannot veto publication. After HTTPS verification, the
+existing monitor additionally builds an aggregate from already-public final pages
+and retains it as a30-day Actions artifact. It reads no encrypted draft, calls no
+Gemini, exports no article text, and is nonblocking. This supplies the actual
+published composition even when the next producer has already moved to tomorrow.
 
 12 remains a target; partial issues and the no-Gemini source digest,06:00 Moscow,
 watchdog, translations,24/run and220/day, cooldown and Secrets are unchanged.

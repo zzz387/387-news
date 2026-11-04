@@ -101,6 +101,9 @@ class InterestsTests(unittest.TestCase):
             target=root(directory);publication43.build(s,target)
             self.assertEqual(publication43.validate(target,s['date'])['article_count'],1)
             self.assertNotIn('missing_week',(target/'index.html').read_text());self.assertNotIn('editorial_report43',json.dumps(publication43.metadata(target,s['date'])))
+            published=interests.published_report(target,lambda:{'https':'verified','policy_version':'4.3','issue_date':s['date'],'articles':1})
+            self.assertEqual(published['stage'],'published_verified');self.assertEqual(published['published_main_articles'],1)
+            self.assertEqual(published['languages']['russian'],1)
 
     def test_report_does_not_call_prepared_stories_published_weekly_coverage(self):
         s=state();r=named('Воспитание ребёнка');report=interests.report(s,[r],[])

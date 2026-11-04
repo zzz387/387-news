@@ -139,3 +139,39 @@ def cited_verification_urls(row):
             urls.append(url)
             if len(urls)>=2:return urls
     return urls
+
+
+def published_report(root=None,check_public=None):
+    """Aggregate already PUBLIC, HTTPS-verified final pages; never decrypt a draft."""
+    from pathlib import Path
+    from scripts import selection43,site_checks,publication43,source_dom41
+    root=Path(root or p.ROOT);live=(check_public or site_checks.check_site)()
+    if live.get('https')!='verified' or live.get('policy_version')!='4.3':raise ValueError('PUBLIC_COMPOSITION_NOT_VERIFIED')
+    date=live['issue_date'];metadata=publication43.validate(root,date)
+    if metadata['article_count']!=live['articles']:raise ValueError('PUBLIC_COMPOSITION_COUNT_MISMATCH')
+    rows=[]
+    for path in sorted((root/'issues'/date/'articles').glob('*/index.html')):
+        doc=source_dom41.Document();doc.feed(path.read_text());nodes=list(doc.root.all())
+        headline=next(n.text() for n in nodes if n.tag=='h1')
+        summary=next((n.text()[:1500] for n in nodes if 'article-body' in n.attrs.get('class','').split()),'')
+        marker=next((n for n in nodes if n.attrs.get('data-source-links-version')=='1'),None)
+        link=next((n for n in nodes if 'source-original' in n.attrs.get('class','').split()),None)
+        meta=next((n.text() for n in nodes if n.attrs.get('class')=='meta'),'Наука')
+        if marker is None or link is None:raise ValueError('PUBLIC_SOURCE_METADATA_REQUIRED')
+        publisher=marker.text().split('Источник:',1)[-1].split(' — ',1)[0].strip()
+        language=marker.attrs.get('data-source-language')
+        rows.append({'title':headline,'summary':summary,'category_hint':meta.split(' · ',1)[0],
+                     'source':{'url':link.attrs['href'],'publisher':publisher,'language':None if language=='und' else language}})
+    if len(rows)!=live['articles']:raise ValueError('PUBLIC_COMPOSITION_COUNT_MISMATCH')
+    result=report({'date':date},rows,selection43.recent(root,date))
+    result.update(stage='published_verified',published_main_articles=len(rows),https_verified=True,
+                  verified_at=datetime.now(p.TZ).isoformat(),missing_week=result['missing_after_prepared'])
+    return result
+
+
+if __name__=='__main__':
+    import argparse
+    from pathlib import Path
+    parser=argparse.ArgumentParser();parser.add_argument('--published-report',action='store_true',required=True);parser.add_argument('--output',required=True);args=parser.parse_args()
+    result=published_report();Path(args.output).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    print('[editorial-composition43] '+json.dumps({'date':result['date'],'published_main_articles':result['published_main_articles'],'https_verified':True,'advisory_only':True}))
