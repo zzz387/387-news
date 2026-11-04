@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-04",
+  "number": 11,
+  "policy_version": "4.3",
+  "article_count": 9,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "b08321c6953287b178c03fc5401c0b5f7ba6c18c7bc7630120633ba19c37e3cd",
+      "markdown": "3cf495faa8a5a48f10cd2cf2744edcafbcf34ce4d3f60b6540e1d88c6d832e6b"
+    },
+    "feature-02": {
+      "html": "82cb0bbab2d8a36b69199df8da159e83674cfb0ec34bc0d597db689da7ca9225",
+      "markdown": "9599e410c67305fa457691fa2d07d57cef4825672324378c499fcf7cd83e00ce"
+    },
+    "feature-03": {
+      "html": "0de71d96aba9903ecd498ffe8a9b3e04203db54fd6cb0cc29e682864e9bc5fc4",
+      "markdown": "0eaf03ad8b50ed9a33198da84ea8f1ef548daa5a4ab1cc405c37c6713046fbfd"
+    },
+    "feature-04": {
+      "html": "988090adb44d3b123ee0a277268404f6157bf8132c62fb662d03ec0aa9d5a7bb",
+      "markdown": "678a5f790177d7761792daef868040786ed62333daeb27f45fdc58dbe6dc9591"
+    },
+    "feature-05": {
+      "html": "d50c9222e099a36152619e1da7124afdcf2c5a680bfa66d8d1c4cfda0b713d4c",
+      "markdown": "9c891ffda20c6fdf8fcfd913b83d8fe1014ff90364421327acea7d93a5412248"
+    },
+    "feature-06": {
+      "html": "9f55ad3114f559fa7ed97abdecb743183b4c3e192a7c70534573ac2bc48bbe16",
+      "markdown": "b39a4438fffaf0aa5c7c45b89ff4d093e3915cccd31e092f970514ea737c9041"
+    },
+    "feature-07": {
+      "html": "e7b424db1d512b3ba2cb730e0bb61e6559278ffb077f868ab15f0fd63b3df847",
+      "markdown": "0b79452f22237f00bd7d684f90fb8bae43885f86d387de47c1677ebaff03dbbf"
+    },
+    "feature-08": {
+      "html": "2774c2ef1cebda2df8a835e060228e5b6adc3383817b89f2841d7bc309f74059",
+      "markdown": "bb380248a0824f39f82e18c6efe2a09dfa3c459f1a43157054a203ebb5e75873"
+    },
+    "feature-09": {
+      "html": "b2ed20c3ad139c7e2dd7b472ac65f740edf556c41463028be54dbb263aae2965",
+      "markdown": "3c8b970dd439fc37dea7a4fc220589bff22699ee2f7ca68d2730e8061999b566"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-04T06:00:26.515644+03:00",
+  "release_not_before": "2026-11-04T06:00:00+03:00",
+  "light_news": [],
+  "light_count": 0,
+  "homepage_hash": "6c811dd0b5f7e147192f35b92a8f3d34a94b3b50cab69c1d189e0a69bc434a7f",
+  "overview_hash": "aea5a9056a616b05565d5f7fd34f0d96ba4457158c40f4265bf3c5627eff882d",
+  "markdown_hash": "201f4dec38925fc63507215661923f8df12636e194898ed6db505b2f1d933f2f"
+}
