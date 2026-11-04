@@ -46,6 +46,14 @@ class InterestsTests(unittest.TestCase):
         for r in rows:
             if r['enabled']:self.assertEqual(r['availability']['status'],'verified')
 
+    def test_activation_uses_live_discovery_proof_not_publisher_reputation(self):
+        config=catalog.registry();row=fixtures.CatalogTests().registry_row();config['publishers']=[row]
+        bad={'checked_at':NOW.isoformat(),'publishers':[{'publisher':row['id'],'status':'unavailable','discovered':0,'code':403}]}
+        self.assertFalse(catalog.apply_verification(config,bad)['publishers'][0]['enabled'])
+        good={'checked_at':NOW.isoformat(),'publishers':[{'publisher':row['id'],'status':'discovery_verified','discovered':3,'eligible':0}]}
+        activated=catalog.apply_verification(config,good)['publishers'][0]
+        self.assertTrue(activated['enabled']);self.assertEqual(activated['availability']['scope'],'public_discovery_only');self.assertEqual(activated['availability']['full_originals_verified'],0)
+
     def test_unverified_publisher_is_not_activated_by_convenient_rss(self):
         config=catalog.registry();row=fixtures.CatalogTests().registry_row();row['availability']={'status':'unverified'};config['publishers']=[row]
         with patch.object(catalog,'registry',return_value=config),patch.object(catalog,'inspect_publisher',side_effect=AssertionError('Unverified publisher')):
@@ -65,6 +73,15 @@ class InterestsTests(unittest.TestCase):
         s=state();s['candidates']=[named('Семейный досуг',1,'discovered'),named('Квантовая фаза',2,'preparing')]
         self.assertEqual(selection.order(s)[0]['status'],'preparing')
 
+    def test_cited_evidence_uses_existing_trusted_links_and_never_guesses_urls(self):
+        row=named('Воспитание без спешки');row['source']['blocks'][0]['links']=['https://www.unicef.org/parenting/real-reference','https://untrusted.example/claim']
+        self.assertEqual(interests.cited_verification_urls(row),['https://www.unicef.org/parenting/real-reference'])
+        row['source']['blocks'][0]['links']=[];self.assertEqual(interests.cited_verification_urls(row),[])
+
+    def test_actual_cosmic_word_and_supernova_are_detected(self):
+        self.assertTrue(selection.profile({'title':'Космический сюжет'})['space'])
+        self.assertTrue(selection.profile({'title':'Сверхновая в соседней галактике'})['space'])
+
     def test_private_composition_report_is_advisory_and_not_exported(self):
         s=state(1);s['editorial_report43']=interests.report(s,s['candidates'],[])
         self.assertTrue(s['editorial_report43']['advisory_only']);self.assertIsNone(s['editorial_report43']['published_main_articles'])
@@ -72,6 +89,15 @@ class InterestsTests(unittest.TestCase):
             target=root(directory);publication43.build(s,target)
             self.assertEqual(publication43.validate(target,s['date'])['article_count'],1)
             self.assertNotIn('missing_week',(target/'index.html').read_text());self.assertNotIn('editorial_report43',json.dumps(publication43.metadata(target,s['date'])))
+
+    def test_report_does_not_call_prepared_stories_published_weekly_coverage(self):
+        s=state();r=named('Воспитание ребёнка');report=interests.report(s,[r],[])
+        self.assertIn(1,report['missing_week']);self.assertNotIn(1,report['missing_after_prepared'])
+
+    def test_cycling_20_to_60_km_is_a_preference_not_a_distance_requirement(self):
+        short=named('Велосипедный маршрут 40 км');long=named('Велосипедный маршрут 150 км',2)
+        self.assertGreater(interests.evaluate(short)['usefulness'],interests.evaluate(long)['usefulness'])
+        s=state();long['status']='discovered';s['candidates']=[long];self.assertEqual(len(selection.order(s)),1)
 
     def test_no_topic_minimum_blocks_zero_one_or_twelve_articles(self):
         for count in [0,1,12]:

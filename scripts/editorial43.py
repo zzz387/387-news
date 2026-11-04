@@ -224,6 +224,8 @@ class Editor(old.Editor):
         sensitive=high_risk(record)
         record['high_risk']=sensitive
         if sensitive:
+            from scripts import priorities43
+            if not record.get('verification_urls'):record['verification_urls']=priorities43.cited_verification_urls(record)
             extra=record.setdefault('supporting_sources',[]);known={s['url'] for s in extra}
             for url in record.get('verification_urls',[]):
                 if url!=source['url'] and url not in known:

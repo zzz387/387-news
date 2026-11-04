@@ -38,7 +38,7 @@ def profile(row):
     quoted=re.search(r'(?:музе[йяею]|парк[аеу]?|усадьб[аыеу])\s+[«"]([^»"]+)[»"]',norm)
     place=row.get('place_hint') or next((v for k,v in PLACES.items() if k in norm),'') or (quoted[1].strip() if quoted else '')
     org=row.get('organisation_hint') or next((key for pattern,key in ((r'\bnasa\b|наса','nasa'),(r'\bcern\b|церн','cern'),(r'\bunicef\b|юнисеф','unicef'),(r'\bwho\b|всемирн\w* организац\w* здравоохран','who'),(r'\bunesco\b|юнеско','unesco'),(r'\bмгу\b','msu')) if re.search(pattern,norm)), '')
-    space=bool(re.search(r'космо|астроно|галактик|спутник|лун[аыуе]|марс|планет|space|astronom|galax|lunar|planet|nasa',norm)) or row.get('science_domain')=='space'
+    space=bool(re.search(r'косм|сверхнов|supernova|astrophys|астроно|галактик|спутник|лун[аыуе]|марс|планет|space|astronom|galax|lunar|planet|nasa',norm)) or row.get('science_domain')=='space'
     return {'title':norm,'words':tokens(text),'doi':doi,'focus':focus,'place':place,
         'publisher':row.get('publisher_group') or row.get('publisher_id') or source.get('publisher') or (urlparse(url).hostname or '').removeprefix('www.'),
         'organisation':org or ('nasa' if 'nasa.gov' in url else ''),'space':space,'url':url}
@@ -107,7 +107,7 @@ def order(state,history=()):
     while pending:
         def score(r):
             p=profile(r);cat=r.get('category_hint') or r.get('category','')
-            return (int(r.get('status')=='discovered'),*priorities43.preference(r,history,state.get('date'),planned),int(any(duplicate(r,h) for h in history))*3+
+            return (int(r.get('status')=='discovered'),int(p['space'] and space>=1),*priorities43.preference(r,history,state.get('date'),planned),int(any(duplicate(r,h) for h in history))*3+
                 int(p['space'] and space>=1)*5+int(bool(p['place']) and places[p['place']]>=1)*3+
                 int(publishers[p['publisher']]>=2)*2+int(bool(p['organisation']) and orgs[p['organisation']]>=2)*2+category[cat])
         row=min(pending,key=score);pending.remove(row);result.append(row);planned.append(row);p=profile(row)

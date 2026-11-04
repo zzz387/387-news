@@ -18,9 +18,11 @@
         "materials"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -45,8 +47,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -63,9 +68,11 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.nature.com/nature.rss"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -90,8 +97,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -108,9 +118,11 @@
         "ecology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.pnas.org/action/showFeed?type=etoc&feed=rss&jc=pnas"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -135,8 +147,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -152,9 +167,11 @@
         "neuroscience"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.cell.com/cell/current.rss"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -176,8 +193,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -194,12 +214,14 @@
         "ecology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://journals.plos.org/plosone/feed/atom"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -221,8 +243,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -238,12 +263,14 @@
         "neuroscience"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://elifesciences.org/rss/recent.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -262,8 +289,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -280,9 +310,11 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.nature.com/ncomms.rss"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -307,8 +339,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -325,9 +360,11 @@
         "engineering"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.nature.com/srep.rss"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -352,8 +389,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -370,12 +410,14 @@
         "history"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.scientificamerican.com/platform/syndication/rss/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -394,8 +436,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -417,7 +462,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -439,8 +484,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -457,12 +505,14 @@
         "archaeology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.sciencenews.org/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -484,8 +534,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -502,9 +555,11 @@
         "biology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.quantamagazine.org/feed/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -526,8 +581,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -571,8 +629,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -589,12 +650,14 @@
         "biology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://nautil.us/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -613,8 +676,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -630,12 +696,14 @@
         "Христианская история и философия"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://aeon.co/feed.rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -659,8 +727,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -704,8 +775,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -745,8 +819,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -763,12 +840,14 @@
         "materials"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://physicsworld.com/feed/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -790,8 +869,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -811,7 +893,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -834,8 +916,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -850,12 +935,14 @@
         "Инженерия, производство и технологии"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://spectrum.ieee.org/feeds/feed.rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -878,8 +965,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -905,7 +995,7 @@
           "https://www.bbc.com/travel"
         ]
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -931,8 +1021,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -955,7 +1048,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -981,8 +1074,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -999,9 +1095,11 @@
         "medicine"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://undark.org/feed/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -1026,8 +1124,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -1044,12 +1145,14 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://arstechnica.com/science/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1071,8 +1174,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -1094,7 +1200,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1119,8 +1225,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -1137,9 +1246,11 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://cosmosmagazine.com/feed/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -1164,8 +1275,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -1182,12 +1296,14 @@
         "geology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://eos.org/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1209,8 +1325,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -1227,9 +1346,11 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://phys.org/rss-feed/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -1254,8 +1375,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -1272,12 +1396,14 @@
         "ecology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.sciencedaily.com/rss/all.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1299,8 +1425,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -1322,7 +1451,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1344,8 +1473,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -1362,9 +1494,11 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://nplus1.ru/rss"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -1386,8 +1520,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -1409,7 +1546,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1428,8 +1565,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -1451,7 +1591,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1470,8 +1610,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -1488,12 +1631,14 @@
         "history"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.nkj.ru/rss/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1515,8 +1660,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -1533,12 +1681,14 @@
         "biology"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.trv-science.ru/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1557,8 +1707,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -1599,8 +1752,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -1617,9 +1773,11 @@
         "engineering"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://naked-science.ru/feed"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
       "enabled": false,
@@ -1644,8 +1802,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
       }
     },
     {
@@ -1689,8 +1850,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -1734,8 +1898,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
       }
     },
     {
@@ -1756,7 +1923,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1775,8 +1942,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -1793,12 +1963,14 @@
         "evolution"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://antropogenez.ru/rss/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1817,8 +1989,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -1840,7 +2015,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1862,8 +2037,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -1885,7 +2063,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1904,8 +2082,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -1945,8 +2126,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -1962,12 +2146,14 @@
         "education"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://kvantik.com/index.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1986,8 +2172,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -2031,8 +2220,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -2073,8 +2265,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -2118,8 +2313,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -2140,7 +2338,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2159,8 +2357,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -2203,8 +2404,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
       }
     },
     {
@@ -2222,12 +2426,14 @@
         "Открытия и загадки природы"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.smithsonianmag.com/rss/latest_articles/"
+        ],
         "html": true,
-        "feed_urls_are_hints": false,
+        "feed_urls_are_hints": true,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2253,8 +2459,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -2272,7 +2481,9 @@
         "Открытия и загадки природы"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.theguardian.com/science/rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true,
@@ -2280,7 +2491,7 @@
           "https://www.theguardian.com/science"
         ]
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2306,8 +2517,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -2351,8 +2565,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -2395,8 +2612,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -2417,7 +2637,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2439,8 +2659,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -2487,8 +2710,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -2504,12 +2730,14 @@
         "Семейные занятия и совместный досуг"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.scholastic.com/parents/home.rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2533,8 +2761,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_URL_UNSAFE"
       }
     },
     {
@@ -2551,12 +2782,14 @@
         "Супружеские отношения"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://greatergood.berkeley.edu/site/rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2581,8 +2814,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -2598,12 +2834,14 @@
         "Супружеские отношения"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.psychologytoday.com/us/front/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2627,8 +2865,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -2675,8 +2916,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -2692,12 +2936,14 @@
         "Семейные занятия и совместный досуг"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://mel.fm/rss/default-news"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2721,8 +2967,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
       }
     },
     {
@@ -2745,7 +2994,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2771,8 +3020,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -2789,12 +3041,14 @@
         "Христианская история и философия"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.pravmir.ru/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2819,8 +3073,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -2871,8 +3128,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
       }
     },
     {
@@ -2887,12 +3147,14 @@
         "Путешествия выходного дня"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.cntraveller.com/feed/rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2915,8 +3177,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -2936,7 +3201,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -2959,8 +3224,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -2979,12 +3247,14 @@
         "Музеи и выставки"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://moskvichmag.ru/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3011,8 +3281,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -3030,12 +3303,14 @@
         "Музеи и выставки"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.timeout.ru/comments/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3061,8 +3336,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -3115,8 +3393,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -3135,12 +3416,14 @@
         "Христианская история и философия"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://arzamas.academy/feed_v1.rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3167,8 +3450,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
       }
     },
     {
@@ -3215,8 +3501,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -3233,12 +3522,14 @@
         "Христианская история и философия"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.historyextra.com/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3263,8 +3554,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -3279,12 +3573,14 @@
         "Исторические загадки и открытия"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://archaeology.org/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3307,8 +3603,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -3330,7 +3629,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3355,8 +3654,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -3378,7 +3680,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3403,8 +3705,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_EMPTY"
       }
     },
     {
@@ -3426,7 +3731,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3451,8 +3756,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -3474,7 +3782,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3499,8 +3807,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -3547,8 +3858,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       },
       "archive_url": "https://iskusstvo-info.ru/"
     },
@@ -3572,7 +3886,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3598,8 +3912,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       },
       "archive_url": "https://mosjour.ru/arhiv-nomerov"
     },
@@ -3625,7 +3942,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3653,8 +3970,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       },
       "archive_url": "https://nn.media/"
     },
@@ -3676,7 +3996,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3700,8 +4020,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       },
       "archive_url": "https://tretyakovgallerymagazine.ru/magazine/archive"
     },
@@ -3718,12 +4041,14 @@
         "Выдающиеся люди и необычные судьбы"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.architectural-review.com/feed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3747,8 +4072,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -3763,12 +4091,14 @@
         "Архитектура и дизайн интерьеров"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.architecturaldigest.com/feed/rss"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3791,8 +4121,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -3812,7 +4145,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3835,8 +4168,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -3879,8 +4215,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -3925,8 +4264,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -3941,12 +4283,14 @@
         "Архитектура и дизайн интерьеров"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.wallpaper.com/feeds.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -3969,8 +4313,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -3990,7 +4337,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4013,8 +4360,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -4057,8 +4407,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -4080,7 +4433,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4105,8 +4458,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
       }
     },
     {
@@ -4121,12 +4477,14 @@
         "Архитектура и дизайн интерьеров"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://design-mate.ru/zen"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4149,8 +4507,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -4172,7 +4533,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4197,8 +4558,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -4247,8 +4611,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     },
     {
@@ -4295,8 +4662,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -4339,8 +4709,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -4360,7 +4733,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4383,8 +4756,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -4399,12 +4775,14 @@
         "Велосипедные путешествия и маршруты"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.bicycling.com/rss/default.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4427,8 +4805,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "TimeoutError"
       }
     },
     {
@@ -4450,7 +4831,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4475,8 +4856,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -4496,7 +4880,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4519,8 +4903,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -4535,12 +4922,14 @@
         "Велосипедные путешествия и маршруты"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.cyclingweekly.com/feeds.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4563,8 +4952,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -4581,12 +4973,14 @@
         "Йога, подвижность и восстановление"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://marathonec.ru/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4611,8 +5005,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -4629,12 +5026,14 @@
         "Современная медицина"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://cuprum.media/rss/all"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4659,8 +5058,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -4680,7 +5082,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4703,8 +5105,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -4724,7 +5129,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4747,8 +5152,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -4768,7 +5176,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4791,8 +5199,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -4808,12 +5219,14 @@
         "Христианская история и философия"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.christianitytoday.com/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4837,8 +5250,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -4858,7 +5274,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4881,8 +5297,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -4903,7 +5322,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4927,8 +5346,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -4948,7 +5370,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -4971,8 +5393,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -4993,7 +5418,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5017,8 +5442,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -5039,7 +5467,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5063,8 +5491,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -5107,8 +5538,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -5151,8 +5585,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -5172,7 +5609,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5195,8 +5632,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -5239,8 +5679,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       }
     },
     {
@@ -5283,8 +5726,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -5327,8 +5773,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 401
       }
     },
     {
@@ -5343,12 +5792,14 @@
         "Экономика, предпринимательство и право"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://vedomosti.ru/rss/articles"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5371,8 +5822,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -5393,7 +5847,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5417,8 +5871,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -5437,12 +5894,14 @@
         "Экономика, предпринимательство и право"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://t-j.ru/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5469,8 +5928,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "TimeoutError"
       }
     },
     {
@@ -5490,7 +5952,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5513,8 +5975,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
       }
     },
     {
@@ -5534,7 +5999,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5557,8 +6022,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -5578,7 +6046,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5601,8 +6069,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "TimeoutError"
       }
     },
     {
@@ -5617,12 +6088,14 @@
         "Инженерия, производство и технологии"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://makezine.com/feed/"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5645,8 +6118,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -5689,8 +6165,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
       }
     },
     {
@@ -5705,12 +6184,14 @@
         "Инженерия, производство и технологии"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://all3dp.com/feed/newsfeed"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5733,8 +6214,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -5749,12 +6233,14 @@
         "Инженерия, производство и технологии"
       ],
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.techinsider.ru/out/public-feed-all-news.xml"
+        ],
         "html": true,
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5777,8 +6263,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -5798,7 +6287,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -5821,8 +6310,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "verified",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
       }
     },
     {
@@ -5867,8 +6359,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -5911,8 +6406,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "unverified",
-        "checked_at": null
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
       }
     }
   ],

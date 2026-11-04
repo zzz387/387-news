@@ -1,5 +1,6 @@
 """Explainable personal-interest preferences. Never a publication gate or AI call."""
 import json,re
+from functools import lru_cache
 from collections import Counter
 from datetime import datetime,timedelta
 from html import unescape
@@ -15,14 +16,18 @@ def classify(row):
     article=row.get('article',{});source=row.get('source',{})
     title=' '.join(str(x or '') for x in (article.get('title'),row.get('title'),source.get('title'),row.get('topic_key')))
     text=title+' '+str(article.get('teaser',''))+' '+str(row.get('summary',''))
+    return dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),row.get('category_hint') or row.get('category') or 'Наука'))
+
+
+@lru_cache(maxsize=2048)
+def _classify(text,hints,fallback):
     scores={i:len(rx.findall(text)) for i,rx in PATTERNS.items() if rx.search(text)}
     # A publisher's coverage is a weak tie-breaker, not proof that every story matches it.
-    hints=[i for i in row.get('priority_ids',[]) if i in DIRECTIONS]
     ordered=sorted(scores,key=lambda i:(-scores[i],-int(i in hints),i))
     primary=ordered[0] if ordered else None
     direction=DIRECTIONS.get(primary,{})
     return {'group':direction.get('group','general'),'direction':primary,'additional_directions':ordered[1:],
-            'category':direction.get('category',row.get('category_hint') or row.get('category') or 'Наука'),
+            'category':direction.get('category',fallback),
             'signals':{str(i):scores[i] for i in ordered}}
 
 
@@ -43,6 +48,9 @@ def evaluate(row,history=(),date=None,selected=()):
     interest=max(0,min(100,int(row.get('editorial_priority',50))))
     title=' '.join(str(x) for x in (row.get('title',''),row.get('source',{}).get('title',''),row.get('article',{}).get('title','')))
     useful=10 if re.search(r'(?i)маршрут|заняти|семейн|практик|велосип|банкрот|йог|route|parent|family|cycling|how to',title) else 5
+    if c['direction']==14:
+        distances=re.findall(r'(?i)\b(\d{1,3})\s*(?:км|kilomet(?:er|re)s?|km)\b',title)
+        useful+=3*int(any(20<=int(n)<=60 for n in distances))
     diversity=10-sum(classify(r)['group']==c['group'] for r in selected)
     return dict(c,interest=interest,source_quality=quality,novelty=novelty,usefulness=useful,
                 diversity=diversity,weekly_compensation=12 if c['direction'] and not counts[c['direction']] else 0)
@@ -79,18 +87,18 @@ def publisher_order(rows,cache,history,date):
 
 
 def report(state,rows,history):
-    counts=Counter();groups=Counter();categories=Counter();pubs=Counter();languages=Counter();science=0
+    counts=Counter();groups=Counter();categories=Counter();pubs=Counter();languages=Counter();science=0;science_sources=0
     for row in rows:
         c=classify(row);counts[c['direction']]+=1;groups[c['group']]+=1;categories[c['category']]+=1
         source=row.get('source',{});pubs[row.get('publisher_id') or source.get('publisher') or urlparse(row.get('url','')).netloc]+=1
         languages['russian' if source.get('language')=='ru' else 'foreign' if source.get('language') else 'unknown']+=1
-        science+=int(row.get('science_source',row.get('category_hint')=='Наука'))
-    total=len(rows);week=weekly(history,state['date']);week.update({i:n for i,n in counts.items() if i})
+        science+=int(c['category']=='Наука');science_sources+=int(row.get('science_source',row.get('category_hint')=='Наука'))
+    total=len(rows);week=weekly(history,state['date']);projected=week.copy();projected.update({i:n for i,n in counts.items() if i})
     return {'version':1,'date':state['date'],'stage':'prepared','published_main_articles':None,'prepared_main_articles':total,
             'priority_articles':total-counts[None],'directions':{str(i):n for i,n in counts.items() if i},
             'groups':dict(groups),'categories':dict(categories),'publishers':dict(pubs),'languages':dict(languages),
-            'science_share':science/total if total else 0,'category_shares':{k:n/total for k,n in categories.items()},
-            'missing_week':[i for i in DIRECTIONS if not week[i]],'advisory_only':True}
+            'science_share':science/total if total else 0,'science_source_share':science_sources/total if total else 0,'category_shares':{k:n/total for k,n in categories.items()},
+            'missing_week':[i for i in DIRECTIONS if not week[i]],'missing_after_prepared':[i for i in DIRECTIONS if not projected[i]],'advisory_only':True}
 
 
 def attach_evidence(row,state):
@@ -108,3 +116,18 @@ def attach_evidence(row,state):
         if editorial41.publisher_identity(source['url'])==editorial41.publisher_identity(row['url']):continue
         sources.append(source);known.add(source['url'])
         if len(sources)>=2:break
+
+
+def cited_verification_urls(row):
+    """Only actual links in a complete original; no guessed law/medical endpoints."""
+    from scripts import editorial41,source41
+    urls=[]
+    for block in row.get('source',{}).get('blocks',[]):
+        for url in block.get('links',[]):
+            if not isinstance(url,str) or not urlparse(url).path.strip('/') or url in urls or url==row.get('url'):continue
+            if not editorial41.host_matches(url,editorial41.TRUSTED):continue
+            try:source41.safe_url(url)
+            except p.Blocked:continue
+            urls.append(url)
+            if len(urls)>=2:return urls
+    return urls
