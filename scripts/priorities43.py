@@ -93,17 +93,17 @@ def publisher_order(rows,cache,history,date):
 
 
 def report(state,rows,history):
-    counts=Counter();groups=Counter();categories=Counter();pubs=Counter();languages=Counter();science=0;science_sources=0
+    counts=Counter();groups=Counter();categories=Counter();pubs=Counter();languages=Counter();science=0
     for row in rows:
         c=classify(row);counts[c['direction']]+=1;groups[c['group']]+=1;categories[c['category']]+=1
         source=row.get('source',{});pubs[row.get('publisher_id') or source.get('publisher') or urlparse(row.get('url','')).netloc]+=1
         languages['russian' if source.get('language')=='ru' else 'foreign' if source.get('language') else 'unknown']+=1
-        science+=int(c['category']=='Наука');science_sources+=int(row.get('science_source',row.get('category_hint')=='Наука'))
+        science+=int(c['category']=='Наука')
     total=len(rows);week=weekly(history,state['date']);projected=week.copy();projected.update({i:n for i,n in counts.items() if i})
     return {'version':1,'date':state['date'],'stage':'prepared','published_main_articles':None,'prepared_main_articles':total,
             'priority_articles':total-counts[None],'directions':{str(i):n for i,n in counts.items() if i},
             'groups':dict(groups),'categories':dict(categories),'publishers':dict(pubs),'languages':dict(languages),
-            'science_share':science/total if total else 0,'science_source_share':science_sources/total if total else 0,'category_shares':{k:n/total for k,n in categories.items()},
+            'science_share':science/total if total else 0,'category_shares':{k:n/total for k,n in categories.items()},
             'missing_week':[i for i in DIRECTIONS if not week[i]],'missing_after_prepared':[i for i in DIRECTIONS if not projected[i]],'advisory_only':True}
 
 
