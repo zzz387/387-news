@@ -115,6 +115,8 @@ class InterestsTests(unittest.TestCase):
         c=interests.classify(row);self.assertNotIn(c['direction'],(1,11,13))
         child=interests.classify({'title':'Machine learning tools in child education'})
         self.assertEqual(child['direction'],1)
+        self.assertEqual(interests.classify({'title':'Learning in wild birds'})['direction'],22)
+        self.assertNotEqual(interests.classify({'title':'Обучение нейросетевой модели'})['direction'],1)
 
     def test_no_topic_minimum_blocks_zero_one_or_twelve_articles(self):
         for count in [0,1,12]:

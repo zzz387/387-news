@@ -9,7 +9,7 @@
       "name": "Воспитание и развитие детей",
       "group": "A",
       "category": "Семья",
-      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|обучен|образован|parent|child|toddler|education|learning"
+      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|образован|parent|child|toddler|education|child learning|дошкольн|педагог|школьн"
     },
     {
       "id": 2,
