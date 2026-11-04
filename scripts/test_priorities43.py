@@ -99,6 +99,16 @@ class InterestsTests(unittest.TestCase):
         self.assertGreater(interests.evaluate(short)['usefulness'],interests.evaluate(long)['usefulness'])
         s=state();long['status']='discovered';s['candidates']=[long];self.assertEqual(len(selection.order(s)),1)
 
+    def test_explicit_advertorial_is_removed_without_blocking_real_economic_reporting(self):
+        self.assertTrue(catalog.advertising_story({'title':'Sponsored: shop now for new furniture'}))
+        self.assertFalse(catalog.advertising_story({'title':'Sale of assets in a bankruptcy case'}))
+
+    def test_machine_learning_architecture_and_training_do_not_impersonate_family_or_cardio(self):
+        row={'title':'Machine learning: training the model and neural network architecture'}
+        c=interests.classify(row);self.assertNotIn(c['direction'],(1,11,13))
+        child=interests.classify({'title':'Machine learning tools in child education'})
+        self.assertEqual(child['direction'],1)
+
     def test_no_topic_minimum_blocks_zero_one_or_twelve_articles(self):
         for count in [0,1,12]:
             with tempfile.TemporaryDirectory() as directory:

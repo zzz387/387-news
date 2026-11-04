@@ -23,7 +23,7 @@ Parents, Scholastic Parents, Greater Good Magazine, Psychology Today, The Atlant
 | Edition | Homepage | Public discovery | Verified full originals | Code |
 |---|---|---|---:|---|
 | Science | https://www.science.org/ | manual only | 0 | 403 |
-| Nature | https://www.nature.com/ | manual only | 0 | NO_VERIFIED_ARTICLE_LINKS |
+| Nature | https://www.nature.com/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
 | PNAS | https://www.pnas.org/ | manual only | 0 | 403 |
 | Cell | https://www.cell.com/ | manual only | 0 | 403 |
 | PLOS | https://journals.plos.org/plosone/ | enabled | 0 | PUBLISHER_ACTIVITY_UNCONFIRMED |
@@ -53,7 +53,7 @@ Parents, Scholastic Parents, Greater Good Magazine, Psychology Today, The Atlant
 | ScienceDaily | https://www.sciencedaily.com/ | enabled | 2 | VERIFIED_DISCOVERY |
 | EurekAlert! | https://www.eurekalert.org/ | enabled | 0 | PUBLISHER_ACTIVITY_UNCONFIRMED |
 | N+1 | https://nplus1.ru/ | manual only | 0 | ROBOTS_UNVERIFIED |
-| Элементы | https://elementy.ru/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
+| Элементы | https://elementy.ru/ | manual only | 0 | ROBOTS_UNVERIFIED |
 | ПостНаука | https://postnauka.org/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
 | Наука и жизнь | https://www.nkj.ru/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
 | Троицкий вариант — Наука | https://www.trv-science.ru/ | enabled | 2 | VERIFIED_DISCOVERY |
@@ -67,7 +67,7 @@ Parents, Scholastic Parents, Greater Good Magazine, Psychology Today, The Atlant
 | Наука из первых рук | https://scfh.ru/ | enabled | 2 | VERIFIED_DISCOVERY |
 | Квант | https://kvant.mccme.ru/ | manual only | 0 | ROBOTS_UNVERIFIED |
 | Квантик | https://kvantik.com/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
-| Кот Шрёдингера | https://kot.sh/ | manual only | 0 | NO_VERIFIED_ARTICLE_LINKS |
+| Кот Шрёдингера | https://kot.sh/ | manual only | 0 | ROBOTS_UNVERIFIED |
 | Знание — сила | https://znanie-sila.su/ | manual only | 0 | NO_VERIFIED_ARTICLE_LINKS |
 | Наука в Сибири | https://www.sbras.info/ | manual only | 0 | ROBOTS_UNVERIFIED |
 | Математические этюды | https://etudes.ru/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
@@ -111,14 +111,14 @@ Parents, Scholastic Parents, Greater Good Magazine, Psychology Today, The Atlant
 | Wallpaper* | https://wallpaper.com/ | enabled | 2 | VERIFIED_DISCOVERY |
 | SALON-interior | https://salon.ru/ | enabled | 2 | VERIFIED_DISCOVERY |
 | InMyRoom | https://inmyroom.ru/ | manual only | 0 | NO_VERIFIED_ARTICLE_LINKS |
-| Архи.ру | https://archi.ru/ | enabled | 0 | ROBOTS_FORBIDDEN |
+| Архи.ру | https://archi.ru/ | enabled | 0 | UnicodeDecodeError |
 | Design Mate | https://design-mate.ru/ | enabled | 0 | PUBLISHER_ACTIVITY_UNCONFIRMED |
 | Проект Россия | https://prorus.ru/ | enabled | 0 | PUBLISHER_ACTIVITY_UNCONFIRMED |
 | Harvard Health Publishing | https://health.harvard.edu/ | manual only | 0 | NO_VERIFIED_ARTICLE_LINKS |
 | Mayo Clinic | https://mayoclinic.org/ | manual only | 0 | ROBOTS_UNVERIFIED |
 | The BMJ | https://bmj.com/ | manual only | 0 | 403 |
 | Runner’s World | https://runnersworld.com/ | enabled | 0 | SOURCE_ACCESS_RESTRICTED |
-| Bicycling | https://bicycling.com/ | enabled | 1 | TimeoutError |
+| Bicycling | https://bicycling.com/ | enabled | 1 | SOURCE_ACCESS_RESTRICTED |
 | Outside | https://outsideonline.com/ | enabled | 1 | SOURCE_ACCESS_RESTRICTED |
 | Yoga Journal | https://yogajournal.com/ | enabled | 0 | SOURCE_ACCESS_RESTRICTED |
 | Cycling Weekly | https://cyclingweekly.com/ | enabled | 0 | SOURCE_ACCESS_RESTRICTED |
@@ -141,10 +141,10 @@ Parents, Scholastic Parents, Greater Good Magazine, Psychology Today, The Atlant
 | РБК | https://rbc.ru/ | manual only | 0 | 401 |
 | Ведомости | https://vedomosti.ru/ | enabled | 2 | VERIFIED_DISCOVERY |
 | Эксперт | https://expert.ru/ | enabled | 1 | PUBLISHER_ACTIVITY_UNCONFIRMED |
-| Т—Ж | https://t-j.ru/ | enabled | 1 | TimeoutError |
+| Т—Ж | https://t-j.ru/ | enabled | 2 | VERIFIED_DISCOVERY |
 | Право.ru | https://pravo.ru/ | enabled | 0 | RIGHTS_NOT_ESTABLISHED |
 | Адвокатская газета | https://advgazeta.ru/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
-| Popular Mechanics | https://popularmechanics.com/ | enabled | 1 | TimeoutError |
+| Popular Mechanics | https://popularmechanics.com/ | enabled | 2 | VERIFIED_DISCOVERY |
 | Make: Magazine | https://makezine.com/ | enabled | 1 | PUBLISHER_ACTIVITY_UNCONFIRMED |
 | TCT Magazine | https://tctmagazine.com/ | manual only | 0 | ROBOTS_FORBIDDEN |
 | All3DP | https://all3dp.com/ | enabled | 0 | SOURCE_EXTRACTION_PARTIAL |
@@ -176,6 +176,6 @@ The previous science-only registry had no explicit direction-to-source links and
 | 17. Исторические загадки и открытия | National Geographic, Smithsonian Magazine, Arzamas, HistoryExtra, Archaeology Magazine, Родина, Дилетант, Наше наследие |
 | 18. Выдающиеся люди и необычные судьбы | Aeon, The Conversation, Smithsonian Magazine, Фома, Arzamas, HistoryExtra, Родина, Дилетант, The Art Newspaper Russia, Apollo Magazine, Московский журнал, Наше наследие, Третьяковская галерея, The Architectural Review, Christianity Today, Christian History, Philosophy Now, Православная энциклопедия, Эксперт |
 | 21. Христианская история и философия | Aeon, Фома, Правмир, Arzamas, HistoryExtra, Наше наследие, Christianity Today, The Tablet, Christian History, First Things, Philosophy Now, Православная энциклопедия |
-| 22. Открытия и загадки природы | PLOS, New Scientist, Science News, Physics World, BBC Future и Travel, Ars Technica Science, National Geographic, Eos, ScienceDaily, EurekAlert!, Наука и жизнь, Химия и жизнь, Smithsonian Magazine, The Guardian, Smithsonian National Zoo, BBC Wildlife, Audubon, Mongabay |
+| 22. Открытия и загадки природы | Nature, PLOS, New Scientist, Science News, Physics World, BBC Future и Travel, Ars Technica Science, National Geographic, Eos, ScienceDaily, EurekAlert!, Наука и жизнь, Химия и жизнь, Smithsonian Magazine, The Guardian, Smithsonian National Zoo, BBC Wildlife, Audubon, Mongabay |
 | 23. Экономика, предпринимательство и право | The Conversation, Harvard Business Review, Ведомости, Эксперт, Т—Ж, Право.ru, Адвокатская газета |
-| 24. Инженерия, производство и технологии | PLOS, New Scientist, Science News, Physics World, MIT Technology Review, IEEE Spectrum, Ars Technica Science, Eos, ScienceDaily, EurekAlert!, Наука и жизнь, Химия и жизнь, Smithsonian National Zoo, Проект Россия, Popular Mechanics, Make: Magazine, All3DP, TechInsider, Хабр |
+| 24. Инженерия, производство и технологии | Nature, PLOS, New Scientist, Science News, Physics World, MIT Technology Review, IEEE Spectrum, Ars Technica Science, Eos, ScienceDaily, EurekAlert!, Наука и жизнь, Химия и жизнь, Smithsonian National Zoo, Проект Россия, Popular Mechanics, Make: Magazine, All3DP, TechInsider, Хабр |

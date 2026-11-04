@@ -48,7 +48,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -75,7 +75,7 @@
         "feed_urls_are_hints": true,
         "manual_search": true
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -97,11 +97,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
-        "code": "NO_VERIFIED_ARTICLE_LINKS"
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -148,7 +148,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -194,7 +194,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -244,7 +244,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -290,7 +290,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -340,7 +340,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -390,7 +390,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -437,7 +437,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -485,7 +485,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -535,7 +535,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -582,7 +582,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -630,7 +630,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -677,7 +677,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -728,7 +728,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -776,7 +776,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -820,7 +820,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -870,7 +870,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -917,7 +917,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -966,7 +966,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -1022,7 +1022,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -1075,7 +1075,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -1125,7 +1125,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -1175,7 +1175,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -1226,7 +1226,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -1276,7 +1276,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -1326,7 +1326,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -1376,7 +1376,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -1426,7 +1426,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -1474,7 +1474,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -1521,7 +1521,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -1546,7 +1546,7 @@
         "feed_urls_are_hints": false,
         "manual_search": true
       },
-      "enabled": true,
+      "enabled": false,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -1565,11 +1565,11 @@
       "quality_score": 80,
       "allow_archive": true,
       "availability": {
-        "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
-        "code": "SOURCE_EXTRACTION_PARTIAL"
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -1611,7 +1611,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -1661,7 +1661,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -1708,7 +1708,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -1753,7 +1753,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -1803,7 +1803,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_FORBIDDEN"
@@ -1851,7 +1851,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -1899,7 +1899,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_FORBIDDEN"
@@ -1943,7 +1943,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -1990,7 +1990,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -2038,7 +2038,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -2083,7 +2083,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -2127,7 +2127,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -2173,7 +2173,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -2221,10 +2221,10 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
-        "code": "NO_VERIFIED_ARTICLE_LINKS"
+        "code": "ROBOTS_UNVERIFIED"
       }
     },
     {
@@ -2266,7 +2266,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -2314,7 +2314,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -2358,7 +2358,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -2405,7 +2405,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_FORBIDDEN"
@@ -2460,7 +2460,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -2518,7 +2518,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -2566,7 +2566,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -2613,7 +2613,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -2660,7 +2660,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -2711,7 +2711,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -2762,7 +2762,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_URL_UNSAFE"
@@ -2815,7 +2815,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -2866,7 +2866,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 1,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -2917,7 +2917,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -2968,7 +2968,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "RIGHTS_NOT_ESTABLISHED"
@@ -3021,7 +3021,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -3074,7 +3074,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -3129,7 +3129,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_FORBIDDEN"
@@ -3178,7 +3178,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -3225,7 +3225,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -3282,7 +3282,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -3337,7 +3337,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -3394,7 +3394,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -3451,7 +3451,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "RIGHTS_NOT_ESTABLISHED"
@@ -3502,7 +3502,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -3555,7 +3555,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -3604,7 +3604,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -3655,7 +3655,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -3706,7 +3706,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_EMPTY"
@@ -3757,7 +3757,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -3808,7 +3808,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -3859,7 +3859,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -3913,7 +3913,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -3971,7 +3971,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -4021,7 +4021,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -4073,7 +4073,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 1,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -4122,7 +4122,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -4169,7 +4169,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -4216,7 +4216,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -4265,7 +4265,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -4314,7 +4314,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -4361,7 +4361,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -4408,7 +4408,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -4459,10 +4459,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
-        "code": "ROBOTS_FORBIDDEN"
+        "code": "UnicodeDecodeError"
       }
     },
     {
@@ -4508,7 +4508,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -4559,7 +4559,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -4612,7 +4612,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
@@ -4663,7 +4663,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -4710,7 +4710,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -4757,7 +4757,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -4806,10 +4806,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 1,
-        "code": "TimeoutError"
+        "code": "SOURCE_ACCESS_RESTRICTED"
       }
     },
     {
@@ -4857,7 +4857,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 1,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -4904,7 +4904,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -4953,7 +4953,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -5006,7 +5006,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5059,7 +5059,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -5106,7 +5106,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5153,7 +5153,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -5200,7 +5200,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5251,7 +5251,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5298,7 +5298,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -5347,7 +5347,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -5394,7 +5394,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5443,7 +5443,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5492,7 +5492,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -5539,7 +5539,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -5586,7 +5586,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -5633,7 +5633,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_ACCESS_RESTRICTED"
@@ -5680,7 +5680,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 403
@@ -5727,7 +5727,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -5774,7 +5774,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": 401
@@ -5823,7 +5823,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 2,
         "code": "VERIFIED_DISCOVERY"
@@ -5872,7 +5872,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 1,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -5929,10 +5929,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
-        "full_originals_verified": 1,
-        "code": "TimeoutError"
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -5976,7 +5976,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "RIGHTS_NOT_ESTABLISHED"
@@ -6023,7 +6023,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -6070,10 +6070,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
-        "full_originals_verified": 1,
-        "code": "TimeoutError"
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       }
     },
     {
@@ -6119,7 +6119,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 1,
         "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
@@ -6166,7 +6166,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_FORBIDDEN"
@@ -6215,7 +6215,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -6264,7 +6264,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
@@ -6311,7 +6311,7 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "RIGHTS_NOT_ESTABLISHED"
@@ -6360,7 +6360,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "ROBOTS_UNVERIFIED"
@@ -6407,7 +6407,7 @@
       "allow_archive": true,
       "availability": {
         "status": "manual_only",
-        "checked_at": "2026-11-04T22:30:12.511545+03:00",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"

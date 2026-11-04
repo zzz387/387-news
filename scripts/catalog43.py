@@ -65,6 +65,10 @@ def article_link(item):
     return bool(item.get('feed_date') or item.get('heading_link') or len(parts)>1 or len(parts[-1])>30)
 
 
+def advertising_story(item):
+    return bool(re.search(r'(?i)\bsponsored\b|\badvertorial\b|\badvertisement\b|promo code|shop now|black friday deals|промокод|на правах рекламы|рекламн\w* (?:материал|публикац)|купить со скидк',item.get('title','')))
+
+
 def feed_items(raw,base):
     if re.search(r'<!DOCTYPE|<!ENTITY',raw,re.I):raise p.Blocked('FEED_ENTITY_FORBIDDEN')
     tree=ET.fromstring(raw);items=[]
@@ -95,7 +99,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
                 if data:break
             except Exception:continue
         items=items or links.articles
-        seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/')!=row['homepage'].rstrip('/') and x['url'] not in exclude]
+        seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not advertising_story(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/')!=row['homepage'].rstrip('/') and x['url'] not in exclude]
         from scripts import selection43
         items.sort(key=lambda item:(int(selection43.profile(item)['space']),not item.get('heading_link',False)))
         report.update(status='discovery_verified',discovered=len(items))

@@ -22,6 +22,11 @@ def classify(row):
 @lru_cache(maxsize=2048)
 def _classify(text,hints,fallback):
     scores={i:len(rx.findall(text)) for i,rx in PATTERNS.items() if rx.search(text)}
+    computing=bool(re.search(r'(?i)machine learning|neural network|model architecture|training (?:a |the )?model|обучени[ея] (?:модел|нейросет)|нейронн.{0,10}сет',text))
+    if computing:
+        if not re.search(r'(?i)child|parent|toddler|дет[иеяй]|реб[её]н|родител',text):scores.pop(1,None)
+        if not re.search(r'(?i)building|interior|museum|здани|интерьер|усадьб',text):scores.pop(11,None)
+        if not re.search(r'(?i)cardio|aerobic|exercise|вынослив|кардио|физиолог',text):scores.pop(13,None)
     # A publisher's coverage is a weak tie-breaker, not proof that every story matches it.
     ordered=sorted(scores,key=lambda i:(-scores[i],-int(i in hints),i))
     primary=ordered[0] if ordered else None
