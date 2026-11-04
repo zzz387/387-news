@@ -88,6 +88,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
     now=now or datetime.now(p.TZ)
     report={'publisher':row['id'],'name':row['name'],'homepage':row['homepage'],'status':'unavailable','discovered':0,'eligible':0,'article_checks':0};sources=[];items=[];feeds=list(row['discovery']['feeds'])
     pages=[row['homepage']]+row['discovery'].get('pages',[])
+    if len(pages)>1:feeds=[]  # A section's RSS must not silently replace another section.
     home=pages[int(now.timestamp()//21600)%len(pages)]
     try:
         raw=permitted_get(home,session);links=Links(getattr(raw,'resolved_url',home));links.feed(raw)

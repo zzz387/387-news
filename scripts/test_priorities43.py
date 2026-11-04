@@ -127,6 +127,19 @@ class InterestsTests(unittest.TestCase):
         self.assertNotEqual(interests.classify({'title':'Pioneer 10 space probe'})['direction'],18)
         self.assertNotEqual(interests.classify({'title':'Space travel to Mars'})['direction'],8)
 
+    def test_science_rss_does_not_override_a_different_editorial_section(self):
+        fixture=fixtures.CatalogTests();row=fixture.registry_row();row['discovery']=dict(row['discovery'],feeds=['https://example.org/science-feed'],pages=['https://example.org/family/'])
+        session=fixture.session()
+        def transport(url):
+            session.urls.append(url)
+            if url.endswith('robots.txt'):return 'User-agent: *\nAllow: /'
+            if url.endswith('science-feed'):return '<rss><channel><item><title>Quantum physics from an unrelated section</title><link>https://example.org/quantum</link></item></channel></rss>'
+            return '<html><h2><a href="https://example.org/family/article">Family activities for the weekend</a></h2></html>'
+        session.transport=transport
+        catalog.inspect_publisher(row,session,now=NOW)
+        self.assertNotIn('https://example.org/science-feed',session.urls)
+        self.assertIn('https://example.org/family/article',session.full)
+
     def test_no_topic_minimum_blocks_zero_one_or_twelve_articles(self):
         for count in [0,1,12]:
             with tempfile.TemporaryDirectory() as directory:
