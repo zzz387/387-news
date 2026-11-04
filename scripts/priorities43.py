@@ -81,7 +81,7 @@ def publisher_order(rows,cache,history,date):
         ids=row.get('priority_ids',[])
         missing=sum(not counts[i] for i in ids)
         checked=cache.get('publishers',{}).get(row['id'],{}).get('checked_at','')
-        return (not bool(ids),checked, -min(missing,3),-row.get('editorial_priority',50),row['id'])
+        return (not bool(ids),-int(missing>0),-missing/max(1,len(ids)),checked,-row.get('editorial_priority',50),row['id'])
     # Within equally old/fresh publishers, compensate sparse groups/directions dynamically.
     result=[];covered=Counter()
     pending=list(rows)

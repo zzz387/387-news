@@ -40,6 +40,13 @@ class InterestsTests(unittest.TestCase):
         family['date']=(NOW-timedelta(days=10)).date().isoformat()
         self.assertEqual(interests.evaluate(family,[family],NOW.date().isoformat())['weekly_compensation'],12)
 
+    def test_publisher_search_compensates_missing_topics_even_with_different_cache_ages(self):
+        family={'id':'family','priority_ids':[1],'editorial_priority':90}
+        bike={'id':'bike','priority_ids':[14],'editorial_priority':90}
+        history=[{'title':'Воспитание ребёнка','date':NOW.date().isoformat()}]
+        cache={'publishers':{'family':{'checked_at':'2026-10-20'},'bike':{'checked_at':'2026-10-21'}}}
+        self.assertEqual(interests.publisher_order([family,bike],cache,history,NOW.date().isoformat())[0]['id'],'bike')
+
     def test_all_directions_have_catalogue_coverage_without_duplicate_publishers(self):
         rows=catalog.registry()['publishers'];self.assertEqual(len({(r['domain'].removeprefix('www.'),r['homepage'].rstrip('/')) for r in rows}),len(rows))
         for i in interests.DIRECTIONS:self.assertTrue(any(i in r.get('priority_ids',[]) for r in rows),i)
