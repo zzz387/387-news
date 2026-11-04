@@ -84,6 +84,10 @@ class InterestsTests(unittest.TestCase):
         row=named('Воспитание без спешки');row['source']['blocks'][0]['links']=['https://www.unicef.org/parenting/real-reference','https://untrusted.example/claim']
         self.assertEqual(interests.cited_verification_urls(row),['https://www.unicef.org/parenting/real-reference'])
         row['source']['blocks'][0]['links']=[];self.assertEqual(interests.cited_verification_urls(row),[])
+        row['supporting_sources']=[{'url':'https://one.example/'},{'url':'https://two.example/'}]
+        before=copy.deepcopy(row['supporting_sources'])
+        interests.attach_evidence(row,state());interests.attach_evidence(row,state())
+        self.assertEqual(row['supporting_sources'],before)
 
     def test_actual_cosmic_word_and_supernova_are_detected(self):
         self.assertTrue(selection.profile({'title':'Космический сюжет'})['space'])

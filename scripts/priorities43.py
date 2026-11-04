@@ -112,9 +112,11 @@ def attach_evidence(row,state):
     if not editorial43.high_risk(row):return
     own=classify(row)['direction']
     if not own:return
-    sources=row.setdefault('supporting_sources',[]);known={s['url'] for s in sources}|{row['url']}
+    sources=row.setdefault('supporting_sources',[])
+    if len(sources)>=2:return
+    known={s['url'] for s in sources}|{row['url']}
     pool=list(state.get('source_cache',{}).values())+[r['source'] for r in state['candidates'] if r.get('source')]
-    for source in pool:
+    for source in sorted(pool,key=lambda s:not editorial41.host_matches(s['url'],editorial41.TRUSTED)):
         if source['url'] in known or not source.get('full_text_verified') or source.get('metadata_status')!='verified':continue
         if own not in [classify({'source':source})['direction']]+classify({'source':source})['additional_directions']:continue
         if rights41.decision(source,'INDEPENDENT_ARTICLE')['status']!='allowed':continue
