@@ -9,7 +9,7 @@
       "name": "Воспитание и развитие детей",
       "group": "A",
       "category": "Семья",
-      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|образован|parent|child|toddler|education|child learning|дошкольн|педагог|школьн"
+      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|образовани[ея].{0,20}(?:дет|школ|родител)|parent|child|toddler|education|child learning|дошкольн|педагог|школьн"
     },
     {
       "id": 2,
@@ -23,7 +23,7 @@
       "name": "Супружеские отношения",
       "group": "A",
       "category": "Семья",
-      "pattern": "супруж|брак|отношени.{0,15}(партн|супруг)|marriage|couple|relationship|spouse"
+      "pattern": "супруж|брак|семейн.{0,10}отношени|отношени.{0,15}(партн|супруг)|marriage|marital|romantic relationship|spouse|couples.{0,25}(?:communicat|conflict|relationship)"
     },
     {
       "id": 6,
@@ -79,7 +79,7 @@
       "name": "Кардиотренировки и физиология",
       "group": "C",
       "category": "Здоровье и движение",
-      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|training|running"
+      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|physical training|strength training|training load|running"
     },
     {
       "id": 14,
@@ -93,7 +93,7 @@
       "name": "Йога, подвижность и восстановление",
       "group": "C",
       "category": "Здоровье и движение",
-      "pattern": "йог|подвижност|мобильност|гибкост|восстановлен.{0,15}(нагруз|трениров)|yoga|mobility|stretching|recovery after"
+      "pattern": "йог|подвижност|мобильност|гибкост|восстановлен.{0,15}(нагруз|трениров)|yoga|mobility|stretching|recovery after (?:exercise|training|running|workout)"
     },
     {
       "id": 16,
@@ -114,7 +114,7 @@
       "name": "Выдающиеся люди и необычные судьбы",
       "group": "D",
       "category": "История и культура",
-      "pattern": "биограф|судьб|жизн.{0,20}(уч[её]н|архитектор|художник|мыслител)|biograph|life of|pioneer|portrait of"
+      "pattern": "биограф|судьб|жизн.{0,20}(уч[её]н|архитектор|художник|мыслител)|biograph|life of|pioneer scientist|pioneer engineer|portrait of"
     },
     {
       "id": 21,

@@ -121,6 +121,10 @@ class InterestsTests(unittest.TestCase):
         self.assertEqual(child['direction'],1)
         self.assertEqual(interests.classify({'title':'Learning in wild birds'})['direction'],22)
         self.assertNotEqual(interests.classify({'title':'Обучение нейросетевой модели'})['direction'],1)
+        self.assertNotIn(interests.classify({'title':'Relationship between photons and the образование кристаллов'})['direction'],(1,3))
+        self.assertNotEqual(interests.classify({'title':'Recovery after bankruptcy'})['direction'],15)
+        self.assertNotEqual(interests.classify({'title':'Pioneer 10 space probe'})['direction'],18)
+        self.assertNotEqual(interests.classify({'title':'Space travel to Mars'})['direction'],8)
 
     def test_no_topic_minimum_blocks_zero_one_or_twelve_articles(self):
         for count in [0,1,12]:
