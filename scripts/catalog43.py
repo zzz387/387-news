@@ -186,7 +186,8 @@ def apply_verification(config,report):
             'code':result.get('code') or result.get('last_article_code') or ('VERIFIED_DISCOVERY' if verified else 'NO_VERIFIED_ARTICLE_LINKS')}
         row['enabled']=False
         if verified:
-            if result.get('verified_feed'):row['discovery']['feeds']=[result['verified_feed']]
+            row['discovery']['feeds']=[result['verified_feed']] if result.get('verified_feed') else []
+            row['discovery']['feed_urls_are_hints']=False
             eligible.append(row)
     for row in sorted(eligible,key=lambda r:(-r.get('editorial_priority',0),r['id']))[:90]:row['enabled']=True
     return config

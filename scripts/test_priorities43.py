@@ -60,6 +60,7 @@ class InterestsTests(unittest.TestCase):
         good={'checked_at':NOW.isoformat(),'publishers':[{'publisher':row['id'],'status':'discovery_verified','discovered':3,'eligible':0}]}
         activated=catalog.apply_verification(config,good)['publishers'][0]
         self.assertTrue(activated['enabled']);self.assertEqual(activated['availability']['scope'],'public_discovery_only');self.assertEqual(activated['availability']['full_originals_verified'],0)
+        self.assertEqual(activated['discovery']['feeds'],[])
 
     def test_unverified_publisher_is_not_activated_by_convenient_rss(self):
         config=catalog.registry();row=fixtures.CatalogTests().registry_row();row['availability']={'status':'unverified'};config['publishers']=[row]

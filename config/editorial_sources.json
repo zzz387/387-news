@@ -18,11 +18,9 @@
         "materials"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -72,7 +70,7 @@
           "https://www.nature.com/nature.rss"
         ],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": true,
@@ -118,11 +116,9 @@
         "ecology"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.pnas.org/action/showFeed?type=etoc&feed=rss&jc=pnas"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -167,11 +163,9 @@
         "neuroscience"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.cell.com/cell/current.rss"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -218,7 +212,7 @@
           "https://journals.plos.org/plosone/feed/atom"
         ],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": true,
@@ -310,11 +304,9 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.nature.com/ncomms.rss"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -360,11 +352,9 @@
         "engineering"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.nature.com/srep.rss"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -556,10 +546,10 @@
       ],
       "discovery": {
         "feeds": [
-          "https://www.quantamagazine.org/feed/"
+          "https://www.quantamagazine.org/quanta/feed/"
         ],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -844,7 +834,7 @@
           "https://physicsworld.com/feed/"
         ],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": true,
@@ -1095,11 +1085,9 @@
         "medicine"
       ],
       "discovery": {
-        "feeds": [
-          "https://undark.org/feed/"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -1246,11 +1234,9 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [
-          "https://cosmosmagazine.com/feed/"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -1346,11 +1332,9 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [
-          "https://phys.org/rss-feed/"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -1494,11 +1478,9 @@
         "physics"
       ],
       "discovery": {
-        "feeds": [
-          "https://nplus1.ru/rss"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -1631,11 +1613,9 @@
         "history"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.nkj.ru/rss/"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": true,
@@ -1773,11 +1753,9 @@
         "engineering"
       ],
       "discovery": {
-        "feeds": [
-          "https://naked-science.ru/feed"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": false,
@@ -2426,11 +2404,9 @@
         "Открытия и загадки природы"
       ],
       "discovery": {
-        "feeds": [
-          "https://www.smithsonianmag.com/rss/latest_articles/"
-        ],
+        "feeds": [],
         "html": true,
-        "feed_urls_are_hints": true,
+        "feed_urls_are_hints": false,
         "manual_search": true
       },
       "enabled": true,
