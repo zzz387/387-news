@@ -200,7 +200,8 @@ class Editor(old.Editor):
     def issue_context(self,state,record):
         try:from scripts import selection43
         except ImportError:import selection43
-        return dict(selection43.prompt_context(state),source_kind=record.get('source_kind','unclassified'),publication_type=record.get('source',{}).get('publication_type','unclassified'),rule='Не выдавай пресс-релиз, обзор или журналистскую статью за первичное исследование. Не повторяй уже выбранный факт/событие/рекомендацию; можно раскрыть другой конкретный сюжет. Стиль заголовка — мягкое пожелание, не литературный запрет.')
+        from scripts import priorities43
+        return dict(selection43.prompt_context(state),personal_interest=priorities43.classify(record),personal_rule='Раскрой выбранный подтверждённый сюжет для читателя: семья, Москва, путешествия, культура, движение, история, природа, экономика или инженерия. Не изобретай связь с интересами. Для веломаршрутов предпочтительны20–60 км, но расстояние не выдумывай. Исторические и философские материалы — без пропаганды и политической полемики. Не выдавай рекламу за независимую статью. Актуальную афишу, посещение объектов и российское право проверяй по действующим официальным источникам; архивные сведения не выдают текущий режим работы или действующее право.',source_kind=record.get('source_kind','unclassified'),publication_type=record.get('source',{}).get('publication_type','unclassified'),rule='Не выдавай пресс-релиз, обзор или журналистскую статью за первичное исследование. Не повторяй уже выбранный факт/событие/рекомендацию; можно раскрыть другой конкретный сюжет. Стиль заголовка — мягкое пожелание, не литературный запрет.')
 
     def writing_basis(self,record):
         return self.model_sources(record)
@@ -223,6 +224,8 @@ class Editor(old.Editor):
         sensitive=high_risk(record)
         record['high_risk']=sensitive
         if sensitive:
+            from scripts import priorities43
+            if not record.get('verification_urls'):record['verification_urls']=priorities43.cited_verification_urls(record)
             extra=record.setdefault('supporting_sources',[]);known={s['url'] for s in extra}
             for url in record.get('verification_urls',[]):
                 if url!=source['url'] and url not in known:

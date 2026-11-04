@@ -1,0 +1,6401 @@
+{
+  "version": 2,
+  "refresh_hours": 6,
+  "publishers_per_run": 5,
+  "article_checks_per_run": 8,
+  "publishers": [
+    {
+      "id": "science",
+      "name": "Science",
+      "homepage": "https://www.science.org/",
+      "domain": "www.science.org",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "physics",
+        "materials"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.science.org/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "nature",
+      "name": "Nature",
+      "homepage": "https://www.nature.com/",
+      "domain": "www.nature.com",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "ecology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.nature.com/nature.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nature.com/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "pnas",
+      "name": "PNAS",
+      "homepage": "https://www.pnas.org/",
+      "domain": "www.pnas.org",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.pnas.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "cell",
+      "name": "Cell",
+      "homepage": "https://www.cell.com/",
+      "domain": "www.cell.com",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "neuroscience"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.cell.com/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "plos",
+      "name": "PLOS",
+      "homepage": "https://journals.plos.org/plosone/",
+      "domain": "journals.plos.org",
+      "language": "en",
+      "country": "US",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://journals.plos.org/plosone/feed/atom"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://journals.plos.org/plosone/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "elife",
+      "name": "eLife",
+      "homepage": "https://elifesciences.org/",
+      "domain": "elifesciences.org",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "biology",
+        "neuroscience"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://elifesciences.org/rss/recent.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://elifesciences.org/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "ncomms",
+      "name": "Nature Communications",
+      "homepage": "https://www.nature.com/ncomms/",
+      "domain": "www.nature.com",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "materials",
+        "biology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nature.com/ncomms/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "srep",
+      "name": "Scientific Reports",
+      "homepage": "https://www.nature.com/srep/",
+      "domain": "www.nature.com",
+      "language": "en",
+      "country": "GB",
+      "type": "research_journal",
+      "topics": [
+        "ecology",
+        "behaviour",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nature.com/srep/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "scientificamerican",
+      "name": "Scientific American",
+      "homepage": "https://www.scientificamerican.com/",
+      "domain": "www.scientificamerican.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "psychology",
+        "biology",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.scientificamerican.com/platform/syndication/rss/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.scientificamerican.com/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "newscientist",
+      "name": "New Scientist",
+      "homepage": "https://www.newscientist.com/",
+      "domain": "www.newscientist.com",
+      "language": "en",
+      "country": "GB",
+      "type": "science_journalism",
+      "topics": [
+        "physics",
+        "biology",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.newscientist.com/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "sciencenews",
+      "name": "Science News",
+      "homepage": "https://www.sciencenews.org/",
+      "domain": "www.sciencenews.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "animals",
+        "biology",
+        "archaeology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.sciencenews.org/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.sciencenews.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "quanta",
+      "name": "Quanta Magazine",
+      "homepage": "https://www.quantamagazine.org/",
+      "domain": "www.quantamagazine.org",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "physics",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.quantamagazine.org/quanta/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.quantamagazine.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "knowable",
+      "name": "Knowable Magazine",
+      "homepage": "https://knowablemagazine.org/",
+      "domain": "knowablemagazine.org",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://knowablemagazine.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "nautilus",
+      "name": "Nautilus",
+      "homepage": "https://nautil.us/",
+      "domain": "nautil.us",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "neuroscience",
+        "history",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://nautil.us/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nautil.us/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "aeon",
+      "name": "Aeon",
+      "homepage": "https://aeon.co/",
+      "domain": "aeon.co",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://aeon.co/feed.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://aeon.co/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "discover",
+      "name": "Discover Magazine",
+      "homepage": "https://www.discovermagazine.com/",
+      "domain": "www.discovermagazine.com",
+      "language": "en",
+      "country": "US",
+      "type": "popular_science",
+      "topics": [
+        "archaeology",
+        "animals",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.discovermagazine.com/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "scientist",
+      "name": "The Scientist",
+      "homepage": "https://www.the-scientist.com/",
+      "domain": "www.the-scientist.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.the-scientist.com/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "physicsworld",
+      "name": "Physics World",
+      "homepage": "https://physicsworld.com/",
+      "domain": "physicsworld.com",
+      "language": "en",
+      "country": "GB",
+      "type": "science_journalism",
+      "topics": [
+        "physics",
+        "engineering",
+        "materials"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://physicsworld.com/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://physicsworld.com/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "mitreview",
+      "name": "MIT Technology Review",
+      "homepage": "https://technologyreview.com/",
+      "domain": "technologyreview.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://technologyreview.com/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "spectrum",
+      "name": "IEEE Spectrum",
+      "homepage": "https://spectrum.ieee.org/",
+      "domain": "spectrum.ieee.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://spectrum.ieee.org/feeds/feed.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://spectrum.ieee.org/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "bbcfuture",
+      "name": "BBC Future и Travel",
+      "homepage": "https://bbc.com/future/",
+      "domain": "bbc.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Путешествия выходного дня",
+        "Питание и долголетие",
+        "Современная медицина",
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true,
+        "pages": [
+          "https://www.bbc.com/travel"
+        ]
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://bbc.com/future/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        8,
+        12,
+        16,
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "conversation",
+      "name": "The Conversation",
+      "homepage": "https://theconversation.com/",
+      "domain": "theconversation.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Супружеские отношения",
+        "Выдающиеся люди и необычные судьбы",
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://theconversation.com/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        3,
+        18,
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "undark",
+      "name": "Undark",
+      "homepage": "https://undark.org/",
+      "domain": "undark.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "history",
+        "ecology",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://undark.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "ars",
+      "name": "Ars Technica Science",
+      "homepage": "https://arstechnica.com/science/",
+      "domain": "arstechnica.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "engineering",
+        "biology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://arstechnica.com/science/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://arstechnica.com/science/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "natgeo",
+      "name": "National Geographic",
+      "homepage": "https://nationalgeographic.com/",
+      "domain": "nationalgeographic.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Путешествия выходного дня",
+        "Исторические загадки и открытия",
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nationalgeographic.com/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        8,
+        17,
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "cosmos",
+      "name": "Cosmos",
+      "homepage": "https://cosmosmagazine.com/",
+      "domain": "cosmosmagazine.com",
+      "language": "en",
+      "country": "AU",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "biology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://cosmosmagazine.com/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "eos",
+      "name": "Eos",
+      "homepage": "https://eos.org/",
+      "domain": "eos.org",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "climate",
+        "ecology",
+        "geology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://eos.org/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://eos.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "phys",
+      "name": "Phys.org",
+      "homepage": "https://phys.org/",
+      "domain": "phys.org",
+      "language": "en",
+      "country": "GB",
+      "type": "research_news",
+      "topics": [
+        "biology",
+        "materials",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://phys.org/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "sciencedaily",
+      "name": "ScienceDaily",
+      "homepage": "https://www.sciencedaily.com/",
+      "domain": "www.sciencedaily.com",
+      "language": "en",
+      "country": "US",
+      "type": "research_news",
+      "topics": [
+        "biology",
+        "behaviour",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.sciencedaily.com/rss/all.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.sciencedaily.com/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "eurekalert",
+      "name": "EurekAlert!",
+      "homepage": "https://www.eurekalert.org/",
+      "domain": "www.eurekalert.org",
+      "language": "en",
+      "country": "US",
+      "type": "press_release",
+      "topics": [
+        "biology",
+        "engineering",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.eurekalert.org/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "nplus1",
+      "name": "N+1",
+      "homepage": "https://nplus1.ru/",
+      "domain": "nplus1.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "archaeology",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nplus1.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "elementy",
+      "name": "Элементы",
+      "homepage": "https://elementy.ru/",
+      "domain": "elementy.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "mathematics",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://elementy.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "postnauka",
+      "name": "ПостНаука",
+      "homepage": "https://postnauka.org/",
+      "domain": "postnauka.org",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "history",
+        "neuroscience",
+        "mathematics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://postnauka.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "nkj",
+      "name": "Наука и жизнь",
+      "homepage": "https://www.nkj.ru/",
+      "domain": "www.nkj.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "archaeology",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nkj.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "trv",
+      "name": "Троицкий вариант — Наука",
+      "homepage": "https://www.trv-science.ru/",
+      "domain": "www.trv-science.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "history",
+        "physics",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.trv-science.ru/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.trv-science.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "biomolecula",
+      "name": "Биомолекула",
+      "homepage": "https://biomolecula.ru/",
+      "domain": "biomolecula.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "neuroscience",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://biomolecula.ru/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "nakedscience",
+      "name": "Naked Science",
+      "homepage": "https://naked-science.ru/",
+      "domain": "naked-science.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "archaeology",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://naked-science.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
+      }
+    },
+    {
+      "id": "indicator",
+      "name": "Индикатор",
+      "homepage": "https://indicator.ru/",
+      "domain": "indicator.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "physics",
+        "biology",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://indicator.ru/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "scientificrussia",
+      "name": "Научная Россия",
+      "homepage": "https://scientificrussia.ru/",
+      "domain": "scientificrussia.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "research_news",
+      "topics": [
+        "biology",
+        "history",
+        "engineering"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://scientificrussia.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
+      }
+    },
+    {
+      "id": "pcr",
+      "name": "PCR.News",
+      "homepage": "https://pcr.news/",
+      "domain": "pcr.news",
+      "language": "ru",
+      "country": "RU",
+      "type": "science_journalism",
+      "topics": [
+        "biology",
+        "medicine"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://pcr.news/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "antropogenez",
+      "name": "Антропогенез.ру",
+      "homepage": "https://antropogenez.ru/",
+      "domain": "antropogenez.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "anthropology",
+        "archaeology",
+        "evolution"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://antropogenez.ru/rss/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://antropogenez.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "hij",
+      "name": "Химия и жизнь",
+      "homepage": "https://www.hij.ru/",
+      "domain": "www.hij.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "chemistry",
+        "biology",
+        "materials"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.hij.ru/"
+      },
+      "light_suitable": false,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "scfh",
+      "name": "Наука из первых рук",
+      "homepage": "https://scfh.ru/",
+      "domain": "scfh.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "biology",
+        "history",
+        "geology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://scfh.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "kvant",
+      "name": "Квант",
+      "homepage": "https://kvant.mccme.ru/",
+      "domain": "kvant.mccme.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "physics"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kvant.mccme.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "kvantik",
+      "name": "Квантик",
+      "homepage": "https://kvantik.com/",
+      "domain": "kvantik.com",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "education"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://kvantik.com/index.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kvantik.com/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "kot",
+      "name": "Кот Шрёдингера",
+      "homepage": "https://kot.sh/",
+      "domain": "kot.sh",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "animals",
+        "history",
+        "biology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kot.sh/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "znaniesila",
+      "name": "Знание — сила",
+      "homepage": "https://znanie-sila.su/",
+      "domain": "znanie-sila.su",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "history",
+        "biology",
+        "psychology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://znanie-sila.su/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "sbras",
+      "name": "Наука в Сибири",
+      "homepage": "https://www.sbras.info/",
+      "domain": "www.sbras.info",
+      "language": "ru",
+      "country": "RU",
+      "type": "research_news",
+      "topics": [
+        "ecology",
+        "biology",
+        "geology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.sbras.info/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "etudes",
+      "name": "Математические этюды",
+      "homepage": "https://etudes.ru/",
+      "domain": "etudes.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "popular_science",
+      "topics": [
+        "mathematics",
+        "history"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://etudes.ru/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "kommersant",
+      "name": "Коммерсантъ",
+      "homepage": "https://kommersant.ru/",
+      "domain": "kommersant.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://kommersant.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
+      }
+    },
+    {
+      "id": "smithsonian",
+      "name": "Smithsonian Magazine",
+      "homepage": "https://smithsonianmag.com/",
+      "domain": "smithsonianmag.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Музеи и выставки",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://smithsonianmag.com/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        10,
+        17,
+        18,
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "guardian",
+      "name": "The Guardian",
+      "homepage": "https://theguardian.com/lifeandstyle/family/",
+      "domain": "theguardian.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Семейные занятия и совместный досуг",
+        "Супружеские отношения",
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.theguardian.com/science/rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true,
+        "pages": [
+          "https://www.theguardian.com/science"
+        ]
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://theguardian.com/lifeandstyle/family/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2,
+        3,
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "ap",
+      "name": "Associated Press Science",
+      "homepage": "https://apnews.com/hub/science",
+      "domain": "apnews.com",
+      "language": "en",
+      "country": "US",
+      "type": "science_journalism",
+      "topics": [
+        "animals",
+        "biology",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://apnews.com/hub/science"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "wwf",
+      "name": "WWF",
+      "homepage": "https://wwf.panda.org/",
+      "domain": "wwf.panda.org",
+      "language": "en",
+      "country": "CH",
+      "type": "official",
+      "topics": [
+        "animals",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://wwf.panda.org/"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "zoo",
+      "name": "Smithsonian National Zoo",
+      "homepage": "https://nationalzoo.si.edu/news",
+      "domain": "nationalzoo.si.edu",
+      "language": "en",
+      "country": "US",
+      "type": "official",
+      "topics": [
+        "animals",
+        "ecology"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nationalzoo.si.edu/news"
+      },
+      "light_suitable": true,
+      "science_source": true,
+      "priority_ids": [
+        22,
+        24
+      ],
+      "editorial_priority": 60,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "parents",
+      "name": "Parents",
+      "homepage": "https://parents.com/",
+      "domain": "parents.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Семейные занятия и совместный досуг",
+        "Супружеские отношения"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://parents.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2,
+        3
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "scholastic",
+      "name": "Scholastic Parents",
+      "homepage": "https://scholastic.com/parents/",
+      "domain": "scholastic.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Семейные занятия и совместный досуг"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.scholastic.com/parents/home.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://scholastic.com/parents/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_URL_UNSAFE"
+      }
+    },
+    {
+      "id": "berkeley",
+      "name": "Greater Good Magazine",
+      "homepage": "https://greatergood.berkeley.edu/",
+      "domain": "greatergood.berkeley.edu",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Семейные занятия и совместный досуг",
+        "Супружеские отношения"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://greatergood.berkeley.edu/site/rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://greatergood.berkeley.edu/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2,
+        3
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "psychologytoday",
+      "name": "Psychology Today",
+      "homepage": "https://psychologytoday.com/",
+      "domain": "psychologytoday.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Супружеские отношения"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.psychologytoday.com/us/front/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://psychologytoday.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        3
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "atlantic",
+      "name": "The Atlantic",
+      "homepage": "https://theatlantic.com/",
+      "domain": "theatlantic.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Супружеские отношения",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://theatlantic.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        3,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "mel",
+      "name": "Мел",
+      "homepage": "https://mel.fm/",
+      "domain": "mel.fm",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Семейные занятия и совместный досуг"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://mel.fm/rss/default-news"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://mel.fm/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
+      }
+    },
+    {
+      "id": "foma",
+      "name": "Фома",
+      "homepage": "https://foma.ru/",
+      "domain": "foma.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Супружеские отношения",
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://foma.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        3,
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "pravmir",
+      "name": "Правмир",
+      "homepage": "https://pravmir.ru/",
+      "domain": "pravmir.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Супружеские отношения",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.pravmir.ru/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://pravmir.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        3,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "vokrug",
+      "name": "Вокруг света",
+      "homepage": "https://vokrugsveta.ru/",
+      "domain": "vokrugsveta.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Необычные места Москвы и Подмосковья",
+        "Путешествия выходного дня",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://vokrugsveta.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        7,
+        8,
+        17,
+        18,
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
+      }
+    },
+    {
+      "id": "cntraveller",
+      "name": "Condé Nast Traveller",
+      "homepage": "https://cntraveller.com/",
+      "domain": "cntraveller.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Путешествия выходного дня"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.cntraveller.com/feed/rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://cntraveller.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        8
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "lonelyplanet",
+      "name": "Lonely Planet",
+      "homepage": "https://lonelyplanet.com/",
+      "domain": "lonelyplanet.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Путешествия выходного дня"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://lonelyplanet.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        8
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "moskvich",
+      "name": "Москвич Mag",
+      "homepage": "https://moskvichmag.ru/",
+      "domain": "moskvichmag.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Московские усадьбы и дворцы",
+        "Необычные места Москвы и Подмосковья",
+        "Путешествия выходного дня",
+        "История Москвы",
+        "Музеи и выставки"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://moskvichmag.ru/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://moskvichmag.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "timeout",
+      "name": "Time Out Москва",
+      "homepage": "https://timeout.ru/msk/",
+      "domain": "timeout.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Семейные занятия и совместный досуг",
+        "Необычные места Москвы и Подмосковья",
+        "Путешествия выходного дня",
+        "Музеи и выставки"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.timeout.ru/comments/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://timeout.ru/msk/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        2,
+        7,
+        8,
+        10
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "culture",
+      "name": "Культура.РФ",
+      "homepage": "https://culture.ru/",
+      "domain": "culture.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Московские усадьбы и дворцы",
+        "Необычные места Москвы и Подмосковья",
+        "История Москвы",
+        "Музеи и выставки",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://culture.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        6,
+        7,
+        9,
+        10,
+        17,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "arzamas",
+      "name": "Arzamas",
+      "homepage": "https://arzamas.academy/",
+      "domain": "arzamas.academy",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "История Москвы",
+        "Музеи и выставки",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://arzamas.academy/feed_v1.rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://arzamas.academy/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        9,
+        10,
+        17,
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
+      }
+    },
+    {
+      "id": "historytoday",
+      "name": "History Today",
+      "homepage": "https://historytoday.com/",
+      "domain": "historytoday.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://historytoday.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        17,
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "historyextra",
+      "name": "HistoryExtra",
+      "homepage": "https://historyextra.com/",
+      "domain": "historyextra.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.historyextra.com/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://historyextra.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        17,
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "archaeology",
+      "name": "Archaeology Magazine",
+      "homepage": "https://archaeology.org/",
+      "domain": "archaeology.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Исторические загадки и открытия"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://archaeology.org/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://archaeology.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        17
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "rodina",
+      "name": "Родина",
+      "homepage": "https://rg.ru/rodina/",
+      "domain": "rg.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "История Москвы",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://rg.ru/rodina/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        9,
+        17,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "diletant",
+      "name": "Дилетант",
+      "homepage": "https://diletant.media/",
+      "domain": "diletant.media",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "История Москвы",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://diletant.media/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        9,
+        17,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_EMPTY"
+      }
+    },
+    {
+      "id": "theartnewspaper",
+      "name": "The Art Newspaper Russia",
+      "homepage": "https://theartnewspaper.ru/",
+      "domain": "theartnewspaper.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Музеи и выставки",
+        "Архитектура и дизайн интерьеров",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://theartnewspaper.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        10,
+        11,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "apollo",
+      "name": "Apollo Magazine",
+      "homepage": "https://apollo-magazine.com/",
+      "domain": "apollo-magazine.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Музеи и выставки",
+        "Архитектура и дизайн интерьеров",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://apollo-magazine.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        10,
+        11,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "iskusstvo",
+      "name": "Искусство",
+      "homepage": "https://iskusstvo-info.ru/",
+      "domain": "iskusstvo-info.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Музеи и выставки",
+        "Архитектура и дизайн интерьеров",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://iskusstvo-info.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        10,
+        11,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      },
+      "archive_url": "https://iskusstvo-info.ru/"
+    },
+    {
+      "id": "mosjour",
+      "name": "Московский журнал",
+      "homepage": "https://mosjour.ru/",
+      "domain": "mosjour.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Московские усадьбы и дворцы",
+        "Необычные места Москвы и Подмосковья",
+        "История Москвы",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://mosjour.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        6,
+        7,
+        9,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      },
+      "archive_url": "https://mosjour.ru/arhiv-nomerov"
+    },
+    {
+      "id": "nashe",
+      "name": "Наше наследие",
+      "homepage": "https://nn.media/",
+      "domain": "nn.media",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Московские усадьбы и дворцы",
+        "История Москвы",
+        "Музеи и выставки",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://nn.media/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        6,
+        9,
+        10,
+        17,
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      },
+      "archive_url": "https://nn.media/"
+    },
+    {
+      "id": "tretyakovmag",
+      "name": "Третьяковская галерея",
+      "homepage": "https://tretyakovgallerymagazine.ru/",
+      "domain": "tretyakovgallerymagazine.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Музеи и выставки",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://tretyakovgallerymagazine.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        10,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      },
+      "archive_url": "https://tretyakovgallerymagazine.ru/magazine/archive"
+    },
+    {
+      "id": "archreview",
+      "name": "The Architectural Review",
+      "homepage": "https://architectural-review.com/",
+      "domain": "architectural-review.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров",
+        "Выдающиеся люди и необычные судьбы"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.architectural-review.com/feed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://architectural-review.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11,
+        18
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "archdigest",
+      "name": "Architectural Digest",
+      "homepage": "https://architecturaldigest.com/",
+      "domain": "architecturaldigest.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.architecturaldigest.com/feed/rss"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://architecturaldigest.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "domus",
+      "name": "Domus",
+      "homepage": "https://domusweb.it/",
+      "domain": "domusweb.it",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://domusweb.it/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "dwell",
+      "name": "Dwell",
+      "homepage": "https://dwell.com/",
+      "domain": "dwell.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://dwell.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "dezeen",
+      "name": "Dezeen",
+      "homepage": "https://dezeen.com/",
+      "domain": "dezeen.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров",
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://dezeen.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11,
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "wallpaper",
+      "name": "Wallpaper*",
+      "homepage": "https://wallpaper.com/",
+      "domain": "wallpaper.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.wallpaper.com/feeds.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://wallpaper.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "salon",
+      "name": "SALON-interior",
+      "homepage": "https://salon.ru/",
+      "domain": "salon.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://salon.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "inmyroom",
+      "name": "InMyRoom",
+      "homepage": "https://inmyroom.ru/",
+      "domain": "inmyroom.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://inmyroom.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "archi",
+      "name": "Архи.ру",
+      "homepage": "https://archi.ru/",
+      "domain": "archi.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Московские усадьбы и дворцы",
+        "История Москвы",
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://archi.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        6,
+        9,
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "UnicodeDecodeError"
+      }
+    },
+    {
+      "id": "designmate",
+      "name": "Design Mate",
+      "homepage": "https://design-mate.ru/",
+      "domain": "design-mate.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Архитектура и дизайн интерьеров"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://design-mate.ru/zen"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://design-mate.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        11
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "prorus",
+      "name": "Проект Россия",
+      "homepage": "https://prorus.ru/",
+      "domain": "prorus.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "История Москвы",
+        "Архитектура и дизайн интерьеров",
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://prorus.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        9,
+        11,
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "harvardhealth",
+      "name": "Harvard Health Publishing",
+      "homepage": "https://health.harvard.edu/",
+      "domain": "health.harvard.edu",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Йога, подвижность и восстановление",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://health.harvard.edu/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        15,
+        16
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "mayo",
+      "name": "Mayo Clinic",
+      "homepage": "https://mayoclinic.org/",
+      "domain": "mayoclinic.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://mayoclinic.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        16
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "bmj",
+      "name": "The BMJ",
+      "homepage": "https://bmj.com/",
+      "domain": "bmj.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://bmj.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        16
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "runnersworld",
+      "name": "Runner’s World",
+      "homepage": "https://runnersworld.com/",
+      "domain": "runnersworld.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Кардиотренировки и физиология"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://runnersworld.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        13
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "bicycling",
+      "name": "Bicycling",
+      "homepage": "https://bicycling.com/",
+      "domain": "bicycling.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Велосипедные путешествия и маршруты"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.bicycling.com/rss/default.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://bicycling.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        14
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "outside",
+      "name": "Outside",
+      "homepage": "https://outsideonline.com/",
+      "domain": "outsideonline.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Путешествия выходного дня",
+        "Кардиотренировки и физиология",
+        "Велосипедные путешествия и маршруты"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://outsideonline.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        8,
+        13,
+        14
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "yogajournal",
+      "name": "Yoga Journal",
+      "homepage": "https://yogajournal.com/",
+      "domain": "yogajournal.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Йога, подвижность и восстановление"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://yogajournal.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        15
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "cyclingweekly",
+      "name": "Cycling Weekly",
+      "homepage": "https://cyclingweekly.com/",
+      "domain": "cyclingweekly.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Велосипедные путешествия и маршруты"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.cyclingweekly.com/feeds.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://cyclingweekly.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        14
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "marathonec",
+      "name": "Марафонец",
+      "homepage": "https://marathonec.ru/",
+      "domain": "marathonec.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Кардиотренировки и физиология",
+        "Велосипедные путешествия и маршруты",
+        "Йога, подвижность и восстановление"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://marathonec.ru/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://marathonec.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        13,
+        14,
+        15
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "cuprum",
+      "name": "Купрум",
+      "homepage": "https://cuprum.media/",
+      "domain": "cuprum.media",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://cuprum.media/rss/all"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://cuprum.media/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        16
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "discoverwildlife",
+      "name": "BBC Wildlife",
+      "homepage": "https://discoverwildlife.com/",
+      "domain": "discoverwildlife.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://discoverwildlife.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "audubon",
+      "name": "Audubon",
+      "homepage": "https://audubon.org/",
+      "domain": "audubon.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://audubon.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "mongabay",
+      "name": "Mongabay",
+      "homepage": "https://mongabay.com/",
+      "domain": "mongabay.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://mongabay.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "christianitytoday",
+      "name": "Christianity Today",
+      "homepage": "https://christianitytoday.com/",
+      "domain": "christianitytoday.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.christianitytoday.com/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://christianitytoday.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "tablet",
+      "name": "The Tablet",
+      "homepage": "https://thetablet.co.uk/",
+      "domain": "thetablet.co.uk",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://thetablet.co.uk/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "christianhistory",
+      "name": "Christian History",
+      "homepage": "https://christianhistoryinstitute.org/",
+      "domain": "christianhistoryinstitute.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://christianhistoryinstitute.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "firstthings",
+      "name": "First Things",
+      "homepage": "https://firstthings.com/",
+      "domain": "firstthings.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://firstthings.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "philosophynow",
+      "name": "Philosophy Now",
+      "homepage": "https://philosophynow.org/",
+      "domain": "philosophynow.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://philosophynow.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "pravenc",
+      "name": "Православная энциклопедия",
+      "homepage": "https://pravenc.ru/",
+      "domain": "pravenc.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Христианская история и философия"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://pravenc.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        21
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "economist",
+      "name": "The Economist",
+      "homepage": "https://economist.com/",
+      "domain": "economist.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://economist.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "ft",
+      "name": "Financial Times",
+      "homepage": "https://ft.com/",
+      "domain": "ft.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://ft.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "hbr",
+      "name": "Harvard Business Review",
+      "homepage": "https://hbr.org/",
+      "domain": "hbr.org",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://hbr.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      }
+    },
+    {
+      "id": "bloomberg",
+      "name": "Bloomberg Businessweek",
+      "homepage": "https://bloomberg.com/businessweek/",
+      "domain": "bloomberg.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://bloomberg.com/businessweek/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      }
+    },
+    {
+      "id": "econs",
+      "name": "Econs",
+      "homepage": "https://econs.online/",
+      "domain": "econs.online",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://econs.online/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "rbc",
+      "name": "РБК",
+      "homepage": "https://rbc.ru/",
+      "domain": "rbc.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://rbc.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 401
+      }
+    },
+    {
+      "id": "vedomosti",
+      "name": "Ведомости",
+      "homepage": "https://vedomosti.ru/",
+      "domain": "vedomosti.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://vedomosti.ru/rss/articles"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://vedomosti.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "expert",
+      "name": "Эксперт",
+      "homepage": "https://expert.ru/",
+      "domain": "expert.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://expert.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "tj",
+      "name": "Т—Ж",
+      "homepage": "https://t-j.ru/",
+      "domain": "t-j.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Воспитание и развитие детей",
+        "Семейные занятия и совместный досуг",
+        "Путешествия выходного дня",
+        "Велосипедные путешествия и маршруты",
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://t-j.ru/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://t-j.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2,
+        8,
+        14,
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "pravo",
+      "name": "Право.ru",
+      "homepage": "https://pravo.ru/",
+      "domain": "pravo.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://pravo.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
+      }
+    },
+    {
+      "id": "advgazeta",
+      "name": "Адвокатская газета",
+      "homepage": "https://advgazeta.ru/",
+      "domain": "advgazeta.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Экономика, предпринимательство и право"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://advgazeta.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        23
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "popularmechanics",
+      "name": "Popular Mechanics",
+      "homepage": "https://popularmechanics.com/",
+      "domain": "popularmechanics.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://popularmechanics.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      }
+    },
+    {
+      "id": "make",
+      "name": "Make: Magazine",
+      "homepage": "https://makezine.com/",
+      "domain": "makezine.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://makezine.com/feed/"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://makezine.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+      }
+    },
+    {
+      "id": "tct",
+      "name": "TCT Magazine",
+      "homepage": "https://tctmagazine.com/",
+      "domain": "tctmagazine.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://tctmagazine.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_FORBIDDEN"
+      }
+    },
+    {
+      "id": "all3dp",
+      "name": "All3DP",
+      "homepage": "https://all3dp.com/",
+      "domain": "all3dp.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://all3dp.com/feed/newsfeed"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://all3dp.com/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "techinsider",
+      "name": "TechInsider",
+      "homepage": "https://techinsider.ru/",
+      "domain": "techinsider.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [
+          "https://www.techinsider.ru/out/public-feed-all-news.xml"
+        ],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://techinsider.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "habr",
+      "name": "Хабр",
+      "homepage": "https://habr.com/ru/",
+      "domain": "habr.com",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://habr.com/ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
+      }
+    },
+    {
+      "id": "technica",
+      "name": "Техника — молодёжи",
+      "homepage": "https://technicamolodezhi.ru/",
+      "domain": "technicamolodezhi.ru",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Выдающиеся люди и необычные судьбы",
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://technicamolodezhi.ru/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        18,
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "modelist",
+      "name": "Моделист-конструктор",
+      "homepage": "https://modelist-konstruktor.press/",
+      "domain": "modelist-konstruktor.press",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "Инженерия, производство и технологии"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "feed_urls_are_hints": false,
+        "manual_search": true
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://modelist-konstruktor.press/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        24
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    }
+  ],
+  "verification_sources": [
+    "https://www.who.int/",
+    "https://www.nhs.uk/",
+    "https://www.nih.gov/",
+    "https://pravo.gov.ru/",
+    "https://vsrf.ru/",
+    "https://kad.arbitr.ru/"
+  ]
+}

@@ -97,6 +97,9 @@ def published_delivery(state, date, ops, preview, now, check_public):
         return reserve_delivery(state,now)
     status(state,'PUBLISHED','none')
     state['delivery_verified_at']=now.isoformat()
+    if state.get('editorial_report43',{}).get('date')==date:
+        state['editorial_report43'].update(stage='published_verified',published_main_articles=state['public_article_count'])
+        state['editorial_report43']['missing_week']=state['editorial_report43'].get('missing_after_prepared',state['editorial_report43'].get('missing_week',[]))
     return False
 
 

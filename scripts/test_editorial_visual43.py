@@ -85,7 +85,7 @@ class TopicTests(unittest.TestCase):
             before=copy.deepcopy(row['article']);e.Editor(call=lambda *a,**k:self.fail('No style-only call')).finish(s,row);self.assertEqual(row['article'],before)
 
 class CatalogTests(unittest.TestCase):
-    def registry_row(self):return dict(cat.registry()['publishers'][0],id='fixture',homepage='https://example.org/',domain='example.org')
+    def registry_row(self):return dict(cat.registry()['publishers'][0],id='fixture',homepage='https://example.org/',domain='example.org',enabled=True,availability={'status':'verified'},allow_archive=False)
     def session(self,forbidden=False,blocked=False):
         src=source(9);src['title']='Full original title'
         feed='<rss><channel><item><title>Real discovered publication metadata</title><link>https://example.org/story/9</link><description>SNIPPET_MUST_NOT_BE_AN_ORIGINAL</description></item></channel></rss>'
@@ -103,11 +103,11 @@ class CatalogTests(unittest.TestCase):
         return Session()
 
     def test_all_requested_fifty_science_publishers_are_registered_with_access_and_rights_rules(self):
-        config=cat.registry();rows=config['publishers'];self.assertEqual(len(rows),55)
-        self.assertEqual(len({r['id'] for r in rows}),55)
+        config=cat.registry();rows=config['publishers'];self.assertGreaterEqual(len(rows),55)
+        self.assertEqual(len({r['id'] for r in rows}),len(rows))
         for row in rows:
             self.assertEqual(row['rights']['status'],'per_article_required');self.assertTrue(row['access']['respect_robots']);self.assertTrue(row['access']['no_paywall_bypass'])
-            self.assertTrue(row['homepage'].startswith('https://'));self.assertIn(row['type'],('research_journal','science_journalism','popular_science','research_news','press_release','official'))
+            self.assertTrue(row['homepage'].startswith('https://'));self.assertIn(row['type'],('research_journal','science_journalism','popular_science','research_news','press_release','official','editorial_journalism'))
 
     def test_feed_discovers_url_but_only_complete_eligible_original_is_admitted(self):
         session=self.session();report,rows=cat.inspect_publisher(self.registry_row(),session)

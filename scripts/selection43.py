@@ -38,9 +38,9 @@ def profile(row):
     quoted=re.search(r'(?:музе[йяею]|парк[аеу]?|усадьб[аыеу])\s+[«"]([^»"]+)[»"]',norm)
     place=row.get('place_hint') or next((v for k,v in PLACES.items() if k in norm),'') or (quoted[1].strip() if quoted else '')
     org=row.get('organisation_hint') or next((key for pattern,key in ((r'\bnasa\b|наса','nasa'),(r'\bcern\b|церн','cern'),(r'\bunicef\b|юнисеф','unicef'),(r'\bwho\b|всемирн\w* организац\w* здравоохран','who'),(r'\bunesco\b|юнеско','unesco'),(r'\bмгу\b','msu')) if re.search(pattern,norm)), '')
-    space=bool(re.search(r'космо|астроно|галактик|спутник|лун[аыуе]|марс|планет|space|astronom|galax|lunar|planet|nasa',norm)) or row.get('science_domain')=='space'
+    space=bool(re.search(r'косм|сверхнов|supernova|astrophys|астроно|галактик|спутник|лун[аыуе]|марс|планет|space|astronom|galax|lunar|planet|nasa',norm)) or row.get('science_domain')=='space'
     return {'title':norm,'words':tokens(text),'doi':doi,'focus':focus,'place':place,
-        'publisher':row.get('publisher_id') or source.get('publisher') or (urlparse(url).hostname or '').removeprefix('www.'),
+        'publisher':row.get('publisher_group') or row.get('publisher_id') or source.get('publisher') or (urlparse(url).hostname or '').removeprefix('www.'),
         'organisation':org or ('nasa' if 'nasa.gov' in url else ''),'space':space,'url':url}
 
 
@@ -92,22 +92,25 @@ def recent(root,date,days=14):
         except ValueError:continue
         if not cutoff<=published<datetime.fromisoformat(date).date():continue
         text=path.read_text();heading=re.search(r'<h1[^>]*>(.*?)</h1>',text,re.S)
-        if heading:result.append({'title':re.sub('<[^>]+>','',heading[1])})
+        if heading:
+            summary=re.sub('<[^>]+>',' ',text[text.find('class="article-body"'):]) if 'class="article-body"' in text else ''
+            result.append({'title':unescape(re.sub('<[^>]+>','',heading[1])),'date':published.isoformat(),'summary':unescape(summary[:1500])})
     return result
 
 
 def order(state,history=()):
-    selected=ready(state);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered')];result=[]
+    from scripts import priorities43
+    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered')];result=[]
     category=Counter(r.get('category_hint') or r.get('category','') for r in selected)
     places=Counter(profile(r)['place'] for r in selected);publishers=Counter(profile(r)['publisher'] for r in selected);orgs=Counter(profile(r)['organisation'] for r in selected)
     space=sum(profile(r)['space'] for r in selected)
     while pending:
         def score(r):
             p=profile(r);cat=r.get('category_hint') or r.get('category','')
-            return (int(r.get('status')=='discovered'),int(any(duplicate(r,h) for h in history))*3+
+            return (int(r.get('status')=='discovered'),int(p['space'] and space>=1),*priorities43.preference(r,history,state.get('date'),planned),int(any(duplicate(r,h) for h in history))*3+
                 int(p['space'] and space>=1)*5+int(bool(p['place']) and places[p['place']]>=1)*3+
                 int(publishers[p['publisher']]>=2)*2+int(bool(p['organisation']) and orgs[p['organisation']]>=2)*2+category[cat])
-        row=min(pending,key=score);pending.remove(row);result.append(row);p=profile(row)
+        row=min(pending,key=score);pending.remove(row);result.append(row);planned.append(row);p=profile(row)
         category[row.get('category_hint') or row.get('category','')]+=1;places[p['place']]+=1;publishers[p['publisher']]+=1;orgs[p['organisation']]+=1;space+=p['space']
     return result
 

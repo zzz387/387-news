@@ -60,8 +60,8 @@ def preparation_order(state):
 
 
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None):
-    try:from scripts import selection43,catalog43,light43
-    except ImportError:import selection43,catalog43,light43
+    try:from scripts import selection43,catalog43,light43,priorities43
+    except ImportError:import selection43,catalog43,light43,priorities43
     clock=(lambda:now) if now is not None else pipeline.now_moscow
     save=persist
     def persist():
@@ -81,6 +81,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         if os.getenv('NEWS_CATALOG_REFRESH')=='true' and clock()<release-timedelta(minutes=25):
             try:catalog43.refresh(state,clock())
             except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
+        for row in state['candidates']:
+            if row.get('status')=='ready':continue
+            row['editorial43']=priorities43.evaluate(row,state['_recent43'],date)
+            if row['editorial43']['direction'] and row.get('status')=='discovered':row['category_hint']=row['editorial43']['category']
         persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
         for record in preparation_order(state):
@@ -94,7 +98,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             record['status']='preparing';persist()
             try:
                 if isinstance(editor,e.Editor):
-                    editor.state=state;editor.usage_record=record;editor.verify_source(record)
+                    editor.state=state;editor.usage_record=record;priorities43.attach_evidence(record,state);editor.verify_source(record)
                     if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
                 editor.finish(state,record)
@@ -110,6 +114,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true' and clock()<release-timedelta(minutes=30) and (len(selection43.ready(state))>=e.CONFIG['article_target'] or not any(r.get('status') in ('discovered','preparing','retryable_error') for r in state['candidates'])):
             light43.prepare(state,persist)
     selected=selection43.ready(state)
+    try:state['editorial_report43']=priorities43.report(state,selected,selection43.recent(root,date))
+    except Exception as exc:print('[editorial-report43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
     state['title_style43']=selection43.title_report(selected)
     state['selection43']={'selected':[r['id'] for r in selected],'excluded_duplicate_ids':[r['id'] for r in e.select_ready(state) if r not in selected]}
     state['selected_ids']=[r['id'] for r in selected]

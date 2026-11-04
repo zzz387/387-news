@@ -391,7 +391,13 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
     def test_workflow_upload_failure_blocks_release(self):
         workflow=(Path(__file__).resolve().parents[1]/'.github/workflows/daily-v31.yml').read_text()
         self.assertIn("success() && github.ref == 'refs/heads/main'",workflow)
-        self.assertNotIn('continue-on-error',workflow)
+        before_monitor,tail=workflow.split('\n  monitor:',1)
+        monitor,after_monitor=tail.split('\n  special-003-r:',1)
+        verification=monitor.split('      - name: Save advisory composition',1)[0]
+        # Draft/quota retention, verification and deployment stay strict. Only
+        # the post-publication, public-data composition report is advisory.
+        self.assertNotIn('continue-on-error',before_monitor+verification+after_monitor)
+        self.assertIn('if-no-files-found: error',before_monitor)
         self.assertIn('if-no-files-found: error',workflow)
 
 if __name__ == '__main__': unittest.main()
