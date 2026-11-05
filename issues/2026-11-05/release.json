@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-05",
+  "number": 12,
+  "policy_version": "4.3",
+  "article_count": 11,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "0b661166b17609754822322ea09712f80ffbb6d30da12b93b79507f2c1b49c28",
+      "markdown": "3f9eb4243af7531386a8c92def05f3ef034db5ed43d6d1562b66eafc807cdc70"
+    },
+    "feature-02": {
+      "html": "f78e044f1a1ba27587eb98df931bfbe2aea4130e53075c864211fb7e70d0d5b3",
+      "markdown": "e695b4b1ef506bc0fb8151fd6e06c53c98f36574bb2934f9e1a8669b29076e0b"
+    },
+    "feature-03": {
+      "html": "71e621771eabd6e012b8937deeec0e8e3c917ec164fa87290c368519c5141977",
+      "markdown": "99c3fbbac5d956ec619b9a8895688ce9d191efaa9ad4ae339d544e9db38417ef"
+    },
+    "feature-04": {
+      "html": "2bd48319b953e2196497aae8452e5a8fa693d7635a3ca79691309bde570a302d",
+      "markdown": "b1f660fc612fc1259b3435e66fa2f1fdee1eb4d89fdd7c3f64b18a3341320aed"
+    },
+    "feature-05": {
+      "html": "4bdca58dafda693dd8bd52fb3902ef1f4b451e86db93a6bee01e9e2c7c69fa05",
+      "markdown": "d2e7ad60f64c465ab3823d7b9f994ceddd94394483673a9fa4b76b746dbbc97e"
+    },
+    "feature-06": {
+      "html": "808840f349ca32c78da33dd184674f75f0d571ef21272141901e3132c7cafcbb",
+      "markdown": "bfde0de300d744b9c351b6b05ed709b61f201cf7203b0dbffaab1fc5c7a96a8a"
+    },
+    "feature-07": {
+      "html": "fa4272e21e5dc3cb4bd48fc0c07e064bb94e843a277724a41e829a58424c4811",
+      "markdown": "741a8aaab677da119688af21483b559c2c3da9c02ef432880767316f6c84f390"
+    },
+    "feature-08": {
+      "html": "a2f6db909e1fdc1819e6378ab113521785df366fc2626c4040523e9cf748f895",
+      "markdown": "e43513063751b9b9cf31054154ef634a55084209c73bca4e3e88ab342270c897"
+    },
+    "feature-09": {
+      "html": "25993c50a47325d5a8d617ce6e8643a4246eec4852bcb7791d4dd56d276dedee",
+      "markdown": "bcc9367b97f810dcbeb8f7f0cfd5b8ca9b62822c4eec61f7ac4972bc1f7b09be"
+    },
+    "feature-10": {
+      "html": "4bbc48fbc704fcf86fc46fb8fbb55ae5c753c88d838f207fc250d6d1baa5835e",
+      "markdown": "27c9bb443d14b94032607a7381c94ba94b2d1bbecba8ea8a8527d2688e70aadf"
+    },
+    "feature-11": {
+      "html": "5679cd977d1226f2276e778b97f59b6a53957ce6794fe646e394a3eda1b9e639",
+      "markdown": "09b02d5bc631cd3c33c72d800dd8cabe116aabb7d6a24e3192c034beb767e948"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-05T09:53:10.851960+03:00",
+  "release_not_before": "2026-11-05T06:00:00+03:00",
+  "light_news": [],
+  "light_count": 0,
+  "homepage_hash": "6f3a5a53908f461f7c0b4e66449cacafa2a0ef590446adcd8f5bc929dc0e1f90",
+  "overview_hash": "b8a1dd8c8fddbc902489fa86f3ff3424e4b642782c311c3bb5434bf382a694f0",
+  "markdown_hash": "53bcd760e23ed1ecc69afc3a34434a72321dab711af0255477da4800173f050d"
+}
