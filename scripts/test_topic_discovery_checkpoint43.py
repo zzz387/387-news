@@ -145,6 +145,19 @@ class TopicDiscoveryTests(unittest.TestCase):
         row=candidate('Интересный маршрут недели',1);row['source'].update(full_text_verified=True,blocks=[{'text':'Велосипедный маршрут длиной 40 км проходит через лес.'}])
         self.assertEqual(pr.classify(row)['group'],'C')
 
+    def test_preparation_reranks_after_a_refusal_instead_of_assuming_planned_coverage(self):
+        rows=[candidate('Quantum experiment',0),candidate('Семейный досуг и игры',1),candidate('Семейные занятия с детьми',2)]
+        s=fixtures.state();s['candidates']=rows;seen=[]
+        for row in rows:row['history']=[]
+        class Editor:
+            def finish(self,state,row):
+                seen.append(row['id']);raise ed.p.Blocked('SYNTHETIC_UNSAFE_SOURCE')
+        from unittest.mock import Mock
+        budget=SimpleNamespace(deadline=float('inf'),can_request=lambda:True)
+        with tempfile.TemporaryDirectory() as temp,patch.object(daily,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(daily,'reserve_rows',return_value=[fixtures.RESERVE_FIXTURE]):
+            daily.advance(s,s['date'],False,SimpleNamespace(ROOT=fixtures.root(temp)),now=fixtures.NOW.replace(hour=5),editor=Editor())
+        self.assertEqual(seen,['1','2','0']);self.assertEqual(len(seen),len(set(seen)))
+
     def test_compact_report_counts_main_groups_not_light_news(self):
         s=fixtures.state();rows=[candidate('Семейный досуг',1),candidate('История Москвы',2),candidate('Йога и подвижность',3)]
         s['light43']={'records':[candidate('Воспитание ребёнка',4)]}

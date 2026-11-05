@@ -35,6 +35,9 @@ The original record, source, evidence checks and refusal history stay in the sam
 checkpoint. Written or partially processed work is not retired. No quota ledger
 is reset. The fixed URL list remains a reserve.
 
+Writing order is recomputed after each success or refusal from actual accepted
+coverage, not the assumed coverage of a planned-but-failed story. A record is
+attempted only once per run, retaining existing bounded stage repair counters.
 A/B/C receive preference when candidates are available, with the twenty original
 directions and 7/14-day history retained. Resuming paid-for stages still has
 priority over starting another story. Coverage is a search/selection objective,

@@ -85,7 +85,11 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         priorities43.apply_rules(state,clock())
         persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
-        for record in preparation_order(state):
+        attempted_ids=set()
+        while True:
+            record=next((r for r in preparation_order(state) if r['id'] not in attempted_ids),None)
+            if record is None:break
+            attempted_ids.add(record['id'])
             if len(selection43.ready(state))>=e.CONFIG['article_target']:break
             if clock()>=release-timedelta(minutes=10) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
