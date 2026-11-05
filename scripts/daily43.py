@@ -59,7 +59,7 @@ def preparation_order(state):
     return selection43.order(state,state.get('_recent43',[]))
 
 
-def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None):
+def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None,delivery_only=False):
     try:from scripts import selection43,catalog43,light43,priorities43
     except ImportError:import selection43,catalog43,light43,priorities43
     clock=(lambda:now) if now is not None else pipeline.now_moscow
@@ -74,7 +74,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     release=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
     budget=news.runtime.ACTIVE_BUDGET
     # Delivery has first claim on every due window; never wait for more model work.
-    if current<release-timedelta(minutes=10):
+    if not delivery_only and current<release-timedelta(minutes=10):
         if budget:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
         discover(state)
         state['_recent43']=selection43.recent(root,date)
@@ -148,3 +148,8 @@ def check_reserve():
 
 
 if __name__=='__main__':check_reserve()
+
+
+def deliver(state,date,preview,ops,persist=lambda:None,now=None,check_public=None):
+    """Restore/validate/assemble existing work only. No discovery, writing or Gemini."""
+    return advance(state,date,preview,ops,persist,now,check_public,delivery_only=True)
