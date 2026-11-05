@@ -84,11 +84,20 @@ def publisher_order(rows,cache,history,date):
         checked=cache.get('publishers',{}).get(row['id'],{}).get('checked_at','')
         return (not bool(ids),-int(missing>0),-missing/max(1,len(ids)),checked,-row.get('editorial_priority',50),row['id'])
     # Within equally old/fresh publishers, compensate sparse groups/directions dynamically.
-    result=[];covered=Counter()
+    result=[];covered=Counter();covered_groups=set()
     pending=list(rows)
+    def groups(row):
+        return {DIRECTIONS[i]['group'] for i in row.get('priority_ids',[]) if i in DIRECTIONS}
     while pending:
-        row=min(pending,key=lambda r:(key(r)[0],key(r)[1],sum(covered[i] for i in r.get('priority_ids',[])),*key(r)[2:]))
-        result.append(row);pending.remove(row);covered.update(row.get('priority_ids',[]))
+        # Search at least one publisher for family, Moscow and health before
+        # spending the whole small discovery window on easy science feeds.
+        # A missing publisher never blocks discovery or publication.
+        missing={'A','B','C'}-covered_groups
+        row=min(pending,key=lambda r:(key(r)[0],
+            int(bool(missing) and not (missing & groups(r))),
+            key(r)[1],sum(covered[i] for i in r.get('priority_ids',[])),*key(r)[2:]))
+        result.append(row);pending.remove(row)
+        covered.update(row.get('priority_ids',[]));covered_groups.update(groups(row))
     return result
 
 
