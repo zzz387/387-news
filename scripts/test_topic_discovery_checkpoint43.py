@@ -19,6 +19,7 @@ class TopicDiscoveryTests(unittest.TestCase):
         a,b=self.eos();self.assertTrue(sel.duplicate(a,b))
         self.assertFalse(sel.duplicate(a,candidate('История московского модерна: особняк Рябушинского',7)))
         self.assertFalse(sel.duplicate(a,candidate('Бактерии в городской экологии рек',8)))
+        self.assertFalse(sel.duplicate(a,candidate('Бактерии в старых зданиях и проблемы санитарии',9)))
 
     def test_cryptic_original_title_uses_verified_full_source_before_writing(self):
         a,b=self.eos();a['title']=a['source']['title'];b['title']=b['source']['title']
@@ -122,8 +123,27 @@ class TopicDiscoveryTests(unittest.TestCase):
         report=s['discovery43']['last_run'];self.assertEqual(report['missing_candidate_groups'],[]);self.assertLessEqual(report['article_checks'],8)
 
     def test_common_english_personal_topic_metadata_is_recognized(self):
-        for title,group in [('Family rituals and time together','A'),('Helping kids learn','A'),('Fitness and recovery after a workout','C'),('Heart health and disease prevention','C')]:
+        for title,group in [('Family rituals and time together','A'),('Helping kids learn','A'),('Fitness and recovery after a workout','C'),('Heart health and disease prevention','C'),('Подготовка к забегу и марафону','C'),('Пять небоскрёбов у площади Гагарина','B')]:
             self.assertEqual(pr.classify({'title':title})['group'],group,title)
+
+    def test_only_publisher_publication_field_can_fill_missing_date_not_updated(self):
+        fixture=visual.CatalogTests();src=fixture.session().fetch('https://example.org/story/9');src['published']=None
+        class Session:
+            def __init__(self,field):self.field=field
+            def transport(self,url):
+                if url.endswith('robots.txt'):return 'User-agent: *\nAllow: /'
+                if url.endswith('feed.xml'):return '<feed><entry><title>Family activities for kids</title><link href="https://example.org/story/9"/><'+self.field+'>2026-10-26T00:00:00Z</'+self.field+'></entry></feed>'
+                return '<html><link rel="alternate" type="application/atom+xml" href="/feed.xml"></html>'
+            def fetch(self,url):return copy.deepcopy(src)
+        report,rows=cat.inspect_publisher(fixture.registry_row(),Session('published'),now=fixtures.NOW)
+        self.assertEqual(len(rows),1);self.assertEqual(rows[0][1]['published'],'2026-10-26T00:00:00Z')
+        self.assertEqual(rows[0][1]['publication_date_evidence']['kind'],'publisher_feed')
+        report,rows=cat.inspect_publisher(fixture.registry_row(),Session('updated'),now=fixtures.NOW)
+        self.assertEqual(rows,[]);self.assertEqual(report['last_article_code'],'PUBLISHER_ACTIVITY_UNCONFIRMED')
+
+    def test_verified_original_context_classifies_an_ambiguous_title(self):
+        row=candidate('Интересный маршрут недели',1);row['source'].update(full_text_verified=True,blocks=[{'text':'Велосипедный маршрут длиной 40 км проходит через лес.'}])
+        self.assertEqual(pr.classify(row)['group'],'C')
 
     def test_compact_report_counts_main_groups_not_light_news(self):
         s=fixtures.state();rows=[candidate('Семейный досуг',1),candidate('История Москвы',2),candidate('Йога и подвижность',3)]

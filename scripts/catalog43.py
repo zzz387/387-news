@@ -82,7 +82,7 @@ def feed_items(raw,base):
             tag=child.tag.split('}')[-1]
             if tag in ('title','pubDate','published','updated','description','summary'):fields[tag]=''.join(child.itertext()).strip()
             if tag=='link' and child.attrib.get('rel','alternate')=='alternate':links.append(child.attrib.get('href') or (child.text or '').strip())
-        if links and fields.get('title'):items.append({'url':urljoin(base,links[0]),'title':fields['title'],'summary':fields.get('description') or fields.get('summary',''),'feed_date':fields.get('published') or fields.get('pubDate') or fields.get('updated','')})
+        if links and fields.get('title'):items.append({'url':urljoin(base,links[0]),'title':fields['title'],'summary':fields.get('description') or fields.get('summary',''),'feed_published':fields.get('published') or fields.get('pubDate',''),'feed_date':fields.get('published') or fields.get('pubDate') or fields.get('updated','')})
     return items
 
 
@@ -119,6 +119,12 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 report['last_checked_url']=item['url']
                 src=session.fetch(item['url'])
                 if not owned(src.get('canonical',src['url']),row):raise p.Blocked('PUBLISHER_REDIRECT_UNVERIFIED')
+                # A publisher's verified RSS publication field can establish a
+                # missing bibliographic date. Never substitute updated/event dates.
+                if not src.get('published') and item.get('feed_published') and report.get('verified_feed'):
+                    src['published']=item['feed_published']
+                    src['publication_date_evidence']={'kind':'publisher_feed','url':report['verified_feed'],'field':'published_or_pubDate'}
+                    src['metadata_gaps']=[g for g in src.get('metadata_gaps',[]) if g!='published']
                 published=str(src.get('published',''))
                 try:stamp=datetime.fromisoformat(published.replace('Z','+00:00'))
                 except ValueError:

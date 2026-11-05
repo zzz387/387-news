@@ -33,7 +33,9 @@ def story_family(row):
     text=story_context(row)
     living=re.search(r'жив\w{0,8}\s+(?:строител\w*\s+)?материал|living (?:building |construction )?materials|мицел|myceli|микроорганизм|microb|бактери|самовосстан|self.heal',text)
     built=re.search(r'строител|бетон|здани|building|concret|construct|brick|structural|insulat',text)
-    if living and built and not re.search(r'истори.{0,25}(?:модерн|архитект)|history of (?:modernism|architecture)',text):return 'living_construction_materials'
+    explicit=re.search(r'жив\w{0,8}\s+(?:строител\w*\s+)?материал|living (?:building |construction )?materials|самовосстан|self.heal',text)
+    construction=re.search(r'строител|бетон|building materials|concret|construct|brick|insulat|structural materials',text)
+    if living and built and (explicit or construction):return 'living_construction_materials'
     if 'sleep_loss' in text and 'metabolic' in text:return 'sleep_and_appetite'
     return ''
 

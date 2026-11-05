@@ -65,7 +65,7 @@
       "name": "Архитектура и дизайн интерьеров",
       "group": "B",
       "category": "История и культура",
-      "pattern": "архитект|интерьер|architect|interior|historic building|building design"
+      "pattern": "архитект|интерьер|architect|interior|historic building|building design|небоскр[её]б|skyscraper"
     },
     {
       "id": 12,
@@ -79,7 +79,7 @@
       "name": "Кардиотренировки и физиология",
       "group": "C",
       "category": "Здоровье и движение",
-      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|physical training|strength training|training load|running|fitness|workout|muscle.{0,20}(?:exercise|training|strength)"
+      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|physical training|strength training|training load|running|fitness|workout|muscle.{0,20}(?:exercise|training|strength)|\\bбег\\b|бегун|забег|марафон|jogging"
     },
     {
       "id": 14,

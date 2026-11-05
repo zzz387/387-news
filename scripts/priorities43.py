@@ -19,6 +19,8 @@ def classify(row):
     article=row.get('article',{});source=row.get('source',{})
     title=' '.join(str(x or '') for x in (article.get('title'),row.get('title'),source.get('title'),row.get('topic_key')))
     text=title+' '+str(article.get('teaser',''))+' '+str(row.get('summary',''))
+    if not article and source.get('full_text_verified'):
+        text+=' '+' '.join(b.get('text','') for b in source.get('blocks',[])[:8])
     if article:
         text=' '.join(str(article.get(k,'')) for k in ('title','teaser'))+' '+' '.join(b.get('text','') for b in article.get('blocks',[])[:8])
     return dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))

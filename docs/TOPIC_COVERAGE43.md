@@ -24,6 +24,10 @@ rights restrictions and missing groups never block an otherwise valid release.
 The existing six-hour publisher cache remains. `discovery43.last_run` records
 attempted groups separately from actual full-source candidate classifications.
 RSS descriptions rank links only and never substitute for a complete original.
+If the complete original has no bibliographic publication date, a verified
+publisher feed may supply its explicit published/pubDate field, with provenance.
+An updated date never substitutes for publication, and no RSS date proves an
+event date; future dates and the normal factual/news checks remain enforced.
 
 The old 120-total-record early return is removed. At most 120 untouched discovered
 candidates remain active; older untouched records are marked discovery_retired.
