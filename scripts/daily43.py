@@ -53,10 +53,10 @@ def discover(state):
             state['candidates'].append(dict(item,id=p.digest(item['url']),status='discovered',checks={},progress={},history=[],discovered_at=datetime.now(p.TZ).isoformat()));known.add(item['url'])
 
 
-def preparation_order(state):
+def preparation_order(state,limit=None,exclude_ids=()):
     try:from scripts import selection43
     except ImportError:import selection43
-    return selection43.order(state,state.get('_recent43',[]))
+    return selection43.order(state,state.get('_recent43',[]),limit=limit,exclude_ids=exclude_ids)
 
 
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None,delivery_only=False):
@@ -87,7 +87,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
         attempted_ids=set()
         while True:
-            record=next((r for r in preparation_order(state) if r['id'] not in attempted_ids),None)
+            record=next(iter(preparation_order(state,limit=1,exclude_ids=attempted_ids)),None)
             if record is None:break
             attempted_ids.add(record['id'])
             if len(selection43.ready(state))>=e.CONFIG['article_target']:break

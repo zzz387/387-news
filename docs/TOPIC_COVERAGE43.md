@@ -38,6 +38,8 @@ is reset. The fixed URL list remains a reserve.
 Writing order is recomputed after each success or refusal from actual accepted
 coverage, not the assumed coverage of a planned-but-failed story. A record is
 attempted only once per run, retaining existing bounded stage repair counters.
+Only the next candidate is ranked at each step; the controller does not rebuild
+a complete hypothetical plan after every refusal.
 A/B/C receive preference when candidates are available, with the twenty original
 directions and 7/14-day history retained. Resuming paid-for stages still has
 priority over starting another story. Coverage is a search/selection objective,

@@ -130,13 +130,13 @@ def recent(root,date,days=14):
     return result
 
 
-def order(state,history=()):
+def order(state,history=(),limit=None,exclude_ids=()):
     from scripts import priorities43
-    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered')];result=[]
+    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered') and r['id'] not in exclude_ids];result=[]
     category=Counter(r.get('category_hint') or r.get('category','') for r in selected)
     places=Counter(profile(r)['place'] for r in selected);publishers=Counter(profile(r)['publisher'] for r in selected);orgs=Counter(profile(r)['organisation'] for r in selected)
     space=sum(profile(r)['space'] for r in selected)
-    while pending:
+    while pending and (limit is None or len(result)<limit):
         def score(r):
             p=profile(r);cat=r.get('category_hint') or r.get('category','')
             # A/B/C are the essential reader-facing streams (family, Moscow,
