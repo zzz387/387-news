@@ -45,17 +45,17 @@ class WatchdogTests(unittest.TestCase):
             return w.run(Path('/unused'),clock=clock,sleep=clock.sleep,request=api,check=api.check,**kw)
 
     def test_before_arming_window_is_normal_wait_not_publication_or_error(self):
-        clock=Clock(at('04:00'));api=API(clock);result=self.run_watch(clock,api)
+        clock=Clock(at('00:30'));api=API(clock);result=self.run_watch(clock,api)
         self.assertEqual(result['publication_status'],'WAITING_FOR_RELEASE');self.assertFalse(result['verified']);self.assertEqual(api.posts,[]);self.assertEqual(clock.sleeps,[])
 
     def test_pre_six_appointment_recovers_at_six_even_without_any_later_cron(self):
         clock=Clock(at('04:55'));api=API(clock);result=self.run_watch(clock,api)
-        self.assertTrue(result['verified']);self.assertEqual(api.posts[0][0],at('06:00'))
+        self.assertTrue(result['verified']);self.assertEqual(api.posts[0][0],at('05:54'));self.assertGreaterEqual(clock(),at('06:00'))
         self.assertTrue(all(delay<=30 for delay in clock.sleeps));self.assertEqual(len(api.posts),1)
 
     def test_seven_am_missing_release_dispatches_exact_owner_requested_inputs(self):
         clock=Clock(at('07:00'));api=API(clock);result=self.run_watch(clock,api)
-        self.assertEqual(api.posts[0][1],{'ref':'main','inputs':{'phase':'run','preview':'false','target_date':DAY}})
+        self.assertEqual(api.posts[0][1],{'ref':'main','inputs':{'phase':'publish','preview':'false','target_date':DAY}})
         self.assertTrue(result['verified']);self.assertEqual(result['gemini_requests'],0)
 
     def test_already_verified_does_not_start_another_producer(self):

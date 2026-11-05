@@ -4,7 +4,7 @@ on:
   # Different wake-up windows from the producer. UTC = Moscow minus three hours.
   schedule:
     - cron: '7,27,47 3-20 * * *'
-    - cron: '43 1,2 * * *'
+    - cron: '43 1,2,22,23 * * *'
   workflow_run:
     workflows: ['387 News — autonomous daily edition']
     types: [completed]
@@ -28,7 +28,7 @@ jobs:
     # Never execute privileged workflow_run actions for PRs, forks or non-main code.
     if: ${{ github.ref == 'refs/heads/main' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' && (github.event_name != 'workflow_run' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.event != 'pull_request')) }}
     runs-on: ubuntu-latest
-    timeout-minutes: 110
+    timeout-minutes: 330
     env:
       GH_TOKEN: ${{ github.token }}
       NEWS_POLICY_VERSION: '4.3'
@@ -42,5 +42,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify public hashes, arm 06:00 appointment, or recover through the original controller
+      - name: Verify public hashes, arm 05:54 delivery, or recover through the original controller
         run: python -m scripts.delivery_watchdog

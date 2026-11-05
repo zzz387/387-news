@@ -1,5 +1,5 @@
 name: 387 News — autonomous daily edition
-run-name: ${{ github.event_name == 'workflow_dispatch' && inputs.phase == 'run' && !inputs.preview && inputs.target_date != '' && format('Delivery {0}', inputs.target_date) || format('387 News {0}', github.event_name) }}
+run-name: ${{ github.event_name == 'workflow_dispatch' && (inputs.phase == 'run' || inputs.phase == 'publish') && !inputs.preview && inputs.target_date != '' && format('Delivery {0}', inputs.target_date) || format('387 News {0}', github.event_name) }}
 
 on:
   push:

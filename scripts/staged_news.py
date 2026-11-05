@@ -598,7 +598,8 @@ def main():
             raise RuntimeError('Encrypted draft missing; run plan first')
         ready=False
         if state.get('version')==43:
-            ready=daily43.advance(state,date,args.preview,sys.modules[__name__],persist)
+            operation=daily43.deliver if args.phase=='publish' else daily43.advance
+            ready=operation(state,date,args.preview,sys.modules[__name__],persist)
         elif state.get('version')==41:
             ready=pipeline.advance(state,date,args.preview,sys.modules[__name__],persist)
         elif args.phase=='plan':

@@ -10,7 +10,8 @@ ACTIVE={'queued','pending','waiting','in_progress','requested'}
 MAX_RECOVERIES=3
 POLL_SECONDS=600
 RECOVERY_GAP=timedelta(minutes=12)
-ARM_SECONDS=90*60
+ARM_SECONDS=5*60*60
+DELIVERY_LEAD_SECONDS=6*60
 
 
 def productions(request):
@@ -54,15 +55,15 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
     result={'date':date,'verified':False,'recovery_dispatched':False,'publication_status':'WAITING_FOR_RELEASE','code':'NOT_DUE','gemini_requests':0}
     if now<release:
         if (release-now).total_seconds()>ARM_SECONDS:return result
-        print('[delivery-watchdog] '+json.dumps(dict(result,code='ARMED_UNTIL_0600',release_at=release.isoformat())),flush=True)
+        print('[delivery-watchdog] '+json.dumps(dict(result,code='ARMED_FOR_DELIVERY',release_at=release.isoformat(),delivery_start=(release-timedelta(seconds=DELIVERY_LEAD_SECONDS)).isoformat())),flush=True)
         # Separate watcher lock: generation can continue while this appointment waits.
-        queue.wait_until_release(date,clock=clock,sleep=sleep,maximum_wait=ARM_SECONDS)
-    deadline=queue.moscow(clock())+timedelta(seconds=poll_seconds)
+        queue.wait_until_release(date,clock=clock,sleep=sleep,maximum_wait=ARM_SECONDS,lead_seconds=DELIVERY_LEAD_SECONDS)
+    deadline=max(queue.moscow(clock()),release)+timedelta(seconds=poll_seconds)
     attempts=0;code='RECOVERY_NOT_VERIFIED';active=False
     while True:
         now=queue.moscow(clock())
         if now.date().isoformat()!=date:code='WATCHDOG_DATE_ROLLED_OVER';break
-        if current(date,check,result):
+        if now>=release and current(date,check,result):
             result.update(verified=True,publication_status='PUBLISHED_VERIFIED',code='VERIFIED')
             try:result['incident']=monitor.incident(date,'VERIFIED',True,request)
             except Exception as exc:result['notification_error']=type(exc).__name__
@@ -78,11 +79,11 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
                 retry_after=max((datetime.fromisoformat(r['created_at'].replace('Z','+00:00'))+RECOVERY_GAP for r in prior),default=now)
                 if now>=retry_after:
                     # Recheck the site and active producers immediately before the one POST.
-                    if current(date,check,result):continue
+                    if now>=release and current(date,check,result):continue
                     if any(r['status'] in ACTIVE for r in productions(request)):active=True
                     else:
                         attempts+=1
-                        request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'run','preview':'false','target_date':date}})
+                        request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'publish','preview':'false','target_date':date}})
                         result.update(recovery_dispatched=True,publication_status='PUBLISHING',code='RECOVERY_DISPATCHED')
                         print('[delivery-watchdog] '+json.dumps(dict(result,recovery_attempts=attempts)),flush=True)
         except Exception as exc:
