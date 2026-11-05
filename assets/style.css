@@ -25,3 +25,8 @@ main[data-policy-version="4.1"] .front-grid{grid-template-columns:minmax(0,1.6fr
 .edition-compact .front-grid{margin-top:18px}.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .light-news{margin:34px 0 28px;padding-top:20px;border-top:3px double var(--ink)}.light-news>h2{font:700 23px Georgia,serif;letter-spacing:.02em;margin:0 0 7px}.light-news>p{font:14px/1.5 Arial,sans-serif;color:var(--quiet);margin:0 0 17px}.light-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}.light-item{border-top:1px solid var(--rule);padding:13px 0;min-width:0;overflow-wrap:anywhere}.light-item h3{font:500 21px/1.18 Georgia,serif;margin:0 0 10px}.light-item p{font:16px/1.55 Georgia,serif;margin:0 0 9px}.light-item .light-source{font:11px/1.5 Arial,sans-serif;color:var(--quiet)}.light-source a{text-decoration:underline;text-underline-offset:3px}
 @media(max-width:768px){.light-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.edition-compact .mast{padding:10px 0 8px}.edition-compact .front-grid{margin-top:10px}.light-grid{grid-template-columns:1fr;gap:3px}.light-news>h2{font-size:21px}}
+
+/* Full policy4.3 text must wrap on phones just like the full4.1 reader. */
+.article-shell[data-policy-version="4.3"]{min-width:0;overflow-wrap:anywhere}
+[data-policy-version="4.3"] .article-body{display:flow-root;overflow-wrap:anywhere;min-width:0}
+main[data-policy-version="4.3"] h2,main[data-policy-version="4.3"] .toc h3{overflow-wrap:anywhere;min-width:0}

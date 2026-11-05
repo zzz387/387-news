@@ -54,7 +54,7 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
                     page.screenshot(path=str(output/f'{width}-digest.png'));report['pages']+=1
                 for index,url in enumerate(urls):
                     page.goto(base+url,wait_until='networkidle')
-                    if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HORIZONTAL_OVERFLOW')
+                    if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'): raise ValueError('BROWSER_HORIZONTAL_OVERFLOW width='+str(width)+' article='+str(index+1))
                     body=page.locator('.article-body')
                     metrics=body.evaluate('(n)=>({scroll:n.scrollHeight,client:n.clientHeight,overflow:getComputedStyle(n).overflowY})')
                     if not body.is_visible(): raise ValueError('BROWSER_BODY_HIDDEN')
