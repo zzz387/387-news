@@ -29,7 +29,7 @@ def story_context(row):
 def story_family(row):
     """Conservative aliases for the same *narrow* story, not broad categories."""
     text=story_context(row)
-    living=re.search(r'жив\\w{0,8}\\s+(?:строител\\w*\\s+)?материал|living (?:building |construction )?materials|мицел|myceli|микроорганизм|microb|бактери|самовосстан|self.heal',text)
+    living=re.search(r'жив\w{0,8}\s+(?:строител\w*\s+)?материал|living (?:building |construction )?materials|мицел|myceli|микроорганизм|microb|бактери|самовосстан|self.heal',text)
     built=re.search(r'строител|бетон|архитект|инфраструкт|городск|здани|building|concret|construct|urban|architecture|cities',text)
     if living and built:return 'living_construction_materials'
     if 'sleep_loss' in text and 'metabolic' in text:return 'sleep_and_appetite'
