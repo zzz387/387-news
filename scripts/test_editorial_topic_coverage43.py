@@ -41,6 +41,21 @@ class EditorialTopicCoverageTests(unittest.TestCase):
         groups = [priorities43.classify(row)['group'] for row in ordered[:3]]
         self.assertEqual(set(groups), {'A', 'B', 'C'})
 
+    def test_publisher_discovery_rotates_three_core_groups(self):
+        publishers = [
+            {'id':'science','priority_ids':[22], 'editorial_priority':90},
+            {'id':'history','priority_ids':[17], 'editorial_priority':90},
+            {'id':'family','priority_ids':[1], 'editorial_priority':90},
+            {'id':'moscow','priority_ids':[9], 'editorial_priority':90},
+            {'id':'health','priority_ids':[15], 'editorial_priority':90},
+        ]
+        ordered = priorities43.publisher_order(publishers, {}, [], '2026-11-06')
+        groups = {
+            priorities43.DIRECTIONS[p['priority_ids'][0]]['group']
+            for p in ordered[:3]
+        }
+        self.assertEqual(groups, {'A', 'B', 'C'})
+
     def test_no_core_candidates_does_not_block_science_selection(self):
         rows = [candidate('Нейтрино в новом эксперименте', 1),
                 candidate('Гравитационные волны от далекой звезды', 2)]
