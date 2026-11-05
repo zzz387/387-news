@@ -106,6 +106,25 @@ class TopicDiscoveryTests(unittest.TestCase):
         with patch.object(cat,'registry',return_value=self.core_registry()),patch.object(cat,'inspect_publisher',side_effect=inspect):cat.refresh(s,fixtures.NOW,visual.CatalogTests().session())
         self.assertTrue(set('ABC')<=set(seen));self.assertEqual(set(s['discovery43']['last_run']['missing_candidate_groups']),set('ABC'))
 
+    def test_missing_core_candidates_use_remaining_slots_for_fallback_not_science(self):
+        config=self.core_registry();config['publishers']=config['publishers'][:3]
+        config['publishers'] += [dict(config['publishers'][0],id='A2'),dict(config['publishers'][2],id='C2')]
+        config.update(publishers_per_run=5,article_checks_per_run=8)
+        source=visual.CatalogTests().session().fetch('https://example.org/story/9');s=fixtures.state();seen=[]
+        def inspect(row,session,**kw):
+            seen.append(row['id'])
+            if row['id'] in ('A','C'):return {'status':'unavailable','article_checks':1},[]
+            title={'A2':'Воспитание ребёнка','B':'История Москвы','C2':'Йога и подвижность'}[row['id']]
+            src=dict(source,url='https://example.org/'+row['id'],title=title)
+            return {'status':'full_sources_verified','article_checks':1},[({},src)]
+        with patch.object(cat,'registry',return_value=config),patch.object(cat,'inspect_publisher',side_effect=inspect):cat.refresh(s,fixtures.NOW,visual.CatalogTests().session())
+        self.assertEqual(set(seen),{'A','B','C','A2','C2'})
+        report=s['discovery43']['last_run'];self.assertEqual(report['missing_candidate_groups'],[]);self.assertLessEqual(report['article_checks'],8)
+
+    def test_common_english_personal_topic_metadata_is_recognized(self):
+        for title,group in [('Family rituals and time together','A'),('Helping kids learn','A'),('Fitness and recovery after a workout','C'),('Heart health and disease prevention','C')]:
+            self.assertEqual(pr.classify({'title':title})['group'],group,title)
+
     def test_compact_report_counts_main_groups_not_light_news(self):
         s=fixtures.state();rows=[candidate('Семейный досуг',1),candidate('История Москвы',2),candidate('Йога и подвижность',3)]
         s['light43']={'records':[candidate('Воспитание ребёнка',4)]}

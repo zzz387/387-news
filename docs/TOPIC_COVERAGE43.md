@@ -13,7 +13,10 @@ are filtered before appointment assignment, so a cached multi-topic source canno
 silently consume another group's search slot. The first attempts share a
 thread-safe, per-origin paced public fetch session; no model calls run in parallel.
 They each reserve one full-original check within the existing five-publisher,
-eight-article-check allowance. Remaining allowance serves other publishers.
+eight-article-check allowance. Remaining publisher slots first retry groups with no eligible candidates using a
+different publisher, then serve other topics. Profile-specific publishers with
+previous complete-original evidence are preferred to broad news portals.
+Unrelated metadata and common section URLs do not consume original checks.
 
 The 75-second discovery window and seven-second public transport timeout bound
 work. Discovery is best effort, not a release gate: slow/unavailable publishers,

@@ -59,6 +59,8 @@ class Links(HTMLParser):
 def article_link(item):
     path=urlparse(item['url']).path.rstrip('/').casefold()
     parts=[x for x in path.split('/') if x]
+    if parts and parts[0] in ('rubric','rubrics','section','sections'):return False
+    if path in ('/business/technology-of-business','/future','/travel','/science','/business'):return False
     if not parts or re.search(r'\.(?:pdf|zip|jpg|png|xml|rss)$',path):return False
     if any(x in ('tag','tags','category','categories','authors','author','about','contact','subscribe','subscription','search','privacy','terms','podcasts','video','videos') for x in parts):return False
     if re.search(r'(?:^|/)(?:pdf\d+|about-us|terms-of-use|privacy-policy|for-authors|editorial-board)$',path):return False
@@ -105,6 +107,12 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
         from scripts import priorities43
         items.sort(key=lambda item:(int(bool(preferred_group) and priorities43.classify(item)['group']!=preferred_group),int(selection43.profile(item)['space']),not item.get('heading_link',False)))
         report.update(status='discovery_verified',discovered=len(items))
+        if preferred_group:
+            matching=[item for item in items if priorities43.classify(item)['group']==preferred_group]
+            report['matching_topic_metadata']=len(matching)
+            # A publisher's advertised coverage is not evidence of this story's topic.
+            # Do not consume complete-original checks on unrelated section links.
+            items=matching
         for item in items[:article_limit]:
             try:
                 report['article_checks']+=1
@@ -163,14 +171,25 @@ def refresh(state,now=None,session=None):
             for key,job in jobs.items():
                 try:initial[key]=job.result()
                 except Exception as exc:initial[key]=({'article_checks':0,'status':'unavailable','code':type(exc).__name__},[])
-    for row in selected:
+    attempted_ids=set();fallback_groups=set()
+    pending=list(selected)
+    while pending and len(attempted_ids)<config['publishers_per_run']:
+        row=pending.pop(0)
+        if row['id'] not in initial:
+            missing=[g for g in priorities43.CORE_GROUPS if not run['candidate_groups'].get(g) and g not in fallback_groups]
+            for group in missing:
+                options=[r for r in ordered if r['id'] not in attempted_ids and r['id'] not in initial and any(priorities43.DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[]))]
+                if options:
+                    row=dict(options[0],search_group=group);fallback_groups.add(group)
+                    pending=[r for r in pending if r['id']!=row['id']];break
         if row['id'] not in initial and time.monotonic()>=deadline:break
         remaining=config['article_checks_per_run']-checks
         if row['id'] in initial:report,found=initial[row['id']]
         else:
             if remaining<=0:break
-            report,found=inspect_publisher(row,session,article_limit=min(2,remaining),exclude=known|published_urls,now=now)
-        checks+=report['article_checks'];run['publishers_attempted']+=1;run['article_checks']=checks
+            kwargs={'preferred_group':row['search_group']} if row.get('search_group') else {}
+            report,found=inspect_publisher(row,session,article_limit=min(2,remaining),exclude=known|published_urls,now=now,**kwargs)
+        attempted_ids.add(row['id']);checks+=report['article_checks'];run['publishers_attempted']+=1;run['article_checks']=checks
         if row.get('search_group'):run['attempted_groups'].append(row['search_group'])
         report['requested_group']=row.get('search_group')
         cache['publishers'][row['id']]=dict(report,checked_at=now.isoformat())

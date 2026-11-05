@@ -93,7 +93,8 @@ def publisher_order(rows,cache,history,date):
     for group in groups:
         choices=[r for r in pending if any(DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[]))]
         if not choices:continue
-        row=min(choices,key=key);pending.remove(row)
+        row=min(choices,key=lambda r:(len({DIRECTIONS[i]['group'] for i in r.get('priority_ids',[]) if i in DIRECTIONS}),
+            -min(2,r.get('availability',{}).get('full_originals_verified',0)),key(r)));pending.remove(row)
         result.append(dict(row,search_group=group))
     return result+sorted(pending,key=key)
 
