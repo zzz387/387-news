@@ -84,7 +84,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         for row in state['candidates']:
             if row.get('status')=='ready':continue
             row['editorial43']=priorities43.evaluate(row,state['_recent43'],date)
-            if row['editorial43']['direction'] and row.get('status')=='discovered':row['category_hint']=row['editorial43']['category']
+            # Correct stale catalogue categories before writing, including resumed
+            # preparing candidates. Never relabel an already written/reviewed article.
+            if row['editorial43']['direction'] and not row.get('article'):
+                row['category_hint']=row['editorial43']['category']
         persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
         for record in preparation_order(state):
