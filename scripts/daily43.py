@@ -50,7 +50,7 @@ def discover(state):
     known={r['url'] for r in state['candidates']}
     for item in json.loads((p.ROOT/'config/candidates.json').read_text()).get('candidates',[]):
         if item['url'] not in known:
-            state['candidates'].append(dict(item,id=p.digest(item['url']),status='discovered',checks={},progress={},history=[]));known.add(item['url'])
+            state['candidates'].append(dict(item,id=p.digest(item['url']),status='discovered',checks={},progress={},history=[],discovered_at=datetime.now(p.TZ).isoformat()));known.add(item['url'])
 
 
 def preparation_order(state):
@@ -76,18 +76,13 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     # Delivery has first claim on every due window; never wait for more model work.
     if not delivery_only and current<release-timedelta(minutes=10):
         if budget:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
-        discover(state)
         state['_recent43']=selection43.recent(root,date)
+        priorities43.apply_rules(state,clock())
+        discover(state)
         if os.getenv('NEWS_CATALOG_REFRESH')=='true' and clock()<release-timedelta(minutes=25):
             try:catalog43.refresh(state,clock())
             except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
-        for row in state['candidates']:
-            if row.get('status')=='ready':continue
-            row['editorial43']=priorities43.evaluate(row,state['_recent43'],date)
-            # Correct stale catalogue categories before writing, including resumed
-            # preparing candidates. Never relabel an already written/reviewed article.
-            if row['editorial43']['direction'] and not row.get('article'):
-                row['category_hint']=row['editorial43']['category']
+        priorities43.apply_rules(state,clock())
         persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}
         for record in preparation_order(state):
@@ -105,6 +100,9 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                     if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
                 editor.finish(state,record)
+                peers=[r for r in e.select_ready(state) if r is not record and selection43.duplicate(record,r)]
+                if peers and not any(h.get('code')=='STORY_DUPLICATE_AFTER_WRITING' for h in record['history']):
+                    record['history'].append({'code':'STORY_DUPLICATE_AFTER_WRITING','peer_ids':[r['id'] for r in peers]})
             except news.runtime.GenerationPaused:
                 record['status']='preparing';persist();break
             except Exception as exc:
@@ -117,10 +115,13 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true' and clock()<release-timedelta(minutes=30) and (len(selection43.ready(state))>=e.CONFIG['article_target'] or not any(r.get('status') in ('discovered','preparing','retryable_error') for r in state['candidates'])):
             light43.prepare(state,persist)
     selected=selection43.ready(state)
-    try:state['editorial_report43']=priorities43.report(state,selected,selection43.recent(root,date))
-    except Exception as exc:print('[editorial-report43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
     state['title_style43']=selection43.title_report(selected)
     state['selection43']={'selected':[r['id'] for r in selected],'excluded_duplicate_ids':[r['id'] for r in e.select_ready(state) if r not in selected]}
+    try:
+        state['editorial_report43']=priorities43.report(state,selected,selection43.recent(root,date))
+        report=state['editorial_report43']
+        print('[topic-coverage43] '+json.dumps({k:report[k] for k in ('prepared_main_articles','core_groups','missing_core_groups','excluded_duplicate_stories')}) ,flush=True)
+    except Exception as exc:print('[editorial-report43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
     state['selected_ids']=[r['id'] for r in selected]
     state['articles']={r['id']:r['article'] for r in selected}
     reserve=[] if selected else reserve_rows(state,clock())

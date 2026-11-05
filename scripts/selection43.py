@@ -23,15 +23,17 @@ def story_context(row):
     source=row.get('source') or {}
     return normalized(' '.join(str(value or '') for value in (
         title(row), row.get('title'), source.get('title'), article.get('teaser'),
-        row.get('summary'), source.get('description'))))
+        row.get('summary'), source.get('description'),
+        ' '.join(b.get('text','') for b in article.get('blocks',[])[:12]),
+        ' '.join(b.get('text','') for b in source.get('blocks',[])[:8]) if source.get('full_text_verified') else '')))
 
 
 def story_family(row):
     """Conservative aliases for the same *narrow* story, not broad categories."""
     text=story_context(row)
     living=re.search(r'жив\w{0,8}\s+(?:строител\w*\s+)?материал|living (?:building |construction )?materials|мицел|myceli|микроорганизм|microb|бактери|самовосстан|self.heal',text)
-    built=re.search(r'строител|бетон|архитект|инфраструкт|городск|здани|building|concret|construct|urban|architecture|cities',text)
-    if living and built:return 'living_construction_materials'
+    built=re.search(r'строител|бетон|здани|building|concret|construct|brick|structural|insulat',text)
+    if living and built and not re.search(r'истори.{0,25}(?:модерн|архитект)|history of (?:modernism|architecture)',text):return 'living_construction_materials'
     if 'sleep_loss' in text and 'metabolic' in text:return 'sleep_and_appetite'
     return ''
 
@@ -82,6 +84,11 @@ def duplicate(a,b):
             if x['title']==y['title']:return True
             common=x['words']&y['words'];union=x['words']|y['words']
             if len(common)>=3 and union and len(common)/len(union)>=0.76:return True
+    ax=a.get('article') or {};by=b.get('article') or {}
+    if ax and by:
+        left=tokens(' '.join(z.get('text','') for z in ax.get('blocks',[])))
+        right=tokens(' '.join(z.get('text','') for z in by.get('blocks',[])))
+        if len(left & right)>=12 and len(left & right)/max(1,len(left | right))>=0.82:return True
     return False
 
 
@@ -93,7 +100,7 @@ def usefulness(row):
 
 def unique_ready(rows):
     selected=[]
-    for row in rows:
+    for row in sorted(rows,key=usefulness,reverse=True):
         same=next((old for old in selected if duplicate(row,old)),None)
         if same is None:selected.append(row)
         elif usefulness(row)>usefulness(same):selected[selected.index(same)]=row

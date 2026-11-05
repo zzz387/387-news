@@ -78,13 +78,13 @@ def feed_items(raw,base):
         fields={};links=[]
         for child in item:
             tag=child.tag.split('}')[-1]
-            if tag in ('title','pubDate','published','updated'):fields[tag]=''.join(child.itertext()).strip()
+            if tag in ('title','pubDate','published','updated','description','summary'):fields[tag]=''.join(child.itertext()).strip()
             if tag=='link' and child.attrib.get('rel','alternate')=='alternate':links.append(child.attrib.get('href') or (child.text or '').strip())
-        if links and fields.get('title'):items.append({'url':urljoin(base,links[0]),'title':fields['title'],'feed_date':fields.get('published') or fields.get('pubDate') or fields.get('updated','')})
+        if links and fields.get('title'):items.append({'url':urljoin(base,links[0]),'title':fields['title'],'summary':fields.get('description') or fields.get('summary',''),'feed_date':fields.get('published') or fields.get('pubDate') or fields.get('updated','')})
     return items
 
 
-def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
+def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferred_group=None):
     now=now or datetime.now(p.TZ)
     report={'publisher':row['id'],'name':row['name'],'homepage':row['homepage'],'status':'unavailable','discovered':0,'eligible':0,'article_checks':0};sources=[];items=[];feeds=list(row['discovery']['feeds'])
     pages=[row['homepage']]+row['discovery'].get('pages',[])
@@ -102,7 +102,8 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
         items=items or links.articles
         seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not advertising_story(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/')!=row['homepage'].rstrip('/') and x['url'] not in exclude]
         from scripts import selection43
-        items.sort(key=lambda item:(int(selection43.profile(item)['space']),not item.get('heading_link',False)))
+        from scripts import priorities43
+        items.sort(key=lambda item:(int(bool(preferred_group) and priorities43.classify(item)['group']!=preferred_group),int(selection43.profile(item)['space']),not item.get('heading_link',False)))
         report.update(status='discovery_verified',discovered=len(items))
         for item in items[:article_limit]:
             try:
@@ -121,7 +122,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
                 grant=rights41.decision(src,'INDEPENDENT_ARTICLE');rights41.require(src,'INDEPENDENT_ARTICLE',grant)
                 # A journal hosts reviews/editorials too; do not infer research design from its name.
                 src['publisher_type']=row['type'];src.setdefault('publication_type','unclassified')
-                sources.append((item,src));report['eligible']+=1
+                sources.append(({k:v for k,v in item.items() if k!='summary'},src));report['eligible']+=1
             except Exception as exc:
                 report['last_article_code']=getattr(exc,'code',type(exc).__name__)
                 if not isinstance(exc,p.Blocked):
@@ -132,10 +133,13 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None):
 
 
 def refresh(state,now=None,session=None):
-    if len(state['candidates'])>=120:return state.get('discovery43',{})
+    rotate_candidates(state)
     now=now or datetime.now(p.TZ);config=registry();cache=state.setdefault('discovery43',{'publishers':{}})
     from scripts import priorities43
-    ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified'],cache,state.get('_recent43',[]),state['date'])
+    def due(row):
+        last=cache['publishers'].get(row['id'],{}).get('checked_at')
+        return not last or now-datetime.fromisoformat(last)>=timedelta(hours=config['refresh_hours'])
+    ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified' and due(r)],cache,state.get('_recent43',[]),state['date'])
     if not ordered:return cache
     from scripts import editorial41
     published_urls={x.get('source_url') for x in editorial41.archive_entries(p.ROOT)}
@@ -145,22 +149,55 @@ def refresh(state,now=None,session=None):
         if last and now-datetime.fromisoformat(last)<timedelta(hours=config['refresh_hours']):continue
         selected.append(row)
         if len(selected)>=config['publishers_per_run']:break
-    known={r['url'] for r in state['candidates']};session=session or public_sources41.Session();deadline=time.monotonic()+75;checks=0
+    known={r['url'] for r in state['candidates']};session=session or public_sources41.Session(timeout=7);deadline=time.monotonic()+75;checks=0
+    cache['last_run']={'at':now.isoformat(),'attempted_groups':[],'candidate_groups':{},'publishers_attempted':0,'article_checks':0}
+    run=cache['last_run']
+    # Reserve an independent discovery attempt for each core group. Network work
+    # overlaps only across public publishers; no model calls or state mutations.
+    core=[row for row in selected if row.get('search_group')]
+    from concurrent.futures import ThreadPoolExecutor
+    initial={}
+    if core:
+        with ThreadPoolExecutor(max_workers=3) as pool:
+            jobs={row['id']:pool.submit(inspect_publisher,row,session,article_limit=1,exclude=known|published_urls,now=now,preferred_group=row['search_group']) for row in core[:config['article_checks_per_run']]}
+            for key,job in jobs.items():
+                try:initial[key]=job.result()
+                except Exception as exc:initial[key]=({'article_checks':0,'status':'unavailable','code':type(exc).__name__},[])
     for row in selected:
-        if time.monotonic()>=deadline:break
+        if row['id'] not in initial and time.monotonic()>=deadline:break
         remaining=config['article_checks_per_run']-checks
-        report,found=inspect_publisher(row,session,article_limit=min(2,max(0,remaining)),exclude=known|published_urls,now=now);checks+=report['article_checks']
+        if row['id'] in initial:report,found=initial[row['id']]
+        else:
+            if remaining<=0:break
+            report,found=inspect_publisher(row,session,article_limit=min(2,remaining),exclude=known|published_urls,now=now)
+        checks+=report['article_checks'];run['publishers_attempted']+=1;run['article_checks']=checks
+        if row.get('search_group'):run['attempted_groups'].append(row['search_group'])
+        report['requested_group']=row.get('search_group')
         cache['publishers'][row['id']]=dict(report,checked_at=now.isoformat())
         for item,src in found:
             if src['url'] in known:continue
             record=dict(id=p.digest(src['url']),url=src['url'],title=src['title'],source=src,publisher_id=row['id'],publisher_group=row['domain'].removeprefix('www.'),source_kind=row['type'],science_domain=next(iter(row['topics']),''),
-                priority_ids=row.get('priority_ids',[]),editorial_priority=row.get('editorial_priority',50),quality_score=row.get('quality_score',50),science_source=row.get('science_source',False),category_hint='Наука',light_suitable=row.get('light_suitable',False),status='discovered',progress={},checks={},history=[])
+                priority_ids=row.get('priority_ids',[]),editorial_priority=row.get('editorial_priority',50),quality_score=row.get('quality_score',50),science_source=row.get('science_source',False),category_hint='Общество',discovered_at=now.isoformat(),light_suitable=row.get('light_suitable',False),status='discovered',progress={},checks={},history=[])
             record['editorial43']=priorities43.evaluate(record,state.get('_recent43',[]),state['date'])
             record['category_hint']=record['editorial43']['category']
+            group=record['editorial43']['group'];run['candidate_groups'][group]=run['candidate_groups'].get(group,0)+1
             state['candidates'].append(record);known.add(src['url'])
             state.setdefault('source_cache',{})[src['url']]=src
         print('[catalog43] '+json.dumps({k:v for k,v in report.items() if k not in ('eligible_urls',)},ensure_ascii=False),flush=True)
+    rotate_candidates(state)
+    run['missing_candidate_groups']=[g for g in priorities43.CORE_GROUPS if not run['candidate_groups'].get(g)]
+    print('[discovery-coverage43] '+json.dumps(run),flush=True)
     return cache
+
+
+def rotate_candidates(state,limit=120):
+    # Retire only untouched candidates from the active search queue. Keep every
+    # original, evidence check and refusal in the SAME encrypted checkpoint.
+    pending=[r for r in state['candidates'] if r.get('status')=='discovered' and not r.get('article') and not r.get('progress')]
+    for row in pending[:-limit]:
+        row['status']='discovery_retired'
+        row.setdefault('history',[]).append({'code':'DISCOVERY_POOL_ROTATION','retained_in_checkpoint':True})
+    return len(pending[:-limit])
 
 
 def live_report(output):
@@ -171,9 +208,20 @@ def live_report(output):
     report={'checked_at':datetime.now(p.TZ).isoformat(),'gemini_requests':0,'publisher_count':len(rows),'publishers':reports}
     Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n');print('[catalog43-live] '+json.dumps(report,ensure_ascii=False))
 
+def core_report(output):
+    # Public-source diagnostic only: no production checkpoint, drafts or model key.
+    now=datetime.now(p.TZ);state={'date':now.date().isoformat(),'candidates':[]}
+    cache=refresh(state,now)
+    result={'checked_at':now.isoformat(),'gemini_requests':0,'search':cache.get('last_run',{}),
+            'publishers':cache.get('publishers',{}),'candidate_groups':cache.get('last_run',{}).get('candidate_groups',{})}
+    Path(output).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
+    print('[core-search43-public] '+json.dumps(result,ensure_ascii=False),flush=True)
+
+
 if __name__=='__main__':
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('--output',required=True);args=parser.parse_args();live_report(args.output)
+    parser=argparse.ArgumentParser();parser.add_argument('--output',required=True);parser.add_argument('--core-search',action='store_true');args=parser.parse_args()
+    (core_report if args.core_search else live_report)(args.output)
 
 
 def apply_verification(config,report):
