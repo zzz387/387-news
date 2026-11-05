@@ -209,6 +209,9 @@ class Editor(old.Editor):
     def verify_source(self,record):
         if not record.get('source'):record['source']=self.cached_fetch(record['url']);self.persist()
         source=record['source']
+        if not record.get('article'):
+            from scripts import priorities43
+            record['category_hint']=priorities43.classify(record)['category']
         if not source.get('full_text_verified') or source.get('extraction_status')!='complete' or source.get('metadata_status')!='verified':raise p.Blocked('FULL_VERIFIED_SOURCE_REQUIRED')
         # Retain a completed/partially translated mode. New ordinary candidates
         # default to a narrow C work instead of an unsolicited lengthy translation.
@@ -242,7 +245,8 @@ class Editor(old.Editor):
         self.verify_source(record)
         progress=record['progress'].setdefault('v43',{'write_attempts':int('article' in record),'review_attempts':{},'history':[]})
         while True:
-            if 'article' not in record:
+            fresh_article='article' not in record
+            if fresh_article:
                 if progress['write_attempts']>=1+CONFIG['repair_attempts']:raise p.Blocked('CANDIDATE_ATTEMPTS_EXHAUSTED')
                 if record['mode']=='INDEPENDENT_ARTICLE':
                     progress['write_attempts']+=1;self.persist()
@@ -273,6 +277,11 @@ class Editor(old.Editor):
             article=record['article']
             if record['mode']=='INDEPENDENT_ARTICLE':normalize(article)
             structure(record)
+            # Classify the actual written aspect before its existing safety/fact review.
+            # Never mutate a previously approved fingerprint or a published article.
+            if fresh_article and not record.get('checks',{}).get('final43',{}).get('approved'):
+                from scripts import priorities43
+                record['category_hint']=record['category']=article['category']=priorities43.classify(record)['category']
             # Generated advice can introduce risk absent from the source title/category.
             self.verify_source(record)
             article.setdefault('mode',record['mode']);article.setdefault('category',record['category']);article.setdefault('kind',record['kind'])

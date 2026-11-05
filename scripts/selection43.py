@@ -17,6 +17,29 @@ PLACES={'tsaritsyno':'tsaritsyno','царицыно':'tsaritsyno','петерг�
 def title(row):return row.get('article',{}).get('title') or row.get('title') or row.get('source',{}).get('title') or row.get('topic_key','')
 
 
+def story_context(row):
+    """Brief editorial context only: no AI call, no full article copying."""
+    article=row.get('article') or {}
+    source=row.get('source') or {}
+    return normalized(' '.join(str(value or '') for value in (
+        title(row), row.get('title'), source.get('title'), article.get('teaser'),
+        row.get('summary'), source.get('description'),
+        ' '.join(b.get('text','') for b in article.get('blocks',[])[:12]),
+        ' '.join(b.get('text','') for b in source.get('blocks',[])[:8]) if source.get('full_text_verified') else '')))
+
+
+def story_family(row):
+    """Conservative aliases for the same *narrow* story, not broad categories."""
+    text=story_context(row)
+    living=re.search(r'жив\w{0,8}\s+(?:строител\w*\s+)?материал|living (?:building |construction )?materials|мицел|myceli|микроорганизм|microb|бактери|самовосстан|self.heal',text)
+    built=re.search(r'строител|бетон|здани|building|concret|construct|brick|structural|insulat',text)
+    explicit=re.search(r'жив\w{0,8}\s+(?:строител\w*\s+)?материал|living (?:building |construction )?materials|самовосстан|self.heal',text)
+    construction=re.search(r'строител|бетон|building materials|concret|construct|brick|insulat|structural materials',text)
+    if living and built and (explicit or construction):return 'living_construction_materials'
+    if 'sleep_loss' in text and 'metabolic' in text:return 'sleep_and_appetite'
+    return ''
+
+
 def normalized(text):
     text=unescape(str(text)).casefold().replace('ё','е')
     for pattern,replacement in ALIASES:text=re.sub(pattern,replacement,text)
@@ -48,6 +71,10 @@ def duplicate(a,b):
     x=profile(a);y=profile(b)
     if x['url'] and x['url']==y['url']:return True
     if x['doi'] and x['doi']==y['doi']:return True
+    # Compare the actual story, including verified teasers: different Eos URLs may
+    # still cover the same living-construction-materials subject in one issue.
+    family_a=story_family(a);family_b=story_family(b)
+    if family_a and family_a==family_b:return True
     # A literary headline must not erase the concrete original story identity.
     def headings(row):
         return set(filter(None,(title(row),row.get('title'),row.get('source',{}).get('title'),row.get('topic_key'))))
@@ -59,6 +86,11 @@ def duplicate(a,b):
             if x['title']==y['title']:return True
             common=x['words']&y['words'];union=x['words']|y['words']
             if len(common)>=3 and union and len(common)/len(union)>=0.76:return True
+    ax=a.get('article') or {};by=b.get('article') or {}
+    if ax and by:
+        left=tokens(' '.join(z.get('text','') for z in ax.get('blocks',[])))
+        right=tokens(' '.join(z.get('text','') for z in by.get('blocks',[])))
+        if len(left & right)>=12 and len(left & right)/max(1,len(left | right))>=0.82:return True
     return False
 
 
@@ -70,7 +102,7 @@ def usefulness(row):
 
 def unique_ready(rows):
     selected=[]
-    for row in rows:
+    for row in sorted(rows,key=usefulness,reverse=True):
         same=next((old for old in selected if duplicate(row,old)),None)
         if same is None:selected.append(row)
         elif usefulness(row)>usefulness(same):selected[selected.index(same)]=row
@@ -98,16 +130,25 @@ def recent(root,date,days=14):
     return result
 
 
-def order(state,history=()):
+def order(state,history=(),limit=None,exclude_ids=()):
     from scripts import priorities43
-    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered')];result=[]
+    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered') and r['id'] not in exclude_ids];result=[]
     category=Counter(r.get('category_hint') or r.get('category','') for r in selected)
     places=Counter(profile(r)['place'] for r in selected);publishers=Counter(profile(r)['publisher'] for r in selected);orgs=Counter(profile(r)['organisation'] for r in selected)
     space=sum(profile(r)['space'] for r in selected)
-    while pending:
+    while pending and (limit is None or len(result)<limit):
         def score(r):
             p=profile(r);cat=r.get('category_hint') or r.get('category','')
-            return (int(r.get('status')=='discovered'),int(p['space'] and space>=1),*priorities43.preference(r,history,state.get('date'),planned),int(any(duplicate(r,h) for h in history))*3+
+            # A/B/C are the essential reader-facing streams (family, Moscow,
+            # health). Attempt their missing streams before optional science when
+            # qualifying candidates exist. Never block a short edition on absence.
+            covered={priorities43.classify(item)['group'] for item in planned}
+            missing={'A','B','C'}-covered
+            group=priorities43.classify(r)['group']
+            return (int(r.get('status')=='discovered'),int(bool(missing) and group not in missing),
+                int(any(duplicate(r,item) for item in planned)),int(p['space'] and space>=1),
+                *priorities43.preference(r,history,state.get('date'),planned),
+                int(any(duplicate(r,h) for h in history))*3+
                 int(p['space'] and space>=1)*5+int(bool(p['place']) and places[p['place']]>=1)*3+
                 int(publishers[p['publisher']]>=2)*2+int(bool(p['organisation']) and orgs[p['organisation']]>=2)*2+category[cat])
         row=min(pending,key=score);pending.remove(row);result.append(row);planned.append(row);p=profile(row)

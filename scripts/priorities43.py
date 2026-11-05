@@ -7,6 +7,9 @@ from html import unescape
 from urllib.parse import urlparse
 from scripts import policy41 as p
 
+RULES_VERSION=2
+CORE_GROUPS=('A','B','C')
+
 CONFIG=json.loads((p.ROOT/'config/editorial_priorities43.json').read_text())
 DIRECTIONS={d['id']:d for d in CONFIG['directions']}
 PATTERNS={i:re.compile(d['pattern'],re.I) for i,d in DIRECTIONS.items()}
@@ -16,7 +19,11 @@ def classify(row):
     article=row.get('article',{});source=row.get('source',{})
     title=' '.join(str(x or '') for x in (article.get('title'),row.get('title'),source.get('title'),row.get('topic_key')))
     text=title+' '+str(article.get('teaser',''))+' '+str(row.get('summary',''))
-    return dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),row.get('category_hint') or row.get('category') or 'Наука'))
+    if not article and source.get('full_text_verified'):
+        text+=' '+' '.join(b.get('text','') for b in source.get('blocks',[])[:8])
+    if article:
+        text=' '.join(str(article.get(k,'')) for k in ('title','teaser'))+' '+' '.join(b.get('text','') for b in article.get('blocks',[])[:8])
+    return dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))
 
 
 @lru_cache(maxsize=2048)
@@ -33,7 +40,7 @@ def _classify(text,hints,fallback):
     primary=ordered[0] if ordered else None
     direction=DIRECTIONS.get(primary,{})
     return {'group':direction.get('group','general'),'direction':primary,'additional_directions':ordered[1:],
-            'category':direction.get('category',fallback),
+            'category':direction.get('category',general_category(text)),
             'signals':{str(i):scores[i] for i in ordered}}
 
 
@@ -76,20 +83,50 @@ def preference(row,history,date,selected):
 
 
 def publisher_order(rows,cache,history,date):
-    """Search missing directions first; cached timestamps prevent one easy site monopolising search."""
+    """Distinct A/B/C search appointments, then rotate the remaining publishers."""
     counts=weekly(history,date)
     def key(row):
-        ids=row.get('priority_ids',[])
+        ids=[i for i in row.get('priority_ids',[]) if i in DIRECTIONS]
         missing=sum(not counts[i] for i in ids)
         checked=cache.get('publishers',{}).get(row['id'],{}).get('checked_at','')
-        return (not bool(ids),-int(missing>0),-missing/max(1,len(ids)),checked,-row.get('editorial_priority',50),row['id'])
-    # Within equally old/fresh publishers, compensate sparse groups/directions dynamically.
-    result=[];covered=Counter()
-    pending=list(rows)
-    while pending:
-        row=min(pending,key=lambda r:(key(r)[0],key(r)[1],sum(covered[i] for i in r.get('priority_ids',[])),*key(r)[2:]))
-        result.append(row);pending.remove(row);covered.update(row.get('priority_ids',[]))
-    return result
+        return (not bool(ids),-missing/max(1,len(ids)),checked,-row.get('editorial_priority',50),row['id'])
+    pending=list(rows);result=[]
+    groups=sorted(CORE_GROUPS,key=lambda g:(sum(counts[i] for i,d in DIRECTIONS.items() if d['group']==g),CORE_GROUPS.index(g)))
+    for group in groups:
+        choices=[r for r in pending if any(DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[]))]
+        if not choices:continue
+        row=min(choices,key=lambda r:(len({DIRECTIONS[i]['group'] for i in r.get('priority_ids',[]) if i in DIRECTIONS}),
+            -min(2,r.get('availability',{}).get('full_originals_verified',0)),key(r)));pending.remove(row)
+        result.append(dict(row,search_group=group))
+    return result+sorted(pending,key=key)
+
+
+def general_category(text):
+    if re.search(r'(?i)parliament|congress|oversight|парламент|конгресс|правительств|government',text):return 'Общество'
+    if re.search(r'(?i)искусств|живопис|art history|painting|renaissance|ренессанс',text):return 'История и культура'
+    if re.search(r'(?i)строител|бетон|living materials|self.healing|construction|concrete',text):return 'Технологии'
+    if re.search(r'(?i)физик|квант|астрон|косм|нейтрин|биолог|quantum|physics|neutrino|astronom|galax|particle|science|scientific',text):return 'Наука'
+    return 'Общество'
+
+
+def apply_rules(state,now):
+    """Addressed metadata migration only. Reviewed articles and quota are immutable."""
+    from scripts import catalog43
+    catalog=catalog43.registry()
+    versions={'rules_version':RULES_VERSION,'classifier_version':CONFIG['version'],
+              'catalog_version':catalog['version'],'catalog_hash':p.digest(catalog)}
+    previous=state.get('selection_policy43',{})
+    changed=any(previous.get(k)!=v for k,v in versions.items())
+    if changed:
+        state.setdefault('history',[]).append({'code':'SELECTION_RULES_UPDATED','previous':previous.copy(),'current':versions.copy()})
+        print('[selection-rules43] '+json.dumps(dict(versions,reviewed_articles_preserved=True,quota_preserved=True)),flush=True)
+    for row in state['candidates']:
+        if row.get('article') or row.get('status')=='ready':continue
+        row['editorial43']=evaluate(row,state.get('_recent43',[]),state['date'])
+        row['category_hint']=row['editorial43']['category']
+        row['selection_versions43']=versions.copy()
+    state['selection_policy43']=dict(versions,candidates_formed_at=previous.get('candidates_formed_at') or now.isoformat(),applied_at=now.isoformat())
+    return changed
 
 
 def report(state,rows,history):
@@ -100,7 +137,13 @@ def report(state,rows,history):
         languages['russian' if source.get('language')=='ru' else 'foreign' if source.get('language') else 'unknown']+=1
         science+=int(c['category']=='Наука')
     total=len(rows);week=weekly(history,state['date']);projected=week.copy();projected.update({i:n for i,n in counts.items() if i})
-    return {'version':1,'date':state['date'],'stage':'prepared','published_main_articles':None,'prepared_main_articles':total,
+    from scripts import selection43
+    duplicate_count=len(rows)-len(selection43.unique_ready(rows))
+    return {'version':2,'core_groups':{g:groups[g] for g in CORE_GROUPS},'missing_core_groups':[g for g in CORE_GROUPS if not groups[g]],
+            'duplicate_stories':duplicate_count,'excluded_duplicate_stories':len(state.get('selection43',{}).get('excluded_duplicate_ids',[])),
+            'history_culture':categories['История и культура'],'nature_science':categories['Наука'],
+            'economy_technology':categories['Экономика и бизнес']+categories['Технологии'],
+            'date':state['date'],'stage':'prepared','published_main_articles':None,'prepared_main_articles':total,
             'priority_articles':total-counts[None],'directions':{str(i):n for i,n in counts.items() if i},
             'groups':dict(groups),'categories':dict(categories),'publishers':dict(pubs),'languages':dict(languages),
             'science_share':science/total if total else 0,'category_shares':{k:n/total for k,n in categories.items()},

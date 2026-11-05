@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "priority_target": 9,
   "history_days": 14,
   "compensation_days": 7,
@@ -9,14 +9,14 @@
       "name": "Воспитание и развитие детей",
       "group": "A",
       "category": "Семья",
-      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|образовани[ея].{0,20}(?:дет|школ|родител)|parent|child|toddler|education|child learning|дошкольн|педагог|школьн"
+      "pattern": "воспитан|развити[ея] дет|реб[её]н|родител|образовани[ея].{0,20}(?:дет|школ|родител)|parent|child|toddler|education|child learning|дошкольн|педагог|школьн|\\bkids?\\b|teenager|adolescen"
     },
     {
       "id": 2,
       "name": "Семейные занятия и совместный досуг",
       "group": "A",
       "category": "Семья",
-      "pattern": "семейн.{0,20}(досуг|игр|традиц|занят|прогул)|игр.{0,15}деть|family (?:fun|activit|tradition|travel)|play (?:with|and)|weekend with"
+      "pattern": "семейн.{0,20}(досуг|игр|традиц|занят|прогул)|игр.{0,15}деть|family (?:fun|activit|tradition|travel)|play (?:with|and)|weekend with|family (?:ritual|routine|weekend|game|leisur|time)"
     },
     {
       "id": 3,
@@ -65,7 +65,7 @@
       "name": "Архитектура и дизайн интерьеров",
       "group": "B",
       "category": "История и культура",
-      "pattern": "архитект|интерьер|architect|interior|historic building|building design"
+      "pattern": "архитект|интерьер|architect|interior|historic building|building design|небоскр[её]б|skyscraper"
     },
     {
       "id": 12,
@@ -79,7 +79,7 @@
       "name": "Кардиотренировки и физиология",
       "group": "C",
       "category": "Здоровье и движение",
-      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|physical training|strength training|training load|running"
+      "pattern": "кардио|вынослив|физиолог.{0,15}нагруз|трениров|cardio|aerobic|endurance|exercise|physical training|strength training|training load|running|fitness|workout|muscle.{0,20}(?:exercise|training|strength)|\\bбег\\b|бегун|забег|марафон|jogging"
     },
     {
       "id": 14,
@@ -100,7 +100,7 @@
       "name": "Современная медицина",
       "group": "C",
       "category": "Здоровье и движение",
-      "pattern": "медицин|лечени|клиническ|терапи|профилактик|clinical|treatment|patient|medicine|medical|therapy"
+      "pattern": "медицин|лечени|клиническ|терапи|профилактик|clinical|treatment|patient|medicine|medical|therapy|health|disease|cardiovasc|sleep.{0,15}(?:health|quality|duration)"
     },
     {
       "id": 17,
