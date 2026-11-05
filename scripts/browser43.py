@@ -18,6 +18,9 @@ def main():
                 for row,language in zip(s['candidates'],languages):
                     row['source']['language']=language
                     row['source']['title']=('Непереносимоедлинноеназваниеисточника'*8)+' '+str(row['id'])
+                    if row is s['candidates'][0]:
+                        row['article']['title']='Длинныйнеразрывныйзаголовокдлятелефона'*7
+                        row['article']['blocks'].append({'kind':'paragraph','text':'Непереносимоеучебноеслово'*20})
                     row['checks']['final43']['input_hash']=editorial43.fingerprint(row)
             from scripts.test_editorial_visual43 import light_ready
             n={0:0,1:1,8:3,12:5}[count]
