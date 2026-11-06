@@ -159,6 +159,9 @@ def positive_semantics(result):
 
 def bind_review(result,record,aliases,fp):
     result=copy.deepcopy(result);sources=[record['source']]+record.get('supporting_sources',[]);errors=[]
+    if result.get('is_news') is False:
+        for key in ('event_date','event_source_id','event_evidence_id','event_quote'):
+            if result.get(key) is None:result[key]=''
     result['input_hash']=fp  # bound by the synchronous call, never echoed/attested by the model
     if not result.get('claims'):errors.append('CLAIMS_MISSING')
     for claim in result.get('claims',[]):
@@ -223,19 +226,24 @@ class Editor(old.Editor):
         rights41.require(source,mode,grant)
         if record.get('article') and record['article'].get('mode')!=mode:
             record.setdefault('previous_mode_preparations',[]).append(record.pop('article'));self.persist()
-        record.update(mode=mode,rights=grant,category=record.get('category_hint') or record.get('category') or 'История и культура',kind='Самостоятельная заметка' if mode=='INDEPENDENT_ARTICLE' else 'Перевод' if mode=='FULL_TRANSLATION' else 'Оригинал')
+        record.update(mode=mode,rights=grant,category=record.get('category_hint') or record.get('category') or 'История и культура',kind='Самостоятельная статья' if mode=='INDEPENDENT_ARTICLE' else 'Перевод' if mode=='FULL_TRANSLATION' else 'Оригинал')
         sensitive=high_risk(record)
         record['high_risk']=sensitive
         if sensitive:
             from scripts import priorities43
             if not record.get('verification_urls'):record['verification_urls']=priorities43.cited_verification_urls(record)
             extra=record.setdefault('supporting_sources',[]);known={s['url'] for s in extra}
-            for url in record.get('verification_urls',[]):
-                if url!=source['url'] and url not in known:
+            for url in record.get('verification_urls',[])[:6]:
+                if safety_sources_valid(record):break
+                if url==source['url'] or url in known:continue
+                try:
                     other=self.cached_fetch(url)
                     if not other.get('full_text_verified') or other.get('metadata_status')!='verified':raise p.Blocked('SAFETY_EVIDENCE_INCOMPLETE')
                     if rights41.decision(other,'INDEPENDENT_ARTICLE',self.grants)['status']!='allowed':raise p.Blocked('SAFETY_EVIDENCE_RIGHTS')
                     extra.append(other);known.add(url);self.persist()
+                except (p.Blocked,OSError,ValueError) as exc:
+                    record.setdefault('history',[]).append({'code':getattr(exc,'code',type(exc).__name__),'stage':'supporting_source','url':url})
+                    self.persist()
             sources=[source]+extra
             if len({old.publisher_identity(s['url']) for s in sources})<2 or not any(old.host_matches(s['url'],old.TRUSTED) for s in sources):raise p.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
         record['checks']['source43']={'approved':True};self.persist()
@@ -251,7 +259,7 @@ class Editor(old.Editor):
                 if record['mode']=='INDEPENDENT_ARTICLE':
                     progress['write_attempts']+=1;self.persist()
                     try:
-                        result=self.call('Подготовь законченную самостоятельную русскую заметку по одному полезному узкому аспекту проверенного материала. '
+                        result=self.call('Подготовь полноценную законченную самостоятельную статью на русском по выбранному проверенному сюжету. Читатель должен понять историю, её значение и подтверждённые факты без обязательного перехода к оригиналу. Не выдавай анонс, набор ссылок или фрагмент будущей статьи за готовый материал. '
                             'Редакционная политика 4.3: нет минимума длины, глубины, разделов, примеров или пересказа всего источника. '
                             'Собственные формулировки, композиция и объяснения; не поверхностный рерайт и не скрытый перевод. '
                             'Не заимствуй авторские примеры и подборки. Не обещай 21 занятие только потому, что такое число есть в чужом заголовке. '
@@ -325,7 +333,7 @@ class Editor(old.Editor):
             result['validation_errors']=validation_errors
             progress['history'].append(copy.deepcopy(result));self.persist()
             if good:
-                record['checks']['final43']=dict(result,approved=True);record['status']='ready';self.persist();return
+                record['checks']['final43']=dict(result,approved=True);record['ready_checked_at']=datetime.now(p.TZ).isoformat();record['status']='ready';self.persist();return
             progress['feedback']=copy.deepcopy(result)
             print('[editorial43] '+json.dumps({'code':'FINAL_REJECTED','candidate':record['id'],'attempt':count+1,'approve':result.get('approve'),'failed_checks':[key for key in CHECKS if result.get(key) is not True],'issues_count':len(result.get('issues',[])),'unresolved_count':len(result.get('unresolved',[])),'protocol_errors':protocol_errors,'validation_errors':validation_errors}),flush=True)
             if positive_semantics(result) and (protocol_errors or validation_errors):

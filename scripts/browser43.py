@@ -25,7 +25,12 @@ def main():
             from scripts.test_editorial_visual43 import light_ready
             n={0:0,1:1,8:3,12:5}[count]
             s['light43']={'records':[light_ready(i) for i in range(n)]}
-            publication43.build(s,working,[RESERVE_FIXTURE])
+            # Exercise historical partial readers under their explicit old profile.
+            # The ordinary new-publication guard is tested separately with minimum8.
+            from unittest.mock import patch
+            from scripts import editorial43
+            with patch.dict(editorial43.CONFIG,minimum_articles=1 if count<8 else 8):
+                publication43.build(s,working,[RESERVE_FIXTURE])
             with tempfile.TemporaryDirectory(prefix='387-browser43-shots-') as images:
                 report[str(count)]=browser41.check(working,s['date'],images,expected_count=count)
     Path(args.output).write_text(json.dumps(report,indent=2)+'\n');print('[browser43-synthetic] '+json.dumps(report))

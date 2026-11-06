@@ -86,6 +86,15 @@ def main():
             run=(production.get('workflow_run') or {}).get('id')
             if type(run) is not int or run<=0: raise RuntimeError('Production artifact has no valid source run ID')
             outputs.update(production_id=str(production['id']),production_run_id=str(run))
+    if not preview and os.getenv('NEWS_POLICY_VERSION')=='4.3':
+        bank_label='387news43-editorial-stock';bank_records=records_for(bank_label)
+        bank=newest_artifact(bank_records,bank_label)
+        if not bank and any(x.get('expired') for x in bank_records):raise RuntimeError('Editorial inventory expired; refusing empty replacement')
+        outputs['stock_found']='true' if bank else 'false'
+        if bank:
+            run=bank.get('workflow_run',{})
+            if run.get('head_branch')!='main' or type(run.get('id')) is not int:raise RuntimeError('Editorial inventory origin invalid')
+            outputs.update(stock_id=str(bank['id']),stock_run_id=str(run['id']))
     out = os.environ.get('GITHUB_OUTPUT')
     if not out:
         raise RuntimeError('GITHUB_OUTPUT not set')

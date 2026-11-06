@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "refresh_hours": 6,
   "publishers_per_run": 5,
   "article_checks_per_run": 8,
@@ -3091,7 +3091,7 @@
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
         "evidence_url": "https://vokrugsveta.ru/"
       },
-      "light_suitable": false,
+      "light_suitable": true,
       "science_source": false,
       "priority_ids": [
         7,
@@ -5072,7 +5072,7 @@
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
         "evidence_url": "https://discoverwildlife.com/"
       },
-      "light_suitable": false,
+      "light_suitable": true,
       "science_source": false,
       "priority_ids": [
         22
@@ -5119,7 +5119,7 @@
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
         "evidence_url": "https://audubon.org/"
       },
-      "light_suitable": false,
+      "light_suitable": true,
       "science_source": false,
       "priority_ids": [
         22
@@ -5166,7 +5166,7 @@
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
         "evidence_url": "https://mongabay.com/"
       },
-      "light_suitable": false,
+      "light_suitable": true,
       "science_source": false,
       "priority_ids": [
         22
@@ -6387,6 +6387,54 @@
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "NO_VERIFIED_ARTICLE_LINKS"
+      }
+    },
+    {
+      "id": "atlasobscura",
+      "name": "Atlas Obscura",
+      "homepage": "https://atlasobscura.com/",
+      "domain": "atlasobscura.com",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "Музеи и выставки",
+        "Исторические загадки и открытия",
+        "Выдающиеся люди и необычные судьбы",
+        "Открытия и загадки природы"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://atlasobscura.com/"
+      },
+      "light_suitable": true,
+      "science_source": false,
+      "priority_ids": [
+        17,
+        22
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "unverified",
+        "code": "PUBLIC_DISCOVERY_CHECK_REQUIRED"
       }
     }
   ],

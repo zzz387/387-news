@@ -15,7 +15,8 @@ def ready(i=0):
     r=record(i);r['article']['category']='Наука';r['category_hint']='Наука';r['article']['title']='Учебная заметка '+str(i)
     r['mode']=r['article']['mode']='INDEPENDENT_ARTICLE';r['rights']=rights41.decision(r['source'],r['mode'])
     r['article']['blocks']=[{'kind':'paragraph','id':'own','text':'Собственное учебное объяснение номер '+str(i)+'.'}]
-    r['checks']['final43']={'approved':True,'input_hash':e.fingerprint(r),**{key:True for key in e.CHECKS}}
+    r['ready_checked_at']=NOW.isoformat()
+    r['checks']['final43']={'is_news':False,'event_date':'','event_source_id':'','event_evidence_id':'','event_quote':'','approved':True,'input_hash':e.fingerprint(r),**{key:True for key in e.CHECKS}}
     return r
 
 
@@ -46,6 +47,7 @@ def verdict(prompt,r,approve=True):
         'claims':[{'fact':b['text'],'source_id':r['source']['id'],'evidence_id':b['id'],'quote':b['text']}]}
 
 
+@patch.dict(e.CONFIG,minimum_articles=1)  # Explicit historical partial-release compatibility, not production policy.
 class Daily43Tests(unittest.TestCase):
     def setUp(self):
         catalog=patch.object(d,'reserve_catalog',return_value=[copy.deepcopy(RESERVE_FIXTURE)]);catalog.start();self.addCleanup(catalog.stop)
@@ -73,8 +75,8 @@ class Daily43Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_RELEASE_APPROVED='true',GITHUB_REF_NAME='main'),patch.object(news,'gemini',side_effect=AssertionError('No inference allowed')):
             r=root(temp);s=state();s['_quota_snapshot']=copy.deepcopy(ledger)
             with patch.object(news.runtime,'ACTIVE_BUDGET',rt.RequestBudget(ledger,day_limit=220)):
-                self.assertTrue(d.advance(s,s['date'],False,SimpleNamespace(ROOT=r),now=NOW))
-            self.assertEqual(ledger,snapshot);self.assertEqual(s['_quota_snapshot'],snapshot);self.assertEqual(pub.validate(r,s['date'])['article_count'],0)
+                self.assertFalse(d.advance(s,s['date'],False,SimpleNamespace(ROOT=r),now=NOW))
+            self.assertEqual(ledger,snapshot);self.assertEqual(s['_quota_snapshot'],snapshot);self.assertEqual(s['block_code'],'MINIMUM_ARTICLES_NOT_MET')
 
     def test_due_one_article_never_waits_for_others_or_calls_model(self):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_RELEASE_APPROVED='true',GITHUB_REF_NAME='main'):
@@ -111,7 +113,7 @@ class Daily43Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp,patch.object(d,'reserve_rows',return_value=[]):
             r=root(temp);s=state()
             self.assertFalse(d.advance(s,s['date'],False,SimpleNamespace(ROOT=r),now=NOW))
-            self.assertEqual(s['block_code'],'NO_SAFE_RESERVE');self.assertFalse((r/'issues'/s['date']).exists())
+            self.assertEqual(s['block_code'],'MINIMUM_ARTICLES_NOT_MET');self.assertFalse((r/'issues'/s['date']).exists())
 
     def test_unapproved_or_changed_article_never_enters_issue(self):
         s=state(3);s['candidates'][1]['checks']['final43']['safety']=False
@@ -190,7 +192,7 @@ class Daily43Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             r=root(temp);s=state();s['date']='2026-10-26';before=copy.deepcopy(s['candidates'])
             self.assertFalse(d.advance(s,s['date'],False,SimpleNamespace(ROOT=r),now=NOW))
-            self.assertEqual(s['candidates'],before);self.assertEqual(s['block_code'],'SUPERSEDED_UNFINISHED_DATE')
+            self.assertEqual(s['candidates'][:len(before)],before);self.assertEqual(s['block_code'],'MINIMUM_ARTICLES_NOT_MET')
 
     def test_delivery_failure_retries_existing_files_without_generation(self):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_RELEASE_APPROVED='true',GITHUB_REF_NAME='main'):
@@ -271,7 +273,7 @@ class ModePreservation43Tests(unittest.TestCase):
 class ReleaseTime43Tests(unittest.TestCase):
     def test_final_window_prepares_private_files_and_never_calls_gemini(self):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_RELEASE_APPROVED='true',GITHUB_REF_NAME='main'),patch.object(d,'reserve_catalog',return_value=[RESERVE_FIXTURE]):
-            r=root(temp);s=state();editor=Mock();editor.finish.side_effect=AssertionError('No new generation in delivery window')
+            r=root(temp);s=state(8);editor=Mock();editor.finish.side_effect=AssertionError('No new generation in delivery window')
             self.assertTrue(d.advance(s,s['date'],False,SimpleNamespace(ROOT=r),now=NOW.replace(hour=5,minute=54),editor=editor))
             editor.finish.assert_not_called();self.assertEqual(s['pipeline_status'],'PUBLISHING')
             meta=pub.validate(r,s['date']);self.assertNotIn('published_at',meta);self.assertIn('prepared_at',meta)

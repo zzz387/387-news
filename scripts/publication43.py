@@ -46,6 +46,7 @@ def validate(root,date):
     count=data.get('article_count');kind=data.get('kind')
     if type(count) is not int or count<0:raise p.Blocked('PUBLIC_COUNT_INVALID')
     if kind not in ('articles','source_digest') or (count==0)!=(kind=='source_digest'):raise p.Blocked('PUBLIC_KIND_MISMATCH')
+    if not data.get('preview') and data.get('minimum_articles',1)>=8 and count<data['minimum_articles']:raise p.Blocked('MINIMUM_ARTICLES_NOT_MET')
     pages=list((issue/'articles').glob('*/index.html'))
     if len(pages)!=count or len(data.get('pages',{}))!=count:raise p.Blocked('PUBLIC_ARTICLE_COUNT')
     for slug,hashes in data['pages'].items():
@@ -83,6 +84,7 @@ def build(state,root,reserve=(),preview=False):
         site_checks.validate_local_release(root,date)
         return not preview
     records=selection43.ready(state);articles=[]
+    if len(records)<e.CONFIG['minimum_articles'] and not preview and (records or e.CONFIG['minimum_articles']>=8):raise p.Blocked('MINIMUM_ARTICLES_NOT_MET')
     for i,r in enumerate(records,1):
         a=public_article(r);a['slug']=news.slugify(a['title'],i);articles.append(a)
     if not articles and not reserve:raise p.Blocked('NO_SAFE_RESERVE')
@@ -97,7 +99,8 @@ def build(state,root,reserve=(),preview=False):
         try:
             no=news.get_next_number();issue=working/'issues'/date;issue.mkdir()
             data={'date':date,'number':no,'policy_version':'4.3','article_count':len(articles),
-                  'kind':'articles' if articles else 'source_digest','pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
+                  'kind':'articles' if articles else 'source_digest','minimum_articles':e.CONFIG['minimum_articles'],
+                  'standard_issue':len(articles)>=e.CONFIG['minimum_articles'],'preview':preview,'pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
                 file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version='4.3')))
@@ -130,7 +133,7 @@ def public_light(state):
     result=[]
     for row in light43.ready(state):
         source=row['source']
-        result.append({'title':row['article']['title'],'text':' '.join(b['text'] for b in row['article']['blocks']),
+        result.append({'kind':row.get('light_kind','unusual_fact'),'title':row['article']['title'],'text':' '.join(b['text'] for b in row['article']['blocks']),
             'source':{k:source.get(k,'') for k in ('url','title','publisher','language','published')}})
     return result
 
@@ -140,7 +143,9 @@ def render_light(items):
     html='<section id="light-news" class="light-news" aria-labelledby="light-news-heading"><h2 id="light-news-heading">НЕ ВСЁ ТАК СЕРЬЁЗНО</h2><p>Маленькие новости, от которых мир становится интереснее</p><div class="light-grid">'
     for item in items:
         source=item['source'];url=source_links43.safe_source_url(source['url'])
-        html+='<article class="light-item"><h3>'+escape(item['title'])+'</h3><p>'+escape(item['text'])+'</p><p class="light-source">Источник: <a href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+escape(source['publisher'])+'</a>'
+        label={'news':'Добрая новость','historical_fact':'Исторический факт','unusual_fact':'Необычный факт'}.get(item.get('kind'))
+        label_html='<p class="meta light-kind">'+label+'</p>' if label else ''
+        html+='<article class="light-item">'+label_html+'<h3>'+escape(item['title'])+'</h3><p>'+escape(item['text'])+'</p><p class="light-source">Источник: <a href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+escape(source['publisher'])+'</a>'
         if source.get('published'):html+=' · '+escape(source['published'])
         translated=source_links43.translation_url(url,source.get('language'))
         if translated:html+=' · <a href="'+escape(translated,quote=True)+'" target="_blank" rel="noopener noreferrer">На русском</a>'

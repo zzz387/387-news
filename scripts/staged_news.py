@@ -573,6 +573,16 @@ def main():
     output = os.getenv('GITHUB_OUTPUT')
 
     def persist():
+        if state and state.get('version')==43:
+            from scripts import stock43
+            stock43.sync_backlog(state)
+            if os.getenv('NEWS_STOCK_FILE') and not args.preview:
+                if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or branch!='main':raise RuntimeError('EDITORIAL_STOCK_PROTECTED_ACTIONS_REQUIRED')
+                stock=stock43.ensure(state);stock['quota_snapshot']=json.loads(json.dumps(ledger))
+                destination=ARTIFACT_FILE.parent/'editorial-stock.enc';temporary=destination.with_suffix('.tmp')
+                temporary.write_bytes(cipher(stock,key));temporary.chmod(0o600);temporary.replace(destination)
+                if output:
+                    with open(output,'a') as stream:stream.write('stock=true\n')
         quota_path.parent.mkdir(parents=True, exist_ok=True)
         temp = quota_path.with_suffix('.tmp')
         temp.write_text(json.dumps(ledger), encoding='utf-8')
@@ -588,6 +598,12 @@ def main():
 
     if state is None and args.phase in ('run','resume','write','audit','auto','plan'):
         state=editorial43.migrate(None,date) if use43 else editorial41.new_state(date)
+
+    if state and use43 and not args.preview and os.getenv('NEWS_STOCK_FILE'):
+        from scripts import stock43
+        if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or branch!='main':raise RuntimeError('EDITORIAL_STOCK_PROTECTED_ACTIONS_REQUIRED')
+        restore_editorial_stock(state,key,ledger,os.environ['NEWS_STOCK_FILE'],os.getenv('NEWS_STOCK_EXPECTED')=='true')
+        print('[editorial-stock-restore43] '+json.dumps(stock43.report(state)),flush=True)
 
     PERSIST = RUNTIME.CHECKPOINT = persist
     RUNTIME.ACTIVE_BUDGET = RUNTIME.RequestBudget(ledger, persist)
@@ -636,6 +652,17 @@ def main():
         if state: pipeline.emit_report(state,ledger,output)
         RUNTIME.ACTIVE_BUDGET = RUNTIME.CHECKPOINT = PERSIST = None
         signal.signal(signal.SIGTERM, previous_handler)
+
+
+def restore_editorial_stock(state,key,ledger,path,expected=False):
+    from scripts import stock43
+    if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('GITHUB_REF_NAME')!='main':raise RuntimeError('EDITORIAL_STOCK_PROTECTED_ACTIONS_REQUIRED')
+    path=Path(path)
+    if expected and not path.is_file():raise RuntimeError('Editorial inventory download missing; refusing empty restore')
+    if path.is_file():
+        inventory=decipher(path.read_bytes(),key)
+        stock43.merge(state,inventory);RUNTIME.merge_snapshot(ledger,inventory.get('quota_snapshot',{}));stock43.restore_backlog(state,ROOT)
+    return stock43.report(state)
 
 
 def quota_label():

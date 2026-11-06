@@ -54,12 +54,12 @@ class AppointmentTests(unittest.TestCase):
             self.assertFalse(d.deliver(s,s['date'],False,SimpleNamespace(ROOT=target),now=NOW+timedelta(minutes=11),check_public=lambda **kw:{}))
             self.assertEqual(before,{str(f):f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()})
 
-    def test_delivery_three_or_zero_uses_approved_work_or_reserve_without_model(self):
+    def test_delivery_three_or_zero_is_not_a_full_issue_without_stock(self):
         for count in (0,3):
             with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_RELEASE_APPROVED='true',GITHUB_REF_NAME='main'),patch.object(d,'reserve_rows',return_value=[RESERVE_FIXTURE]),patch.object(news,'gemini',side_effect=AssertionError('No model')):
                 s=state(count);target=root(temp)
-                self.assertTrue(d.deliver(s,s['date'],False,SimpleNamespace(ROOT=target),now=NOW))
-                self.assertEqual(pub.validate(target,s['date'])['article_count'],count)
+                self.assertFalse(d.deliver(s,s['date'],False,SimpleNamespace(ROOT=target),now=NOW))
+                self.assertEqual(s['block_code'],'MINIMUM_ARTICLES_NOT_MET');self.assertFalse((target/'issues'/s['date']).exists())
 
     def test_lead_wait_is_bounded_and_normal_commit_wait_remains_early_publication_gate(self):
         clock=fixtures.Clock(fixtures.at('01:37'))

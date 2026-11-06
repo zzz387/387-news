@@ -2,6 +2,7 @@
 import copy,json,tempfile,unittest
 from datetime import timedelta
 from unittest.mock import patch
+from scripts import editorial43
 from scripts import priorities43 as interests,selection43 as selection,catalog43 as catalog,publication43,policy41 as p
 from scripts import test_editorial_visual43 as fixtures
 named=fixtures.named
@@ -94,6 +95,7 @@ class InterestsTests(unittest.TestCase):
         self.assertTrue(selection.profile({'title':'Космический сюжет'})['space'])
         self.assertTrue(selection.profile({'title':'Сверхновая в соседней галактике'})['space'])
 
+    @patch.dict(editorial43.CONFIG,minimum_articles=1)  # Historical rendering compatibility.
     def test_private_composition_report_is_advisory_and_not_exported(self):
         s=state(1);s['editorial_report43']=interests.report(s,s['candidates'],[])
         self.assertTrue(s['editorial_report43']['advisory_only']);self.assertIsNone(s['editorial_report43']['published_main_articles'])
@@ -143,6 +145,7 @@ class InterestsTests(unittest.TestCase):
         self.assertNotIn('https://example.org/science-feed',session.urls)
         self.assertIn('https://example.org/family/article',session.full)
 
+    @patch.dict(editorial43.CONFIG,minimum_articles=1)  # Historical rendering compatibility.
     def test_no_topic_minimum_blocks_zero_one_or_twelve_articles(self):
         for count in [0,1,12]:
             with tempfile.TemporaryDirectory() as directory:

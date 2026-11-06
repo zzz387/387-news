@@ -11,15 +11,29 @@ review=copy.deepcopy(news.SCHEMAS['v43_final']);review['properties']['id']=S;rev
 news.SCHEMAS['v43_light_review']=content41.schema({'reviews':{'type':'array','items':review}})
 
 
-def ready(state):
+def story_suitable(row):
+    text=selection43.story_context(row)
+    if e.high_risk(row) or re.search(r'(?i)войн|убит|трагед|болезн|политик|парламент|election|politic|disaster|cancer|death|illness|war\b',text):return False
+    return bool(re.search(r'(?i)животн|птиц|ворон|зоопарк|звер|кошк|собак|природ|находк|музе|курьез|спасли|восстанов.{0,15}(?:лес|сад)|animal|bird|zoo|wildlife|museum|curious|unusual|rescu|garden|conserv',text))
+
+def recent(root):
+    from pathlib import Path
+    rows=[]
+    for path in Path(root).glob('issues/*/release.json'):
+        for item in json.loads(path.read_text()).get('light_news',[]):
+            rows.append({'title':item['title'],'summary':item.get('text',''),'url':item.get('source',{}).get('url','')})
+    return rows
+
+def ready(state,limit=5):
     result=[];mains=selection43.ready(state)
     for row in state.get('light43',{}).get('records',[]):
         if not e.eligible(row):continue
         try:rights41.require(row['source'],'INDEPENDENT_ARTICLE',rights41.decision(row['source'],'INDEPENDENT_ARTICLE'))
         except p.Blocked:continue
-        if any(selection43.duplicate(row,x) for x in mains+result):continue
+        if e.news_errors(row.get('checks',{}).get('final43',{}),row,state):continue
+        if any(selection43.duplicate(row,x) for x in mains+result+state.get('_recent_light43',[])):continue
         result.append(row)
-    return result[:5]
+    return result if limit is None else result[:limit]
 
 
 def safe_record(item,source):
@@ -49,18 +63,18 @@ def prepare(state,persist=lambda:None,editor=None):
         if not saved.get('draft'):
             if saved.get('write_attempts',0)>=1:return
             sources=[]
-            for row in state['candidates']:
+            for row in sorted(state['candidates'],key=lambda r:not r.get('for_light_only',False)):
                 src=row.get('source')
-                if not row.get('light_suitable') or not src or e.high_risk(row):continue
+                if not src or not src.get('full_text_verified') or src.get('metadata_status')!='verified' or not story_suitable(row):continue
                 if re.search(r'(?i)войн|болезн|убит|трагед|disaster|cancer|death|illness',src['title']):continue
-                if any(selection43.duplicate(row,r) for r in selection43.ready(state)):continue
+                if any(selection43.duplicate(row,r) for r in selection43.ready(state)+state.get('_recent_light43',[])):continue
                 grant=rights41.decision(src,'INDEPENDENT_ARTICLE')
                 if grant['status']=='allowed' and src['url'] not in {s['url'] for s in sources}:sources.append(src)
                 if len(sources)>=5:break
             if not sources:return
             saved['sources']=sources
             dummy={'source':sources[0],'supporting_sources':sources[1:]};wire,aliases=e.review_wire(dummy)
-            prompt='Рубрика «НЕ ВСЁ ТАК СЕРЬЁЗНО». Подготовь до пяти коротких добрых, удивительных фактов: заголовок и1–3 предложения. Юмор только из реальной истории, без насмешек над людьми, трагедиями или болезнями. Собственные формулировки и композиция C, никаких вымышленных фактов и скрытого перевода. Можно меньше пяти или пустой список. Только факты полных оригиналов, не аннотации. Не выдавай старое за сегодняшнее. Для каждого id и source_id=sN. Не повторяй основные сюжеты: '+json.dumps(selection43.prompt_context(state),ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False)
+            prompt='Рубрика «НЕ ВСЁ ТАК СЕРЬЁЗНО». Без политики и трагедий. Подготовь до пяти коротких добрых, удивительных фактов: заголовок и1–3 предложения. Юмор только из реальной истории, без насмешек над людьми, трагедиями или болезнями. Собственные формулировки и композиция C, никаких вымышленных фактов и скрытого перевода. Можно меньше пяти или пустой список. Только факты полных оригиналов, не аннотации. Не выдавай старое за сегодняшнее. Для каждого id и source_id=sN. Не повторяй основные сюжеты: '+json.dumps(selection43.prompt_context(state),ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False)
             if len(prompt)>e.Editor.context_characters:return
             before=budget.used;saved['write_attempts']+=1;persist()
             try:saved['draft']=editor.call(prompt,output_tokens=4000,schema='v43_light_write')
@@ -96,7 +110,8 @@ def prepare(state,persist=lambda:None,editor=None):
             except (KeyError,TypeError,ValueError):continue
             if errors or not e.positive_semantics(verdict) or e.news_errors(verdict,row,state):continue
             if any(c.get('source_id')!=row['source']['id'] or not any(c.get('quote','') in b['text'] for b in row['source']['blocks']) for c in verdict.get('claims',[])):continue
-            row['checks']['final43']=dict(verdict,approved=True);row['status']='ready';saved['records'].append(row)
+            row['light_kind']='news' if verdict.get('is_news') else 'historical_fact' if re.search(r'(?i)истор|древн|history|ancient',row['article']['title']) else 'unusual_fact'
+            row['checks']['final43']=dict(verdict,approved=True);row['ready_checked_at']=datetime.now(p.TZ).isoformat();row['status']='ready';saved['records'].append(row)
         saved['complete']=True;persist()
     except news.runtime.GenerationPaused:
         if budget.used==before:saved['review_attempts']-=1

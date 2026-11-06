@@ -1,5 +1,5 @@
 """Rotating RSS/page discovery. Feed text is metadata, NEVER the original article."""
-import json,re,time,traceback
+import json,re,time,traceback,os
 from email.utils import parsedate_to_datetime
 from datetime import datetime,timedelta
 from html.parser import HTMLParser
@@ -129,10 +129,13 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 try:stamp=datetime.fromisoformat(published.replace('Z','+00:00'))
                 except ValueError:
                     try:stamp=parsedate_to_datetime(published)
-                    except (ValueError,TypeError):raise p.Blocked('PUBLISHER_ACTIVITY_UNCONFIRMED')
-                stamp=stamp.replace(tzinfo=p.TZ) if stamp.tzinfo is None else stamp
-                if stamp-now>timedelta(days=1):raise p.Blocked('PUBLISHER_PUBLICATION_IN_FUTURE')
-                if not row.get('allow_archive') and now-stamp>timedelta(days=365):raise p.Blocked('PUBLISHER_ACTIVITY_NOT_CURRENT')
+                    except (ValueError,TypeError):
+                        if row.get('allow_archive') and re.search(r'(?i)истор|биограф|архитект|культур|history|historical|biograph|heritage|philosophy',src['title']):
+                            stamp=None;report['undated_archival_original']=True
+                        else:raise p.Blocked('PUBLISHER_ACTIVITY_UNCONFIRMED')
+                stamp=(stamp.replace(tzinfo=p.TZ) if stamp.tzinfo is None else stamp) if stamp is not None else None
+                if stamp is not None and stamp-now>timedelta(days=1):raise p.Blocked('PUBLISHER_PUBLICATION_IN_FUTURE')
+                if stamp is not None and not row.get('allow_archive') and now-stamp>timedelta(days=365):raise p.Blocked('PUBLISHER_ACTIVITY_NOT_CURRENT')
                 grant=rights41.decision(src,'INDEPENDENT_ARTICLE');rights41.require(src,'INDEPENDENT_ARTICLE',grant)
                 # A journal hosts reviews/editorials too; do not infer research design from its name.
                 src['publisher_type']=row['type'];src.setdefault('publication_type','unclassified')
@@ -146,14 +149,31 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
     return report,sources
 
 
-def refresh(state,now=None,session=None):
+def refresh(state,now=None,session=None,shortage=False):
     rotate_candidates(state)
-    now=now or datetime.now(p.TZ);config=registry();cache=state.setdefault('discovery43',{'publishers':{}})
+    now=now or datetime.now(p.TZ);config=registry()
+    from scripts import editorial43,selection43
+    shortage=(len(selection43.ready(state))<editorial43.CONFIG['minimum_articles']) if shortage is None else shortage
+    config=dict(config)
+    if shortage:
+        config['publishers_per_run']=min(15,config['publishers_per_run']*3)
+        config['article_checks_per_run']=min(24,config['article_checks_per_run']*3)
+    cache=state.setdefault('discovery43',{'publishers':{}})
     from scripts import priorities43
     def due(row):
         last=cache['publishers'].get(row['id'],{}).get('checked_at')
         return not last or now-datetime.fromisoformat(last)>=timedelta(hours=config['refresh_hours'])
     ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified' and due(r)],cache,state.get('_recent43',[]),state['date'])
+    if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true':
+        # One public discovery slot for the independent light column; content,
+        # complete originals and rights still decide eligibility, never the flag.
+        core=[r for r in ordered if r.get('search_group')]
+        other=[r for r in ordered if not r.get('search_group')]
+        picks=[r for r in other if r.get('light_suitable')]
+        if picks:
+            light=min(picks,key=lambda r:(cache['publishers'].get(r['id'],{}).get('checked_at',''),-r.get('availability',{}).get('full_originals_verified',0),r['id']))
+            other=[r for r in other if r['id']!=light['id']]
+            ordered=core+[dict(light,search_light=True)]+other
     if not ordered:return cache
     from scripts import editorial41
     published_urls={x.get('source_url') for x in editorial41.archive_entries(p.ROOT)}
@@ -163,7 +183,7 @@ def refresh(state,now=None,session=None):
         if last and now-datetime.fromisoformat(last)<timedelta(hours=config['refresh_hours']):continue
         selected.append(row)
         if len(selected)>=config['publishers_per_run']:break
-    known={r['url'] for r in state['candidates']};session=session or public_sources41.Session(timeout=7);deadline=time.monotonic()+75;checks=0
+    known={r['url'] for r in state['candidates']};session=session or public_sources41.Session(timeout=7);deadline=time.monotonic()+(120 if shortage else 75);checks=0
     cache['last_run']={'at':now.isoformat(),'attempted_groups':[],'candidate_groups':{},'publishers_attempted':0,'article_checks':0}
     run=cache['last_run']
     # Reserve an independent discovery attempt for each core group. Network work
@@ -181,7 +201,7 @@ def refresh(state,now=None,session=None):
     pending=list(selected)
     while pending and len(attempted_ids)<config['publishers_per_run']:
         row=pending.pop(0)
-        if row['id'] not in initial:
+        if row['id'] not in initial and not row.get('search_light'):
             missing=[g for g in priorities43.CORE_GROUPS if not run['candidate_groups'].get(g) and g not in fallback_groups]
             for group in missing:
                 options=[r for r in ordered if r['id'] not in attempted_ids and r['id'] not in initial and any(priorities43.DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[]))]
@@ -205,6 +225,9 @@ def refresh(state,now=None,session=None):
                 priority_ids=row.get('priority_ids',[]),editorial_priority=row.get('editorial_priority',50),quality_score=row.get('quality_score',50),science_source=row.get('science_source',False),category_hint='Общество',discovered_at=now.isoformat(),light_suitable=row.get('light_suitable',False),status='discovered',progress={},checks={},history=[])
             record['editorial43']=priorities43.evaluate(record,state.get('_recent43',[]),state['date'])
             record['category_hint']=record['editorial43']['category']
+            if row.get('search_light'):
+                from scripts import light43
+                if light43.story_suitable(record):record['for_light_only']=True
             group=record['editorial43']['group'];run['candidate_groups'][group]=run['candidate_groups'].get(group,0)+1
             state['candidates'].append(record);known.add(src['url'])
             state.setdefault('source_cache',{})[src['url']]=src
@@ -236,7 +259,7 @@ def live_report(output):
 def core_report(output):
     # Public-source diagnostic only: no production checkpoint, drafts or model key.
     now=datetime.now(p.TZ);state={'date':now.date().isoformat(),'candidates':[]}
-    cache=refresh(state,now)
+    cache=refresh(state,now,shortage=True)
     result={'checked_at':now.isoformat(),'gemini_requests':0,'search':cache.get('last_run',{}),
             'publishers':cache.get('publishers',{}),'candidate_groups':cache.get('last_run',{}).get('candidate_groups',{})}
     Path(output).write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')

@@ -169,6 +169,20 @@ def attach_evidence(row,state):
         if len(sources)>=2:break
 
 
+def reconsider_evidence(state):
+    # Reopen only a missing-evidence hold when genuinely new verified sources exist.
+    # Article/final-review counters and all previous refusals remain unchanged.
+    from scripts import editorial43
+    basis=p.digest(sorted((url,src.get('content_hash')) for url,src in state.get('source_cache',{}).items() if src.get('full_text_verified')))
+    for row in state['candidates']:
+        if row.get('status')!='deferred' or row.get('support_basis43')==basis:continue
+        failures=[h.get('code') for h in row.get('history',[]) if h.get('stage')=='v43_final']
+        if not failures or failures[-1] not in ('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED','SAFETY_EVIDENCE_INCOMPLETE'):continue
+        row['support_basis43']=basis;attach_evidence(row,state)
+        if editorial43.safety_sources_valid(row):
+            row['status']='preparing';row['history'].append({'code':'NEW_INDEPENDENT_EVIDENCE_AVAILABLE','stage':'source43'})
+
+
 def cited_verification_urls(row):
     """Only actual links in a complete original; no guessed law/medical endpoints."""
     from scripts import editorial41,source41
@@ -180,7 +194,7 @@ def cited_verification_urls(row):
             try:source41.safe_url(url)
             except p.Blocked:continue
             urls.append(url)
-            if len(urls)>=2:return urls
+            if len(urls)>=6:return urls
     return urls
 
 

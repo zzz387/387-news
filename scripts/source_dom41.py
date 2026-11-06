@@ -7,7 +7,7 @@ VOID={'area','base','br','col','embed','hr','img','input','link','meta','param',
 BLOCK={'h1','h2','h3','h4','h5','h6','p','li','blockquote','tr','pre','dt','dd','figcaption'}
 IGNORE={'script','style','nav','noscript','svg','footer','form','button','template'}
 UTILITY=re.compile(r'(?:^|[-_\s])(?:breadcrumb|social|share|sharing|related|recommendations|cookie|newsletter|pagination|toc|editsection|reflist|mw-editsection)(?:$|[-_\s])',re.I)
-BODY_NAMES={'article-body','article-content','entry-content','post-content','story-body','field--name-body','mw-parser-output','bodyContent','content-body','article__body','fulltext-content','n-single__content'}
+BODY_NAMES={'article__content','article-text','story-content','blog-entry__body','blog-entry-body','article-body__content','article-body','article-content','entry-content','post-content','story-body','field--name-body','mw-parser-output','bodyContent','content-body','article__body','fulltext-content','n-single__content'}
 
 
 class Node:
@@ -96,7 +96,7 @@ def choose_region(document):
             current=current.parent
         return True
     nodes=[n for n in document.root.all() if eligible(n)]
-    bodies=[n for n in nodes if n.attrs.get('itemprop')=='articleBody' or
+    bodies=[n for n in nodes if 'articleBody' in n.attrs.get('itemprop','').split() or n.attrs.get('data-testid') in ('article-body','article-content') or n.attrs.get('data-component')=='ArticleBody' or
             bool(set(n.attrs.get('class','').split()) & BODY_NAMES) or n.attrs.get('id') in BODY_NAMES]
     # Keep only outermost body nodes; split Drupal body fields are all retained in DOM order.
     outer=[]; descendants=set()
