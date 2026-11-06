@@ -118,7 +118,9 @@ jobs:
           python-version: '3.12'
       - name: Check publisher discovery robots full-text access and per-article rights (public only no Gemini)
         run: python -m scripts.catalog43 --output '${{ runner.temp }}/catalog43-report.json'
-      - name: Measure bounded A B C public discovery with the actual production selector (no checkpoint or Gemini)
+      - name: Measure adaptive A B C and light public discovery (no checkpoint or Gemini)
+        env:
+          NEWS_LIGHT_NEWS_ENABLED: 'true'
         run: python -m scripts.catalog43 --core-search --output '${{ runner.temp }}/core-search43-report.json'
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}
@@ -461,6 +463,16 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/quota
           merge-multiple: true
+      - name: Restore shared encrypted editorial inventory
+        if: ${{ steps.checkpoint.outputs.stock_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.stock_id }}
+          run-id: ${{ steps.checkpoint.outputs.stock_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/editorial-stock
+          merge-multiple: true
       - name: Restore special checkpoint for shared quota recovery only
         if: ${{ steps.checkpoint.outputs.special_quota_found == 'true' }}
         uses: actions/download-artifact@v4
@@ -481,6 +493,8 @@ jobs:
           NEWS_CHECKPOINT_FILE: ${{ runner.temp }}/checkpoint/news-draft.enc
           NEWS_CHECKPOINT_EXPECTED: ${{ steps.checkpoint.outputs.found }}
           NEWS_QUOTA_FILE: ${{ runner.temp }}/quota/quota.json
+          NEWS_STOCK_FILE: ${{ runner.temp }}/editorial-stock/editorial-stock.enc
+          NEWS_STOCK_EXPECTED: ${{ steps.checkpoint.outputs.stock_found }}
           NEWS_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.quota_found }}
           NEWS_SPECIAL_QUOTA_FILE: ${{ runner.temp }}/special-quota-backup/special-003-r.enc
           NEWS_SPECIAL_QUOTA_EXPECTED: ${{ steps.checkpoint.outputs.special_quota_found }}
@@ -507,6 +521,14 @@ jobs:
           path: ${{ runner.temp }}/quota/quota.json
           if-no-files-found: error
           retention-days: 90
+      - name: Save only encrypted shared editorial inventory
+        if: ${{ always() && steps.stage.outputs.stock == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: 387news43-editorial-stock
+          path: ${{ runner.temp }}/editorial-stock.enc
+          if-no-files-found: error
+          retention-days: 30
       - name: Project compact current home without modifying immutable editions
         id: home
         if: ${{ success() && steps.context.outputs.preview == 'false' && (steps.context.outputs.phase == 'run' || steps.context.outputs.phase == 'resume') && steps.stage.outputs.published != 'true' }}

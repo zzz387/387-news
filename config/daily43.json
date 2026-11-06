@@ -2,11 +2,14 @@
   "version": "4.3",
   "enabled": true,
   "article_target": 12,
-  "minimum_articles": 1,
+  "minimum_articles": 8,
   "release_time": "06:00",
   "special_paused": false,
   "repair_attempts": 2,
   "reserve_max_age_days": 14,
   "special43_enabled": true,
-  "context_characters": 480000
+  "context_characters": 480000,
+  "article_stock_target": 20,
+  "light_stock_target": 15,
+  "candidate_stock_target": 32
 }

@@ -143,6 +143,8 @@ def admit(root,daily,ledger,now=None):
     from scripts import release_queue
     if not release_queue.edition_exists(root,today):return False,'CURRENT_DAILY_NOT_PUBLISHED'
     if not daily or daily.get('version')!=43 or daily.get('branch')!='main' or daily.get('preview') is not False:return False,'DAILY43_STATE_REQUIRED'
+    from scripts import selection43
+    if len(selection43.ready(dict(daily,candidates=daily.get('candidates',[]))))<e.CONFIG['minimum_articles']:return False,'DAILY_MINIMUM_NOT_READY'
     if not daily43.reserve_rows({},now):return False,'DAILY_RESERVE_UNAVAILABLE'
     if ledger.get('day')!=day or type(ledger.get('requests')) is not int:return False,'CURRENT_SHARED_LEDGER_REQUIRED'
     if 220-ledger['requests']<=sc.definition()['daily_reserve_requests']:return False,'DAILY_QUOTA_RESERVED'

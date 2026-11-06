@@ -314,7 +314,8 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                 response_failed = False
                 body = e.read(3000).decode('utf-8','replace')
                 status = (re.search(r'"status"\s*:\s*"([A-Z_]+)"',body) or [None, 'UNKNOWN'])[1]
-                print(f'[Gemini] model={model} HTTP {e.code} status={status} '
+                reason=('PROVIDER_HIGH_DEMAND' if re.search(r'overload|high demand|too busy',body,re.I) else 'PROVIDER_UNAVAILABLE' if e.code==503 else 'QUOTA_OR_RATE_LIMIT' if e.code==429 else 'HTTP_ERROR')
+                print(f'[Gemini] model={model} HTTP {e.code} status={status} reason={reason} '
                       f'attempt={attempt + 1}/3', file=sys.stderr, flush=True)
                 errors.append(f'{model}: HTTP {e.code} ({status})')
                 if e.code in (429, 503):

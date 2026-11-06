@@ -84,7 +84,7 @@ class SourceLinks43Tests(unittest.TestCase):
 
 class TargetTwelve43Tests(unittest.TestCase):
     def test_real_config_and_preflight_use_twelve_without_changing_free_quota(self):
-        self.assertEqual(e.CONFIG['article_target'],12);self.assertEqual(e.CONFIG['minimum_articles'],1)
+        self.assertEqual(e.CONFIG['article_target'],12);self.assertEqual(e.CONFIG['minimum_articles'],8)
         env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','NEWS_POLICY_VERSION':'4.3','DRAFT_ENCRYPTION_KEY':'x'*44,'NEWS_AUTOMATION_V31_ENABLED':'true','NEWS_RELEASE_APPROVED':'true'}
         with patch.object(preflight.stage,'validate_key',return_value=b'x'*32):self.assertEqual(preflight.check(env)['article_target'],12)
         text=(p.ROOT/'.github/workflows/daily-v31.yml').read_text();self.assertIn('NEWS_MAX_REQUESTS_PER_RUN: "24"',text);self.assertIn('NEWS_MAX_REQUESTS_PER_DAY: "220"',text)
@@ -106,7 +106,7 @@ class TargetTwelve43Tests(unittest.TestCase):
         editor=Mock();editor.finish.side_effect=lambda state,row:row.update(status='ready')
         with tempfile.TemporaryDirectory() as temp,patch.object(daily,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
             target=root(temp);daily.advance(s,s['date'],False,SimpleNamespace(ROOT=target),now=NOW.replace(hour=5,minute=0),editor=editor)
-        self.assertEqual(editor.finish.call_count,4);self.assertEqual(len(e.select_ready(s)),12);self.assertEqual(s['candidates'][:8],accepted)
+        self.assertEqual(editor.finish.call_count,7);self.assertEqual(len(e.select_ready(s)),12);self.assertEqual(s['stock_report43']['ready_articles'],3);self.assertEqual(s['candidates'][:8],accepted)
         self.assertFalse(any(r['id'] in {a['id'] for a in accepted} for _,r in (call.args for call in editor.finish.call_args_list)))
 
     def test_no_quota_or_failed_candidate_still_publishes_ten_when_due(self):

@@ -62,36 +62,64 @@ def preparation_order(state,limit=None,exclude_ids=()):
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None,delivery_only=False):
     try:from scripts import selection43,catalog43,light43,priorities43
     except ImportError:import selection43,catalog43,light43,priorities43
+    from scripts import stock43
     clock=(lambda:now) if now is not None else pipeline.now_moscow
     save=persist
     def persist():
         state['publication_status']=pipeline.delivery_state(state,clock());save()
     current=clock();root=Path(ops.ROOT)
-    if date<current.date().isoformat() and not (root/'issues'/date/'index.html').is_file():
+    if any(path.name>date for path in (root/'issues').glob('*') if path.is_dir() and len(path.name)==10) and not (root/'issues'/date/'index.html').is_file():
         pipeline.status(state,'DEFERRED','preserve_old_checkpoint','SUPERSEDED_UNFINISHED_DATE');persist();return False
     if (root/'issues'/date/'index.html').is_file():
         ready=pipeline.published_delivery(state,date,ops,preview,current,check_public or pipeline.site_checks.check_site);persist();return ready
     release=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
     budget=news.runtime.ACTIVE_BUDGET
+    minimum=e.CONFIG['minimum_articles']
+    stock43.restore_backlog(state,root)
+    stock43.draw(state,root,current)
+    state['_recent_light43']=light43.recent(root)
+    stock43.draw_light(state,root)
+    due=current>=release-timedelta(minutes=10)
+    short=len(selection43.ready(state))<minimum
+    if short:
+        state['audit_passed']=False
+        pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET')
     # Delivery has first claim on every due window; never wait for more model work.
-    if not delivery_only and current<release-timedelta(minutes=10):
-        if budget:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
+    if not delivery_only and (not due or short):
+        if budget and not due:budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-600))
         state['_recent43']=selection43.recent(root,date)
         priorities43.apply_rules(state,clock())
         discover(state)
-        if os.getenv('NEWS_CATALOG_REFRESH')=='true' and clock()<release-timedelta(minutes=25):
-            try:catalog43.refresh(state,clock())
+        if os.getenv('NEWS_CATALOG_REFRESH')=='true' and (short or clock()<release-timedelta(minutes=25)):
+            try:catalog43.refresh(state,clock(),shortage=short)
             except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
         priorities43.apply_rules(state,clock())
+        priorities43.reconsider_evidence(state)
         persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
-        prior={r.get('source_url') for r in editorial41.archive_entries(root)}
-        attempted_ids=set()
+        prior={r.get('source_url') for r in editorial41.archive_entries(root)}|set(stock43.ensure(state)['published_urls'])
+        def prepare_light():
+            if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or clock()>=release-timedelta(minutes=10) or not budget:return
+            keep=max(4,2*max(0,minimum-len(selection43.ready(state))))
+            if budget.remaining_requests()>=keep+2:
+                light43.prepare(state,persist)
+                stock43.bank_light(state,clock())
+        prepare_light()
+        attempted_ids=set();extra_searches=0
         while True:
             record=next(iter(preparation_order(state,limit=1,exclude_ids=attempted_ids)),None)
-            if record is None:break
+            if record is None:
+                if len(selection43.ready(state))<minimum and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
+                    extra_searches+=1
+                    try:catalog43.refresh(state,clock(),shortage=True)
+                    except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
+                    priorities43.apply_rules(state,clock());priorities43.reconsider_evidence(state);persist();continue
+                break
             attempted_ids.add(record['id'])
-            if len(selection43.ready(state))>=e.CONFIG['article_target']:break
-            if clock()>=release-timedelta(minutes=10) or not budget or not budget.can_request():break
+            count=len(selection43.ready(state))
+            banking=count>=e.CONFIG['article_target']
+            if due and count>=minimum:break
+            if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):break
+            if (not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
             if record['url'] in prior:record['status']='deferred';persist();continue
@@ -104,6 +132,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                     if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
                 editor.finish(state,record)
+                if banking:stock43.bank(state,record,clock())
                 peers=[r for r in e.select_ready(state) if r is not record and selection43.duplicate(record,r)]
                 if peers and not any(h.get('code')=='STORY_DUPLICATE_AFTER_WRITING' for h in record['history']):
                     record['history'].append({'code':'STORY_DUPLICATE_AFTER_WRITING','peer_ids':[r['id'] for r in peers]})
@@ -116,8 +145,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 record['status']='deferred' if isinstance(exc,p.Blocked) or failures>=2 else 'retryable_error'
                 print('[candidate43] '+json.dumps({'id':record['id'],'status':record['status'],'code':getattr(exc,'code',type(exc).__name__)}),flush=True)
             persist()
-        if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true' and clock()<release-timedelta(minutes=30) and (len(selection43.ready(state))>=e.CONFIG['article_target'] or not any(r.get('status') in ('discovered','preparing','retryable_error') for r in state['candidates'])):
-            light43.prepare(state,persist)
+        prepare_light()
+    stock43.draw(state,root,clock())
     selected=selection43.ready(state)
     state['title_style43']=selection43.title_report(selected)
     state['selection43']={'selected':[r['id'] for r in selected],'excluded_duplicate_ids':[r['id'] for r in e.select_ready(state) if r not in selected]}
@@ -128,6 +157,12 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     except Exception as exc:print('[editorial-report43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
     state['selected_ids']=[r['id'] for r in selected]
     state['articles']={r['id']:r['article'] for r in selected}
+    stock43.sync_backlog(state)
+    state['stock_report43']=stock43.report(state)
+    print('[editorial-stock43] '+json.dumps(state['stock_report43']),flush=True)
+    if len(selected)<minimum:
+        state['audit_passed']=False;state['issue_kind']='preparing';state['reserve_count']=0;state['public_article_count']=0
+        pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET');persist();return False
     reserve=[] if selected else reserve_rows(state,clock())
     state['issue_kind']='articles' if selected else 'source_digest'
     state['reserve_count']=len(reserve)

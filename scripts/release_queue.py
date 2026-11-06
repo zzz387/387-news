@@ -118,7 +118,8 @@ def main():
             and os.environ.get('GITHUB_REF_NAME')=='main'):
         if os.getenv('NEWS_POLICY_VERSION')=='4.3':
             # Keep old ciphertext artifacts under their original dates; don't relabel as today.
-            print('[release-context] policy43 serves current date; older checkpoints retained under original labels')
+            date=unfinished_date(news.ROOT,date,production_artifacts())
+            print('[release-context] policy43 resumes the oldest unpublished checkpoint before advancing dates')
         else:date=unfinished_date(news.ROOT,date,production_artifacts())
     with open(os.environ['GITHUB_OUTPUT'],'a') as output:
         output.write(f'phase={phase}\npreview={str(preview).lower()}\ntarget_date={date}\n')

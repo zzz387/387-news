@@ -52,7 +52,8 @@ class Special43Tests(unittest.TestCase):
 
     def test_daily_first_admission_and_global_cooldown_and_reserve_are_not_bypassed(self):
         now=datetime(2026,10,28,12,tzinfo=p.TZ);day=now.astimezone(timezone.utc).date().isoformat()
-        daily={'version':43,'branch':'main','preview':False};ledger={'day':day,'requests':3,'models':{'lite':3},'cooldowns':{}}
+        from scripts.test_daily43 import state as daily_state
+        daily=dict(daily_state(8),branch='main',preview=False);ledger={'day':day,'requests':3,'models':{'lite':3},'cooldowns':{}}
         with tempfile.TemporaryDirectory() as temp,patch.object(r.daily43,'reserve_catalog',return_value=[RESERVE_FIXTURE]):
             root=Path(temp);self.assertEqual(r.admit(root,daily,ledger,now)[1],'CURRENT_DAILY_NOT_PUBLISHED')
             (root/'issues'/now.date().isoformat()).mkdir(parents=True)

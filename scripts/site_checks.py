@@ -188,6 +188,8 @@ def check_v43(base,home,expected_date=None):
     data=json.loads(fetch(base+'/issues/'+date+'/release.json'))
     if data.get('date')!=date or data.get('policy_version')!='4.3':raise RuntimeError('PUBLIC_METADATA_INVALID')
     count=data.get('article_count');pages=data.get('pages',{})
+    if data.get('preview'):raise RuntimeError('PUBLIC_PREVIEW_FORBIDDEN')
+    if type(data.get('minimum_articles')) is int and data['minimum_articles']>=8 and (type(count) is not int or count<data['minimum_articles']):raise RuntimeError('PUBLIC_MINIMUM_ARTICLES_NOT_MET')
     if type(count) is not int or count<0 or len(pages)!=count:raise RuntimeError('PUBLIC_COUNT_INVALID')
     overview=fetch(base+'/issues/'+date+'/')
     if publication43.digest_bytes(overview.encode())!=data.get('overview_hash'):raise RuntimeError('PUBLIC_OVERVIEW_CHANGED')

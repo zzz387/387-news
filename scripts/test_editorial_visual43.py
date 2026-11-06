@@ -170,6 +170,7 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(items[0][1]['publisher_type'],'press_release');self.assertEqual(items[0][1]['publication_type'],'unclassified')
 
 class LightAndLayoutTests(unittest.TestCase):
+    @patch.dict(e.CONFIG,minimum_articles=1)  # Historical rendering compatibility.
     def test_optional_section_counts_never_change_main_article_admission(self):
         for mains,shorts in [(12,5),(8,3),(1,1),(12,0),(0,0)]:
             with self.subTest(mains=mains,shorts=shorts),tempfile.TemporaryDirectory() as temp:
@@ -179,6 +180,7 @@ class LightAndLayoutTests(unittest.TestCase):
                 with patch.object(site_checks,'fetch',side_effect=web(target)):self.assertEqual(site_checks.check_site(expected_date=s['date'])['articles'],mains)
                 text=(target/'index.html').read_text();self.assertEqual('id="light-news"' in text,bool(shorts));self.assertNotIn('PRIVATE',json.dumps(data))
 
+    @patch.dict(e.CONFIG,minimum_articles=1)  # Historical rendering compatibility.
     def test_unapproved_light_story_is_omitted_without_blocking_the_main_article(self):
         s=state(1);row=light_ready(0);row['checks']['final43']['facts']=False;s['light43']={'records':[row]}
         with tempfile.TemporaryDirectory() as temp:

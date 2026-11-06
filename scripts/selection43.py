@@ -132,7 +132,7 @@ def recent(root,date,days=14):
 
 def order(state,history=(),limit=None,exclude_ids=()):
     from scripts import priorities43
-    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered') and r['id'] not in exclude_ids];result=[]
+    selected=ready(state);planned=list(selected);pending=[r for r in state['candidates'] if r.get('status') in ('preparing','retryable_error','discovered') and r['id'] not in exclude_ids and not r.get('for_light_only')];result=[]
     category=Counter(r.get('category_hint') or r.get('category','') for r in selected)
     places=Counter(profile(r)['place'] for r in selected);publishers=Counter(profile(r)['publisher'] for r in selected);orgs=Counter(profile(r)['organisation'] for r in selected)
     space=sum(profile(r)['space'] for r in selected)

@@ -213,6 +213,7 @@ def delivery_state(state,now=None):
     now=now or now_moscow();stage=state.get('pipeline_status','PREPARING')
     release=datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=news.TZ)
     if stage=='PUBLISHED' and state.get('delivery_verified_at'):return 'PUBLISHED_VERIFIED'
+    if state.get('version')==43 and state.get('block_code')=='MINIMUM_ARTICLES_NOT_MET':return 'PREPARING'
     ready=bool(state.get('articles') or state.get('public_article_count') or state.get('reserve_count') or state.get('audit_passed'))
     if now<release:
         if stage=='PUBLISHING':return 'READY_TO_PUBLISH'
@@ -237,7 +238,11 @@ def report(state,ledger,now=None):
         try:from scripts import selection43
         except ImportError:import selection43
         ready_count=len(selection43.ready(state))
-    return dict(date=state['date'],policy_version=state.get('policy_version','3.2'),
+    inventory={}
+    if state.get('version')==43:
+        from scripts import stock43,light43,editorial43
+        inventory={'minimum_articles':editorial43.CONFIG['minimum_articles'],'editorial_stock':stock43.report(state),'light_news_ready':len(light43.ready(state))}
+    return dict(**inventory,date=state['date'],policy_version=state.get('policy_version','3.2'),
                 issue_kind=state.get('issue_kind','articles'),reserve_links=state.get('reserve_count',0),
                 publication_status=delivery_state(state,now),
                 article_target=article_target(state),articles=max(ready_count,state.get('public_article_count',0)),
