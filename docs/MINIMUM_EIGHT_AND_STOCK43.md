@@ -112,3 +112,17 @@ fallbacks. First production reports must state actual main/light inventory and
 next-issue readiness; passing synthetic tests is not publication. №013 is left
 unchanged. Ordinary delivery/watchdog, daily priority over special work and06:00
 Moscow remain in force.
+
+## Protected inspection and capacity recovery
+
+Read-only inspect reports the current minimum and restores the latest encrypted
+inventory before counting it; it does not persist state or initialize a model
+budget. Light diagnostics expose only attempts/counts/reason codes, never drafts.
+
+A503 still pauses its failed operation and persists that model's cooldown. A
+later operation/run can prefer the other ALREADY configured free model; the same
+key, six-second interval and total24/220 budget apply to both. Models whose
+cooldowns remain active are skipped, not called. A429 now also persists a global
+all-models hold for Retry-After, so changing models cannot evade rate/quota
+restrictions. If both configured models are unavailable, preparation waits with
+its encrypted progress. No new model, paid fallback or quota reset is introduced.

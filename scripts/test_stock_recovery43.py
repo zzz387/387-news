@@ -84,6 +84,18 @@ class StockRecoveryTests(unittest.TestCase):
         priorities43.reconsider_evidence(s);self.assertEqual(row['status'],'preparing');self.assertEqual(row['progress'],before)
         self.assertTrue(e.safety_sources_valid(row));self.assertEqual(row['history'][0]['code'],'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
 
+    def test_inspection_cannot_report_inherited_one_article_approval(self):
+        s=fixture.state(1);s['audit_passed']=True;before=copy.deepcopy(s['candidates'])
+        stage.inspection_status(s)
+        self.assertFalse(s['audit_passed']);self.assertEqual(s['pipeline_status'],'PREPARING');self.assertEqual(s['candidates'],before)
+
+    def test_safe_report_distinguishes_no_light_from_failed_light_calls(self):
+        from scripts import pipeline
+        s=fixture.state(2);s['light43']={'write_attempts':1,'review_attempts':1,'http_requests':2,'code':'GEMINI_HTTP_503','records':[]}
+        report=pipeline.report(s,{})
+        self.assertEqual(report['light_news_ready'],0);self.assertEqual(report['light_preparation']['http_requests'],2);self.assertEqual(report['light_preparation']['code'],'GEMINI_HTTP_503')
+        self.assertNotIn('records',report['light_preparation'])
+
     def test_inventory_upload_is_ciphertext_only_and_keeps_existing_mutex(self):
         text=(e.p.ROOT/'.github/workflows/daily-v31.yml').read_text()
         section=text.split('Save only encrypted shared editorial inventory',1)[1].split('Project compact',1)[0]

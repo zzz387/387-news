@@ -241,7 +241,8 @@ def report(state,ledger,now=None):
     inventory={}
     if state.get('version')==43:
         from scripts import stock43,light43,editorial43
-        inventory={'minimum_articles':editorial43.CONFIG['minimum_articles'],'editorial_stock':stock43.report(state),'light_news_ready':len(light43.ready(state))}
+        inventory={'minimum_articles':editorial43.CONFIG['minimum_articles'],'editorial_stock':stock43.report(state),'light_news_ready':len(light43.ready(state)),
+                   'light_preparation':{k:state.get('light43',{}).get(k,0 if k!='code' else None) for k in ('write_attempts','review_attempts','http_requests','code')}}
     return dict(**inventory,date=state['date'],policy_version=state.get('policy_version','3.2'),
                 issue_kind=state.get('issue_kind','articles'),reserve_links=state.get('reserve_count',0),
                 publication_status=delivery_state(state,now),
