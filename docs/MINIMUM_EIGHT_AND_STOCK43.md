@@ -131,3 +131,7 @@ Inventory preparation uses its own existing personal-topic/diversity ranking,
 rather than treating the already-full main edition as its topic allocation.
 Sensitive candidates are left for fresh main preparation, not silently banked.
 Known main or reserve duplicates are skipped before another paid writing stage.
+
+When a queue runs out after eight are accepted, the same two bounded additional
+public-search rounds can replenish the target twelve and then inventory.
+Reaching the minimum no longer disables supply discovery; Gemini caps stay fixed.
