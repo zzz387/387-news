@@ -560,9 +560,11 @@ def main():
         segments = sum(len(d.get(k, {}).get('parts', [])) for d in state.get('dossiers', {}).values() for k in ('_longform_progress', '_shortform_progress'))
         print(f'[checkpoint-test] restored {vetted_count(state)}/{target_count} articles, {segments} segments', flush=True)
         if args.phase=='inspect':
-            action='publish_when_due' if state.get('audit_passed') else 'audit' if vetted_count(state)>=pipeline.article_target(state) else 'continue_saved_writing'
-            pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if vetted_count(state)>=pipeline.article_target(state) else 'RETRY_PENDING',action)
-            pipeline.emit_report(state,state.get('_quota_snapshot',{}),os.getenv('GITHUB_OUTPUT'))
+            inspection_ledger=json.loads(json.dumps(state.get('_quota_snapshot',{})))
+            if use43 and not args.preview and os.getenv('NEWS_STOCK_FILE'):
+                restore_editorial_stock(state,key,inspection_ledger,os.environ['NEWS_STOCK_FILE'],os.getenv('NEWS_STOCK_EXPECTED')=='true')
+            inspection_status(state)
+            pipeline.emit_report(state,inspection_ledger,os.getenv('GITHUB_OUTPUT'))
         return
     quota_path = Path(os.getenv('NEWS_QUOTA_FILE', str(ARTIFACT_FILE.parent / 'quota.json')))
     if os.getenv('NEWS_QUOTA_EXPECTED') == 'true' and not quota_path.is_file():
@@ -652,6 +654,19 @@ def main():
         if state: pipeline.emit_report(state,ledger,output)
         RUNTIME.ACTIVE_BUDGET = RUNTIME.CHECKPOINT = PERSIST = None
         signal.signal(signal.SIGTERM, previous_handler)
+
+
+def inspection_status(state):
+    count=vetted_count(state)
+    if state.get('version')==43:
+        from scripts import editorial43
+        state['audit_passed']=count>=editorial43.CONFIG['minimum_articles']
+        if not state['audit_passed']:
+            pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET')
+        else:pipeline.status(state,'APPROVED','publish_when_due')
+        return
+    action='publish_when_due' if state.get('audit_passed') else 'audit' if count>=pipeline.article_target(state) else 'continue_saved_writing'
+    pipeline.status(state,'APPROVED' if state.get('audit_passed') else 'READY_FOR_AUDIT' if count>=pipeline.article_target(state) else 'RETRY_PENDING',action)
 
 
 def restore_editorial_stock(state,key,ledger,path,expected=False):

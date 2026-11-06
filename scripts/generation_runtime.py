@@ -90,7 +90,8 @@ class RequestBudget:
             raise GenerationPaused('API request budget exhausted; encrypted progress retained')
         if now + self.gap + 155 >= self.deadline:
             raise GenerationPaused('Stage time budget reached; allow checkpoint upload before timeout')
-        cooldown = self.ledger.setdefault('cooldowns', {}).get(model, 0)
+        cooldowns=self.ledger.setdefault('cooldowns', {})
+        cooldown = max(cooldowns.get(model,0),cooldowns.get('__all_models__',0))
         if cooldown > time.time():
             raise GenerationPaused('Model cooldown active; resume in a later run')
         if self.last is not None:

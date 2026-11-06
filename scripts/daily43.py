@@ -106,7 +106,14 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         prepare_light()
         attempted_ids=set();extra_searches=0
         while True:
-            record=next(iter(preparation_order(state,limit=1,exclude_ids=attempted_ids)),None)
+            banking=len(selection43.ready(state))>=e.CONFIG['article_target']
+            plan_state=state
+            if banking:
+                # Inventory needs its own topic balance, not the already full
+                # edition's nine personal places followed by optional science.
+                pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and not e.high_risk(r)]
+                plan_state=dict(state,candidates=stock43.available(state,date)+pending)
+            record=next(iter(preparation_order(plan_state,limit=1,exclude_ids=attempted_ids)),None)
             if record is None:
                 if len(selection43.ready(state))<minimum and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                     extra_searches+=1
@@ -123,13 +130,15 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
             if record['url'] in prior:record['status']='deferred';persist();continue
-            if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
+            if any(selection43.duplicate(record,r) for r in selection43.ready(state)+(stock43.available(state,date) if banking else [])):
                 record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_BEFORE_WRITING'});persist();continue
             record['status']='preparing';persist()
             try:
                 if isinstance(editor,e.Editor):
                     editor.state=state;editor.usage_record=record;priorities43.attach_evidence(record,state);editor.verify_source(record)
-                    if any(selection43.duplicate(record,r) for r in selection43.ready(state)):
+                    if banking and e.high_risk(record):
+                        record['status']='discovered';persist();continue
+                    if any(selection43.duplicate(record,r) for r in selection43.ready(state)+(stock43.available(state,date) if banking else [])):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
                 editor.finish(state,record)
                 if banking:stock43.bank(state,record,clock())

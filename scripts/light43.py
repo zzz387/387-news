@@ -78,7 +78,8 @@ def prepare(state,persist=lambda:None,editor=None):
             if len(prompt)>e.Editor.context_characters:return
             before=budget.used;saved['write_attempts']+=1;persist()
             try:saved['draft']=editor.call(prompt,output_tokens=4000,schema='v43_light_write')
-            except news.runtime.GenerationPaused:
+            except news.runtime.GenerationPaused as exc:
+                saved['code']='GEMINI_HTTP_503' if '503' in str(exc) else 'GEMINI_HTTP_429' if '429' in str(exc) else 'LIGHT_PREPARATION_PAUSED'
                 if budget.used==before:saved['write_attempts']-=1
                 persist();return
             persist()
@@ -113,7 +114,8 @@ def prepare(state,persist=lambda:None,editor=None):
             row['light_kind']='news' if verdict.get('is_news') else 'historical_fact' if re.search(r'(?i)истор|древн|history|ancient',row['article']['title']) else 'unusual_fact'
             row['checks']['final43']=dict(verdict,approved=True);row['ready_checked_at']=datetime.now(p.TZ).isoformat();row['status']='ready';saved['records'].append(row)
         saved['complete']=True;persist()
-    except news.runtime.GenerationPaused:
+    except news.runtime.GenerationPaused as exc:
+        saved['code']='GEMINI_HTTP_503' if '503' in str(exc) else 'GEMINI_HTTP_429' if '429' in str(exc) else 'LIGHT_PREPARATION_PAUSED'
         if budget.used==before:saved['review_attempts']-=1
         persist()
     except Exception as exc:

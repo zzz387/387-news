@@ -289,6 +289,14 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                    'gemini-3.6-flash', 'gemini-3.8-flash', 'gemini-3-flash-preview'}
     if not model_list or any(x not in SAFE_MODELS for x in model_list):
         raise RuntimeError('Invalid GEMINI_MODELS configuration; refusing unsupported model')
+    if runtime.ACTIVE_BUDGET:
+        cooldowns=runtime.ACTIVE_BUDGET.ledger.get('cooldowns',{});now=time.time()
+        if cooldowns.get('__all_models__',0)>now:raise runtime.GenerationPaused('Global model quota/rate cooldown active')
+        model_list=[m for m in model_list if cooldowns.get(m,0)<=now]
+        if not model_list:raise runtime.GenerationPaused('Configured model cooldowns active')
+        # Capacity503 belongs to a model. Prefer the existing healthy free model
+        # on a later operation/run; never retry immediately inside a failed call.
+        model_list.sort(key=lambda m:cooldowns.get(m,0))
     errors = []
     response_failed = False
     for model in model_list:
@@ -319,8 +327,9 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                       f'attempt={attempt + 1}/3', file=sys.stderr, flush=True)
                 errors.append(f'{model}: HTTP {e.code} ({status})')
                 if e.code in (429, 503):
-                    # Never multiply retries/fallbacks on quota or overload.
-                    # Retry-After is persisted rather than sleeping in the runner.
+                    # Pause this operation; persist Retry-After, never loop on503.
+                    # A429 also holds ALL configured models, so routing cannot
+                    # be used to evade a provider quota/rate restriction.
                     delay = 900 if e.code == 429 else 120
                     raw_retry = e.headers.get('Retry-After', '') if e.headers else ''
                     try:
@@ -329,6 +338,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                         pass
                     if runtime.ACTIVE_BUDGET:
                         runtime.ACTIVE_BUDGET.defer(model, delay)
+                        if e.code==429:runtime.ACTIVE_BUDGET.defer('__all_models__',delay)
                     raise runtime.GenerationPaused(f'Gemini HTTP {e.code}; deferred without model fallback') from None
                 if e.code in (400,401,402,403,404):
                     break
