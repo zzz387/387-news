@@ -115,7 +115,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 plan_state=dict(state,candidates=stock43.available(state,date)+pending)
             record=next(iter(preparation_order(plan_state,limit=1,exclude_ids=attempted_ids)),None)
             if record is None:
-                if len(selection43.ready(state))<minimum and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
+                needs_supply=(len(selection43.ready(state))<e.CONFIG['article_target'] or len(stock43.available(state,date))<e.CONFIG.get('article_stock_target',20))
+                if needs_supply and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                     extra_searches+=1
                     try:catalog43.refresh(state,clock(),shortage=True)
                     except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)

@@ -137,6 +137,22 @@ class MinimumStockTests(unittest.TestCase):
             d.advance(s,s['date'],False,SimpleNamespace(ROOT=fixture.root(temp)),now=fixture.NOW.replace(hour=5),editor=Editor())
         self.assertEqual(seen,['91'])
 
+    def test_exhausted_queue_replenishes_target_and_stock_after_minimum(self):
+        for count in (11,12):
+            with self.subTest(accepted=count):
+                s=self.make(count);calls=[]
+                def refresh(*args,**kwargs):
+                    calls.append(kwargs.get('shortage'))
+                    if len(calls)==2:s['candidates'].append(dict(fixture.ready(50),status='discovered'))
+                class Editor:
+                    def finish(self,state,row):row['status']='ready'
+                with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='true'),patch.object(d,'discover'),patch.object(cat,'refresh',side_effect=refresh),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+                    d.advance(s,s['date'],False,SimpleNamespace(ROOT=fixture.root(temp)),now=fixture.NOW.replace(hour=5),editor=Editor())
+                self.assertEqual(len(calls),3)  # one initial, at most two additional searches
+                self.assertTrue(calls[1]);self.assertEqual(len(d.preparation_order(s)),0)
+                self.assertEqual(s['public_article_count'],12)
+                self.assertEqual(stock.report(s)['ready_articles'],int(count==12))
+
     def test_inventory_goals_are_not_fictional_ready_counts(self):
         s=self.make();report=stock.report(s)
         self.assertEqual(report['ready_articles'],0);self.assertEqual(report['ready_light'],0)
