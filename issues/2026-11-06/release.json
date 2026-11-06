@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-06",
+  "number": 13,
+  "policy_version": "4.3",
+  "article_count": 1,
+  "kind": "articles",
+  "pages": {
+    "feature-01": {
+      "html": "a267e27ee0a9accfea3972e710ecb874e214c5a22154ad17a372cf8c6c72d741",
+      "markdown": "4e7b95376cda418f61e4d7ea8a532571f63db9aae7e68828c3ec639ab7c5eab3"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-06T05:54:23.682156+03:00",
+  "release_not_before": "2026-11-06T06:00:00+03:00",
+  "light_news": [],
+  "light_count": 0,
+  "homepage_hash": "2d97474c690c445e46b4dea47e5f4b030444b5b71405548399e24172abf0866c",
+  "overview_hash": "fd18b12ff47194d3114817f7f8d5ef9e2c2071754e39b6ad083bf60168bb1b60",
+  "markdown_hash": "ef0146e3bcaec9bd02ae0e99d6e3cf1f5c6df69de43035d377d500d32043436e"
+}
