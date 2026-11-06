@@ -127,6 +127,16 @@ class MinimumStockTests(unittest.TestCase):
             d.advance(s,s['date'],False,SimpleNamespace(ROOT=fixture.root(temp)),now=fixture.NOW.replace(hour=5),editor=editor)
         self.assertEqual(calls[0],'light');self.assertIn('main',calls)
 
+    def test_stock_preparation_has_its_own_personal_topic_balance(self):
+        titles=['Архитектура библиотеки','Музей старой коллекции','История Москвы','Московские усадьбы','Археологическая находка','Биография художника','Христианская история','Экономика повседневности','Инженерия производства','Квантовая фаза','Нейтрино в эксперименте','Гравитационные волны']
+        s=fixture.state();s['candidates']=[visual.named(title,i) for i,title in enumerate(titles)]
+        science=visual.named('Физика нового сверхпроводника',90,'discovered');history=visual.named('Биография инженера',91,'discovered');s['candidates'] += [science,history];seen=[]
+        class Editor:
+            def finish(self,state,row):seen.append(row['id']);raise news.runtime.GenerationPaused('Synthetic time boundary')
+        with tempfile.TemporaryDirectory() as temp,patch.object(d,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+            d.advance(s,s['date'],False,SimpleNamespace(ROOT=fixture.root(temp)),now=fixture.NOW.replace(hour=5),editor=Editor())
+        self.assertEqual(seen,['91'])
+
     def test_inventory_goals_are_not_fictional_ready_counts(self):
         s=self.make();report=stock.report(s)
         self.assertEqual(report['ready_articles'],0);self.assertEqual(report['ready_light'],0)

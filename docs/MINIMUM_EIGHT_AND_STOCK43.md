@@ -126,3 +126,8 @@ cooldowns remain active are skipped, not called. A429 now also persists a global
 all-models hold for Retry-After, so changing models cannot evade rate/quota
 restrictions. If both configured models are unavailable, preparation waits with
 its encrypted progress. No new model, paid fallback or quota reset is introduced.
+
+Inventory preparation uses its own existing personal-topic/diversity ranking,
+rather than treating the already-full main edition as its topic allocation.
+Sensitive candidates are left for fresh main preparation, not silently banked.
+Known main or reserve duplicates are skipped before another paid writing stage.
