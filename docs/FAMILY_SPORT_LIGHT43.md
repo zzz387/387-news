@@ -76,3 +76,9 @@ records from those eligible after main-story deduplication. Sources of accepted
 short notes are reserved in the existing light queue before subsequent main
 writing. Already accepted long articles/inventory and active written main drafts
 are excluded from new light sourcing, preventing resource cannibalization.
+
+A real run logged75 checkpoint timing samples; repeated composition counting
+took up to4.399 seconds per save, while encryption stayed below0.851 seconds.
+Checkpoint save no longer reruns composition just for logging. Source/article
+eligibility, fingerprints and the publication minimum still run at their actual
+gates; an unfinished draft can always be safely saved.

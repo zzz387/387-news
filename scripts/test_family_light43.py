@@ -57,6 +57,15 @@ class FamilyRiskTests(unittest.TestCase):
         self.assertEqual(calls,['v43_final']);self.assertFalse(e.eligible(r));self.assertIn('article',r)
 
 
+    def test_unfinished_checkpoint_save_does_not_require_another_editorial_count(self):
+        from scripts import staged_news as stage
+        from pathlib import Path
+        checkpoint={'version':43,'date':'2026-11-08','candidates':[{'status':'preparing','article':{'blocks':[]}}]}
+        with tempfile.TemporaryDirectory() as temp,patch.object(stage,'ARTIFACT_FILE',Path(temp)/'synthetic.enc'),patch.object(stage,'vetted_count',side_effect=AssertionError('Saving is not another editorial audit')):
+            stage.save(checkpoint,b'x'*32)
+            self.assertEqual(stage.decipher(stage.ARTIFACT_FILE.read_bytes(),b'x'*32),checkpoint)
+
+
 class SourceAccessTests(unittest.TestCase):
     def test_new_source_metadata_uses_its_own_domain_and_actual_language(self):
         from scripts import catalog43 as c
