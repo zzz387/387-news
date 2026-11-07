@@ -82,3 +82,8 @@ took up to4.399 seconds per save, while encryption stayed below0.851 seconds.
 Checkpoint save no longer reruns composition just for logging. Source/article
 eligibility, fingerprints and the publication minimum still run at their actual
 gates; an unfinished draft can always be safely saved.
+
+A pause before an HTTP reservation resumes the same pending stage without
+resetting its logical counter. A draft saved before an unstarted review resumes
+review only. A paid failed write may use the single different-source replacement
+in a later window; all actual attempts remain charged and total at most four.

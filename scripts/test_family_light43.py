@@ -159,6 +159,39 @@ class LightBatchTests(unittest.TestCase):
         summary=light.diagnose_saved(s)
         self.assertEqual(summary['reviewed_records'],1);self.assertEqual(summary['main_conflicts'],1);self.assertEqual(summary['accepted'],0)
 
+    def test_pause_before_any_http_resumes_same_write_without_reset_or_new_batch(self):
+        s=self.sample();budget=self.budget()
+        class Paused:
+            def call(self,*a,**kw):raise rt.GenerationPaused('Global cooldown before reservation')
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s,editor=Paused())
+        self.assertEqual(s['light43']['http_requests'],0);self.assertEqual(s['light43']['write_attempts'],1)
+        editor,sources=self.writer(budget)
+        def persist():sources[0]=s['light43'].get('sources',[])
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s,persist,editor)
+        self.assertEqual(budget.used,2);self.assertEqual(s['light43']['write_attempts'],1);self.assertNotIn('batches',s['light43']);self.assertGreater(len(light.ready(s)),0)
+    def test_pause_before_review_http_keeps_draft_and_resumes_only_review(self):
+        s=self.sample();budget=self.budget();editor,sources=self.writer(budget)
+        class PausedReview:
+            def call(self,prompt,**kw):
+                if kw['schema']=='v43_light_review':raise rt.GenerationPaused('Time boundary before review request')
+                return editor.call(prompt,**kw)
+        def persist():sources[0]=s['light43'].get('sources',[])
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s,persist,PausedReview())
+        draft=copy.deepcopy(s['light43']['draft']);self.assertEqual(budget.used,1)
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s,persist,editor)
+        self.assertEqual(s['light43']['draft'],draft);self.assertEqual(budget.used,2);self.assertEqual(s['light43']['review_attempts'],1);self.assertGreater(len(light.ready(s)),0)
+    def test_failed_one_http_write_allows_one_different_batch_next_window(self):
+        s=self.sample();budget=self.budget()
+        class FailedWrite:
+            def call(self,*a,**kw):budget.reserve('fixture');raise rt.GenerationPaused('Gemini HTTP 503')
+        with patch.dict(os.environ,GITHUB_RUN_ID='first'),patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s,editor=FailedWrite())
+        self.assertEqual(budget.used,1);old={src['url'] for src in s['light43']['sources']}
+        s['candidates'] += [named('Животные в новом зоопарке '+str(i),95+i,'discovered') for i in range(5)]
+        later=rt.RequestBudget(budget.ledger,day_limit=220,gap=0);editor,sources=self.writer(later)
+        def persist():sources[0]=s['light43'].get('sources',[])
+        with patch.dict(os.environ,GITHUB_RUN_ID='second'),patch.object(news.runtime,'ACTIVE_BUDGET',later):light.prepare(s,persist,editor)
+        self.assertEqual(s['light43']['http_requests'],3);self.assertEqual(later.ledger['requests'],3);self.assertEqual(len(s['light43']['batches']),1);self.assertFalse(old&{src['url'] for src in s['light43']['sources']})
+
     def test_same_source_retry_and_main_duplicates_are_not_allowed(self):
         s=self.sample();s['light43']={'complete':True,'http_requests':2,'write_attempts':1,'review_attempts':1,'records':[],'sources':[r['source'] for r in s['candidates'][8:]]}
         with patch.object(news.runtime,'ACTIVE_BUDGET',self.budget()),patch.object(news,'gemini',side_effect=AssertionError('No new source')):light.prepare(s)

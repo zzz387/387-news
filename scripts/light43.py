@@ -164,7 +164,9 @@ def prepare(state,persist=lambda:None,editor=None):
         saved['records'] += [r for r in recovered if r['id'] not in existing]
         saved['complete']=True;saved['code']='LIGHT_ACCEPTED' if recovered else 'LIGHT_ALL_REJECTED';reserve_accepted_sources(state,recovered);persist()
     window=os.getenv('GITHUB_RUN_ID','local-window')+':'+os.getenv('GITHUB_RUN_ATTEMPT','1')
-    finished=saved.get('complete') or saved['review_attempts']-saved.get('batch_review_start',0)>=1 or saved['http_requests']-saved.get('batch_http_start',0)>=2
+    batch_http=saved['http_requests']-saved.get('batch_http_start',0)
+    failed_write=(not saved.get('draft') and saved['write_attempts']-saved.get('batch_write_start',0)>=1 and batch_http>0)
+    finished=saved.get('complete') or bool(saved.get('review')) or batch_http>=2 or failed_write
     if finished:
         diagnose_saved(state)
         if ready(state) or saved.get('batches') or saved.get('attempt_window')==window:return
@@ -191,20 +193,22 @@ def prepare(state,persist=lambda:None,editor=None):
     saved.setdefault('attempt_window',window)
     try:
         if not saved.get('draft'):
-            if saved['write_attempts']-saved.get('batch_write_start',0)>=1:return
+            if saved['write_attempts']-saved.get('batch_write_start',0)>=1 and saved['http_requests']-saved.get('batch_http_start',0)>0:return
             sources=saved.get('sources') or sources_for_batch(state)
             if not sources:saved['code']='LIGHT_NO_VERIFIED_SOURCES';return
             saved['sources']=sources
             wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
             prompt='Рубрика «НЕ ВСЁ ТАК СЕРЬЁЗНО»: до пяти независимых коротких добрых, удивительных фактов. Заголовок и1–3 предложения. Без политики, трагедий, болезней, насмешек, выдумок и скрытого перевода. Можно меньше пяти или пустой список. Только факты полных оригиналов. Старое не выдавай за сегодняшнее. Для каждой заметки уникальный id и source_id строго sN из списка источников. Один источник на заметку; каждый факт должен подтверждаться именно им. Не повторяй основные сюжеты: '+json.dumps(selection43.prompt_context(state),ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False)
-            saved['write_attempts']+=1;persist();saved['draft']=editor.call(prompt,output_tokens=4000,schema='v43_light_write');persist()
+            if saved['write_attempts']==saved.get('batch_write_start',0):saved['write_attempts']+=1
+            persist();saved['draft']=editor.call(prompt,output_tokens=4000,schema='v43_light_write');persist()
         records,normalization=batch_records(saved,state);saved['diagnostics']=normalization
         if not records:saved['complete']=True;saved['code']='LIGHT_NORMALIZATION_REJECTED';return
         if not saved.get('review'):
-            if saved['review_attempts']-saved.get('batch_review_start',0)>=1:return
+            if saved['review_attempts']-saved.get('batch_review_start',0)>=1 and saved['http_requests']-saved.get('batch_http_start',0)>=2:return
             sources=saved['sources'];wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
             saved['review_inputs']={r['id']:e.fingerprint(r) for r in records}
-            saved['review_attempts']+=1;persist()
+            if saved['review_attempts']==saved.get('batch_review_start',0):saved['review_attempts']+=1
+            persist()
             saved['review']=editor.call('Одна независимая пакетная проверка коротких заметок политики4.3. Для каждого id из заметок оцени все семь критериев v43_final: факты, безопасность, права, самостоятельность, заголовок и законченность. Проверяй смысл каждого факта и дословную цитату. Для claims source_id=sN и evidence_id=qN строго из полного оригинала. Каждый факт заметки подтверждается её единственным source_id. Верни is_news=true только если это оперативная новость, тогда подтверди дату события дословной цитатой. Для исторического/неоперативного факта is_news=false, поля event_* пустые: отсутствие сегодняшней даты не ошибка. Не отклоняй фактическую историю из-за отсутствия глубины, юмора или большого объёма. Отклоняй заметки отдельно: ошибка одной не отменяет остальные. approve=true только если семь критериев true, issues/unresolved пустые.\nЗаметки: '+json.dumps([{'id':r['id'],'source_id':next('s'+str(i+1) for i,s in enumerate(sources) if s['id']==r['source']['id']),'article':r['article']} for r in records],ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False),output_tokens=8000,schema='v43_light_review');persist()
         accepted=apply_batch_review(saved,state)
         existing={r['id'] for r in saved['records']}
