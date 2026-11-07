@@ -46,7 +46,7 @@ the encrypted stock snapshot. No secret, draft or full dossier is exported here.
 
 Nearest edition has first claim: draw reviewed unused non-duplicate material to
 12 using existing soft diversity ranking. Once12 are secured, remaining permitted
-requests prepare evergreen inventory up to20. Sensitive medical/legal/childcare
+requests prepare evergreen inventory up to20. Potentially harmful medical/legal/infant-health
 advice is not silently reused across dates: it requires fresh normal safety
 review. Unknown review times, expired records, news and failed fingerprints are
 not counted as usable reserve. Sources and rejection/stage histories remain
@@ -79,7 +79,7 @@ is reconsidered only when new complete independent competent evidence arrives,
 without resetting previous requests, writing attempts or genuine vetoes.
 
 The column starts independently with headroom reserved for the main eight. It
-uses at most two batch model attempts per issue. Semantic animal/museum/nature/
+uses two model calls per batch. The owner amendment of7 November permits exactly one replacement batch with different sources in a later run if the first produced zero accepted notes: at most four actual calls total, preserving the first history and shared quotas. Semantic animal/museum/nature/
 curiosity selection replaces blind publisher-flag trust. Accepted short records
 retain fact/right/independence checks; historical/fact labels avoid false news
 freshness. Main articles and previously published stories are excluded. Usually
@@ -99,8 +99,8 @@ new independent evidence and independent light scheduling. Existing quota,
 rights/facts, checkpoint, source/translation, mobile and watchdog checks remain.
 
 Typical preparation costs two successful requests per main article (write plus
-independent review), with bounded repairs when needed:8≈16 and12≈24, plus at most2
-for light notes. A cold20-article evergreen stock costs about40 successful requests,
+independent review), with bounded repairs when needed:8≈16 and12≈24, plus2
+for a light batch (at most4 across the two owner-authorized batches if the first yields zero). A cold20-article evergreen stock costs about40 successful requests,
 spread after nearest-issue work across existing windows; repairs/failures add to
 these totals. None are exempt from the ledger. This is a capacity estimate, not
 proof of provider availability. A GET model metadata success is not generation.
