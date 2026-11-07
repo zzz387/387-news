@@ -6442,8 +6442,8 @@
       "name": "UNICEF Parenting",
       "homepage": "https://www.unicef.org/parenting/",
       "domain": "unicef.org",
-      "language": "ru",
-      "country": "RU",
+      "language": "en",
+      "country": "US",
       "type": "official",
       "topics": [
         "family",
@@ -6467,7 +6467,7 @@
         "status": "per_article_required",
         "mode": "INDEPENDENT_ARTICLE",
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
-        "evidence_url": "https://foma.ru/"
+        "evidence_url": "https://www.unicef.org/parenting/"
       },
       "light_suitable": false,
       "science_source": false,
@@ -6491,8 +6491,8 @@
       "name": "HealthyChildren.org (AAP)",
       "homepage": "https://www.healthychildren.org/English/Pages/default.aspx",
       "domain": "healthychildren.org",
-      "language": "ru",
-      "country": "RU",
+      "language": "en",
+      "country": "US",
       "type": "official",
       "topics": [
         "family",
@@ -6516,7 +6516,7 @@
         "status": "per_article_required",
         "mode": "INDEPENDENT_ARTICLE",
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
-        "evidence_url": "https://foma.ru/"
+        "evidence_url": "https://www.healthychildren.org/English/Pages/default.aspx"
       },
       "light_suitable": false,
       "science_source": false,
@@ -6542,8 +6542,8 @@
       "name": "Raising Children Network",
       "homepage": "https://raisingchildren.net.au/",
       "domain": "raisingchildren.net.au",
-      "language": "ru",
-      "country": "RU",
+      "language": "en",
+      "country": "AU",
       "type": "official",
       "topics": [
         "family",
@@ -6567,7 +6567,7 @@
         "status": "per_article_required",
         "mode": "INDEPENDENT_ARTICLE",
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
-        "evidence_url": "https://foma.ru/"
+        "evidence_url": "https://raisingchildren.net.au/"
       },
       "light_suitable": false,
       "science_source": false,
@@ -6592,8 +6592,8 @@
       "name": "ZERO TO THREE",
       "homepage": "https://www.zerotothree.org/",
       "domain": "zerotothree.org",
-      "language": "ru",
-      "country": "RU",
+      "language": "en",
+      "country": "US",
       "type": "official",
       "topics": [
         "family",
@@ -6617,7 +6617,7 @@
         "status": "per_article_required",
         "mode": "INDEPENDENT_ARTICLE",
         "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
-        "evidence_url": "https://foma.ru/"
+        "evidence_url": "https://www.zerotothree.org/"
       },
       "light_suitable": false,
       "science_source": false,

@@ -38,6 +38,13 @@ class FamilyRiskTests(unittest.TestCase):
         self.assertEqual(len(light.ready(s)),3);self.assertEqual(len(sel.composition(s)),12)
 
 class SourceAccessTests(unittest.TestCase):
+    def test_new_source_metadata_uses_its_own_domain_and_actual_language(self):
+        from scripts import catalog43 as c
+        rows=[r for r in c.registry()['publishers'] if r['id'] in ('unicef-parenting','healthychildren','raisingchildren','zerotothree')]
+        self.assertEqual(len(rows),4)
+        for r in rows:
+            self.assertEqual(r['language'],'en');self.assertEqual(r['rights']['evidence_url'],r['homepage'])
+
     def test_official_http_link_is_requested_over_https_without_changing_the_path(self):
         from scripts import catalog43 as c
         row={'domain':'scholastic.com'}
