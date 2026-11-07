@@ -83,7 +83,7 @@ def build(state,root,reserve=(),preview=False):
         except ImportError:import site_checks
         site_checks.validate_local_release(root,date)
         return not preview
-    records=selection43.ready(state);articles=[]
+    records=selection43.composition(state);articles=[]
     if len(records)<e.CONFIG['minimum_articles'] and not preview and (records or e.CONFIG['minimum_articles']>=8):raise p.Blocked('MINIMUM_ARTICLES_NOT_MET')
     for i,r in enumerate(records,1):
         a=public_article(r);a['slug']=news.slugify(a['title'],i);articles.append(a)

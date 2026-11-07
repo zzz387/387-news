@@ -19,6 +19,21 @@ def owned(url,row):
     return host==domain or host.endswith('.'+domain)
 
 
+def secure_discovery_url(url,row):
+    parts=urlparse(url)
+    if parts.scheme=='http' and owned(url,row) and not parts.username and not parts.password and parts.port in (None,80):
+        return parts._replace(scheme='https',netloc=parts.netloc.removesuffix(':80')).geturl()
+    return url
+
+
+def undated_evergreen(source,row):
+    from scripts import editorial43
+    title=source.get('title','')
+    if not row.get('allow_archive') or editorial43.high_risk({'source':source}):return False
+    if re.search(r'(?i)today|breaking|new study|сегодня|новое исследование|клиническ',title):return False
+    return bool(re.search(r'(?i)истор|биограф|архитект|культур|history|historical|biograph|heritage|philosophy|parent|child|famil|play|learn|education|paternity|воспитан|реб[её]н|дет|семейн|обучен|игр|велосипед|cycling|йог|yoga',title))
+
+
 def permitted_get(url,session):
     source41.safe_url(url);parts=urlparse(url);robots=parts.scheme+'://'+parts.netloc+'/robots.txt'
     try:text=session.transport(robots)
@@ -101,7 +116,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 report['verified_feed']=feed
                 if data:break
             except Exception:continue
-        items=items or links.articles
+        items=[dict(item,url=secure_discovery_url(item['url'],row)) for item in (items or links.articles)]
         seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not advertising_story(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/')!=row['homepage'].rstrip('/') and x['url'] not in exclude]
         from scripts import selection43
         from scripts import priorities43
@@ -130,7 +145,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 except ValueError:
                     try:stamp=parsedate_to_datetime(published)
                     except (ValueError,TypeError):
-                        if row.get('allow_archive') and re.search(r'(?i)истор|биограф|архитект|культур|history|historical|biograph|heritage|philosophy',src['title']):
+                        if undated_evergreen(src,row):
                             stamp=None;report['undated_archival_original']=True
                         else:raise p.Blocked('PUBLISHER_ACTIVITY_UNCONFIRMED')
                 stamp=(stamp.replace(tzinfo=p.TZ) if stamp.tzinfo is None else stamp) if stamp is not None else None
@@ -227,7 +242,10 @@ def refresh(state,now=None,session=None,shortage=False):
             record['category_hint']=record['editorial43']['category']
             if row.get('search_light'):
                 from scripts import light43
-                if light43.story_suitable(record):record['for_light_only']=True
+                if light43.story_suitable(record):
+                    record['for_light_only']=True
+                    queue=state.setdefault('light43_queue',[])
+                    if record['id'] not in queue:queue.append(record['id'])
             group=record['editorial43']['group'];run['candidate_groups'][group]=run['candidate_groups'].get(group,0)+1
             state['candidates'].append(record);known.add(src['url'])
             state.setdefault('source_cache',{})[src['url']]=src

@@ -237,12 +237,18 @@ def report(state,ledger,now=None):
     if state.get('version')==43:
         try:from scripts import selection43
         except ImportError:import selection43
-        ready_count=len(selection43.ready(state))
+        ready_count=len(selection43.composition(state))
     inventory={}
     if state.get('version')==43:
         from scripts import stock43,light43,editorial43
         inventory={'minimum_articles':editorial43.CONFIG['minimum_articles'],'editorial_stock':stock43.report(state),'light_news_ready':len(light43.ready(state)),
                    'light_preparation':{k:state.get('light43',{}).get(k,0 if k!='code' else None) for k in ('write_attempts','review_attempts','http_requests','code')}}
+    if inventory:
+        from scripts import priorities43,selection43
+        composition=priorities43.report(state,selection43.composition(state),state.get('_recent43',[]))
+        inventory['composition']={k:composition[k] for k in ('family_articles','children_articles','health_sport_articles','sport_articles','core_groups','missing_core_groups','light_news')}
+        inventory['light_diagnostic']=state.get('light43',{}).get('summary',{})
+        inventory['verified_source_candidates']={g:sum(priorities43.classify(r)['group']==g and r.get('status') in ('discovered','preparing','retryable_error') and r.get('source',{}).get('full_text_verified') is True for r in state.get('candidates',[])) for g in ('A','B','C')}
     if inventory and not inventory['light_preparation']['code'] and inventory['light_preparation']['http_requests']>=2 and not inventory['light_news_ready']:
         inventory['light_preparation']['code']='LIGHT_BATCH_BUDGET_USED'
     return dict(**inventory,date=state['date'],policy_version=state.get('policy_version','3.2'),

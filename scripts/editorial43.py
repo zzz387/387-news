@@ -77,12 +77,31 @@ def fingerprint(record):
 
 
 
-def high_risk(record):
-    article=record.get('article',{})
-    text=' '.join(str(value) for value in [record.get('source',{}).get('title',''),article.get('title',''),article.get('teaser','')]+[b.get('text','') for b in article.get('blocks',[])])
-    return (record.get('category') in ('Семья','Здоровье и движение','Экономика и бизнес') or
-            record.get('category_hint') in ('Семья','Здоровье и движение','Экономика и бизнес') or
-            bool(re.search(r'(?i)медицин|лечени|дозиров|малыш|ребен|ребён|детям|здоров|юридич|инвестиц|лекарств|таблет|препарат|беремен|доз[ауые]|child|toddler|infant|medical|treatment',text)))
+RISK_VERSION=2
+
+def risk_codes(record):
+    """Content risk, never a publisher/category/previous boolean attestation."""
+    article=record.get('article',{});source=record.get('source',{})
+    texts=[article.get('title',''),article.get('teaser','')]
+    if article:texts += [b.get('text','') for b in article.get('blocks',[])]
+    else:
+        texts += [record.get('title',''),record.get('summary',''),source.get('title','')]
+        texts += [b.get('text','') for b in source.get('blocks',[])]
+    text=' '.join(str(t) for t in texts).casefold();codes=[]
+    def has(pattern):return bool(re.search(pattern,text,re.I))
+    advice=has(r'рекоменд|совет|следует|нужно|приним|примите|дава[йи]|дайте|приём|прием|выполня|попробуй|сделайте|избег|лечи|дозиров|how to|should|recommend|advice|take |taking |avoid|perform|try |dose|dosage')
+    historical=bool(re.search(r'(?i)история|историческ|history|historical',str(article.get('title') or source.get('title') or record.get('title',''))))
+    clinical=has(r'клиническ|clinical trial|randomi[sz]ed|рандомиз|пациент|patients?\b|лечени|treatment|therapy|therapeutic')
+    disease=has(r'заболеван|болезн|диабет|гипертон|астм|сердечн|инфаркт|эпилеп|disease|diabet|hypertens|asthma|cardiac|heart failure|cancer')
+    medicine=has(r'лекарств|препарат|таблет|инъекц|дозиров|доз[аеуы]|dosage|medication|drug\b|injection')
+    if (clinical or medicine) and (not historical or advice):codes.append('CLINICAL_OR_MEDICATION')
+    if disease and (advice or has(r'снижа[ею]т|повыша[ею]т|предотвращ|риск|reduces?|increases?|prevents?|risk')):codes.append('DISEASE_ADVICE_OR_CLAIM')
+    if has(r'младен|новорожд|малыш|infant|newborn|baby|babies|toddler') and has(r'корм|прикорм|питан|сон|сна|спать|дыхани|температур|health|sleep|feed|breath|fever|лечени|медицин|medical'):codes.append('INFANT_HEALTH')
+    if has(r'противопоказ|contraindicat|опасн.{0,30}(?:упражнен|нагруз|поз)|dangerous exercise|встаньте на голову|стойк.{0,10}на голове|headstand|breath.hold|задерж.{0,12}дыхан|перев[её]рнут.{0,15}асан|поз.{0,8}плуга') and advice:codes.append('DANGEROUS_EXERCISE')
+    if has(r'банкрот|списани.{0,10}долг|судебн.{0,15}практик|правов.{0,15}совет|юридич|bankruptcy|legal advice|debt discharge|investment advice|инвестиц') and (advice or not has(r'история|history of')):codes.append('LEGAL_OR_FINANCIAL_ADVICE')
+    return codes
+
+def high_risk(record):return bool(risk_codes(record))
 
 
 def safety_sources_valid(record):
@@ -229,6 +248,7 @@ class Editor(old.Editor):
         record.update(mode=mode,rights=grant,category=record.get('category_hint') or record.get('category') or 'История и культура',kind='Самостоятельная статья' if mode=='INDEPENDENT_ARTICLE' else 'Перевод' if mode=='FULL_TRANSLATION' else 'Оригинал')
         sensitive=high_risk(record)
         record['high_risk']=sensitive
+        record['risk43']={'version':RISK_VERSION,'codes':risk_codes(record)}
         if sensitive:
             from scripts import priorities43
             if not record.get('verification_urls'):record['verification_urls']=priorities43.cited_verification_urls(record)
@@ -307,7 +327,7 @@ class Editor(old.Editor):
                     'самостоятельность C (формулировки, композиция, примеры), законченность и соответствие заголовка. '
                     'Не требуй глубины, объёма, всех тем источника, количества примеров/занятий или литературного совершенства. '
                     'A/B должны действительно воспроизводить полный оригинал/перевод по установленным правам. '
-                    'Для медицинских, детских и правовых советов требуются компетентные независимые подтверждения; '
+                    'Повышенная проверка определяется риском содержания, не рубрикой. Для медицинских рекомендаций, лечения, лекарств, дозировок, здоровья младенцев, опасных упражнений и правовых советов требуются компетентные независимые подтверждения. Обычные игры, семейные традиции, воспитание без опасных рекомендаций, история спорта, йоги и велопутешествия проходят обычную проверку фактов и прав; '
                     'неподтверждённый совет, недоказанная дата события или вывод исследования означают отказ. '
                     'В is_news укажи, сообщает ли статья оперативное событие как актуальную новость. Не маскируй новость под evergreen. '
                     'Не путай дату публикации с датой события. Для новости event_date ISO, event_source_id, event_evidence_id и '

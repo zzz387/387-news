@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": "3-family-sport",
   "refresh_hours": 6,
   "publishers_per_run": 5,
   "article_checks_per_run": 8,
@@ -2738,10 +2738,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:35:58.227255+03:00",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
-        "code": "SOURCE_URL_UNSAFE"
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -2791,10 +2791,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:35:58.227255+03:00",
-        "scope": "public_discovery_only",
-        "full_originals_verified": 0,
-        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "full_originals_verified",
+        "full_originals_verified": 1,
+        "code": "VERIFIED_FULL_ORIGINALS"
       }
     },
     {
@@ -2997,10 +2997,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:35:58.227255+03:00",
-        "scope": "public_discovery_only",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "full_originals_verified",
         "full_originals_verified": 2,
-        "code": "VERIFIED_DISCOVERY"
+        "code": "VERIFIED_FULL_ORIGINALS"
       }
     },
     {
@@ -4982,10 +4982,10 @@
       "allow_archive": true,
       "availability": {
         "status": "verified",
-        "checked_at": "2026-11-04T22:35:58.227255+03:00",
-        "scope": "public_discovery_only",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "full_originals_verified",
         "full_originals_verified": 2,
-        "code": "VERIFIED_DISCOVERY"
+        "code": "VERIFIED_FULL_ORIGINALS"
       }
     },
     {
@@ -6435,6 +6435,205 @@
       "availability": {
         "status": "unverified",
         "code": "PUBLIC_DISCOVERY_CHECK_REQUIRED"
+      }
+    },
+    {
+      "id": "unicef-parenting",
+      "name": "UNICEF Parenting",
+      "homepage": "https://www.unicef.org/parenting/",
+      "domain": "unicef.org",
+      "language": "en",
+      "country": "US",
+      "type": "official",
+      "topics": [
+        "family",
+        "children"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": true,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.unicef.org/parenting/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "full_originals_verified",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_FULL_ORIGINALS"
+      }
+    },
+    {
+      "id": "healthychildren",
+      "name": "HealthyChildren.org (AAP)",
+      "homepage": "https://www.healthychildren.org/English/Pages/default.aspx",
+      "domain": "healthychildren.org",
+      "language": "en",
+      "country": "US",
+      "type": "official",
+      "topics": [
+        "family",
+        "children"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.healthychildren.org/English/Pages/default.aspx"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2,
+        12,
+        16
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "raisingchildren",
+      "name": "Raising Children Network",
+      "homepage": "https://raisingchildren.net.au/",
+      "domain": "raisingchildren.net.au",
+      "language": "en",
+      "country": "AU",
+      "type": "official",
+      "topics": [
+        "family",
+        "children"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://raisingchildren.net.au/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2,
+        3
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "ROBOTS_UNVERIFIED"
+      }
+    },
+    {
+      "id": "zerotothree",
+      "name": "ZERO TO THREE",
+      "homepage": "https://www.zerotothree.org/",
+      "domain": "zerotothree.org",
+      "language": "en",
+      "country": "US",
+      "type": "official",
+      "topics": [
+        "family",
+        "children"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.zerotothree.org/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        1,
+        2
+      ],
+      "editorial_priority": 90,
+      "quality_score": 80,
+      "allow_archive": true,
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-07T14:18:11.138498+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     }
   ],

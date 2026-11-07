@@ -87,9 +87,21 @@ def bank(state,row,now,key='records'):
     rows.append(saved);row['status']='reserve_ready'
     return True
 
+def balance(state,root,now):
+    """Keep accepted surplus in the same encrypted inventory, never discard it."""
+    selected=sel.composition(state)
+    for row in sel.ready(state):
+        if row not in selected:
+            existing=next((r for r in ensure(state)['records'] if identity(r)==identity(row)),None)
+            if existing is not None and existing.get('stock_reserved_for')==state['date'] and not existing.get('stock_published'):
+                existing.pop('stock_reserved_for');row['status']='reserve_ready'
+            else:bank(state,row,now)
+    return selected
+
+
 def draw(state,root,now,target=None):
     reconcile(state,root);target=target or e.CONFIG['article_target'];known={r['url'] for r in state['candidates']}
-    history=sel.recent(root,state['date']);selected=sel.ready(state)
+    history=sel.recent(root,state['date']);selected=sel.composition(state)
     pending=list(available(state,state['date'],include_reserved=True))
     while pending and len(selected)<target:
         proxies=[dict(r,status='discovered') for r in pending]
@@ -160,7 +172,9 @@ def restore_backlog(state,root):
 def report(state):
     stock=ensure(state);date=state['date']
     prospects=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and not r.get('for_light_only') and r.get('url') not in stock['published_urls'] and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified']
-    return {'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
+    from scripts import priorities43
+    stock_groups={g:sum(priorities43.classify(r)['group']==g for r in available(state,date)) for g in ('A','C')}
+    return {'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
             'stored_articles':len(stock['records']),'stored_light':len(stock['light']),
             'backlog':len(stock['backlog']),'article_goal':e.CONFIG.get('article_stock_target',20),
             'light_goal':e.CONFIG.get('light_stock_target',15)}

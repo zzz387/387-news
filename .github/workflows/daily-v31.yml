@@ -483,6 +483,19 @@ jobs:
           repository: ${{ github.repository }}
           path: ${{ runner.temp }}/special-quota-backup
           merge-multiple: true
+      - name: Restore latest published edition for read-only light diagnostics
+        if: ${{ steps.checkpoint.outputs.light_diagnostic_found == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ steps.checkpoint.outputs.light_diagnostic_id }}
+          run-id: ${{ steps.checkpoint.outputs.light_diagnostic_run_id }}
+          github-token: ${{ github.token }}
+          repository: ${{ github.repository }}
+          path: ${{ runner.temp }}/published-light-diagnostic
+          merge-multiple: true
+      - name: Diagnose saved light batch without model calls or private logs
+        if: ${{ steps.checkpoint.outputs.light_diagnostic_found == 'true' }}
+        run: python -m scripts.light43 --diagnose-checkpoint '${{ runner.temp }}/published-light-diagnostic/news-draft.enc'
       - name: Prepare encrypted draft checkpoint or release
         id: stage
         timeout-minutes: 20

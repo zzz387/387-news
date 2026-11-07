@@ -119,7 +119,7 @@ def vetted_count(state):
     if state.get('version')==43:
         try:from scripts import selection43
         except ImportError:import selection43
-        return len(selection43.ready(state))
+        return len(selection43.composition(state))
     return sum(r.get('status')=='ready' for r in state.get('candidates',[])) if state.get('version') in (41,43) else len(state.get('articles',{}))
 
 
