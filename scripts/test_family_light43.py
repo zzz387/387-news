@@ -13,7 +13,7 @@ class FamilyRiskTests(unittest.TestCase):
                 row=named(title);row['category_hint']='Семья';row['category']='Здоровье и движение'
                 self.assertFalse(e.high_risk(row));self.assertTrue(e.eligible(row))
     def test_risky_recommendations_need_independent_evidence_in_any_category(self):
-        for title in ['Как лечить младенца при температуре','Рекомендации по нагрузкам при сердечных заболеваниях','Принимайте лекарство в двойной дозе','Как выполнять стойку на голове','Клиническое исследование нового лечения']:
+        for title in ['Как лечить младенца при температуре','Рекомендации по нагрузкам при сердечных заболеваниях','Принимайте лекарство в двойной дозе','Как выполнять стойку на голове','Клиническое исследование нового лечения','Примите препарат ежедневно','Советы по инвестициям','Как выполнять задержку дыхания','Как кормить младенца']:
             with self.subTest(title=title):
                 row=named(title);row['category_hint']='История и культура'
                 self.assertTrue(e.high_risk(row));self.assertFalse(e.eligible(row))
@@ -36,6 +36,24 @@ class FamilyRiskTests(unittest.TestCase):
         s=state(12);stock.ensure(s)['light']=[light_ready(i) for i in range(3)]
         with tempfile.TemporaryDirectory() as temp,patch.object(news,'gemini',side_effect=AssertionError('No model for inventory')):stock.draw_light(s,root(temp))
         self.assertEqual(len(light.ready(s)),3);self.assertEqual(len(sel.composition(s)),12)
+
+class SourceAccessTests(unittest.TestCase):
+    def test_official_http_link_is_requested_over_https_without_changing_the_path(self):
+        from scripts import catalog43 as c
+        row={'domain':'scholastic.com'}
+        self.assertEqual(c.secure_discovery_url('http://www.scholastic.com/parents/books/story.html',row),'https://www.scholastic.com/parents/books/story.html')
+        self.assertEqual(c.secure_discovery_url('http://elsewhere.example/story',row),'http://elsewhere.example/story')
+    def test_undated_educational_original_is_not_rejected_as_undated_news(self):
+        from scripts import catalog43 as c
+        from scripts.test_editorial_visual43 import CatalogTests
+        f=CatalogTests();session=f.session();original=session.fetch
+        session.fetch=lambda url:dict(original(url),title='Игры для детей: учимся вместе',published='')
+        report,rows=c.inspect_publisher(dict(f.registry_row(),allow_archive=True),session,now=NOW)
+        self.assertEqual(len(rows),1);self.assertTrue(report['undated_archival_original']);self.assertEqual(rows[0][1]['published'],'')
+        session.fetch=lambda url:dict(original(url),title='Рекомендации по лечению младенца',published='')
+        report,rows=c.inspect_publisher(dict(f.registry_row(),allow_archive=True),session,now=NOW)
+        self.assertEqual(rows,[]);self.assertEqual(report['last_article_code'],'PUBLISHER_ACTIVITY_UNCONFIRMED')
+
 
 class LightBatchTests(unittest.TestCase):
     titles=['Вороны решают головоломки','Музей нашёл редкую карту','Животные: панды осваивают новый сад','Волонтёры спасли морских черепах','Необычная музейная мозаика']

@@ -89,16 +89,16 @@ def risk_codes(record):
         texts += [b.get('text','') for b in source.get('blocks',[])]
     text=' '.join(str(t) for t in texts).casefold();codes=[]
     def has(pattern):return bool(re.search(pattern,text,re.I))
-    advice=has(r'рекоменд|совет|следует|нужно|приним|дава[йи]|дайте|приём|прием|выполня|попробуй|сделайте|избег|лечи|дозиров|how to|should|recommend|advice|take |taking |avoid|perform|try |dose|dosage')
+    advice=has(r'рекоменд|совет|следует|нужно|приним|примите|дава[йи]|дайте|приём|прием|выполня|попробуй|сделайте|избег|лечи|дозиров|how to|should|recommend|advice|take |taking |avoid|perform|try |dose|dosage')
     historical=bool(re.search(r'(?i)история|историческ|history|historical',str(article.get('title') or source.get('title') or record.get('title',''))))
     clinical=has(r'клиническ|clinical trial|randomi[sz]ed|рандомиз|пациент|patients?\b|лечени|treatment|therapy|therapeutic')
     disease=has(r'заболеван|болезн|диабет|гипертон|астм|сердечн|инфаркт|эпилеп|disease|diabet|hypertens|asthma|cardiac|heart failure|cancer')
     medicine=has(r'лекарств|препарат|таблет|инъекц|дозиров|доз[аеуы]|dosage|medication|drug\b|injection')
-    if clinical and (not historical or advice) or medicine and advice:codes.append('CLINICAL_OR_MEDICATION')
+    if (clinical or medicine) and (not historical or advice):codes.append('CLINICAL_OR_MEDICATION')
     if disease and (advice or has(r'снижа[ею]т|повыша[ею]т|предотвращ|риск|reduces?|increases?|prevents?|risk')):codes.append('DISEASE_ADVICE_OR_CLAIM')
-    if has(r'младен|новорожд|малыш|infant|newborn|baby|babies|toddler') and has(r'кормлен|прикорм|питан|сон|сна|спать|дыхани|температур|health|sleep|feed|breath|fever|лечени|медицин|medical'):codes.append('INFANT_HEALTH')
-    if has(r'противопоказ|contraindicat|опасн.{0,30}(?:упражнен|нагруз|поз)|dangerous exercise|встаньте на голову|стойк.{0,10}на голове|headstand|breath.hold') and advice:codes.append('DANGEROUS_EXERCISE')
-    if has(r'банкрот|списани.{0,10}долг|судебн.{0,15}практик|правов.{0,15}совет|юридич|bankruptcy|legal advice|debt discharge|investment advice') and (advice or not has(r'история|history of')):codes.append('LEGAL_OR_FINANCIAL_ADVICE')
+    if has(r'младен|новорожд|малыш|infant|newborn|baby|babies|toddler') and has(r'корм|прикорм|питан|сон|сна|спать|дыхани|температур|health|sleep|feed|breath|fever|лечени|медицин|medical'):codes.append('INFANT_HEALTH')
+    if has(r'противопоказ|contraindicat|опасн.{0,30}(?:упражнен|нагруз|поз)|dangerous exercise|встаньте на голову|стойк.{0,10}на голове|headstand|breath.hold|задерж.{0,12}дыхан|перев[её]рнут.{0,15}асан|поз.{0,8}плуга') and advice:codes.append('DANGEROUS_EXERCISE')
+    if has(r'банкрот|списани.{0,10}долг|судебн.{0,15}практик|правов.{0,15}совет|юридич|bankruptcy|legal advice|debt discharge|investment advice|инвестиц') and (advice or not has(r'история|history of')):codes.append('LEGAL_OR_FINANCIAL_ADVICE')
     return codes
 
 def high_risk(record):return bool(risk_codes(record))
