@@ -55,7 +55,7 @@ class Daily43Tests(unittest.TestCase):
     def test_dynamic_counts_and_zero_digest_are_valid_and_honest_over_https(self):
         for count in (0,1,3,7,8,10,12,13):
             with self.subTest(count=count),tempfile.TemporaryDirectory() as temp:
-                r=root(temp);s=state(count);reserve=d.reserve_rows(s,NOW)
+                r=root(temp);s=state(count);count=min(count,e.CONFIG['article_target']);reserve=d.reserve_rows(s,NOW)
                 self.assertTrue(pub.build(s,r,reserve));meta=pub.validate(r,s['date'])
                 self.assertEqual(meta['article_count'],count)
                 with patch.object(site_checks,'fetch',side_effect=web(r)):
@@ -162,7 +162,7 @@ class Daily43Tests(unittest.TestCase):
                 self.assertFalse(e.eligible(r))
 
     def test_risky_material_needs_independent_competent_evidence_before_any_model_call(self):
-        r=record();r['category_hint']='Здоровье и движение'
+        r=record();r['category_hint']='Здоровье и движение';r['article']['title']='Рекомендации по лечению заболевания'
         with self.assertRaisesRegex(p.Blocked,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):e.Editor(call=lambda *a,**k:self.fail('Missing safety evidence')).finish(state(),r)
 
     def test_literal_duplicates_normalize_without_rewriting_distinct_content(self):

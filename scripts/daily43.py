@@ -76,11 +76,12 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     budget=news.runtime.ACTIVE_BUDGET
     minimum=e.CONFIG['minimum_articles']
     stock43.restore_backlog(state,root)
+    stock43.balance(state,root,current)
     stock43.draw(state,root,current)
     state['_recent_light43']=light43.recent(root)
     stock43.draw_light(state,root)
     due=current>=release-timedelta(minutes=10)
-    short=len(selection43.ready(state))<minimum
+    short=len(selection43.composition(state))<minimum
     if short:
         state['audit_passed']=False
         pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET')
@@ -99,23 +100,27 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}|set(stock43.ensure(state)['published_urls'])
         def prepare_light():
             if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or clock()>=release-timedelta(minutes=10) or not budget:return
-            keep=max(4,2*max(0,minimum-len(selection43.ready(state))))
+            keep=max(4,2*max(0,minimum-len(selection43.composition(state))))
             if budget.remaining_requests()>=keep+2:
                 light43.prepare(state,persist)
                 stock43.bank_light(state,clock())
         prepare_light()
         attempted_ids=set();extra_searches=0
         while True:
-            banking=len(selection43.ready(state))>=e.CONFIG['article_target']
+            stock43.balance(state,root,clock())
+            banking=len(selection43.composition(state))>=e.CONFIG['article_target']
+            main_groups={g:sum(priorities43.classify(r)['group']==g for r in selection43.composition(state)) for g in ('A','C')}
+            coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
+            coverage_needed=banking and bool(coverage_pending)
             plan_state=state
-            if banking:
+            if banking and not coverage_needed:
                 # Inventory needs its own topic balance, not the already full
                 # edition's nine personal places followed by optional science.
                 pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and not e.high_risk(r)]
-                plan_state=dict(state,candidates=stock43.available(state,date)+pending)
+                plan_state=dict(state,candidates=stock43.available(state,date)+pending,_stock_preparation43=True)
             record=next(iter(preparation_order(plan_state,limit=1,exclude_ids=attempted_ids)),None)
             if record is None:
-                needs_supply=(len(selection43.ready(state))<e.CONFIG['article_target'] or len(stock43.available(state,date))<e.CONFIG.get('article_stock_target',20))
+                needs_supply=(len(selection43.composition(state))<e.CONFIG['article_target'] or len(stock43.available(state,date))<e.CONFIG.get('article_stock_target',20))
                 if needs_supply and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                     extra_searches+=1
                     try:catalog43.refresh(state,clock(),shortage=True)
@@ -123,15 +128,15 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                     priorities43.apply_rules(state,clock());priorities43.reconsider_evidence(state);persist();continue
                 break
             attempted_ids.add(record['id'])
-            count=len(selection43.ready(state))
-            banking=count>=e.CONFIG['article_target']
+            count=len(selection43.composition(state))
+            banking=count>=e.CONFIG['article_target'] and main_groups.get(priorities43.classify(record)['group'],2)>=2
             if due and count>=minimum:break
             if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):break
             if (not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
             if record['url'] in prior:record['status']='deferred';persist();continue
-            if any(selection43.duplicate(record,r) for r in selection43.ready(state)+(stock43.available(state,date) if banking else [])):
+            if any(selection43.duplicate(record,r) for r in selection43.composition(state)+(stock43.available(state,date) if banking else [])):
                 record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_BEFORE_WRITING'});persist();continue
             record['status']='preparing';persist()
             try:
@@ -139,7 +144,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                     editor.state=state;editor.usage_record=record;priorities43.attach_evidence(record,state);editor.verify_source(record)
                     if banking and e.high_risk(record):
                         record['status']='discovered';persist();continue
-                    if any(selection43.duplicate(record,r) for r in selection43.ready(state)+(stock43.available(state,date) if banking else [])):
+                    if any(selection43.duplicate(record,r) for r in selection43.composition(state)+(stock43.available(state,date) if banking else [])):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
                 editor.finish(state,record)
                 if banking:stock43.bank(state,record,clock())
@@ -157,9 +162,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             persist()
         prepare_light()
     stock43.draw(state,root,clock())
-    selected=selection43.ready(state)
+    stock43.balance(state,root,clock())
+    selected=selection43.composition(state)
     state['title_style43']=selection43.title_report(selected)
-    state['selection43']={'selected':[r['id'] for r in selected],'excluded_duplicate_ids':[r['id'] for r in e.select_ready(state) if r not in selected]}
+    state['selection43']={'selected':[r['id'] for r in selected],'excluded_duplicate_ids':[r['id'] for r in e.select_ready(state) if any(selection43.duplicate(r,chosen) for chosen in selected) and r not in selected]}
     try:
         state['editorial_report43']=priorities43.report(state,selected,selection43.recent(root,date))
         report=state['editorial_report43']

@@ -7,7 +7,7 @@ from html import unescape
 from urllib.parse import urlparse
 from scripts import policy41 as p
 
-RULES_VERSION=2
+RULES_VERSION=3
 CORE_GROUPS=('A','B','C')
 
 CONFIG=json.loads((p.ROOT/'config/editorial_priorities43.json').read_text())
@@ -96,7 +96,7 @@ def publisher_order(rows,cache,history,date):
         choices=[r for r in pending if any(DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[]))]
         if not choices:continue
         row=min(choices,key=lambda r:(len({DIRECTIONS[i]['group'] for i in r.get('priority_ids',[]) if i in DIRECTIONS}),
-            -min(2,r.get('availability',{}).get('full_originals_verified',0)),key(r)));pending.remove(row)
+            -min(2,cache.get('publishers',{}).get(r['id'],{}).get('eligible',r.get('availability',{}).get('full_originals_verified',0))),key(r)));pending.remove(row)
         result.append(dict(row,search_group=group))
     return result+sorted(pending,key=key)
 
@@ -141,6 +141,9 @@ def report(state,rows,history):
     duplicate_count=len(rows)-len(selection43.unique_ready(rows))
     return {'version':2,'core_groups':{g:groups[g] for g in CORE_GROUPS},'missing_core_groups':[g for g in CORE_GROUPS if not groups[g]],
             'duplicate_stories':duplicate_count,'excluded_duplicate_stories':len(state.get('selection43',{}).get('excluded_duplicate_ids',[])),
+            'family_articles':groups['A'],'children_articles':sum(bool(re.search(r'(?i)дет|реб[её]н|child|parent',str(r.get('article',{})))) for r in rows if classify(r)['group']=='A'),
+            'health_sport_articles':groups['C'],'sport_articles':sum(classify(r)['direction'] in (13,14,15) for r in rows),
+            'light_news':len(__import__('scripts.light43',fromlist=['ready']).ready(state)) if 'candidates' in state else None,
             'history_culture':categories['История и культура'],'nature_science':categories['Наука'],
             'economy_technology':categories['Экономика и бизнес']+categories['Технологии'],
             'date':state['date'],'stage':'prepared','published_main_articles':None,'prepared_main_articles':total,
@@ -173,7 +176,7 @@ def reconsider_evidence(state):
     # Reopen only a missing-evidence hold when genuinely new verified sources exist.
     # Article/final-review counters and all previous refusals remain unchanged.
     from scripts import editorial43
-    basis=p.digest(sorted((url,src.get('content_hash')) for url,src in state.get('source_cache',{}).items() if src.get('full_text_verified')))
+    basis=p.digest({'risk_version':editorial43.RISK_VERSION,'sources':sorted((url,src.get('content_hash')) for url,src in state.get('source_cache',{}).items() if src.get('full_text_verified'))})
     for row in state['candidates']:
         if row.get('status')!='deferred' or row.get('support_basis43')==basis:continue
         failures=[h.get('code') for h in row.get('history',[]) if h.get('stage')=='v43_final']

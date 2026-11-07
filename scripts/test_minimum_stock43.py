@@ -89,7 +89,7 @@ class MinimumStockTests(unittest.TestCase):
         for i in range(4):rows.append(fixture.ready(100+i))
         rows[0]['ready_checked_at']=(fixture.NOW-timedelta(days=30)).isoformat()
         rows[1]['checks']['final43']['is_news']=True
-        rows[2]['category_hint']='Здоровье и движение'
+        rows[2]['category_hint']='Здоровье и движение';rows[2]['article']['title']='Принимайте препарат при сердечных заболеваниях';rows[2]['checks']['final43']['input_hash']=e.fingerprint(rows[2])
         rows[3]['article']['blocks'][0]['text']='Tampered'
         stock.ensure(s)['records']=rows
         self.assertEqual(stock.available(s,s['date']),[])

@@ -227,7 +227,10 @@ def refresh(state,now=None,session=None,shortage=False):
             record['category_hint']=record['editorial43']['category']
             if row.get('search_light'):
                 from scripts import light43
-                if light43.story_suitable(record):record['for_light_only']=True
+                if light43.story_suitable(record):
+                    record['for_light_only']=True
+                    queue=state.setdefault('light43_queue',[])
+                    if record['id'] not in queue:queue.append(record['id'])
             group=record['editorial43']['group'];run['candidate_groups'][group]=run['candidate_groups'].get(group,0)+1
             state['candidates'].append(record);known.add(src['url'])
             state.setdefault('source_cache',{})[src['url']]=src

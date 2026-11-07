@@ -95,6 +95,16 @@ def main():
             run=bank.get('workflow_run',{})
             if run.get('head_branch')!='main' or type(run.get('id')) is not int:raise RuntimeError('Editorial inventory origin invalid')
             outputs.update(stock_id=str(bank['id']),stock_run_id=str(run['id']))
+    if not preview and os.getenv('NEWS_POLICY_VERSION')=='4.3':
+        # Read-only diagnosis of the latest PUBLIC edition's private light batch.
+        # Only the official download action handles ciphertext; no private output.
+        dates=sorted(path.name for path in (staged_news.ROOT/'issues').glob('*') if len(path.name)==10 and (path/'index.html').is_file())
+        if dates:
+            diagnostic_label='387news31-production-'+dates[-1]
+            diagnostic=newest_artifact(records_for(diagnostic_label),diagnostic_label)
+            if diagnostic and diagnostic.get('workflow_run',{}).get('head_branch')=='main':
+                run=diagnostic['workflow_run'].get('id')
+                if type(run) is int:outputs.update(light_diagnostic_found='true',light_diagnostic_id=str(diagnostic['id']),light_diagnostic_run_id=str(run))
     out = os.environ.get('GITHUB_OUTPUT')
     if not out:
         raise RuntimeError('GITHUB_OUTPUT not set')
