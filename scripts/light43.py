@@ -103,6 +103,7 @@ def apply_batch_review(saved,state):
         codes=[];result=by_id.get(row['id'])
         if row['id'] in ambiguous:codes=['LIGHT_REVIEW_ID_AMBIGUOUS']
         elif result is None:codes=['LIGHT_REVIEW_MISSING']
+        elif saved.get('review_inputs',{}).get(row['id'])!=e.fingerprint(row):codes=['LIGHT_REVIEW_INPUT_CHANGED']
         else:
             try:
                 verdict,errors=e.bind_review(result,row,aliases,e.fingerprint(row));codes+=errors
@@ -141,6 +142,10 @@ def prepare(state,persist=lambda:None,editor=None):
     for key,value in (('write_attempts',0),('review_attempts',0),('records',[]),('http_requests',0)):saved.setdefault(key,value)
     # Nested transport counters survive a crash before the call's finally block.
     saved['http_requests']=max(saved['http_requests'],sum(v.get('http_requests',0) for v in saved.get('model_usage',{}).values()))
+    if saved.get('review') and not saved.get('complete'):
+        recovered=apply_batch_review(saved,state);existing={r['id'] for r in saved['records']}
+        saved['records'] += [r for r in recovered if r['id'] not in existing]
+        saved['complete']=True;saved['code']='LIGHT_ACCEPTED' if recovered else 'LIGHT_ALL_REJECTED';persist()
     window=os.getenv('GITHUB_RUN_ID','local-window')+':'+os.getenv('GITHUB_RUN_ATTEMPT','1')
     finished=saved.get('complete') or saved['review_attempts']-saved.get('batch_review_start',0)>=1 or saved['http_requests']-saved.get('batch_http_start',0)>=2
     if finished:
@@ -153,7 +158,7 @@ def prepare(state,persist=lambda:None,editor=None):
         # sources, counters, draft, review and diagnoses remain in the checkpoint.
         previous={k:copy.deepcopy(v) for k,v in saved.items() if k not in ('records','batches','model_usage')}
         saved.setdefault('batches',[]).append(previous)
-        for key in ('draft','review','complete','code','diagnostics'):saved.pop(key,None)
+        for key in ('draft','review','review_inputs','complete','code','diagnostics'):saved.pop(key,None)
         saved.pop('attempt_window',None)
         saved.update(sources=sources,batch_http_start=saved['http_requests'],batch_write_start=saved['write_attempts'],batch_review_start=saved['review_attempts'])
         persist()
@@ -181,6 +186,7 @@ def prepare(state,persist=lambda:None,editor=None):
         if not saved.get('review'):
             if saved['review_attempts']-saved.get('batch_review_start',0)>=1:return
             sources=saved['sources'];wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
+            saved['review_inputs']={r['id']:e.fingerprint(r) for r in records}
             saved['review_attempts']+=1;persist()
             saved['review']=editor.call('Одна независимая пакетная проверка коротких заметок политики4.3. Для каждого id из заметок оцени все семь критериев v43_final: факты, безопасность, права, самостоятельность, заголовок и законченность. Проверяй смысл каждого факта и дословную цитату. Для claims source_id=sN и evidence_id=qN строго из полного оригинала. Каждый факт заметки подтверждается её единственным source_id. Верни is_news=true только если это оперативная новость, тогда подтверди дату события дословной цитатой. Для исторического/неоперативного факта is_news=false, поля event_* пустые: отсутствие сегодняшней даты не ошибка. Не отклоняй фактическую историю из-за отсутствия глубины, юмора или большого объёма. Отклоняй заметки отдельно: ошибка одной не отменяет остальные. approve=true только если семь критериев true, issues/unresolved пустые.\nЗаметки: '+json.dumps([{'id':r['id'],'source_id':next('s'+str(i+1) for i,s in enumerate(sources) if s['id']==r['source']['id']),'article':r['article']} for r in records],ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False),output_tokens=8000,schema='v43_light_review');persist()
         accepted=apply_batch_review(saved,state)

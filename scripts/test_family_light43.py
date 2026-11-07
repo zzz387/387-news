@@ -95,6 +95,20 @@ class LightBatchTests(unittest.TestCase):
         self.assertFalse(previous&{src['url'] for src in s['light43']['sources']})
         with patch.dict(os.environ,GITHUB_RUN_ID='third'),patch.object(news.runtime,'ACTIVE_BUDGET',self.budget()):light.prepare(s,persist,editor)
         self.assertEqual(s['light43']['http_requests'],4);self.assertEqual(len(s['light43']['batches']),1)
+    def saved_review(self):
+        s=self.sample();src=s['candidates'][8]['source'];b=src['blocks'][-1]
+        item={'id':'x','source_id':'s1','title':'Вороны решают головоломки','text':'Собственная формулировка проверенного факта.'}
+        s['light43']={'write_attempts':1,'review_attempts':1,'http_requests':2,'records':[],'sources':[src],'draft':{'items':[item]},'review_inputs':{'x':e.fingerprint(light.safe_record(item,src))},'review':{'reviews':[{'id':'x','approve':True,**{k:True for k in e.CHECKS},'is_news':False,'event_date':'','event_source_id':'','event_evidence_id':'','event_quote':'','issues':[],'unresolved':[],'claims':[{'fact':b['text'],'source_id':'s1','evidence_id':'q'+str(len(src['blocks'])),'quote':b['text']}]}]}}
+        return s
+    def test_completed_review_is_recovered_after_interruption_without_another_call(self):
+        s=self.saved_review();budget=self.budget()
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(news,'gemini',side_effect=AssertionError('Accepted review must be recovered')):light.prepare(s)
+        self.assertEqual(len(light.ready(s)),1);self.assertEqual(budget.used,0);self.assertEqual(s['light43']['http_requests'],2)
+    def test_retained_review_cannot_approve_a_changed_draft(self):
+        s=self.saved_review();s['light43']['draft']['items'][0]['text']='Другой непроверенный текст.'
+        self.assertEqual(light.apply_batch_review(s['light43'],s),[])
+        self.assertIn('LIGHT_REVIEW_INPUT_CHANGED',s['light43']['diagnostics'][0]['codes'])
+
     def test_same_source_retry_and_main_duplicates_are_not_allowed(self):
         s=self.sample();s['light43']={'complete':True,'http_requests':2,'write_attempts':1,'review_attempts':1,'records':[],'sources':[r['source'] for r in s['candidates'][8:]]}
         with patch.object(news.runtime,'ACTIVE_BUDGET',self.budget()),patch.object(news,'gemini',side_effect=AssertionError('No new source')):light.prepare(s)
