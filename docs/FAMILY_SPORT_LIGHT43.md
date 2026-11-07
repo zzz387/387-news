@@ -69,3 +69,21 @@ A full edition now explicitly prepares missing A/C candidates before unrelated
 unfinished stock. A sole witnessed NEWS_EVENT_TOO_OLD verdict rejects that
 candidate immediately, preserving text/history and leaving freshness intact.
 Slow checkpoint diagnostics expose only timings and ciphertext size.
+
+The protected issue014 checkpoint contained two drafted notes from one source;
+both conflict with its main articles. Diagnostics now distinguish saved reviewed
+records from those eligible after main-story deduplication. Sources of accepted
+short notes are reserved in the existing light queue before subsequent main
+writing. Already accepted long articles/inventory and active written main drafts
+are excluded from new light sourcing, preventing resource cannibalization.
+
+A real run logged75 checkpoint timing samples; repeated composition counting
+took up to4.399 seconds per save, while encryption stayed below0.851 seconds.
+Checkpoint save no longer reruns composition just for logging. Source/article
+eligibility, fingerprints and the publication minimum still run at their actual
+gates; an unfinished draft can always be safely saved.
+
+A pause before an HTTP reservation resumes the same pending stage without
+resetting its logical counter. A draft saved before an unstarted review resumes
+review only. A paid failed write may use the single different-source replacement
+in a later window; all actual attempts remain charged and total at most four.

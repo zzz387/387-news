@@ -24,8 +24,22 @@ def recent(root):
             rows.append({'title':item['title'],'summary':item.get('text',''),'url':item.get('source',{}).get('url','')})
     return rows
 
+def main_work(state):
+    # Accepted long work has priority, including unselected encrypted reserve.
+    rows=selection43.ready(state)
+    rows += [r for r in state.get('stock43',{}).get('records',[]) if e.eligible(r)]
+    return rows
+
+def reserve_accepted_sources(state,rows):
+    urls={r['source']['url'] for r in rows};queue=state.setdefault('light43_queue',[])
+    for candidate in state['candidates']:
+        if candidate['url'] in urls and candidate.get('status') in ('discovered','preparing','retryable_error'):
+            candidate['for_light_only']=True
+            if candidate['id'] not in queue:queue.append(candidate['id'])
+
+
 def ready(state,limit=5):
-    result=[];mains=selection43.composition(state)
+    result=[];mains=main_work(state)
     for row in state.get('light43',{}).get('records',[]):
         if not e.eligible(row):continue
         try:rights41.require(row['source'],'INDEPENDENT_ARTICLE',rights41.decision(row['source'],'INDEPENDENT_ARTICLE'))
@@ -48,10 +62,11 @@ def safe_record(item,source):
 
 
 def sources_for_batch(state,excluded=()):
-    selected=[];mains=selection43.composition(state)
+    selected=[];mains=main_work(state)
     excluded=set(excluded)|set(state.get('stock43',{}).get('published_urls',[]))
     for row in sorted(state['candidates'],key=lambda r:(r['id'] not in state.get('light43_queue',[]),not r.get('for_light_only',False))):
         src=row.get('source')
+        if row.get('status')=='preparing' and row.get('article') and not row.get('for_light_only'):continue
         if not src or src['url'] in excluded or src['url'] in {s['url'] for s in selected}:continue
         if not src.get('full_text_verified') or src.get('metadata_status')!='verified' or not story_suitable(row):continue
         if any(selection43.duplicate(row,r) for r in mains+state.get('_recent_light43',[])):continue
@@ -80,7 +95,7 @@ def batch_records(saved,state):
                 if len(matches)!=1:raise p.Blocked('LIGHT_SOURCE_UNBOUND')
                 src=matches[0]
             row=safe_record(item,src)
-            if any(selection43.duplicate(row,r) for r in selection43.composition(state)+records+state.get('_recent_light43',[])):raise p.Blocked('LIGHT_DUPLICATE')
+            if any(selection43.duplicate(row,r) for r in main_work(state)+records+state.get('_recent_light43',[])):raise p.Blocked('LIGHT_DUPLICATE')
             records.append(row)
         except (KeyError,TypeError,ValueError) as exc:codes=[getattr(exc,'code','LIGHT_ITEM_FORMAT')]
         diagnostics.append({'item':index+1,'codes':codes})
@@ -127,7 +142,8 @@ def diagnose_saved(state):
     saved=state.get('light43',{});records,normalization=batch_records(saved,state)
     if saved.get('review'):apply_batch_review(saved,state)
     reasons=Counter(code for item in saved.get('diagnostics',normalization) for code in item['codes'])
-    summary={'sources':len(saved.get('sources',[])),'written':len(saved.get('draft',{}).get('items',[]) or []) if isinstance(saved.get('draft',{}),dict) else 0,
+    reviewed=[r for r in saved.get('records',[]) if r.get('status') in ('ready','reserve_ready') and e.eligible(dict(r,status='ready'))]
+    summary={'stored_records':len(saved.get('records',[])),'reviewed_records':len(reviewed),'main_conflicts':sum(any(selection43.duplicate(r,m) for m in main_work(state)) for r in reviewed),'sources':len(saved.get('sources',[])),'written':len(saved.get('draft',{}).get('items',[]) or []) if isinstance(saved.get('draft',{}),dict) else 0,
         'normalized':len(records),'normalization_rejected':sum(bool(d['codes']) for d in normalization),
         'accepted':len(ready(state)),'rejection_codes':dict(reasons),
         'review_retained':bool(saved.get('review')),'legacy_review_unavailable':bool(saved.get('review_attempts') and not saved.get('review')),
@@ -140,14 +156,17 @@ def diagnose_saved(state):
 def prepare(state,persist=lambda:None,editor=None):
     saved=state.setdefault('light43',{'write_attempts':0,'review_attempts':0,'records':[]})
     for key,value in (('write_attempts',0),('review_attempts',0),('records',[]),('http_requests',0)):saved.setdefault(key,value)
+    reserve_accepted_sources(state,ready(state))
     # Nested transport counters survive a crash before the call's finally block.
     saved['http_requests']=max(saved['http_requests'],sum(v.get('http_requests',0) for v in saved.get('model_usage',{}).values()))
     if saved.get('review') and not saved.get('complete'):
         recovered=apply_batch_review(saved,state);existing={r['id'] for r in saved['records']}
         saved['records'] += [r for r in recovered if r['id'] not in existing]
-        saved['complete']=True;saved['code']='LIGHT_ACCEPTED' if recovered else 'LIGHT_ALL_REJECTED';persist()
+        saved['complete']=True;saved['code']='LIGHT_ACCEPTED' if recovered else 'LIGHT_ALL_REJECTED';reserve_accepted_sources(state,recovered);persist()
     window=os.getenv('GITHUB_RUN_ID','local-window')+':'+os.getenv('GITHUB_RUN_ATTEMPT','1')
-    finished=saved.get('complete') or saved['review_attempts']-saved.get('batch_review_start',0)>=1 or saved['http_requests']-saved.get('batch_http_start',0)>=2
+    batch_http=saved['http_requests']-saved.get('batch_http_start',0)
+    failed_write=(not saved.get('draft') and saved['write_attempts']-saved.get('batch_write_start',0)>=1 and batch_http>0)
+    finished=saved.get('complete') or bool(saved.get('review')) or batch_http>=2 or failed_write
     if finished:
         diagnose_saved(state)
         if ready(state) or saved.get('batches') or saved.get('attempt_window')==window:return
@@ -174,24 +193,27 @@ def prepare(state,persist=lambda:None,editor=None):
     saved.setdefault('attempt_window',window)
     try:
         if not saved.get('draft'):
-            if saved['write_attempts']-saved.get('batch_write_start',0)>=1:return
+            if saved['write_attempts']-saved.get('batch_write_start',0)>=1 and saved['http_requests']-saved.get('batch_http_start',0)>0:return
             sources=saved.get('sources') or sources_for_batch(state)
             if not sources:saved['code']='LIGHT_NO_VERIFIED_SOURCES';return
             saved['sources']=sources
             wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
             prompt='Рубрика «НЕ ВСЁ ТАК СЕРЬЁЗНО»: до пяти независимых коротких добрых, удивительных фактов. Заголовок и1–3 предложения. Без политики, трагедий, болезней, насмешек, выдумок и скрытого перевода. Можно меньше пяти или пустой список. Только факты полных оригиналов. Старое не выдавай за сегодняшнее. Для каждой заметки уникальный id и source_id строго sN из списка источников. Один источник на заметку; каждый факт должен подтверждаться именно им. Не повторяй основные сюжеты: '+json.dumps(selection43.prompt_context(state),ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False)
-            saved['write_attempts']+=1;persist();saved['draft']=editor.call(prompt,output_tokens=4000,schema='v43_light_write');persist()
+            if saved['write_attempts']==saved.get('batch_write_start',0):saved['write_attempts']+=1
+            persist();saved['draft']=editor.call(prompt,output_tokens=4000,schema='v43_light_write');persist()
         records,normalization=batch_records(saved,state);saved['diagnostics']=normalization
         if not records:saved['complete']=True;saved['code']='LIGHT_NORMALIZATION_REJECTED';return
         if not saved.get('review'):
-            if saved['review_attempts']-saved.get('batch_review_start',0)>=1:return
+            if saved['review_attempts']-saved.get('batch_review_start',0)>=1 and saved['http_requests']-saved.get('batch_http_start',0)>=2:return
             sources=saved['sources'];wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
             saved['review_inputs']={r['id']:e.fingerprint(r) for r in records}
-            saved['review_attempts']+=1;persist()
+            if saved['review_attempts']==saved.get('batch_review_start',0):saved['review_attempts']+=1
+            persist()
             saved['review']=editor.call('Одна независимая пакетная проверка коротких заметок политики4.3. Для каждого id из заметок оцени все семь критериев v43_final: факты, безопасность, права, самостоятельность, заголовок и законченность. Проверяй смысл каждого факта и дословную цитату. Для claims source_id=sN и evidence_id=qN строго из полного оригинала. Каждый факт заметки подтверждается её единственным source_id. Верни is_news=true только если это оперативная новость, тогда подтверди дату события дословной цитатой. Для исторического/неоперативного факта is_news=false, поля event_* пустые: отсутствие сегодняшней даты не ошибка. Не отклоняй фактическую историю из-за отсутствия глубины, юмора или большого объёма. Отклоняй заметки отдельно: ошибка одной не отменяет остальные. approve=true только если семь критериев true, issues/unresolved пустые.\nЗаметки: '+json.dumps([{'id':r['id'],'source_id':next('s'+str(i+1) for i,s in enumerate(sources) if s['id']==r['source']['id']),'article':r['article']} for r in records],ensure_ascii=False)+'\nПолные источники: '+json.dumps(wire,ensure_ascii=False),output_tokens=8000,schema='v43_light_review');persist()
         accepted=apply_batch_review(saved,state)
         existing={r['id'] for r in saved['records']}
         saved['records'] += [r for r in accepted if r['id'] not in existing]
+        reserve_accepted_sources(state,accepted)
         saved['complete']=True;saved['code']='LIGHT_ACCEPTED' if accepted else 'LIGHT_ALL_REJECTED'
     except news.runtime.GenerationPaused as exc:
         saved['code']='GEMINI_HTTP_503' if '503' in str(exc) else 'GEMINI_HTTP_429' if '429' in str(exc) else 'LIGHT_PREPARATION_PAUSED'

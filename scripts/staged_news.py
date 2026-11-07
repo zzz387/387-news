@@ -130,10 +130,10 @@ def save(state: dict, key: bytes):
     temp.write_bytes(blob)
     temp.chmod(0o600)
     temp.replace(ARTIFACT_FILE)
-    target=pipeline.article_target(state)  # preserve v31/v41 while using the v43 configuration
-    counted=time.monotonic();count=vetted_count(state);count_seconds=time.monotonic()-counted
-    print(f'[checkpoint] AES-256-GCM encrypted; {count}/{target} vetted article drafts',flush=True)
-    if cipher_seconds+count_seconds>1:print('[checkpoint-perf43] '+json.dumps({'cipher_seconds':round(cipher_seconds,3),'count_seconds':round(count_seconds,3),'encrypted_bytes':len(blob)}),flush=True)
+    # Saving an unfinished checkpoint must not re-run issue selection just to log.
+    # Eligibility/minimum/fingerprints remain enforced by advance/build/report.
+    print('[checkpoint] AES-256-GCM encrypted; state saved',flush=True)
+    if cipher_seconds>1:print('[checkpoint-perf43] '+json.dumps({'cipher_seconds':round(cipher_seconds,3),'encrypted_bytes':len(blob)}),flush=True)
 
 
 def phase_date(phase: str, now: datetime, manual_date: str | None) -> str:
