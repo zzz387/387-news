@@ -136,6 +136,20 @@ class LightBatchTests(unittest.TestCase):
         self.assertEqual(light.apply_batch_review(s['light43'],s),[])
         self.assertIn('LIGHT_REVIEW_INPUT_CHANGED',s['light43']['diagnostics'][0]['codes'])
 
+    def test_verified_light_source_is_reserved_before_main_writing(self):
+        s=self.saved_review();budget=self.budget();source_id=s['candidates'][8]['id']
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):light.prepare(s)
+        self.assertEqual(len(light.ready(s)),1);self.assertTrue(s['candidates'][8]['for_light_only'])
+        self.assertNotIn(source_id,[r['id'] for r in sel.order(s)])
+    def test_accepted_long_reserve_cannot_be_consumed_as_a_short_story(self):
+        s=state(8);long=named('Необычная история воронов',88);stock.ensure(s)['records']=[long]
+        candidate=copy.deepcopy(long);candidate['status']='discovered';s['candidates'].append(candidate)
+        self.assertEqual(light.sources_for_batch(s),[])
+    def test_legacy_diagnostic_counts_main_conflicts_separately(self):
+        s=state(8);row=copy.deepcopy(s['candidates'][0]);s['light43']={'records':[row],'review_attempts':1,'http_requests':2}
+        summary=light.diagnose_saved(s)
+        self.assertEqual(summary['reviewed_records'],1);self.assertEqual(summary['main_conflicts'],1);self.assertEqual(summary['accepted'],0)
+
     def test_same_source_retry_and_main_duplicates_are_not_allowed(self):
         s=self.sample();s['light43']={'complete':True,'http_requests':2,'write_attempts':1,'review_attempts':1,'records':[],'sources':[r['source'] for r in s['candidates'][8:]]}
         with patch.object(news.runtime,'ACTIVE_BUDGET',self.budget()),patch.object(news,'gemini',side_effect=AssertionError('No new source')):light.prepare(s)
