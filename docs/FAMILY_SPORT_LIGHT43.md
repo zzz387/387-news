@@ -62,3 +62,10 @@ safe stories are ready, omit the column rather than delay the main newspaper.
 The report distinguishes verified-source candidates, accepted main articles,
 usable inventory and accepted light items. Inventory goals are not actual
 counts. A successful CI or checkpoint is not an HTTPS publication.
+
+Production verification on7 November found an unrelated unfinished candidate
+receiving repeated positive reviews with a witnessed but expired news date.
+A full edition now explicitly prepares missing A/C candidates before unrelated
+unfinished stock. A sole witnessed NEWS_EVENT_TOO_OLD verdict rejects that
+candidate immediately, preserving text/history and leaving freshness intact.
+Slow checkpoint diagnostics expose only timings and ciphertext size.

@@ -37,6 +37,26 @@ class FamilyRiskTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp,patch.object(news,'gemini',side_effect=AssertionError('No model for inventory')):stock.draw_light(s,root(temp))
         self.assertEqual(len(light.ready(s)),3);self.assertEqual(len(sel.composition(s)),12)
 
+    def test_coverage_preparation_precedes_unrelated_unfinished_stock(self):
+        from scripts import daily43 as d
+        from types import SimpleNamespace
+        s=state(12);other=named('Архитектура старого дворца',90,'preparing');family=named('Семейные игры и воспитание детей',91,'discovered');s['candidates'] += [other,family];seen=[]
+        class Editor:
+            def finish(self,state,row):seen.append(row['id']);raise rt.GenerationPaused('Natural synthetic boundary')
+        with tempfile.TemporaryDirectory() as temp,patch.object(d,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+            d.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5),editor=Editor())
+        self.assertEqual(seen,['91']);self.assertEqual(other['status'],'preparing')
+    def test_witnessed_expired_news_is_rejected_after_one_review(self):
+        from scripts.test_daily43 import verdict
+        s=state();r=named('Новость о музее');r['status']='preparing';r['checks'].pop('final43');r['source']['blocks'][-1]['text']='The event occurred on January 1, 2020.';calls=[]
+        def model(prompt,**kwargs):
+            calls.append(kwargs['schema']);result=verdict(prompt,r)
+            result.update(is_news=True,event_date='2020-01-01',event_source_id=r['source']['id'],event_evidence_id=r['source']['blocks'][-1]['id'],event_quote=r['source']['blocks'][-1]['text'])
+            return result
+        with self.assertRaisesRegex(e.p.Blocked,'NEWS_EVENT_TOO_OLD'):e.Editor(call=model).finish(s,r)
+        self.assertEqual(calls,['v43_final']);self.assertFalse(e.eligible(r));self.assertIn('article',r)
+
+
 class SourceAccessTests(unittest.TestCase):
     def test_new_source_metadata_uses_its_own_domain_and_actual_language(self):
         from scripts import catalog43 as c

@@ -113,7 +113,11 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
             coverage_needed=banking and bool(coverage_pending)
             plan_state=state
-            if banking and not coverage_needed:
+            if coverage_needed:
+                # Missing personal streams take the preparation window before
+                # unrelated unfinished stock, even when that stock is full.
+                plan_state=dict(state,candidates=selection43.composition(state)+coverage_pending)
+            elif banking:
                 # Inventory needs its own topic balance, not the already full
                 # edition's nine personal places followed by optional science.
                 pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and not e.high_risk(r)]
@@ -138,6 +142,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             if record['url'] in prior:record['status']='deferred';persist();continue
             if any(selection43.duplicate(record,r) for r in selection43.composition(state)+(stock43.available(state,date) if banking else [])):
                 record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_BEFORE_WRITING'});persist();continue
+            print('[candidate-priority43] '+json.dumps({'id':record['id'],'group':priorities43.classify(record)['group'],'coverage_needed':coverage_needed,'operation':'review' if record.get('article') else 'write','risk_codes':e.risk_codes(record)}),flush=True)
             record['status']='preparing';persist()
             try:
                 if isinstance(editor,e.Editor):
