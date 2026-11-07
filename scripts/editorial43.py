@@ -356,6 +356,10 @@ class Editor(old.Editor):
                 record['checks']['final43']=dict(result,approved=True);record['ready_checked_at']=datetime.now(p.TZ).isoformat();record['status']='ready';self.persist();return
             progress['feedback']=copy.deepcopy(result)
             print('[editorial43] '+json.dumps({'code':'FINAL_REJECTED','candidate':record['id'],'attempt':count+1,'approve':result.get('approve'),'failed_checks':[key for key in CHECKS if result.get(key) is not True],'issues_count':len(result.get('issues',[])),'unresolved_count':len(result.get('unresolved',[])),'protocol_errors':protocol_errors,'validation_errors':validation_errors}),flush=True)
+            if validation_errors==['NEWS_EVENT_TOO_OLD'] and not protocol_errors:
+                # A bound literal establishes an actually stale news date.
+                # Repeating the same audit cannot make this current news.
+                raise p.Blocked('NEWS_EVENT_TOO_OLD')
             if positive_semantics(result) and (protocol_errors or validation_errors):
                 progress['review_protocol_feedback']={'codes':protocol_errors+validation_errors,'instruction':'Уточни проверку без изменения статьи: sN и qN, дословная цитата. Для дат отличай публикацию от события и текущую новость от неоперативного объяснения; контекст переиздания сам по себе не отменяет актуальность реальной новости. Если факт/дата не подтверждаются или текст выдаёт старое за новое, отклони; не выдумывай свидетельство и не меняй дату.'}
                 self.persist();continue
