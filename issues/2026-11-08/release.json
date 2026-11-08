@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-08",
+  "number": 15,
+  "policy_version": "4.3",
+  "article_count": 12,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "9ede047d5e17325e06d4e1fb9a10e61cafd7c7475312b294130e42d9b972324a",
+      "markdown": "b9915e4f0c41f7e5e63e1568ed3b40a17401d5ab2edbf941a312353310a42383"
+    },
+    "feature-02": {
+      "html": "9c066e669f492c42e6ace07e91d30779d18fba297ba6c3cb0135ab3db5f7d5ac",
+      "markdown": "e18642621d86adf9d25222f11e5fd7717820a1c410fcfd1a463825d3f7366d32"
+    },
+    "feature-03": {
+      "html": "643eeffd43a1ffb520311a682cb0e13ba531d1eeb7f9f69eb351c8029d6baad2",
+      "markdown": "d6d5bf630047b5c494cd2ab1f2ef7c6eaa3a76b6998ec991b098b4c8be693c30"
+    },
+    "feature-04": {
+      "html": "13ae4f194f32ca7d1cc9f4d540dbda66c125fed7c7696eee851d6d24b925ab98",
+      "markdown": "9f10582bc81599130a23849018ded227138fc5ddbd8b069b754b37f44601d374"
+    },
+    "feature-05": {
+      "html": "617c3aa85d53eece4ac3ee6fa8c5b2b6a72b7aa7ec048ca412e79f0c98958b01",
+      "markdown": "6f8099527659fd03bf0b3820b5c78bf3980da82754fa6a32d2a6f5fbd62c79ae"
+    },
+    "feature-06": {
+      "html": "5b5ff98dd8fc03c5863b84dbd89d4bcb043b61f098e27f1610c56e8ab86e2a19",
+      "markdown": "30185b80f2a6080d3263718989abf79f24fca2a48fb66f0d914a52385e16d512"
+    },
+    "feature-07": {
+      "html": "617a56e255e5e07bb3c5f4b84397637e1cc810f95343cda80876d6de58381cc2",
+      "markdown": "6da8093dd01eb120f44eaebeace0358bfe0fffeed4a3e60208cd479ded0e0bc5"
+    },
+    "feature-08": {
+      "html": "c6371e792b654b17084caad4aafd752e7d0fcc655969c2e64227ab0013282d6d",
+      "markdown": "e1386d07380c33bceae2715da7789bfad04e8a5924af591c57d613f941094408"
+    },
+    "feature-09": {
+      "html": "00ff4da8ed71604946db2b4c698ae6e3079bdfc13ca9937281f94cfbc569ece1",
+      "markdown": "e7bbef818fbde70a325876b75a4f13bfcc300081913c5d00d3e34245a4b40e73"
+    },
+    "feature-10": {
+      "html": "a060c6334d20cc52d667135f00e6ec76dc735f1e9e930eed8f6635b78dc859d7",
+      "markdown": "a56c4dbe124276e776e2ba880316ee4fc4bc5f1c86221f3420d5dddbfa43ce2b"
+    },
+    "feature-11": {
+      "html": "0079ec7d91e0b3ad052de9e2838b585253fd6b437ab5b77960b043e4eacee3df",
+      "markdown": "5abd35c0a91cb30e8fd006eb2a73bb1e765c7f24ed222e2c1ead1b4b5f556029"
+    },
+    "feature-12": {
+      "html": "d8c7665c8811307f78962487e1744b0a71bf3d31fda9c52d9bbf4ca9535e6d29",
+      "markdown": "fbdb26d824801d9e915fa71b249c494aa72a45ed9d29f4c9a383aaf1be32054c"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-08T05:54:47.001768+03:00",
+  "release_not_before": "2026-11-08T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Возвращение перуанских ныряющих буревестников",
+      "text": "На острове Чорос у побережья Чили популяция редких птиц — перуанских ныряющих буревестников — увеличилась почти в восемь раз после природоохранных мероприятий. Удаление инвазивных кроликов и восстановление мест гнездования помогли колонии вырасти с 12 тысяч пар в 2013 году почти до 90 тысяч пар в 2024 году.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/peruvian-diving-petrel-choros-island",
+        "title": "Invasive rabbits were removed from an island in Chile – then something \"extraordinary\" happened",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-03T08:26:03+00:00"
+      }
+    }
+  ],
+  "light_count": 1,
+  "homepage_hash": "370b46d03e5ddd54dd88942628cb975eab694a13dc148e43286f51b9939bb360",
+  "overview_hash": "ad5707600db562c4cb3ea07ef5452507cc4a5396f290cdce0b247737b0656b44",
+  "markdown_hash": "74e57dc9c3179de8ff0124c2feb654277fcc98fa8bd54382558fd77cfd9a7250"
+}
