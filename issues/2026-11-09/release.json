@@ -1,0 +1,81 @@
+{
+  "date": "2026-11-09",
+  "number": 16,
+  "policy_version": "4.3",
+  "article_count": 12,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "507c991e677bc4dd9d3b506f06a1bf61d15f9428637f798987cb4869acc70972",
+      "markdown": "a0b66b84dc296fd1fbd4080606c0702cb7c9bd0d5d41b02bd9b9789f4c6c5f01"
+    },
+    "feature-02": {
+      "html": "129f4808fa5c3ee9bdd106425ca628bdbae46ea077c5f5cab49d0d9c4293d41a",
+      "markdown": "cfab13c98e347f113366ffe7bd640668ae986c5599868f6b6ef4876d200b3f6d"
+    },
+    "feature-03": {
+      "html": "b0b5f5b9296d774afa26a81ce56be28df88e2f77c175e54e7e0474329177aee2",
+      "markdown": "e399e6a77d48a87c16f51d8377dfbd4d6e93afc9f590e64b46e3839eb883217c"
+    },
+    "feature-04": {
+      "html": "4878b4ee8c5dc005edab938a8462c340310b873bba5d83390c29ecc2d4c86e52",
+      "markdown": "8128d3a405c1aa9ab797822c7b1f7d9dac81d752f15b0b01a538355fb2aa341c"
+    },
+    "feature-05": {
+      "html": "11ce4bb1cd9f1439669c50c49f6f5d15bd5b2046cc4b742e6b46a9cf05f9c88f",
+      "markdown": "259635f2edee5da8a331e33dbd440148facb7aa9db51d60f4226b5f4674717e9"
+    },
+    "feature-06": {
+      "html": "c5f5ba80c29c36a4faba055d041c89a9ca81f0089142cc546796451b922027fa",
+      "markdown": "35d411fe3c5e702512cc5d51d10391699f78af59333212466134823a9d0cbf9c"
+    },
+    "feature-07": {
+      "html": "b44f2fd4a867ce6f31fda34d9f04bc97d998e54345c604629e713baaedaab4a0",
+      "markdown": "c5810fa1940f430df0b3380552122e190bbba438ffb3061cbc4c6c0040c27621"
+    },
+    "feature-08": {
+      "html": "596d2e4bcb482840fac62aaa5e5aa92ce3ba2e0028645620b0be609ac948d7d7",
+      "markdown": "7fed4ee4ce254b68e5449fda9efc848671c9d7850aadb2b32f47726985aee633"
+    },
+    "feature-09": {
+      "html": "aafefafe1e9bd9efa60ffe300c414f7c8256732bca2289d81a5228bb31772606",
+      "markdown": "48e3f46027c7fd260a01b4b79518ee6aac9a52d60fd7c9d9426657421fc685e4"
+    },
+    "feature-10": {
+      "html": "241a2c667c4d6d9da85453e14074b87dbd32efd10df45459b1f63406895d83d2",
+      "markdown": "4b556b03117c845ede184b4b4c53f1fc85c918a069e47b4995177fa628dcdd41"
+    },
+    "feature-11": {
+      "html": "89e26527864a8935c6f132e0d31c7874326b08c02de6b7489a2c7b1c05abf81f",
+      "markdown": "7626102a563a57edfda4755a0aa192a72134762fc9a26b5f87eb9b616564d8fd"
+    },
+    "feature-12": {
+      "html": "0a9197ff172ccfc05cb1fb12fa5e328e504726e4c75740edb0569682c1a34c66",
+      "markdown": "714f263da2fe73c14fc4ef1bacdf13631904ca9b0680fd6e850d0a3ff469be23"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-09T05:54:50.153074+03:00",
+  "release_not_before": "2026-11-09T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Индикатор здоровья голубоногой олуши",
+      "text": "Яркий бирюзовый цвет лап голубоногой олуши служит показателем её здоровья. Чем насыщеннее оттенок, тем привлекательнее самец для партнерши, так как это свидетельствует о хороших генах, полученных благодаря питанию свежей рыбой.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/weirdest-bird-feet",
+        "title": "5 weirdest bird feet",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-07T03:16:00+00:00"
+      }
+    }
+  ],
+  "light_count": 1,
+  "homepage_hash": "0de9c2b71d9c6124e9d7f67c113dd872f1f21515870dd97f2a372263f04bc9f0",
+  "overview_hash": "c10fcab294dbc82aa7f846bb3d404b123a0a24f6ff4222f2673f239cc01a648b",
+  "markdown_hash": "b73cf3377bd364de09d6ffe1c1e69adc7f116f8db6a4426c39182910f5371cc8"
+}
