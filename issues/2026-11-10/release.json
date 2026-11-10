@@ -1,0 +1,105 @@
+{
+  "date": "2026-11-10",
+  "number": 17,
+  "policy_version": "4.3",
+  "article_count": 12,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "3adad87712dfd501bed060a5801dcbdfc0c9836d2d6d53e5a5d0b3f665d82230",
+      "markdown": "60cbd545e98caec71d96e003c20316a77b420965bd6b4bd2a369e0dca487e0aa"
+    },
+    "feature-02": {
+      "html": "adb977c4f66bb881a1d647f213a094c1a1dd0f4dbc18938d568c71291d3bf34d",
+      "markdown": "220b25ec5b9bd91240bcc81226a76654bc0766127e134913262a9f56714fbe03"
+    },
+    "feature-03": {
+      "html": "801d1e3ad84411a3d177f4872dda1ffd06c6f7c83abf7f617c142e4e2bbff115",
+      "markdown": "e6e19779e5ab344cd91a1a379efdf2beea378fe3715a0940d5defc80ed12d143"
+    },
+    "feature-04": {
+      "html": "cc68c10d202a571253989bd0149da42846659e08a970822743a4c3d7c30a4ae1",
+      "markdown": "e5e14943305ff3f3c1054e4006b901924f35542d801afefedd63ff082b45dbed"
+    },
+    "feature-05": {
+      "html": "594d745c42fae98f525c74a53e258247f81cf48ca946ec2f8f92c6b9c9606ace",
+      "markdown": "c42edcd43dd9227c487cf5b1193994252bacf363b97a4809c5b8d1055c77515a"
+    },
+    "feature-06": {
+      "html": "4e29946460417c257b3e7ec01c412124d6fa60d36900406bc241a6be67b2963a",
+      "markdown": "e9f5d1185d2127973f595bd49619df6d59a923aec9000b2215a17b7c7d78785b"
+    },
+    "feature-07": {
+      "html": "1c333c8e8b1aa24cf51d03cf97bca577a6d51ec4c7daf98d512ec1888d98f940",
+      "markdown": "23a93177cb63882888ef4e8875f1ec7b80c311f035fa5faf35065ff667404c14"
+    },
+    "feature-08": {
+      "html": "2356ba8aa498c051a730985348cf57610d7edd9138bce86428a3e63eef94468f",
+      "markdown": "0748ae57bf65b4fcfe68801b20a71a13346b28d22c76d2aa55ea668cfbe40e91"
+    },
+    "feature-09": {
+      "html": "a048329b93bd34f6be202e3197188b9105d0b7cb2ff4ce1d0e89122904f178af",
+      "markdown": "d7477e85602ab39523f4e62e9666ca7e50dd05840854d6b424fdcfbec02ca936"
+    },
+    "feature-10": {
+      "html": "56ba96aed760c6b368bd2fbd143d4c26aee648d7558a9491b5246c77bc8075f9",
+      "markdown": "6d2744127379a5ecaac004ba65fb2a4060fa46363a9228a4120522bfb034193c"
+    },
+    "feature-11": {
+      "html": "f8538b4e56ea3fb6bcb7a92c672178a0c2bd0c60a52ded61e4c288be92e137ad",
+      "markdown": "41ab439bf856d76ece6bd8428aefe756182005ad5999c27290afa1ff2a79ceae"
+    },
+    "feature-12": {
+      "html": "29ebb9d117fae0a7cc1c714e3517e5810a91718c46dd4ab75c19f651c2bccae6",
+      "markdown": "04c307df92043db1646c0d64ffb179cbb556c175056f5236e5b7928fde15069e"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-10T06:32:13.395127+03:00",
+  "release_not_before": "2026-11-10T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Уникальный «швейцарский нож» гавайских лесов",
+      "text": "Птица акиаполаау обладает клювом, который функционирует как два разных инструмента: длинная и тонкая верхняя часть позволяет извлекать личинок из узких отверстий, а короткая и толстая нижняя используется для долбления древесины. Ученые также обнаружили, что для сильных ударов по дереву птица использует инерцию всего своего тела, отталкиваясь от поверхности с помощью мощных мышц голени.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/akiapolaau-swiss-army-beak-evolution",
+        "title": "“It has features unseen in any birds.” This bizarre Hawaiian animal just got even stranger",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-05T17:24:48+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Грозный характер милых малиновок",
+      "text": "Звучные и мелодичные песни малиновок на самом деле служат инструментом для защиты территории, которую эти птицы удерживают круглый год. В отличие от многих других видов, они очень агрессивны к сородичам, а их призывный «тик» является сигналом тревоги и предупреждением «назад» для любого непрошеного гостя.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/robin-song-warning",
+        "title": "It might sound sweet – but actually it's anything but as your garden robin is sending out a warning",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-04T20:32:21+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Секреты различия рыжих и серых белок",
+      "text": "Хотя белок часто пытаются различать по цвету, самый надежный способ их идентифицировать — посмотреть на хвост. У серых белок кончик меха на хвосте имеет характерный белый цвет, создающий эффект мерцания, тогда как у рыжих белок хвост окрашен равномерно.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/mammals/red-squirrel-vs-grey-squirrel-differences",
+        "title": "Red squirrel vs grey squirrel: Think you know how they differ? Think again as the differences between these two squirrels will surprise you",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2025-11-08T12:36:14+00:00"
+      }
+    }
+  ],
+  "light_count": 3,
+  "homepage_hash": "fce1fabd77175889d252293c6c8d7b0d96b9a8c11b2f56d1a9d5296904a00022",
+  "overview_hash": "0670b4a822adfbb10a083e0fee745c7dbea412e6fdf679454b555d3a022d618b",
+  "markdown_hash": "f62d2652bca43235fad743516420f7a268d31f37572a0455cc933a9886552963"
+}
