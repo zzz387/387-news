@@ -154,4 +154,11 @@ class Policy44Tests(unittest.TestCase):
         self.assertTrue(result['verified']);self.assertEqual(api.posts[0][1]['inputs']['phase'],'run')
         self.assertEqual(len(api.posts),1)
 
+
+    def test_restored_legacy_news_keep_date_checks_and_titles_are_own(self):
+        s=issue(8,1);row=s['light43']['records'][0];row['checks']['final43'].update(is_news=True,event_date='2099-01-01')
+        self.assertEqual(light43.ready(s),[])
+        src,item=response_item();src['title']=item['title']='Долгая история необычного открытия в музее'
+        with self.assertRaisesRegex(ValueError,'BRIEF_COPIED_TITLE'):brief.accept(item,src)
+
 if __name__=='__main__':unittest.main()

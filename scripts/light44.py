@@ -30,7 +30,7 @@ def ready(state):
     from scripts import light43
     result=[];published=set(state.get('stock43',{}).get('published_urls',[]));mains=sel.ready(state)
     for row in state.get('light43',{}).get('records',[]):
-        if not (eligible(row) or e.eligible(row)):continue
+        if not eligible(row) and (not e.eligible(row) or e.news_errors(row.get('checks',{}).get('final43',{}),row,state)):continue
         if row['source']['url'] in published:continue
         try:rights41.require(row['source'],'INDEPENDENT_ARTICLE',rights41.decision(row['source'],'INDEPENDENT_ARTICLE'))
         except p.Blocked:continue
@@ -42,6 +42,7 @@ def accept(item,source):
     title=item['title'].strip();text=item['text'].strip()
     if not title or not text or len(re.split(r'(?<=[.!?])\s+(?=[А-ЯA-Z])',text))>3:raise p.Blocked('BRIEF_FORMAT')
     if dangerous(title+' '+text):raise p.Blocked('BRIEF_UNSAFE')
+    if content41.normalized(title)==content41.normalized(source.get('title','')) and len(title.split())>=5:raise p.Blocked('BRIEF_COPIED_TITLE')
     if not source.get('full_text_verified') or source.get('metadata_status')!='verified':raise p.Blocked('BRIEF_SOURCE_UNVERIFIED')
     source41_url=__import__('scripts.source41',fromlist=['safe_url']);source41_url.safe_url(source['url'])
     grant=rights41.decision(source,'INDEPENDENT_ARTICLE');rights41.require(source,'INDEPENDENT_ARTICLE',grant)
