@@ -12,6 +12,8 @@ PATTERNS={
 RX={k:re.compile(v,re.I) for k,v in PATTERNS.items()}
 ART=re.compile(r'(?i)картин|худож|живопис|пейзаж|полотн|o.keeffe|painting|artwork')
 POWER=re.compile(r'(?i)электропитан|резервн.{0,15}питан|кухонн.{0,20}техник|бытов.{0,15}(?:техник|прибор)|power supply|battery backup|fridgeguard|электростанц')
+NON_HUMAN=re.compile(r'(?i)мамонт|динозавр|осминог|собак|кошк|птиц|ворон|ветерин|экосистем|животн|mammoth|dinosaur|octopus|\bdogs?\b|\bcats?\b|\bbirds?\b|veterinar|animal')
+HUMAN_TITLE=re.compile(r'(?i)человек|люд|для (?:детей|родителей|взрослых)|развити.{0,12}дет|human|people|adult|parenting|your|you\b')
 COMPUTING=re.compile(r'(?i)обучени.{0,12}(?:модел|нейросет)|трениров.{0,12}(?:модел|нейросет)|model training|machine learning')
 
 def active(state):return state.get('policy_version')=='4.4' and not state.get('special43_revision')
@@ -30,6 +32,7 @@ def subject(row):
         supported=(t and hits and share>=.1) or (h and hits>=2 and share>=.15) or (hits>=3 and share>=.25 and rx.search(body[:1000]))
         if (row.get('article') or body) and not supported:continue
         if not row.get('article') and not body and not (t or h):continue
+        if NON_HUMAN.search(title+' '+teaser) and not HUMAN_TITLE.search(title):continue
         if group=='family' and re.search(r'(?i)child process|parent process|parent company|parent corporation|родительск.{0,15}(?:процесс|класс)|дочерн.{0,10}процесс|материнск.{0,10}компани',title):continue
         if group=='family' and ART.search(title) and not rx.search(title):continue
         if group=='health' and POWER.search(title):continue

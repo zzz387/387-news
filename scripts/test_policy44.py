@@ -338,4 +338,16 @@ class Policy44Tests(unittest.TestCase):
         for title,text in [('Healthy teeth and gums','Brush your teeth. Dental care matters. Your dentist can help with oral hygiene.'),('Best way to wash your hands','Handwashing is ordinary hygiene. Wash your hands carefully. Handwashing helps reduce spread.')]:
             self.assertEqual(v.subject({'source':{'title':title,'blocks':[{'text':text}]}}),'health')
 
+
+    def test_animal_topics_do_not_fill_human_health_family_or_sport_places(self):
+        for title,text in [('Зубы мамонта','Зубы мамонта. Зубы мамонта. Зубы мамонта.'),('Родительская забота у птиц','Родители птиц кормят птенцов. Родители птиц заботятся о птенцах. Родители птиц строят гнездо.'),('Тренировки для собак','Тренировки для собак. Бег собак. Спортивные тренировки собак.')]:
+            self.assertIsNone(v.subject({'article':{'title':title,'blocks':[{'text':text}]}}))
+
+
+    def test_ordinary_prevention_is_not_disease_treatment_but_clinical_claims_remain_risky(self):
+        for title in ['Мытьё рук помогает снижать риск заболеваний','Следует поддерживать обычную гигиену для профилактики болезней','Как контролировать сердечный ритм на обычной тренировке']:
+            self.assertFalse(e.high_risk(named(title)))
+        for title in ['Рекомендации по нагрузкам при сердечных заболеваниях','Как выполнять упражнения при болезни','Йога лечит все болезни','Диета предотвращает инфаркт','Принимайте препарат ежедневно']:
+            self.assertTrue(e.high_risk(named(title)))
+
 if __name__=='__main__':unittest.main()

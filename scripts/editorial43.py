@@ -81,7 +81,7 @@ def fingerprint(record):
 
 
 
-RISK_VERSION=4
+RISK_VERSION=5
 
 def risk_codes(record):
     """Content risk, never a publisher/category/previous boolean attestation."""
@@ -95,11 +95,12 @@ def risk_codes(record):
     def has(pattern):return bool(re.search(pattern,text,re.I))
     advice=has(r'рекоменд|совет|следует|нужно|приним|примите|дава[йи]|дайте|приём|прием|выполня|попробуй|сделайте|избег|лечи|дозиров|how to|should|recommend|advice|take |taking |avoid|perform|try |dose|dosage')
     historical=bool(re.search(r'(?i)история|историческ|history|historical',str(article.get('title') or source.get('title') or record.get('title',''))))
-    clinical=has(r'клиническ.{0,20}(?:исслед|эффектив|испыт)|clinical trial|randomi[sz]ed|рандомиз') or (advice and has(r'лечени|treatment|therapy|therapeutic') and has(r'заболеван|болезн|disease|пациент|patient'))
-    disease=has(r'заболеван|болезн|диабет|гипертон|астм|сердечн|инфаркт|эпилеп|disease|diabet|hypertens|asthma|cardiac|heart failure|cancer')
+    clinical=has(r'клиническ.{0,20}(?:исслед|эффектив|испыт)|clinical trial|randomi[sz]ed|рандомиз') or has(r'\b(?:лечит|лечат|лечите|вылечит|вылечат|вылечите|исцеляет|исцелите)\b|\bcures?\b|\btreats?\b') or (advice and has(r'лечени|treatment|therapy|therapeutic') and has(r'заболеван|болезн|disease|пациент|patient'))
+    disease=has(r'диабет|гипертон|астм|сердечн.{0,15}(?:заболеван|болезн|недостаточн|приступ)|(?:болезн|заболеван).{0,12}сердц|инфаркт|эпилеп|аритми|diabet|hypertens|asthma|cardiac disease|heart (?:failure|disease|attack)|cancer')
+    illness_condition=has(r'(?:при|если).{0,25}(?:заболеван|болезн)|when.{0,15}ill|if you.{0,20}(?:ill|disease)')
     medicine=has(r'лекарств|препарат|таблет|инъекц|дозиров|доз[аеуы]|dosage|medication|drug\b|injection')
     if (clinical or medicine) and (not historical or advice):codes.append('CLINICAL_OR_MEDICATION')
-    if disease and (advice or has(r'снижа[ею]т|повыша[ею]т|предотвращ|риск|reduces?|increases?|prevents?|risk')):codes.append('DISEASE_ADVICE_OR_CLAIM')
+    if (disease and (advice or has(r'снижа[ею]т|повыша[ею]т|предотвращ|риск|reduces?|increases?|prevents?|risk'))) or (illness_condition and advice):codes.append('DISEASE_ADVICE_OR_CLAIM')
     if has(r'младен|новорожд|малыш|infant|newborn|baby|babies|toddler') and has(r'корм|прикорм|питан|feed|fever|лечени|лечить|лечи|медицин|medical|лихорад|высок.{0,12}температур|при температур|затруднен.{0,12}дыхан|sids|синдром.{0,15}внезапн.{0,10}смерт|безопасн.{0,10}сон|sleep safety|sleep position|(?:спать|укладыва).{0,25}(?:живот|бок)'):codes.append('INFANT_HEALTH')
     if has(r'противопоказ|contraindicat|опасн.{0,30}(?:упражнен|нагруз|поз)|dangerous exercise|встаньте на голову|стойк.{0,10}на голове|headstand|breath.hold|задерж.{0,12}дыхан|перев[её]рнут.{0,15}асан|поз.{0,8}плуга') and advice:codes.append('DANGEROUS_EXERCISE')
     if has(r'банкрот|списани.{0,10}долг|судебн.{0,15}практик|правов.{0,15}совет|юридич|bankruptcy|legal advice|debt discharge|investment advice|инвестиц') and (advice or not has(r'история|history of')):codes.append('LEGAL_OR_FINANCIAL_ADVICE')
