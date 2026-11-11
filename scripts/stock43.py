@@ -120,6 +120,7 @@ def draw(state,root,now,target=None):
         plan=sel.order(dict(state,candidates=selected+proxies),history,limit=1)
         if not plan:break
         row=next(r for r in pending if identity(r)==identity(plan[0]));pending.remove(row)
+        if policy44.active(state) and row.get('stock_prepared_for')==state['date'] and len(selected)>=e.CONFIG['minimum_articles'] and all(n>=2 for n in policy44.counts(selected).values()):continue
         previous=next((r for r in state['candidates'] if r['url']==row['url']),None)
         if previous is not None and previous.get('status')!='reserve_ready':continue
         if any(sel.duplicate(row,r) for r in selected+history):continue

@@ -179,4 +179,21 @@ class Policy44Tests(unittest.TestCase):
             tomorrow=issue(8,0);tomorrow['date']='2026-10-28';stock43.merge(tomorrow,restored['stock43']);stock43.draw_light(tomorrow,target)
             self.assertEqual(len(light43.ready(tomorrow)),1)
 
+
+    def test_explicit_main_stock_does_not_reenter_the_current_issue(self):
+        s=issue(16);row=main_row(40);row['stock_prepared_for']=s['date'];self.assertTrue(stock43.bank(s,row,NOW))
+        with tempfile.TemporaryDirectory() as temp:
+            target=root(temp);stock43.draw(s,target,NOW)
+            self.assertEqual(len(sel.composition(s)),16);self.assertEqual(stock43.report(s)['ready_articles'],1)
+            tomorrow=issue(8);tomorrow['date']='2026-10-28';stock43.merge(tomorrow,s['stock43']);stock43.draw(tomorrow,target,NOW)
+            self.assertEqual(len(sel.composition(tomorrow)),9)
+    def test_main_stock_commissioning_preserves_uncapped_current_issue(self):
+        from scripts import daily43
+        s=issue(20);pending=main_row(40);pending.update(id='future-article',status='discovered');s['candidates'].append(pending)
+        class Editor:
+            def finish(self,state,row):row['status']='ready'
+        with tempfile.TemporaryDirectory() as temp,patch.object(daily43,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+            daily43.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5),editor=Editor())
+        self.assertEqual(len(sel.composition(s)),20);self.assertEqual(stock43.report(s)['ready_articles'],1)
+
 if __name__=='__main__':unittest.main()

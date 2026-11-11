@@ -109,7 +109,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         attempted_ids=set();extra_searches=0
         while True:
             stock43.balance(state,root,clock())
-            banking=not active44 and len(selection43.composition(state))>=e.CONFIG['article_target']
+            banking=len(selection43.composition(state))>=e.CONFIG['article_target'] and (not active44 or all(n>=2 for n in policy44.counts(selection43.composition(state)).values()))
             main_groups={g:sum(priorities43.classify(r)['group']==g for r in selection43.composition(state)) for g in ('A','C')}
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
             if active44:
@@ -142,7 +142,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 break
             attempted_ids.add(record['id'])
             count=len(selection43.composition(state))
-            banking=not active44 and count>=e.CONFIG['article_target'] and main_groups.get(priorities43.classify(record)['group'],2)>=2
+            banking=count>=e.CONFIG['article_target'] and (all(n>=2 for n in policy44.counts(selection43.composition(state)).values()) if active44 else main_groups.get(priorities43.classify(record)['group'],2)>=2)
             if due and count>=minimum and (not active44 or policy44.standard(state)['compliant']):break
             if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):break
             if (not active44 and not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
@@ -160,6 +160,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                         record['status']='discovered';persist();continue
                     if any(selection43.duplicate(record,r) for r in selection43.composition(state)+(stock43.available(state,date) if banking else [])):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
+                if active44:
+                    if banking:record['stock_prepared_for']=state['date']
+                    else:record.pop('stock_prepared_for',None)
+                    persist()
                 editor.finish(state,record)
                 if banking:stock43.bank(state,record,clock())
                 peers=[r for r in e.select_ready(state) if r is not record and selection43.duplicate(record,r)]

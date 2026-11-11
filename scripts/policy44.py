@@ -75,7 +75,12 @@ def migrate(state):
     return state
 
 def publisher_order(rows,state):
-    wanted={g for g,n in counts(__import__('scripts.selection43',fromlist=['ready']).ready(state)).items() if n<2}
+    from scripts import selection43,stock43
+    current=selection43.ready(state)
+    # Once this issue's six subject places are covered, replenish that same mix
+    # in the existing reserve. This changes commissioning, never publication size.
+    planned=stock43.available(state,state['date']) if all(n>=2 for n in counts(current).values()) else current
+    wanted={g for g,n in counts(planned).items() if n<2}
     ids={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}};pending=list(rows);selected=[]
     for group in sorted(wanted):
         options=[r for r in pending if ids[group]&set(r.get('priority_ids',[]))]
