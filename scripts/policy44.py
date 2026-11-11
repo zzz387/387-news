@@ -3,11 +3,12 @@ import copy,re
 from collections import Counter
 from scripts import policy41 as p
 
+REVISION=3
 GROUPS=('family','health','sport')
 PATTERNS={
- 'family':r'воспитан|родител|реб[её]н|дет[иеяй]\b|дошколь|школьни|супруж|семейн.{0,18}(?:игр|традиц|отношен|досуг|занят)|parent(?:ing|s)?\b|children|child development|family (?:activit|relationship|game|tradition)|marital|marriage',
+ 'family':r'воспитан|родител|реб[её]н|дет(?:и|ей|ям|ьми|ях)\b|детск|детств|дошколь|школьни|супруж|супруг|материнств|отцовств|\bбрак\b|marital relationship|couple relationship|married|семейн.{0,18}(?:игр|традиц|отношен|досуг|занят)|parent(?:ing|s)?\b|children|child(?:hood|care)?\b|kids?\b|child development|family (?:activit|relationship|game|tradition)|marital|marriage',
  'health':r'здоров.{0,12}питан|рацион|нутриц|диет|пищев|долголет|медицин|лечени|клиническ|профилакт|заболеван|(?:режим|качество|недостаток|гигиена).{0,12}сн|\bсон\b|\bсна\b|здоров(?:ье|ья|ью)|human health|healthy (?:eating|diet|habits)|public health|healthcare|nutrition|dietary|medicine|clinical|disease|longevity|sleep|cardiovascular',
- 'sport':r'велосип|велоспорт|веломаршрут|йог|подвижност|растяжк|гибкост|кардио|вынослив|трениров|физическ.{0,18}(?:активност|нагруз)|спорт(?:ивн|смен)|бегун|марафон|триатлон|силов.{0,12}нагруз|physical (?:activity|exercise|training)|cycling|yoga|workout|endurance|aerobic|running|stretching|strength training'}
+ 'sport':r'велосип|велоспорт|веломаршрут|йог|подвижност|растяжк|гибкост|кардио|вынослив|трениров|физическ.{0,18}(?:активност|нагруз)|спорт(?:а|ом|у|е)?\b|спорт(?:ивн|смен)|\bбег(?:а|ом)?\b|ходьб|плаван|гимнастик|exercise|fitness|walking|swimming|pilates|mobility|бегун|марафон|триатлон|силов.{0,12}нагруз|physical (?:activity|exercise|training)|cycling|yoga|workout|endurance|aerobic|running|stretching|strength training'}
 RX={k:re.compile(v,re.I) for k,v in PATTERNS.items()}
 ART=re.compile(r'(?i)картин|худож|живопис|пейзаж|полотн|o.keeffe|painting|artwork')
 POWER=re.compile(r'(?i)электропитан|резервн.{0,15}питан|кухонн.{0,20}техник|бытов.{0,15}(?:техник|прибор)|power supply|battery backup|fridgeguard|электростанц')
@@ -26,7 +27,10 @@ def subject(row):
     for group,rx in RX.items():
         t=len(rx.findall(title));h=len(rx.findall(teaser));hits=sum(bool(rx.search(s)) for s in sentences)
         if row.get('article') and not ((t and hits and hits/max(1,len(sentences))>=.3) or (h and hits>=2 and hits/max(1,len(sentences))>=.4) or (hits>=3 and hits/max(1,len(sentences))>=.65)):continue
-        if not row.get('article') and not (t or h or hits>=2):continue
+        if not row.get('article'):
+            if body and not ((t and hits and hits/max(1,len(sentences))>=.3) or (h and hits>=2 and hits/max(1,len(sentences))>=.4) or (hits>=3 and hits/max(1,len(sentences))>=.65)):continue
+            if not body and not (t or h):continue
+        if group=='family' and re.search(r'(?i)child process|parent process|parent company|parent corporation|родительск.{0,15}(?:процесс|класс)|дочерн.{0,10}процесс|материнск.{0,10}компани',title):continue
         if group=='family' and ART.search(title) and not rx.search(title):continue
         if group=='health' and POWER.search(title):continue
         if group=='sport' and COMPUTING.search(title) and not re.search(r'(?i)велосип|йог|бегун|спортсмен|athlete|cycl',title):continue
@@ -74,13 +78,19 @@ def migrate(state):
     if previous!='4.4':state.setdefault('history',[]).append({'code':'POLICY44_MIGRATION','previous':previous,'accepted_text_and_quota_preserved':True})
     return state
 
+def search_deficits(state):
+    from scripts import selection43,stock43
+    current=selection43.ready(state)
+    planned=stock43.available(state,state['date']) if all(n>=2 for n in counts(current).values()) else current
+    return {g:max(0,2-n) for g,n in counts(planned).items()}
+
 def publisher_order(rows,state):
-    wanted={g for g,n in counts(__import__('scripts.selection43',fromlist=['ready']).ready(state)).items() if n<2}
+    wanted={g for g,n in search_deficits(state).items() if n}
     ids={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}};pending=list(rows);selected=[]
     for group in sorted(wanted):
         options=[r for r in pending if ids[group]&set(r.get('priority_ids',[]))]
         if options:
-            row=min(options,key=lambda r:(-r.get('availability',{}).get('full_originals_verified',0),-r.get('editorial_priority',50)))
+            row=min(options,key=lambda r:(-len(ids[group]&set(r.get('priority_ids',[])))/max(1,len(r.get('priority_ids',[]))),-r.get('availability',{}).get('full_originals_verified',0),-r.get('editorial_priority',50)))
             pending.remove(row);selected.append(dict(row,search_group=group))
     return selected+[dict(r,**({'search_group':None} if r.get('search_group') else {})) for r in pending]
 

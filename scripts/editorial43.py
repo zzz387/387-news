@@ -81,7 +81,7 @@ def fingerprint(record):
 
 
 
-RISK_VERSION=3
+RISK_VERSION=4
 
 def risk_codes(record):
     """Content risk, never a publisher/category/previous boolean attestation."""
@@ -100,12 +100,17 @@ def risk_codes(record):
     medicine=has(r'лекарств|препарат|таблет|инъекц|дозиров|доз[аеуы]|dosage|medication|drug\b|injection')
     if (clinical or medicine) and (not historical or advice):codes.append('CLINICAL_OR_MEDICATION')
     if disease and (advice or has(r'снижа[ею]т|повыша[ею]т|предотвращ|риск|reduces?|increases?|prevents?|risk')):codes.append('DISEASE_ADVICE_OR_CLAIM')
-    if has(r'младен|новорожд|малыш|infant|newborn|baby|babies|toddler') and has(r'корм|прикорм|питан|сон|сна|спать|дыхани|температур|health|sleep|feed|breath|fever|лечени|медицин|medical'):codes.append('INFANT_HEALTH')
+    if has(r'младен|новорожд|малыш|infant|newborn|baby|babies|toddler') and has(r'корм|прикорм|питан|feed|fever|лечени|лечить|лечи|медицин|medical|лихорад|высок.{0,12}температур|при температур|затруднен.{0,12}дыхан|sids|синдром.{0,15}внезапн.{0,10}смерт|безопасн.{0,10}сон|sleep safety|sleep position|(?:спать|укладыва).{0,25}(?:живот|бок)'):codes.append('INFANT_HEALTH')
     if has(r'противопоказ|contraindicat|опасн.{0,30}(?:упражнен|нагруз|поз)|dangerous exercise|встаньте на голову|стойк.{0,10}на голове|headstand|breath.hold|задерж.{0,12}дыхан|перев[её]рнут.{0,15}асан|поз.{0,8}плуга') and advice:codes.append('DANGEROUS_EXERCISE')
     if has(r'банкрот|списани.{0,10}долг|судебн.{0,15}практик|правов.{0,15}совет|юридич|bankruptcy|legal advice|debt discharge|investment advice|инвестиц') and (advice or not has(r'история|history of')):codes.append('LEGAL_OR_FINANCIAL_ADVICE')
     return codes
 
 def high_risk(record):return bool(risk_codes(record))
+
+def source_risk_may_wait(record):
+    # A C article can cover the ordinary part of a broader original. Its actual
+    # generated title/body MUST pass the full risk gate before any final approval.
+    return not record.get('article') and record.get('mode','INDEPENDENT_ARTICLE')=='INDEPENDENT_ARTICLE' and not risk_codes({'title':record.get('title') or record.get('source',{}).get('title',''),'summary':record.get('summary','')})
 
 
 def safety_sources_valid(record):
@@ -269,7 +274,10 @@ class Editor(old.Editor):
                     record.setdefault('history',[]).append({'code':getattr(exc,'code',type(exc).__name__),'stage':'supporting_source','url':url})
                     self.persist()
             sources=[source]+extra
-            if len({old.publisher_identity(s['url']) for s in sources})<2 or not any(old.host_matches(s['url'],old.TRUSTED) for s in sources):raise p.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
+            if len({old.publisher_identity(s['url']) for s in sources})<2 or not any(old.host_matches(s['url'],old.TRUSTED) for s in sources):
+                if source_risk_may_wait(record):record['source_risk_pending']=True
+                else:raise p.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
+        if record.get('article'):record.pop('source_risk_pending',None)
         record['checks']['source43']={'approved':True};self.persist()
 
     def finish(self,state,record):
@@ -289,7 +297,7 @@ class Editor(old.Editor):
                             'Не заимствуй авторские примеры и подборки. Не обещай 21 занятие только потому, что такое число есть в чужом заголовке. '
                             'Заголовок — естественный, выразительный и точный, в культуре качественного журнала. Чередуй конструкции, не копируй чужой заголовок и не создавай кликбейт. Слово «Как» допустимо, но стремись к2–3 таким началам на12 материалов; стилистика не причина отказа и не требует отдельного запроса. '
                             'Заголовок должен соответствовать фактически раскрытому аспекту. Не давай рискованные советы без доказательной базы; '
-                            'не придумывай цифры и даты, различай дату публикации и события, корреляцию и причинность. '
+                            'не придумывай цифры и даты, различай дату публикации и события, корреляцию и причинность. Практическое объяснение о семье или движении не превращай в оперативную новость: не добавляй сегодня, недавно или новое исследование без прямого подтверждения. Не вводи в обычную семейную или спортивную статью медицинские советы. '
                             'Для медицинских исследований укажи дизайн и ограничения, не подменяй исследование пресс-релизом. '
                             'finished=true только для законченной заметки. URL только в служебном блоке источника, не в тексте. '
                             '\nПолные материалы: '+json.dumps(self.writing_basis(record),ensure_ascii=False)+
@@ -319,6 +327,7 @@ class Editor(old.Editor):
             article.setdefault('mode',record['mode']);article.setdefault('category',record['category']);article.setdefault('kind',record['kind'])
             fp=fingerprint(record)
             if eligible(record):return
+            if progress.get('wire_blocked_hash')==fp:raise p.Blocked('REPEATED_REVIEW_DIAGNOSTIC')
             reviews=progress['review_attempts'];review_key='wire2:'+fp;count=reviews.get(review_key,0)
             if count>=1+CONFIG['repair_attempts']:raise p.Blocked('FINAL_REVIEW_ATTEMPTS_EXHAUSTED')
             sources=[record['source']]+record.get('supporting_sources',[])
@@ -360,6 +369,12 @@ class Editor(old.Editor):
                 record['checks']['final43']=dict(result,approved=True);record['ready_checked_at']=datetime.now(p.TZ).isoformat();record['status']='ready';self.persist();return
             progress['feedback']=copy.deepcopy(result)
             print('[editorial43] '+json.dumps({'code':'FINAL_REJECTED','candidate':record['id'],'attempt':count+1,'approve':result.get('approve'),'failed_checks':[key for key in CHECKS if result.get(key) is not True],'issues_count':len(result.get('issues',[])),'unresolved_count':len(result.get('unresolved',[])),'protocol_errors':protocol_errors,'validation_errors':validation_errors}),flush=True)
+            diagnostics=protocol_errors+validation_errors
+            if diagnostics:
+                previous=progress.get('last_wire_diagnostic')
+                progress['last_wire_diagnostic']={'hash':fp,'codes':diagnostics};self.persist()
+                if previous==progress['last_wire_diagnostic']:
+                    progress['wire_blocked_hash']=fp;self.persist();raise p.Blocked('REPEATED_REVIEW_DIAGNOSTIC')
             if validation_errors==['NEWS_EVENT_TOO_OLD'] and not protocol_errors:
                 # A bound literal establishes an actually stale news date.
                 # Repeating the same audit cannot make this current news.

@@ -109,7 +109,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         attempted_ids=set();extra_searches=0
         while True:
             stock43.balance(state,root,clock())
-            banking=not active44 and len(selection43.composition(state))>=e.CONFIG['article_target']
+            banking=len(selection43.composition(state))>=e.CONFIG['article_target'] and (not active44 or all(n>=2 for n in policy44.counts(selection43.composition(state)).values()))
             main_groups={g:sum(priorities43.classify(r)['group']==g for r in selection43.composition(state)) for g in ('A','C')}
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
             if active44:
@@ -120,6 +120,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 try:catalog43.refresh(state,clock(),shortage=True)
                 except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
                 priorities43.apply_rules(state,clock());persist();continue
+            if active44 and needed and not coverage_pending and len(selection43.composition(state))>=e.CONFIG['article_target']:break
             coverage_needed=bool(coverage_pending) if active44 else banking and bool(coverage_pending)
             plan_state=state
             if coverage_needed:
@@ -142,9 +143,11 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 break
             attempted_ids.add(record['id'])
             count=len(selection43.composition(state))
-            banking=not active44 and count>=e.CONFIG['article_target'] and main_groups.get(priorities43.classify(record)['group'],2)>=2
+            banking=count>=e.CONFIG['article_target'] and (all(n>=2 for n in policy44.counts(selection43.composition(state)).values()) if active44 else main_groups.get(priorities43.classify(record)['group'],2)>=2)
             if due and count>=minimum and (not active44 or policy44.standard(state)['compliant']):break
-            if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):break
+            if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):
+                stock_needed={g for g,n in policy44.counts(stock43.available(state,date)).items() if n<2}
+                if not (active44 and policy44.subject(record) in stock_needed):break
             if (not active44 and not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
@@ -156,10 +159,16 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             try:
                 if isinstance(editor,e.Editor):
                     editor.state=state;editor.usage_record=record;priorities43.attach_evidence(record,state);editor.verify_source(record)
+                    if active44 and coverage_needed and policy44.subject(record) not in needed:
+                        record['status']='discovered';record['history'].append({'code':'SOURCE_SUBJECT_MISMATCH_AFTER_FETCH'});persist();continue
                     if banking and e.high_risk(record):
                         record['status']='discovered';persist();continue
                     if any(selection43.duplicate(record,r) for r in selection43.composition(state)+(stock43.available(state,date) if banking else [])):
                         record['status']='topic_duplicate';record['history'].append({'code':'STORY_DUPLICATE_AFTER_SOURCE'});persist();continue
+                if active44:
+                    if banking:record['stock_prepared_for']=state['date']
+                    else:record.pop('stock_prepared_for',None)
+                    persist()
                 editor.finish(state,record)
                 if banking:stock43.bank(state,record,clock())
                 peers=[r for r in e.select_ready(state) if r is not record and selection43.duplicate(record,r)]
@@ -172,7 +181,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 record['progress']['v43_external_failures']=failures
                 record['history'].append({'code':getattr(exc,'code',type(exc).__name__),'stage':'v43_final'})
                 record['status']='deferred' if isinstance(exc,p.Blocked) or failures>=2 else 'retryable_error'
-                print('[candidate43] '+json.dumps({'id':record['id'],'status':record['status'],'code':getattr(exc,'code',type(exc).__name__)}),flush=True)
+                print('[candidate43] '+json.dumps({'id':record['id'],'status':record['status'],'code':getattr(exc,'code',type(exc).__name__),'draft_present':bool(record.get('article'))}),flush=True)
             persist()
         prepare_light()
     stock43.draw(state,root,clock())

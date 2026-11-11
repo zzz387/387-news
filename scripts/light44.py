@@ -5,6 +5,19 @@ from scripts import policy41 as p,news,content41,rights41,editorial43 as e,selec
 S={'type':'string'}
 news.SCHEMAS['v44_briefs']=content41.schema({'items':{'type':'array','items':content41.schema({'id':S,'source_id':S,'title':S,'text':S,'time_kind':{'type':'string','enum':['news','historical_fact','unusual_fact']},'event_date':S,'evidence':{'type':'array','items':content41.schema({'block_id':S,'quote':S})}})}})
 
+def numbers(text,language):
+    """Equivalent decimal/thousands notation, not permission to invent a number."""
+    from decimal import Decimal,InvalidOperation
+    result=set()
+    for value in re.findall(r'\d+(?:[ \u00a0\u202f]\d{3})*(?:[.,]\d+)*',text):
+        value=re.sub(r'[ \u00a0\u202f]','',value)
+        if str(language).startswith('en'):
+            if re.fullmatch(r'\d{1,3}(?:,\d{3})+(?:\.\d+)?',value):value=value.replace(',','')
+        else:value=value.replace(',','.')
+        try:result.add(Decimal(value))
+        except InvalidOperation:result.add(value)
+    return result
+
 def fingerprint(row):return p.digest({'article':row['article'],'source_hash':row['source']['content_hash'],'rights':row['rights']})
 
 def dangerous(text):
@@ -53,7 +66,7 @@ def accept(item,source):
         witnesses.append(quote)
     if not witnesses:raise p.Blocked('BRIEF_FACT_NOT_BOUND')
     evidence=' '.join(witnesses)
-    if set(re.findall(r'\d+(?:[.,]\d+)?',title+' '+text))-set(re.findall(r'\d+(?:[.,]\d+)?',evidence)):raise p.Blocked('BRIEF_NUMBER_UNSUPPORTED')
+    if numbers(title+' '+text,'ru')-numbers(evidence,source.get('language','en')):raise p.Blocked('BRIEF_NUMBER_UNSUPPORTED')
     own=content41.normalized(text)
     source_expression=content41.normalized(' '.join(b['text'] for b in source['blocks']))
     words=own.split()
@@ -81,7 +94,7 @@ def prepare(state,persist=lambda:None):
     from scripts import light43
     saved=state.setdefault('light43',{'records':[]});saved.setdefault('records',[])
     batch=saved.setdefault('v44',{'completed':[],'refusals':[],'http_requests':0})
-    if batch.get('response') is not None and not batch.get('response_applied'):
+    if batch.get('response') is not None and (not batch.get('response_applied') or batch.get('admission_revision',1)<2):
         apply_response(state,persist);return
     budget=news.runtime.ACTIVE_BUDGET
     if not budget or not budget.can_request():return
@@ -89,7 +102,7 @@ def prepare(state,persist=lambda:None):
     if batch.get('window')==window:return
     from scripts import stock43
     if len(ready(state))>=e.CONFIG.get('light_target',12) and len(stock43.available(state,state['date'],'light'))>=e.CONFIG.get('light_stock_target',40):return
-    excluded=set(state.get('stock43',{}).get('published_urls',[]))|{r['source']['url'] for r in saved['records']}|{r['url'] for r in batch['refusals']}
+    excluded={r['source']['url'] for r in state.get('stock43',{}).get('light',[])}|set(state.get('stock43',{}).get('published_urls',[]))|{r['source']['url'] for r in saved['records']}|{r['url'] for r in batch['refusals']}
     mains=light43.main_work(state);sources=[];publishers={}
     needed={g for g,n in policy44.counts(sel.ready(state)).items() if n<2}
     candidates=sorted(state['candidates'],key=lambda r:(not r.get('for_light_only'),r.get('publisher_id','')))
@@ -103,12 +116,15 @@ def prepare(state,persist=lambda:None):
         sources.append(src);key=row.get('publisher_id') or src.get('publisher');publishers[key]=publishers.get(key,0)+1
     if not sources:return
     # Atomic resume: a completed response is retained before deterministic admission.
+    if batch.get('response') is not None:
+        batch.setdefault('prior_responses',[]).append({k:copy.deepcopy(batch.get(k)) for k in ('response','sources','window','destination','admission_revision')})
     batch.pop('response',None);batch['response_applied']=False
+    batch['destination']='stock' if len(ready(state))>=e.CONFIG.get('light_target',12) else 'issue'
     batch['window']=window;batch['sources']=sources;batch['attempts']=batch.get('attempts',0)+1;persist()
     wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
     old_limit=budget.run_limit;start=budget.used;budget.run_limit=min(old_limit,budget.used+1)
     try:
-        prompt='Подготовь короткую газетную подборку на русском: стремись к8–12 разным сообщениям из этих источников, можно меньше при нехватке фактов. Темы любые, не требуется юмор, доброта, глубина или полный пересказ. Для каждого: короткий собственный заголовок,1–3 собственных предложения, source_id, time_kind news/historical_fact/unusual_fact, event_date (только подтверждённая дата события для news), evidence с block_id и точной непустой цитатой. Сверь каждое утверждение с оригиналом: не выдумывай факты, числа, имена и обстоятельства, не искажай смысл. Собственная композиция и формулировки; не копируй заголовки/аннотации. Исторические факты не выдавай за сегодняшнюю новость. Никаких опасных инструкций, лечения или незаконных советов. Это краткие сообщения, не большие статьи; отдельный литературный аудит не нужен.\n'+json.dumps(wire,ensure_ascii=False)
+        prompt='Подготовь короткую газетную подборку на русском: стремись к8–12 разным сообщениям из этих источников, можно меньше при нехватке фактов. Темы любые, не требуется юмор, доброта, глубина или полный пересказ. Предпочитай самостоятельные конкретные unusual_fact без слов сегодня/недавно/новый, если оригинал не подтверждает свежесть. news только при прямом свидетельстве полной даты события. Для каждого числа приведи в evidence цитату с самим числом: дата публикации и дата события различаются, не добавляй год публикации в содержание как дату события. Для каждого: короткий собственный заголовок,1–3 собственных предложения, source_id, time_kind news/historical_fact/unusual_fact, event_date (только подтверждённая дата события для news), evidence с block_id и точной непустой цитатой. Сверь каждое утверждение с оригиналом: не выдумывай факты, числа, имена и обстоятельства, не искажай смысл. Собственная композиция и формулировки; не копируй заголовки/аннотации. Исторические факты не выдавай за сегодняшнюю новость. Никаких опасных инструкций, лечения или незаконных советов. Это краткие сообщения, не большие статьи; отдельный литературный аудит не нужен.\n'+json.dumps(wire,ensure_ascii=False)
         response=news.gemini(prompt,output_tokens=12000,schema='v44_briefs');batch['response']=response;persist()
     except news.runtime.GenerationPaused as exc:
         batch['code']='BRIEF_API_PAUSED';persist();return
@@ -137,9 +153,18 @@ def apply_response(state,persist=lambda:None):
                     if original:proof['block_id']=original['id']
                     elif found:proof.update(block_id=found[1],quote=found[2])
             src=by_id[item['source_id']];row=accept(item,src)
-            if any(duplicate(row,x) for x in mains+ready(state)+accepted+state.get('_recent_light43',[])):raise p.Blocked('BRIEF_DUPLICATE')
+            if any(duplicate(row,x) for x in mains+ready(state)+accepted+state.get('_recent_light43',[])+state.get('stock43',{}).get('light',[])):raise p.Blocked('BRIEF_DUPLICATE')
             accepted.append(row)
         except (KeyError,TypeError,ValueError,AttributeError) as exc:batch['refusals'].append({'url':by_id.get(item.get('source_id'),{}).get('url',''),'code':getattr(exc,'code','BRIEF_FORMAT')})
-    batch['response_applied']=True
-    saved['records']+=accepted;batch['completed'].append({'window':window,'accepted':len(accepted),'attempts':batch['attempts']});light43.reserve_accepted_sources(state,accepted);persist()
-    print('[brief44] '+json.dumps({'accepted':len(accepted),'ready':len(ready(state)),'refusal_codes':dict(__import__('collections').Counter(r['code'] for r in batch['refusals'])),'http_requests':batch['http_requests']}),flush=True)
+    from scripts import stock43
+    current=[];banked=0
+    for row in accepted:
+        if batch.get('destination')=='stock':
+            row['stock_prepared_for']=state['date']
+            if stock43.bank(state,row,datetime.now(p.TZ),'light'):
+                banked+=1;continue
+        current.append(row)  # News/overflow remains in this issue; nothing is discarded.
+    batch['response_applied']=True;batch['admission_revision']=2
+    batch['banked']=batch.get('banked',0)+banked
+    saved['records']+=current;batch['completed'].append({'window':window,'accepted':len(accepted),'attempts':batch['attempts']});light43.reserve_accepted_sources(state,accepted);persist()
+    print('[brief44] '+json.dumps({'accepted':len(accepted),'ready':len(ready(state)),'banked':banked,'stock_ready':len(stock43.available(state,state['date'],'light')),'refusal_codes':dict(__import__('collections').Counter(r['code'] for r in batch['refusals'])),'http_requests':batch['http_requests']}),flush=True)

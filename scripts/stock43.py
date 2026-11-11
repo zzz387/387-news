@@ -93,7 +93,9 @@ def bank(state,row,now,key='records'):
     compare=light44.duplicate if key=='light' and policy44.active(state) else sel.duplicate
     if any(identity(row)==identity(r) or compare(row,r) for r in rows if not r.get('stock_published')):return False
     cap=e.CONFIG.get('article_stock_target',20) if key=='records' else e.CONFIG.get('light_stock_target',15)
-    if len(available(state,state['date'],key))>=cap:return False
+    if len(available(state,state['date'],key))>=cap:
+        needed={g for g,n in policy44.counts(available(state,state['date'])).items() if n<2}
+        if not (key=='records' and policy44.active(state) and policy44.subject(row) in needed):return False
     saved=copy.deepcopy(row);saved['stock_saved_at']=now.isoformat();saved['stock_published']=False
     rows.append(saved);row['status']='reserve_ready'
     return True
@@ -120,6 +122,7 @@ def draw(state,root,now,target=None):
         plan=sel.order(dict(state,candidates=selected+proxies),history,limit=1)
         if not plan:break
         row=next(r for r in pending if identity(r)==identity(plan[0]));pending.remove(row)
+        if policy44.active(state) and row.get('stock_prepared_for')==state['date'] and len(selected)>=e.CONFIG['minimum_articles'] and all(n>=2 for n in policy44.counts(selected).values()):continue
         previous=next((r for r in state['candidates'] if r['url']==row['url']),None)
         if previous is not None and previous.get('status')!='reserve_ready':continue
         if any(sel.duplicate(row,r) for r in selected+history):continue
@@ -140,6 +143,9 @@ def draw_light(state,root):
     target=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
     from scripts import light44
     for row in available(state,state['date'],'light',include_reserved=True):
+        # A separately commissioned stock batch stays for the following edition.
+        # It may rescue THIS issue only if its eight-note minimum becomes short.
+        if policy44.active(state) and row.get('stock_prepared_for')==state['date'] and len(light43.ready(state))>=e.CONFIG.get('light_minimum',8):continue
         if not policy44.active(state) and len(light43.ready(state))>=target:break
         if any((light44.duplicate if policy44.active(state) else sel.duplicate)(row,r) for r in related):continue
         row['stock_reserved_for']=state['date']
@@ -148,7 +154,8 @@ def draw_light(state,root):
 def bank_light(state,now):
     from scripts import light43
     from scripts import policy44
-    keep=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
+    if policy44.active(state):return  # New batches choose issue/stock BEFORE generation.
+    keep=3
     for row in light43.ready(state,limit=None)[keep:]:bank(state,row,now,'light')
 
 def sync_backlog(state):
