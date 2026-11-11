@@ -232,11 +232,21 @@ class Policy44Tests(unittest.TestCase):
 
 
     def test_decimal_admission_migration_recovers_saved_response_without_api(self):
-        src,item=response_item();src['blocks'][0]['text']='The museum restored 1,000 paintings in its collection.'
+        src,item=response_item();src['language']='en';src['blocks'][0]['text']='The museum restored 1,000 paintings in its collection.'
         item['text']='Музей восстановил 1 000 картин из своего собрания.';item['evidence'][0]['quote']=src['blocks'][0]['text']
         s=issue(8,0);s['light43']['v44']={'sources':[src],'response':{'items':[item]},'response_applied':True,'admission_revision':1,'window':'paid-run','attempts':1,'http_requests':1,'refusals':[{'url':src['url'],'code':'BRIEF_NUMBER_UNSUPPORTED'}],'completed':[]}
         with patch.object(news.runtime,'ACTIVE_BUDGET',None),patch.object(news,'gemini',side_effect=AssertionError('Response already paid')):
             brief.prepare(s);brief.prepare(s)
         self.assertEqual(len(light43.ready(s)),1);self.assertEqual(s['light43']['v44']['http_requests'],1)
+
+
+    def test_source_medical_aside_does_not_force_an_ordinary_c_article_to_be_medical(self):
+        row=main_row(0);article=row.pop('article');row['title']=row['source']['title']='Семейные игры'
+        row['source']['blocks'].append({'id':'aside','text':'A clinical trial described medication effects in patients.','kind':'paragraph'})
+        row['checks'].pop('final43');row['mode']='INDEPENDENT_ARTICLE'
+        editor=e.Editor();editor.verify_source(row);self.assertTrue(row['source_risk_pending'])
+        row['article']=article;editor.verify_source(row);self.assertFalse(e.high_risk(row))
+        row['article']['title']='Дайте ребёнку лекарство'
+        with self.assertRaisesRegex(ValueError,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):editor.verify_source(row)
 
 if __name__=='__main__':unittest.main()

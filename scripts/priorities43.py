@@ -194,7 +194,7 @@ def reconsider_evidence(state):
         failures=[h.get('code') for h in row.get('history',[]) if h.get('stage')=='v43_final']
         if not failures or failures[-1] not in ('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED','SAFETY_EVIDENCE_INCOMPLETE'):continue
         row['support_basis43']=basis;attach_evidence(row,state)
-        if editorial43.safety_sources_valid(row):
+        if editorial43.safety_sources_valid(row) or editorial43.source_risk_may_wait(row):
             row['status']='preparing';row['history'].append({'code':'NEW_INDEPENDENT_EVIDENCE_AVAILABLE','stage':'source43'})
 
 

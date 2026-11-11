@@ -107,6 +107,11 @@ def risk_codes(record):
 
 def high_risk(record):return bool(risk_codes(record))
 
+def source_risk_may_wait(record):
+    # A C article can cover the ordinary part of a broader original. Its actual
+    # generated title/body MUST pass the full risk gate before any final approval.
+    return not record.get('article') and record.get('mode','INDEPENDENT_ARTICLE')=='INDEPENDENT_ARTICLE' and not risk_codes({'title':record.get('title') or record.get('source',{}).get('title',''),'summary':record.get('summary','')})
+
 
 def safety_sources_valid(record):
     if not high_risk(record):return True
@@ -269,7 +274,10 @@ class Editor(old.Editor):
                     record.setdefault('history',[]).append({'code':getattr(exc,'code',type(exc).__name__),'stage':'supporting_source','url':url})
                     self.persist()
             sources=[source]+extra
-            if len({old.publisher_identity(s['url']) for s in sources})<2 or not any(old.host_matches(s['url'],old.TRUSTED) for s in sources):raise p.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
+            if len({old.publisher_identity(s['url']) for s in sources})<2 or not any(old.host_matches(s['url'],old.TRUSTED) for s in sources):
+                if source_risk_may_wait(record):record['source_risk_pending']=True
+                else:raise p.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
+        if record.get('article'):record.pop('source_risk_pending',None)
         record['checks']['source43']={'approved':True};self.persist()
 
     def finish(self,state,record):

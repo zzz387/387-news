@@ -181,7 +181,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 record['progress']['v43_external_failures']=failures
                 record['history'].append({'code':getattr(exc,'code',type(exc).__name__),'stage':'v43_final'})
                 record['status']='deferred' if isinstance(exc,p.Blocked) or failures>=2 else 'retryable_error'
-                print('[candidate43] '+json.dumps({'id':record['id'],'status':record['status'],'code':getattr(exc,'code',type(exc).__name__)}),flush=True)
+                print('[candidate43] '+json.dumps({'id':record['id'],'status':record['status'],'code':getattr(exc,'code',type(exc).__name__),'draft_present':bool(record.get('article'))}),flush=True)
             persist()
         prepare_light()
     stock43.draw(state,root,clock())
