@@ -1,0 +1,93 @@
+{
+  "date": "2026-11-11",
+  "number": 18,
+  "policy_version": "4.3",
+  "article_count": 12,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "6f4607a8394abf76bf5061c1f691aa1210f2332de7ed7f915a9a40e7ddf12378",
+      "markdown": "fcec4ba04893bbf7ba824a258464f99171168b20c34096f3cb1ee0e5a3998ac4"
+    },
+    "feature-02": {
+      "html": "05e282ed9aca25c06589c02ba1f122815ee2a6742275a0180c94f3b84fb867f6",
+      "markdown": "72432c79f2ed566e593143e37fafb7ed03cc3dae1523de64fbaacd0026bf2ed7"
+    },
+    "feature-03": {
+      "html": "1c9ebd134ec161e38ed7df5edacfa67e23f932e994b8e1a35031d4c274acc17b",
+      "markdown": "3acd2df073e67e3627bba8fa74f1a95edbfc0239b5cf2a46693b97b66dc227cb"
+    },
+    "feature-04": {
+      "html": "f06abb5837eda63bd12bcf5466d86cb93fa31a493e6fe9b7b7e21aa3946deeec",
+      "markdown": "85249305be3f261318811d1ce388e1f5a7c58c44fdd4c2f33ed79c57218e3bdb"
+    },
+    "feature-05": {
+      "html": "b061b4efe56a9440ff60468445dfe607605a5619b2faae98f014d7fac19fb051",
+      "markdown": "17babbf376e234bd3b29a4e896890d2bb315060edeafde40570286a459fc39ab"
+    },
+    "feature-06": {
+      "html": "59282df9937992c10a2cc5b0456497e114ff0114a9e8dde8bea79564b961790d",
+      "markdown": "469083e71ac8f8777cae1ff9e7a2c46d7f3069056777a905641132840d6afbbd"
+    },
+    "feature-07": {
+      "html": "36b2bd51af5bb9f817d5b24721f245af905af8693629bcb1cead7dd80db6bea3",
+      "markdown": "0c2fa685a46876b742c9376a259172d3a12efbe5f7bf2fa64835c6853ad8664e"
+    },
+    "feature-08": {
+      "html": "e27adf9c867886202fff77547e6da09a57dd086e198eba3ecc2755d4a73730a7",
+      "markdown": "acc683dd1bd940c3aab90aa6bd44dd2ea2abf5fce2dd0dc72f634040b09dd316"
+    },
+    "feature-09": {
+      "html": "91d270f9c2414bcb659558a5f0862f9260c85df0a9c0544cf030c27182e17036",
+      "markdown": "fc64e8be9a13ab0f0cac76665fcaf5baf0795888a6bb45fc967a2870c09150ce"
+    },
+    "feature-10": {
+      "html": "65b9b2d57d58c371a3f1a9cdbd226aacb97bf8c58f086d4d20c0ed25171a133e",
+      "markdown": "329d60b90dfb38228b92c14f098d7f899a42cfd5bff208281302b90cc6c244fe"
+    },
+    "feature-11": {
+      "html": "37006576878601ea41ecf0ac3bd283041f65c3902c9f9300117ac490fa519049",
+      "markdown": "28bb4ed146d2cc88c5c98430377e473b4c4e8ae4cf1cf6a61ea6d27a3d88e0d8"
+    },
+    "feature-12": {
+      "html": "3ec5efeb1514447260c6c04a4565cc090155593e132d27a84da1ed6e2d1078a7",
+      "markdown": "316aefb84b7eb72bcad96541a6fac3230d08b84969fd53734f0bea1c649ae9a0"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-11T05:55:22.894722+03:00",
+  "release_not_before": "2026-11-11T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Секретный код орнитологов",
+      "text": "Любители птиц часто используют сокращения и прозвища для обозначения видов, чтобы быстрее обмениваться информацией в полевых условиях. Например, малых зуйков называют LRP, длиннохвостых неясытей — «Лео», а пятнистых коньков — OBP.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/how-to/identify-wildlife/how-to-understand-birders-language",
+        "title": "LRPs, PG Tips and Jizz: Cracking the secret language of birders",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2025-08-27T11:06:08+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Сверхспособности сапсана при пикировании",
+      "text": "Чтобы безопасно дышать при скоростном пикировании, достигающем 290 км/ч, сапсаны имеют в ноздрях специальные костные выступы — бугорки. Они замедляют поток воздуха и помогают птице справляться с резкими перепадами давления.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/peregrine-falcon-facts",
+        "title": "It's the fastest animal in the world and its deadly claws can catch prey mid-air: Meet one of the world's most incredible birds of prey",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2025-07-19T19:48:40+00:00"
+      }
+    }
+  ],
+  "light_count": 2,
+  "homepage_hash": "223d195a97d4f8c7ebe9418f8df37b35d83f44efb3c4c0567c5ab1b3268b0b83",
+  "overview_hash": "185621462dffe32025ef12a51f71407e68c2ceeceeb34670a1be911e9b14a428",
+  "markdown_hash": "e1a39e9fb5bdfc7370346ca7036de3091bc1e6e4e9566158835c1a8b5639183e"
+}
