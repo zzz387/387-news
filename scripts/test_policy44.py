@@ -133,4 +133,15 @@ class Policy44Tests(unittest.TestCase):
         self.assertEqual(call.call_count,1);self.assertEqual(budget.used,1);self.assertEqual(s['light43']['v44']['http_requests'],1)
         self.assertEqual(len(brief.ready(s)),1)
 
+
+    def test_due_deficit_creates_existing_safe_incident(self):
+        from scripts import release_monitor as monitor
+        calls=[]
+        def github(method,path,payload=None):
+            calls.append((method,path,payload));return [] if method=='GET' else {}
+        status=monitor.evaluate(Path('/nonexistent'),{'date':NOW.date().isoformat(),'block_code':'EDITORIAL_STANDARD_NOT_MET'},NOW,check_public=lambda **kw:(_ for _ in ()).throw(ValueError('No issue')))
+        self.assertEqual(status['code'],'EDITORIAL_DEFICIT');self.assertTrue(status['alert'])
+        self.assertEqual(monitor.incident(status['date'],status['code'],False,request=github),'created')
+        self.assertNotIn('source',str(calls[-1][2]).lower())
+
 if __name__=='__main__':unittest.main()

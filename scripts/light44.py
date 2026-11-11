@@ -8,7 +8,7 @@ news.SCHEMAS['v44_briefs']=content41.schema({'items':{'type':'array','items':con
 def fingerprint(row):return p.digest({'article':row['article'],'source_hash':row['source']['content_hash'],'rights':row['rights']})
 
 def dangerous(text):
-    return bool(re.search(r'(?i)(?:принимайте|дайте|дозиров|лечите|inject|take.{0,15}dose|как изготовить.{0,15}(?:бомб|яд))',text))
+    return bool(re.search(r'(?i)(?:(?:принимайте|дайте|введите).{0,50}(?:лекарств|препарат|таблет|доз|инъекц)|лечите.{0,30}(?:болезн|заболеван)|inject.{0,20}(?:drug|dose)|take.{0,15}dose|как изготовить.{0,15}(?:бомб|яд))',text))
 
 def eligible(row):
     gate=row.get('checks',{}).get('brief44',{})
