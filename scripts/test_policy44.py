@@ -249,4 +249,15 @@ class Policy44Tests(unittest.TestCase):
         row['article']['title']='Дайте ребёнку лекарство'
         with self.assertRaisesRegex(ValueError,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):editor.verify_source(row)
 
+
+    def test_children_inflections_and_child_are_real_family_not_processes(self):
+        for title in ['Развитие детей','Общение с детьми','Счастливое детство','A child learns through play','Kids and parents']:
+            row={'article':{'title':title,'blocks':[{'text':title+'. '+title+' — основная тема исследования.'}]}}
+            self.assertEqual(v.subject(row),'family')
+        self.assertIsNone(v.subject({'title':'Parent company funds research','summary':'Parent company manages its subsidiaries.'}))
+        self.assertIsNone(v.subject({'title':'Child processes in Linux','summary':'Child processes inherit parent process state.'}))
+    def test_sport_inflections_and_walking_are_supported(self):
+        for title in ['История спорта','Физиология бега','Плавание для взрослых','Walking and physical activity']:
+            self.assertEqual(v.subject({'article':{'title':title,'blocks':[{'text':title+'. '+title+' — тема этого материала.'}]}}),'sport')
+
 if __name__=='__main__':unittest.main()
