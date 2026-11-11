@@ -6,7 +6,7 @@ from scripts import policy41 as p
 GROUPS=('family','health','sport')
 PATTERNS={
  'family':r'воспитан|родител|реб[её]н|дет[иеяй]\b|дошколь|школьни|супруж|семейн.{0,18}(?:игр|традиц|отношен|досуг|занят)|parent(?:ing|s)?\b|children|child development|family (?:activit|relationship|game|tradition)|marital|marriage',
- 'health':r'здоров.{0,12}питан|рацион|нутриц|диет|пищев|долголет|медицин|лечени|клиническ|профилакт|заболеван|(?:режим|качество|недостаток|гигиена).{0,12}сн|\bсон\b|\bсна\b|nutrition|dietary|medicine|clinical|disease|longevity|sleep|cardiovascular',
+ 'health':r'здоров.{0,12}питан|рацион|нутриц|диет|пищев|долголет|медицин|лечени|клиническ|профилакт|заболеван|(?:режим|качество|недостаток|гигиена).{0,12}сн|\bсон\b|\bсна\b|здоров(?:ье|ья|ью)|human health|healthy (?:eating|diet|habits)|public health|healthcare|nutrition|dietary|medicine|clinical|disease|longevity|sleep|cardiovascular',
  'sport':r'велосип|велоспорт|веломаршрут|йог|подвижност|растяжк|гибкост|кардио|вынослив|трениров|физическ.{0,18}(?:активност|нагруз)|спорт(?:ивн|смен)|бегун|марафон|триатлон|силов.{0,12}нагруз|physical (?:activity|exercise|training)|cycling|yoga|workout|endurance|aerobic|running|stretching|strength training'}
 RX={k:re.compile(v,re.I) for k,v in PATTERNS.items()}
 ART=re.compile(r'(?i)картин|худож|живопис|пейзаж|полотн|o.keeffe|painting|artwork')
@@ -25,7 +25,7 @@ def subject(row):
     scores={}
     for group,rx in RX.items():
         t=len(rx.findall(title));h=len(rx.findall(teaser));hits=sum(bool(rx.search(s)) for s in sentences)
-        if row.get('article') and not ((t and hits) or (h and hits>=2) or (hits>=3 and hits/max(1,len(sentences))>=.65)):continue
+        if row.get('article') and not ((t and hits and hits/max(1,len(sentences))>=.3) or (h and hits>=2 and hits/max(1,len(sentences))>=.4) or (hits>=3 and hits/max(1,len(sentences))>=.65)):continue
         if not row.get('article') and not (t or h or hits>=2):continue
         if group=='family' and ART.search(title) and not rx.search(title):continue
         if group=='health' and POWER.search(title):continue

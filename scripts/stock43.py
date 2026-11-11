@@ -121,6 +121,7 @@ def draw(state,root,now,target=None):
         else:
             saved=copy.deepcopy(row);saved['stock_origin']=identity(row);saved['status']='ready'
             state['candidates'].append(saved);selected.append(saved);known.add(row['url'])
+    if policy44.active(state):policy44.migrate(state)
     return len(selected)
 
 def draw_light(state,root):

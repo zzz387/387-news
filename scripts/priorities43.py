@@ -127,6 +127,7 @@ def apply_rules(state,now):
         state.setdefault('history',[]).append({'code':'SELECTION_RULES_UPDATED','previous':previous.copy(),'current':versions.copy()})
         print('[selection-rules43] '+json.dumps(dict(versions,reviewed_articles_preserved=True,quota_preserved=True)),flush=True)
     for row in state['candidates']:
+        if state.get('policy_version')=='4.4':row['topic_policy_version']='4.4'
         if row.get('article') or row.get('status')=='ready':continue
         row['editorial43']=evaluate(row,state.get('_recent43',[]),state['date'])
         row['category_hint']=row['editorial43']['category']
