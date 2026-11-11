@@ -21,7 +21,7 @@ def ready(i=0):
 
 
 def state(n=0):
-    s=e.migrate(None,'2026-10-27');s['candidates']=[ready(i) for i in range(n)];return s
+    s=e.migrate(None,'2026-10-27');s['policy_version']='4.3';s['candidates']=[ready(i) for i in range(n)];return s
 
 
 def root(temp):
@@ -55,7 +55,7 @@ class Daily43Tests(unittest.TestCase):
     def test_dynamic_counts_and_zero_digest_are_valid_and_honest_over_https(self):
         for count in (0,1,3,7,8,10,12,13):
             with self.subTest(count=count),tempfile.TemporaryDirectory() as temp:
-                r=root(temp);s=state(count);count=min(count,e.CONFIG['article_target']);reserve=d.reserve_rows(s,NOW)
+                r=root(temp);s=state(count);reserve=d.reserve_rows(s,NOW)
                 self.assertTrue(pub.build(s,r,reserve));meta=pub.validate(r,s['date'])
                 self.assertEqual(meta['article_count'],count)
                 with patch.object(site_checks,'fetch',side_effect=web(r)):

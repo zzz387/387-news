@@ -59,7 +59,10 @@ def reconcile(state,root):
 
 def reusable(row,date,used=()):
     if row.get('stock_published') or source_urls(row)&set(used):return False
-    if not e.eligible(row) or row.get('checks',{}).get('final43',{}).get('is_news') is not False:return False
+    from scripts import light44
+    brief=light44.eligible(row)
+    if not brief and (not e.eligible(row) or row.get('checks',{}).get('final43',{}).get('is_news') is not False):return False
+    if brief and row.get('light_kind')=='news':return False
     # Clinical/legal/childcare advice is not silently carried into another day.
     # Such work stays in its original checkpoint until fresh normal safety review.
     if e.high_risk(row):return False
@@ -103,7 +106,8 @@ def draw(state,root,now,target=None):
     reconcile(state,root);target=target or e.CONFIG['article_target'];known={r['url'] for r in state['candidates']}
     history=sel.recent(root,state['date']);selected=sel.composition(state)
     pending=list(available(state,state['date'],include_reserved=True))
-    while pending and len(selected)<target:
+    from scripts import policy44
+    while pending and (len(selected)<target or policy44.active(state) and any(v<2 for v in policy44.counts(selected).values())):
         proxies=[dict(r,status='discovered') for r in pending]
         plan=sel.order(dict(state,candidates=selected+proxies),history,limit=1)
         if not plan:break
@@ -123,15 +127,19 @@ def draw_light(state,root):
     from scripts import light43
     reconcile(state,root);saved=state.setdefault('light43',{'records':[]});rows=saved.setdefault('records',[])
     related=sel.ready(state)+light43.ready(state)+sel.recent(root,state['date'])
+    from scripts import policy44
+    target=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
     for row in available(state,state['date'],'light',include_reserved=True):
-        if len(light43.ready(state))>=3:break
+        if len(light43.ready(state))>=target:break
         if any(sel.duplicate(row,r) for r in related):continue
         row['stock_reserved_for']=state['date']
         copied=copy.deepcopy(row);copied['status']='ready';copied['stock_origin']=identity(row);rows.append(copied);related.append(copied)
 
 def bank_light(state,now):
     from scripts import light43
-    for row in light43.ready(state,limit=None)[3:]:bank(state,row,now,'light')
+    from scripts import policy44
+    keep=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
+    for row in light43.ready(state,limit=None)[keep:]:bank(state,row,now,'light')
 
 def sync_backlog(state):
     stock=ensure(state);used=set(stock['published_urls'])
@@ -174,7 +182,8 @@ def report(state):
     prospects=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and not r.get('for_light_only') and r.get('url') not in stock['published_urls'] and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified']
     from scripts import priorities43
     stock_groups={g:sum(priorities43.classify(r)['group']==g for r in available(state,date)) for g in ('A','C')}
-    return {'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
+    required=__import__('scripts.policy44',fromlist=['counts']).counts(available(state,date))
+    return {'required_topics':required,'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
             'stored_articles':len(stock['records']),'stored_light':len(stock['light']),
             'backlog':len(stock['backlog']),'article_goal':e.CONFIG.get('article_stock_target',20),
             'light_goal':e.CONFIG.get('light_stock_target',15)}

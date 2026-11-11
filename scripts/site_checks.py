@@ -65,7 +65,7 @@ def check_site(base='https://387.su', expected_date=None):
         raise RuntimeError('Public health check requires verified HTTPS')
     base = base.rstrip('/')
     home = fetch(base+'/')
-    if 'data-policy-version="4.3"' in home:
+    if any('data-policy-version="'+v+'"' in home for v in ('4.3','4.4')):
         return check_v43(base,home,expected_date)
     links = set(re.findall(r"href=[\"']/?issues/(\d{4}-\d{2}-\d{2})/articles/([a-z0-9-]+)/",home))
     if not links:
@@ -186,7 +186,7 @@ def check_v43(base,home,expected_date=None):
     date=found[1]
     if expected_date and date!=expected_date:raise RuntimeError('PUBLIC_DATE_MISMATCH')
     data=json.loads(fetch(base+'/issues/'+date+'/release.json'))
-    if data.get('date')!=date or data.get('policy_version')!='4.3':raise RuntimeError('PUBLIC_METADATA_INVALID')
+    if data.get('date')!=date or data.get('policy_version') not in ('4.3','4.4'):raise RuntimeError('PUBLIC_METADATA_INVALID')
     count=data.get('article_count');pages=data.get('pages',{})
     if data.get('preview'):raise RuntimeError('PUBLIC_PREVIEW_FORBIDDEN')
     if type(data.get('minimum_articles')) is int and data['minimum_articles']>=8 and (type(count) is not int or count<data['minimum_articles']):raise RuntimeError('PUBLIC_MINIMUM_ARTICLES_NOT_MET')
@@ -195,7 +195,7 @@ def check_v43(base,home,expected_date=None):
     if publication43.digest_bytes(overview.encode())!=data.get('overview_hash'):raise RuntimeError('PUBLIC_OVERVIEW_CHANGED')
     if publication43.digest_bytes(home.encode())!=data.get('homepage_hash') and home!=publication43.layout43.homepage(overview,date):raise RuntimeError('PUBLIC_HOME_CHANGED')
     light=data.get('light_news',[])
-    if not isinstance(light,list) or len(light)>5 or data.get('light_count',len(light))!=len(light):raise RuntimeError('PUBLIC_LIGHT_COUNT')
+    if not isinstance(light,list) or data.get('light_count',len(light))!=len(light):raise RuntimeError('PUBLIC_LIGHT_COUNT')
     if publication43.render_light(light) not in overview:raise RuntimeError('PUBLIC_LIGHT_CHANGED')
     markdown=fetch(base+'/issues/'+date+'/overview.md')
     if publication43.digest_bytes(markdown.encode())!=data.get('markdown_hash'):raise RuntimeError('PUBLIC_MARKDOWN_CHANGED')
@@ -210,14 +210,19 @@ def check_v43(base,home,expected_date=None):
             source41.safe_url(row['url'])
             if not all(row.get(k) for k in ('title','publisher','checked_at')) or row['url'] not in unescape(overview):raise RuntimeError('PUBLIC_RESERVE_INVALID')
     elif data.get('kind')!='articles':raise RuntimeError('PUBLIC_KIND_MISMATCH')
+    actual_articles=[]
     for slug,hashes in pages.items():
         if not re.fullmatch(r'[a-z0-9-]+',slug):raise RuntimeError('PUBLIC_SLUG_INVALID')
         page=fetch(base+'/issues/'+date+'/articles/'+slug+'/')
         md=fetch(base+'/issues/'+date+'/articles/'+slug+'/article.md')
         if publication43.digest_bytes(page.encode())!=hashes['html'] or publication43.digest_bytes(md.encode())!=hashes['markdown']:raise RuntimeError('PUBLIC_CONTENT_CHANGED')
         publication41.source_links43.validate(page,required=data.get('source_links_version')==1)
-        publication41.validate_page(page.replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
-    return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':'4.3','expected_date':expected_date,'status':'ok'}
+        publication41.validate_page(page.replace('data-policy-version="'+data['policy_version']+'"','data-policy-version="4.1"',1))
+        if data['policy_version']=='4.4':
+            from scripts import policy44
+            actual_articles.append(policy44.from_html(page))
+    if data['policy_version']=='4.4':policy44.require({'policy_version':'4.4'},actual_articles,light)
+    return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':data['policy_version'],'expected_date':expected_date,'status':'ok'}
 
 
 if __name__=='__main__': main()

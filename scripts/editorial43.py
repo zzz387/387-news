@@ -7,7 +7,7 @@ except ImportError:
     import policy41 as p,source41,rights41,content41,editorial41 as old,news
 
 CONFIG=json.loads((p.ROOT/'config/daily43.json').read_text())
-VERSION='4.3'
+VERSION=CONFIG.get('version','4.3')
 S={'type':'string'}; B={'type':'boolean'}
 news.SCHEMAS['v43_article']=content41.schema({'finished':B,'title':S,'teaser':S,
     'blocks':{'type':'array','items':content41.schema({'kind':{'type':'string','enum':['heading','paragraph','item']},'text':S})}})
@@ -19,8 +19,12 @@ news.SCHEMAS['v43_final']=content41.schema({'approve':B,**{name:B for name in CH
 
 
 def migrate(state,date):
-    if state and state.get('version')==43:return state
-    result={'version':43,'policy_version':VERSION,'date':date,'candidates':[],'articles':{},'history':[],
+    if state and state.get('version')==43:
+        if __import__('os').getenv('NEWS_POLICY_VERSION')=='4.4':
+            from scripts import policy44
+            return policy44.migrate(state)
+        return state
+    result={'version':43,'policy_version':__import__('os').getenv('NEWS_POLICY_VERSION',VERSION),'date':date,'candidates':[],'articles':{},'history':[],
             'stage':'PREPARING','audit_passed':False,'selected_ids':[]}
     if state:
         result['previous_policy_checkpoint']=copy.deepcopy(state)
@@ -77,7 +81,7 @@ def fingerprint(record):
 
 
 
-RISK_VERSION=2
+RISK_VERSION=3
 
 def risk_codes(record):
     """Content risk, never a publisher/category/previous boolean attestation."""
@@ -91,7 +95,7 @@ def risk_codes(record):
     def has(pattern):return bool(re.search(pattern,text,re.I))
     advice=has(r'рекоменд|совет|следует|нужно|приним|примите|дава[йи]|дайте|приём|прием|выполня|попробуй|сделайте|избег|лечи|дозиров|how to|should|recommend|advice|take |taking |avoid|perform|try |dose|dosage')
     historical=bool(re.search(r'(?i)история|историческ|history|historical',str(article.get('title') or source.get('title') or record.get('title',''))))
-    clinical=has(r'клиническ|clinical trial|randomi[sz]ed|рандомиз|пациент|patients?\b|лечени|treatment|therapy|therapeutic')
+    clinical=has(r'клиническ.{0,20}(?:исслед|эффектив|испыт)|clinical trial|randomi[sz]ed|рандомиз') or (advice and has(r'лечени|treatment|therapy|therapeutic') and has(r'заболеван|болезн|disease|пациент|patient'))
     disease=has(r'заболеван|болезн|диабет|гипертон|астм|сердечн|инфаркт|эпилеп|disease|diabet|hypertens|asthma|cardiac|heart failure|cancer')
     medicine=has(r'лекарств|препарат|таблет|инъекц|дозиров|доз[аеуы]|dosage|medication|drug\b|injection')
     if (clinical or medicine) and (not historical or advice):codes.append('CLINICAL_OR_MEDICATION')

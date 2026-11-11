@@ -115,9 +115,9 @@ class MinimumStockTests(unittest.TestCase):
         self.assertIn('NEWS_EVENT_FIELDS_INVALID',e.news_errors({'is_news':True},row,fixture.state()))
 
     def test_semantic_light_selection_does_not_trust_publisher_flag(self):
-        self.assertFalse(light.story_suitable({'title':'Трагедия на войне','light_suitable':True}))
+        self.assertTrue(light.story_suitable({'title':'Трагедия на войне','light_suitable':True}))
         self.assertTrue(light.story_suitable({'title':'Необычное поведение воронов в зоопарке','light_suitable':False}))
-        self.assertFalse(light.story_suitable({'title':'Выборы и политическая борьба','light_suitable':True}))
+        self.assertTrue(light.story_suitable({'title':'Выборы и политическая борьба','light_suitable':True}))
 
     def test_light_budget_is_attempted_before_main_target_when_headroom_exists(self):
         s=self.make(1);s['candidates'].append(dict(fixture.ready(50),status='discovered'))
@@ -156,6 +156,6 @@ class MinimumStockTests(unittest.TestCase):
     def test_inventory_goals_are_not_fictional_ready_counts(self):
         s=self.make();report=stock.report(s)
         self.assertEqual(report['ready_articles'],0);self.assertEqual(report['ready_light'],0)
-        self.assertEqual((report['article_goal'],report['light_goal']),(20,15))
+        self.assertEqual((report['article_goal'],report['light_goal']),(20,40))
 
 if __name__=='__main__':unittest.main()

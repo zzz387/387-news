@@ -7,7 +7,7 @@ from html import unescape
 from urllib.parse import urlparse
 from scripts import policy41 as p
 
-RULES_VERSION=3
+RULES_VERSION=4
 CORE_GROUPS=('A','B','C')
 
 CONFIG=json.loads((p.ROOT/'config/editorial_priorities43.json').read_text())
@@ -23,7 +23,13 @@ def classify(row):
         text+=' '+' '.join(b.get('text','') for b in source.get('blocks',[])[:8])
     if article:
         text=' '.join(str(article.get(k,'')) for k in ('title','teaser'))+' '+' '.join(b.get('text','') for b in article.get('blocks',[])[:8])
-    return dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))
+    result=dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))
+    if row.get('topic_policy_version')=='4.4':
+        from scripts import policy44
+        group=policy44.subject(row);direction={'family':1,'health':12,'sport':13}.get(group)
+        if direction:result.update(group='A' if group=='family' else 'C',direction=direction,category=policy44.category(row))
+        elif result['group'] in ('A','C'):result.update(group='general',direction=None,category=policy44.category(row,general_category(text)))
+    return result
 
 
 @lru_cache(maxsize=2048)

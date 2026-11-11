@@ -31,7 +31,7 @@ jobs:
     timeout-minutes: 330
     env:
       GH_TOKEN: ${{ github.token }}
-      NEWS_POLICY_VERSION: '4.3'
+      NEWS_POLICY_VERSION: '4.4'
       NEWS_AUTOMATION_V31_ENABLED: ${{ vars.NEWS_AUTOMATION_V31_ENABLED }}
       NEWS_RELEASE_APPROVED: ${{ vars.NEWS_RELEASE_APPROVED }}
     steps:

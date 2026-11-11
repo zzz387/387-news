@@ -12,9 +12,10 @@ news.SCHEMAS['v43_light_review']=content41.schema({'reviews':{'type':'array','it
 
 
 def story_suitable(row):
-    text=selection43.story_context(row)
-    if e.high_risk(row) or re.search(r'(?i)войн|убит|трагед|болезн|политик|парламент|election|politic|disaster|cancer|death|illness|war\b',text):return False
-    return bool(re.search(r'(?i)животн|птиц|ворон|зоопарк|звер|кошк|собак|природ|находк|музе|курьез|спасли|восстанов.{0,15}(?:лес|сад)|animal|bird|zoo|wildlife|museum|curious|unusual|rescu|garden|conserv|crow|raven|panda|otter|turtle|penguin|археолог|раскоп|archaeolog|добры|волонтёр|волонтер',text))
+    """No topical, humorous or positive-news gate. Safety is content-specific."""
+    from scripts import light44
+    return not light44.dangerous(selection43.story_context(row))
+
 
 def recent(root):
     from pathlib import Path
@@ -38,7 +39,9 @@ def reserve_accepted_sources(state,rows):
             if candidate['id'] not in queue:queue.append(candidate['id'])
 
 
-def ready(state,limit=5):
+def ready(state,limit=None):
+    from scripts import policy44,light44
+    if policy44.active(state):return light44.ready(state)
     result=[];mains=main_work(state)
     for row in state.get('light43',{}).get('records',[]):
         if not e.eligible(row):continue
@@ -154,6 +157,8 @@ def diagnose_saved(state):
 
 
 def prepare(state,persist=lambda:None,editor=None):
+    from scripts import policy44,light44
+    if policy44.active(state):return light44.prepare(state,persist)
     saved=state.setdefault('light43',{'write_attempts':0,'review_attempts':0,'records':[]})
     for key,value in (('write_attempts',0),('review_attempts',0),('records',[]),('http_requests',0)):saved.setdefault(key,value)
     reserve_accepted_sources(state,ready(state))

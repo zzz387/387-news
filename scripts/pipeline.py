@@ -213,7 +213,7 @@ def delivery_state(state,now=None):
     now=now or now_moscow();stage=state.get('pipeline_status','PREPARING')
     release=datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=news.TZ)
     if stage=='PUBLISHED' and state.get('delivery_verified_at'):return 'PUBLISHED_VERIFIED'
-    if state.get('version')==43 and state.get('block_code')=='MINIMUM_ARTICLES_NOT_MET':return 'PREPARING'
+    if state.get('version')==43 and state.get('block_code') in ('MINIMUM_ARTICLES_NOT_MET','EDITORIAL_STANDARD_NOT_MET'):return 'PREPARING'
     ready=bool(state.get('articles') or state.get('public_article_count') or state.get('reserve_count') or state.get('audit_passed'))
     if now<release:
         if stage=='PUBLISHING':return 'READY_TO_PUBLISH'
@@ -249,6 +249,9 @@ def report(state,ledger,now=None):
         inventory['composition']={k:composition[k] for k in ('family_articles','children_articles','health_sport_articles','sport_articles','core_groups','missing_core_groups','light_news')}
         inventory['light_diagnostic']=state.get('light43',{}).get('summary',{})
         inventory['verified_source_candidates']={g:sum(priorities43.classify(r)['group']==g and r.get('status') in ('discovered','preparing','retryable_error') and r.get('source',{}).get('full_text_verified') is True for r in state.get('candidates',[])) for g in ('A','B','C')}
+    if state.get('policy_version')=='4.4':
+        from scripts import policy44
+        inventory['editorial_standard']=policy44.standard(state)
     if inventory and not inventory['light_preparation']['code'] and inventory['light_preparation']['http_requests']>=2 and not inventory['light_news_ready']:
         inventory['light_preparation']['code']='LIGHT_BATCH_BUDGET_USED'
     return dict(**inventory,date=state['date'],policy_version=state.get('policy_version','3.2'),

@@ -1,5 +1,5 @@
 {
-  "version": "4.3",
+  "version": "4.4",
   "enabled": true,
   "article_target": 12,
   "minimum_articles": 8,
@@ -10,6 +10,13 @@
   "special43_enabled": true,
   "context_characters": 480000,
   "article_stock_target": 20,
-  "light_stock_target": 15,
-  "candidate_stock_target": 32
+  "light_stock_target": 40,
+  "candidate_stock_target": 32,
+  "light_minimum": 8,
+  "light_target": 12,
+  "required_topics": {
+    "family": 2,
+    "health": 2,
+    "sport": 2
+  }
 }

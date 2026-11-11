@@ -37,7 +37,7 @@ def overview(date,no,rows,permanent=False):
 def metadata(root,date):
     path=Path(root)/'issues'/date/'release.json'
     data=json.loads(path.read_text())
-    if data.get('policy_version')!='4.3' or data.get('date')!=date:raise p.Blocked('PUBLIC_METADATA_INVALID')
+    if data.get('policy_version') not in ('4.3','4.4') or data.get('date')!=date:raise p.Blocked('PUBLIC_METADATA_INVALID')
     return data
 
 
@@ -54,14 +54,17 @@ def validate(root,date):
         file=issue/'articles'/slug/'index.html';md=file.with_name('article.md')
         if digest_bytes(file.read_bytes())!=hashes['html'] or digest_bytes(md.read_bytes())!=hashes['markdown']:raise p.Blocked('PUBLIC_CONTENT_CHANGED')
         render.source_links43.validate(file.read_text(),required=data.get('source_links_version')==1)
-        render.validate_page(file.read_text().replace('data-policy-version="4.3"','data-policy-version="4.1"',1))
+        render.validate_page(file.read_text().replace('data-policy-version="'+data['policy_version']+'"','data-policy-version="4.1"',1))
     for name,key in (('index.html','overview_hash'),('overview.md','markdown_hash')):
         if digest_bytes((issue/name).read_bytes())!=data[key]:raise p.Blocked('PUBLIC_OVERVIEW_CHANGED')
     page=(issue/'index.html').read_text()
     if f'data-article-count="{count}"' not in page or f'data-issue-date="{date}"' not in page:raise p.Blocked('PUBLIC_COUNT_INVALID')
     light=data.get('light_news',[])
-    if data.get('light_count',len(light))!=len(light) or len(light)>5:raise p.Blocked('PUBLIC_LIGHT_COUNT')
+    if data.get('light_count',len(light))!=len(light):raise p.Blocked('PUBLIC_LIGHT_COUNT')
     if render_light(light) and render_light(light) not in page:raise p.Blocked('PUBLIC_LIGHT_CHANGED')
+    if data['policy_version']=='4.4' and not data.get('preview'):
+        from scripts import policy44
+        policy44.require({'policy_version':'4.4'},[policy44.from_html(f.read_text()) for f in pages],light)
     if count==0:
         rows=data.get('sources',[])
         if not rows or 'Обзор источников' not in page:raise p.Blocked('EMPTY_RESERVE')
@@ -83,7 +86,10 @@ def build(state,root,reserve=(),preview=False):
         except ImportError:import site_checks
         site_checks.validate_local_release(root,date)
         return not preview
+    from scripts import policy44
     records=selection43.composition(state);articles=[]
+    version='4.4' if policy44.active(state) else '4.3'
+    if version=='4.4' and not preview:policy44.require(state,records)
     if len(records)<e.CONFIG['minimum_articles'] and not preview and (records or e.CONFIG['minimum_articles']>=8):raise p.Blocked('MINIMUM_ARTICLES_NOT_MET')
     for i,r in enumerate(records,1):
         a=public_article(r);a['slug']=news.slugify(a['title'],i);articles.append(a)
@@ -98,12 +104,12 @@ def build(state,root,reserve=(),preview=False):
         previous=news.ROOT;news.ROOT=working
         try:
             no=news.get_next_number();issue=working/'issues'/date;issue.mkdir()
-            data={'date':date,'number':no,'policy_version':'4.3','article_count':len(articles),
+            data={'date':date,'number':no,'policy_version':version,'article_count':len(articles),
                   'kind':'articles' if articles else 'source_digest','minimum_articles':e.CONFIG['minimum_articles'],
                   'standard_issue':len(articles)>=e.CONFIG['minimum_articles'],'preview':preview,'pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
-                file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version='4.3')))
+                file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version=version)))
                 md=file.with_name('article.md');md.write_text(render.markdown(a))
                 data['pages'][a['slug']]={'html':digest_bytes(file.read_bytes()),'markdown':digest_bytes(md.read_bytes())}
             light=public_light(state)
@@ -111,7 +117,7 @@ def build(state,root,reserve=(),preview=False):
             rows=[{k:r.get(k,'') for k in ('url','title','publisher','published','checked_at')} for r in reserve] if not articles else []
             if not articles:data['sources']=rows
             for permanent,target in ((True,issue/'index.html'),(False,working/'index.html')):
-                page=reader_chrome(render.render_overview(date,no,articles,permanent,policy_version='4.3')) if articles else overview(date,no,rows,permanent)
+                page=reader_chrome(render.render_overview(date,no,articles,permanent,policy_version=version)) if articles else overview(date,no,rows,permanent)
                 target.write_text(page.replace('</main>',render_light(light)+'</main>',1))
             markdown=('# Обзор источников\n\nПроверенные ссылки; не полноценные статьи. Без генерации Gemini.\n\n'+'\n'.join('- ['+r['title']+']('+r['url']+') — '+r['publisher']+'; '+(r.get('published') or 'дата не сохранена') for r in rows)) if not articles else '# Выпуск '+date+'\n\n'+'\n'.join('- ['+a['title']+'](/issues/'+date+'/articles/'+a['slug']+'/)' for a in articles)
             if light:markdown+='\n\n# НЕ ВСЁ ТАК СЕРЬЁЗНО\n\nМаленькие новости, от которых мир становится интереснее\n\n'+'\n\n'.join('## '+x['title']+'\n\n'+x['text']+'\n\nИсточник: ['+x['source']['publisher']+']('+x['source']['url']+')' for x in light)
@@ -143,7 +149,7 @@ def render_light(items):
     html='<section id="light-news" class="light-news" aria-labelledby="light-news-heading"><h2 id="light-news-heading">НЕ ВСЁ ТАК СЕРЬЁЗНО</h2><p>Маленькие новости, от которых мир становится интереснее</p><div class="light-grid">'
     for item in items:
         source=item['source'];url=source_links43.safe_source_url(source['url'])
-        label={'news':'Добрая новость','historical_fact':'Исторический факт','unusual_fact':'Необычный факт'}.get(item.get('kind'))
+        label={'news':'Короткая новость','historical_fact':'Исторический факт','unusual_fact':'Необычный факт'}.get(item.get('kind'))
         label_html='<p class="meta light-kind">'+label+'</p>' if label else ''
         html+='<article class="light-item">'+label_html+'<h3>'+escape(item['title'])+'</h3><p>'+escape(item['text'])+'</p><p class="light-source">Источник: <a href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+escape(source['publisher'])+'</a>'
         if source.get('published'):html+=' · '+escape(source['published'])
