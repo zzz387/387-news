@@ -89,7 +89,7 @@ def prepare(state,persist=lambda:None):
     if batch.get('window')==window:return
     from scripts import stock43
     if len(ready(state))>=e.CONFIG.get('light_target',12) and len(stock43.available(state,state['date'],'light'))>=e.CONFIG.get('light_stock_target',40):return
-    excluded=set(state.get('stock43',{}).get('published_urls',[]))|{r['source']['url'] for r in saved['records']}|{r['url'] for r in batch['refusals']}
+    excluded={r['source']['url'] for r in state.get('stock43',{}).get('light',[])}|set(state.get('stock43',{}).get('published_urls',[]))|{r['source']['url'] for r in saved['records']}|{r['url'] for r in batch['refusals']}
     mains=light43.main_work(state);sources=[];publishers={}
     needed={g for g,n in policy44.counts(sel.ready(state)).items() if n<2}
     candidates=sorted(state['candidates'],key=lambda r:(not r.get('for_light_only'),r.get('publisher_id','')))
@@ -104,6 +104,7 @@ def prepare(state,persist=lambda:None):
     if not sources:return
     # Atomic resume: a completed response is retained before deterministic admission.
     batch.pop('response',None);batch['response_applied']=False
+    batch['destination']='stock' if len(ready(state))>=e.CONFIG.get('light_target',12) else 'issue'
     batch['window']=window;batch['sources']=sources;batch['attempts']=batch.get('attempts',0)+1;persist()
     wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
     old_limit=budget.run_limit;start=budget.used;budget.run_limit=min(old_limit,budget.used+1)
@@ -137,9 +138,18 @@ def apply_response(state,persist=lambda:None):
                     if original:proof['block_id']=original['id']
                     elif found:proof.update(block_id=found[1],quote=found[2])
             src=by_id[item['source_id']];row=accept(item,src)
-            if any(duplicate(row,x) for x in mains+ready(state)+accepted+state.get('_recent_light43',[])):raise p.Blocked('BRIEF_DUPLICATE')
+            if any(duplicate(row,x) for x in mains+ready(state)+accepted+state.get('_recent_light43',[])+state.get('stock43',{}).get('light',[])):raise p.Blocked('BRIEF_DUPLICATE')
             accepted.append(row)
         except (KeyError,TypeError,ValueError,AttributeError) as exc:batch['refusals'].append({'url':by_id.get(item.get('source_id'),{}).get('url',''),'code':getattr(exc,'code','BRIEF_FORMAT')})
+    from scripts import stock43
+    current=[];banked=0
+    for row in accepted:
+        if batch.get('destination')=='stock':
+            row['stock_prepared_for']=state['date']
+            if stock43.bank(state,row,datetime.now(p.TZ),'light'):
+                banked+=1;continue
+        current.append(row)  # News/overflow remains in this issue; nothing is discarded.
     batch['response_applied']=True
-    saved['records']+=accepted;batch['completed'].append({'window':window,'accepted':len(accepted),'attempts':batch['attempts']});light43.reserve_accepted_sources(state,accepted);persist()
-    print('[brief44] '+json.dumps({'accepted':len(accepted),'ready':len(ready(state)),'refusal_codes':dict(__import__('collections').Counter(r['code'] for r in batch['refusals'])),'http_requests':batch['http_requests']}),flush=True)
+    batch['banked']=batch.get('banked',0)+banked
+    saved['records']+=current;batch['completed'].append({'window':window,'accepted':len(accepted),'attempts':batch['attempts']});light43.reserve_accepted_sources(state,accepted);persist()
+    print('[brief44] '+json.dumps({'accepted':len(accepted),'ready':len(ready(state)),'banked':banked,'stock_ready':len(stock43.available(state,state['date'],'light')),'refusal_codes':dict(__import__('collections').Counter(r['code'] for r in batch['refusals'])),'http_requests':batch['http_requests']}),flush=True)

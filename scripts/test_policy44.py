@@ -161,4 +161,22 @@ class Policy44Tests(unittest.TestCase):
         src,item=response_item();src['title']=item['title']='Долгая история необычного открытия в музее'
         with self.assertRaisesRegex(ValueError,'BRIEF_COPIED_TITLE'):brief.accept(item,src)
 
+
+    def test_current_sixteen_briefs_are_not_capped_to_build_stock(self):
+        s=issue(8,16);stock43.bank_light(s,NOW)
+        self.assertEqual(len(light43.ready(s)),16);self.assertEqual(stock43.report(s)['ready_light'],0)
+    def test_independent_stock_batch_survives_current_and_next_issue(self):
+        src,item=response_item();s=issue(8,16)
+        s['light43']['v44']={'sources':[src],'response':{'items':[item]},'window':'stock-run','attempts':1,'http_requests':1,'refusals':[],'completed':[],'destination':'stock'}
+        accept=brief.accept
+        def checked(*a):
+            row=accept(*a);row['ready_checked_at']=NOW.isoformat();return row
+        with patch.object(brief,'accept',side_effect=checked),tempfile.TemporaryDirectory() as temp:
+            target=root(temp);brief.apply_response(s);stock43.draw_light(s,target)
+            self.assertEqual(len(light43.ready(s)),16);self.assertEqual(stock43.report(s)['ready_light'],1)
+            restored=json.loads(json.dumps(s));stock43.draw_light(restored,target)
+            self.assertEqual(len(light43.ready(restored)),16)
+            tomorrow=issue(8,0);tomorrow['date']='2026-10-28';stock43.merge(tomorrow,restored['stock43']);stock43.draw_light(tomorrow,target)
+            self.assertEqual(len(light43.ready(tomorrow)),1)
+
 if __name__=='__main__':unittest.main()

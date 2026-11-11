@@ -140,6 +140,9 @@ def draw_light(state,root):
     target=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
     from scripts import light44
     for row in available(state,state['date'],'light',include_reserved=True):
+        # A separately commissioned stock batch stays for the following edition.
+        # It may rescue THIS issue only if its eight-note minimum becomes short.
+        if policy44.active(state) and row.get('stock_prepared_for')==state['date'] and len(light43.ready(state))>=e.CONFIG.get('light_minimum',8):continue
         if not policy44.active(state) and len(light43.ready(state))>=target:break
         if any((light44.duplicate if policy44.active(state) else sel.duplicate)(row,r) for r in related):continue
         row['stock_reserved_for']=state['date']
@@ -148,7 +151,8 @@ def draw_light(state,root):
 def bank_light(state,now):
     from scripts import light43
     from scripts import policy44
-    keep=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
+    if policy44.active(state):return  # New batches choose issue/stock BEFORE generation.
+    keep=3
     for row in light43.ready(state,limit=None)[keep:]:bank(state,row,now,'light')
 
 def sync_backlog(state):
