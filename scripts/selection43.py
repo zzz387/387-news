@@ -117,19 +117,8 @@ def ready(state):
 
 
 def composition(state):
-    """Select a soft balanced target from accepted works without modifying any."""
-    from scripts import editorial43,priorities43
-    rows=ready(state)
-    if state.get('special43_revision') or len(rows)<=editorial43.CONFIG['article_target']:return rows
-    selected=[];pending=sorted(rows,key=usefulness,reverse=True)
-    for _ in range(2):
-        for group in ('A','C','B'):
-            row=next((r for r in pending if priorities43.classify(r)['group']==group),None)
-            if row is not None:selected.append(row);pending.remove(row)
-    while pending and len(selected)<editorial43.CONFIG['article_target']:
-        row=min(pending,key=lambda r:priorities43.preference(r,state.get('_recent43',[]),state.get('date'),selected))
-        selected.append(row);pending.remove(row)
-    return selected
+    """All accepted distinct works. article_target is never a release ceiling."""
+    return ready(state)
 
 
 def recent(root,date,days=14):
@@ -163,7 +152,10 @@ def order(state,history=(),limit=None,exclude_ids=()):
             group=priorities43.classify(r)['group']
             aim=4 if state.get('_stock_preparation43') else 2
             under={g for g in ('A','C') if sum(priorities43.classify(item)['group']==g for item in planned)<aim}
-            return (int(r.get('status')=='discovered'),int(bool(missing) and group not in missing),
+            from scripts import policy44
+            missing44={g for g,n in policy44.counts(planned).items() if n<2}
+            priority44=int(policy44.subject(r) not in missing44) if policy44.active(state) and missing44 else 0
+            return (priority44,int(r.get('status')=='discovered'),int(bool(missing) and group not in missing),
                 int(any(duplicate(r,item) for item in planned)),int(bool(under) and group not in under),int(p['space'] and space>=1),
                 *priorities43.preference(r,history,state.get('date'),planned),
                 int(any(duplicate(r,h) for h in history))*3+

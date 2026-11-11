@@ -1,0 +1,96 @@
+"""Policy4.4 on the existing controller: content subjects and explicit deficits."""
+import copy,re
+from collections import Counter
+from scripts import policy41 as p
+
+GROUPS=('family','health','sport')
+PATTERNS={
+ 'family':r'воспитан|родител|реб[её]н|дет[иеяй]\b|дошколь|школьни|супруж|семейн.{0,18}(?:игр|традиц|отношен|досуг|занят)|parent(?:ing|s)?\b|children|child development|family (?:activit|relationship|game|tradition)|marital|marriage',
+ 'health':r'здоров.{0,12}питан|рацион|нутриц|диет|пищев|долголет|медицин|лечени|клиническ|профилакт|заболеван|(?:режим|качество|недостаток|гигиена).{0,12}сн|\bсон\b|\bсна\b|здоров(?:ье|ья|ью)|human health|healthy (?:eating|diet|habits)|public health|healthcare|nutrition|dietary|medicine|clinical|disease|longevity|sleep|cardiovascular',
+ 'sport':r'велосип|велоспорт|веломаршрут|йог|подвижност|растяжк|гибкост|кардио|вынослив|трениров|физическ.{0,18}(?:активност|нагруз)|спорт(?:ивн|смен)|бегун|марафон|триатлон|силов.{0,12}нагруз|physical (?:activity|exercise|training)|cycling|yoga|workout|endurance|aerobic|running|stretching|strength training'}
+RX={k:re.compile(v,re.I) for k,v in PATTERNS.items()}
+ART=re.compile(r'(?i)картин|худож|живопис|пейзаж|полотн|o.keeffe|painting|artwork')
+POWER=re.compile(r'(?i)электропитан|резервн.{0,15}питан|кухонн.{0,20}техник|бытов.{0,15}(?:техник|прибор)|power supply|battery backup|fridgeguard|электростанц')
+COMPUTING=re.compile(r'(?i)обучени.{0,12}(?:модел|нейросет)|трениров.{0,12}(?:модел|нейросет)|model training|machine learning')
+
+def active(state):return state.get('policy_version')=='4.4' and not state.get('special43_revision')
+
+def texts(row):
+    a=row.get('article',{});src=row.get('source',{})
+    if a:return str(a.get('title','')),str(a.get('teaser','')),' '.join(b.get('text','') for b in a.get('blocks',[]))
+    return str(row.get('title') or src.get('title','')),str(row.get('summary','')),' '.join(b.get('text','') for b in src.get('blocks',[]))
+
+def subject(row):
+    title,teaser,body=texts(row);sentences=[s for s in re.split(r'[.!?;\n]+',body) if len(s.strip())>12]
+    scores={}
+    for group,rx in RX.items():
+        t=len(rx.findall(title));h=len(rx.findall(teaser));hits=sum(bool(rx.search(s)) for s in sentences)
+        if row.get('article') and not ((t and hits and hits/max(1,len(sentences))>=.3) or (h and hits>=2 and hits/max(1,len(sentences))>=.4) or (hits>=3 and hits/max(1,len(sentences))>=.65)):continue
+        if not row.get('article') and not (t or h or hits>=2):continue
+        if group=='family' and ART.search(title) and not rx.search(title):continue
+        if group=='health' and POWER.search(title):continue
+        if group=='sport' and COMPUTING.search(title) and not re.search(r'(?i)велосип|йог|бегун|спортсмен|athlete|cycl',title):continue
+        scores[group]=5*t+3*h+min(hits,8)
+    # One concrete article counts once; exercise benefits remain SPORT, not HEALTH too.
+    return max(scores,key=lambda k:(scores[k],{'sport':3,'health':2,'family':1}[k])) if scores else None
+
+def category(row,fallback='Общество'):
+    group=subject(row)
+    if group:return {'family':'Семья','health':'Здоровье и движение','sport':'Здоровье и движение'}[group]
+    title,_,_=texts(row)
+    if ART.search(title):return 'История и культура'
+    if POWER.search(title):return 'Технологии'
+    return fallback if fallback not in ('Семья','Здоровье и движение') else 'Общество'
+
+def counts(rows):return {g:sum(subject(r)==g for r in rows) for g in GROUPS}
+
+def standard(state,rows=None,notes=None):
+    from scripts import selection43,light43
+    rows=selection43.ready(state) if rows is None else rows;notes=light43.ready(state) if notes is None else notes
+    groups=counts(rows);deficits={g:max(0,2-groups[g]) for g in GROUPS}
+    return {'policy_version':'4.4','main_articles':len(rows),'topics':groups,'main_deficit':max(0,8-len(rows)),
+        'topic_deficits':deficits,'light_notes':len(notes),'light_deficit':max(0,8-len(notes)),
+        'compliant':len(rows)>=8 and not any(deficits.values()) and len(notes)>=8}
+
+def require(state,rows=None,notes=None):
+    result=standard(state,rows,notes)
+    if not result['compliant']:raise p.Blocked('EDITORIAL_STANDARD_NOT_MET')
+    return result
+
+def migrate(state):
+    """Unpublished only, called by existing CLI migration. No text/counter resets."""
+    from scripts import editorial43 as e
+    previous=state.get('policy_version');state['policy_version']='4.4'
+    for row in state.get('candidates',[]):
+        row['topic_policy_version']='4.4'
+        if not row.get('article'):continue
+        old=row['article'].get('category');new=category(row,old or 'Общество')
+        if old==new:continue
+        gate=row.get('checks',{}).get('final43',{});approved=e.eligible(row);old_fp=e.fingerprint(row)
+        row['article']['category']=new;row['category']=row['category_hint']=new
+        if approved:gate['input_hash']=e.fingerprint(row)
+        row.setdefault('history',[]).append({'code':'CATEGORY44_METADATA_CORRECTION','previous':old,'current':new,'previous_hash':old_fp,'reviewed_content_unchanged':True})
+    state['audit_passed']=False
+    if previous!='4.4':state.setdefault('history',[]).append({'code':'POLICY44_MIGRATION','previous':previous,'accepted_text_and_quota_preserved':True})
+    return state
+
+def publisher_order(rows,state):
+    wanted={g for g,n in counts(__import__('scripts.selection43',fromlist=['ready']).ready(state)).items() if n<2}
+    ids={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}};pending=list(rows);selected=[]
+    for group in sorted(wanted):
+        options=[r for r in pending if ids[group]&set(r.get('priority_ids',[]))]
+        if options:
+            row=min(options,key=lambda r:(-r.get('availability',{}).get('full_originals_verified',0),-r.get('editorial_priority',50)))
+            pending.remove(row);selected.append(dict(row,search_group=group))
+    return selected+[dict(r,**({'search_group':None} if r.get('search_group') else {})) for r in pending]
+
+
+def from_html(page):
+    """Classify only the reader's article body, excluding sources/nav/footer."""
+    from scripts.source_dom41 import Document
+    doc=Document();doc.feed(page)
+    nodes=list(doc.root.all())
+    title=next((n.text() for n in nodes if n.tag=='h1'),'')
+    teaser=next((n.text() for n in nodes if 'dek' in n.attrs.get('class','').split()),'')
+    body=next((n for n in nodes if 'article-body' in n.attrs.get('class','').split()),None)
+    return {'article':{'title':title,'teaser':teaser,'blocks':[{'text':n.text()} for n in body.all() if n.tag in ('p','li')] if body else []}}

@@ -83,7 +83,7 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
                     if any(r['status'] in ACTIVE for r in productions(request)):active=True
                     else:
                         attempts+=1
-                        request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'publish','preview':'false','target_date':date}})
+                        request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'run' if os.getenv('NEWS_POLICY_VERSION')=='4.4' else 'publish','preview':'false','target_date':date}})
                         result.update(recovery_dispatched=True,publication_status='PUBLISHING',code='RECOVERY_DISPATCHED')
                         print('[delivery-watchdog] '+json.dumps(dict(result,recovery_attempts=attempts)),flush=True)
         except Exception as exc:

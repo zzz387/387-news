@@ -554,7 +554,7 @@ def main():
               f'{len(state.get("dossiers", {}))} saved dossiers', flush=True)
     try:from scripts import daily43,editorial43
     except ImportError:import daily43,editorial43
-    use43=os.getenv('NEWS_POLICY_VERSION')=='4.3' and daily43.enabled()
+    use43=os.getenv('NEWS_POLICY_VERSION') in ('4.3','4.4') and daily43.enabled()
     if args.phase not in ('check','inspect') and not release_queue.edition_exists(ROOT,date):
         state=editorial43.migrate(state,date) if use43 else editorial41.migrate(state,date)
     if args.phase in ('check','inspect'):
@@ -662,7 +662,12 @@ def main():
 def inspection_status(state):
     count=vetted_count(state)
     if state.get('version')==43:
-        from scripts import editorial43
+        from scripts import editorial43,policy44
+        if policy44.active(state):
+            state['editorial_standard44']=policy44.standard(state)
+            state['audit_passed']=state['editorial_standard44']['compliant']
+            pipeline.status(state,'APPROVED' if state['audit_passed'] else 'PREPARING','publish_when_due' if state['audit_passed'] else 'continue_editorial_deficit',None if state['audit_passed'] else 'EDITORIAL_STANDARD_NOT_MET')
+            return
         state['audit_passed']=count>=editorial43.CONFIG['minimum_articles']
         if not state['audit_passed']:
             pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET')

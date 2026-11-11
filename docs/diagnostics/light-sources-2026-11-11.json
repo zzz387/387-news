@@ -1,0 +1,264 @@
+{
+  "checked_at": "2026-11-11T12:01:43+03:00",
+  "run_id": 42991579796,
+  "gemini_requests": 0,
+  "publishers": [
+    {
+      "publisher": "bbcfuture",
+      "name": "BBC Future и Travel",
+      "homepage": "https://bbc.com/future/",
+      "status": "discovery_verified",
+      "discovered": 54,
+      "eligible": 0,
+      "article_checks": 2,
+      "last_checked_url": "https://www.bbc.com/travel/to-the-ends-of-the-earth",
+      "last_article_code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
+    },
+    {
+      "publisher": "nplus1",
+      "name": "N+1",
+      "homepage": "https://nplus1.ru/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": "ROBOTS_UNVERIFIED"
+    },
+    {
+      "publisher": "kommersant",
+      "name": "Коммерсантъ",
+      "homepage": "https://kommersant.ru/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": "ROBOTS_FORBIDDEN"
+    },
+    {
+      "publisher": "smithsonian",
+      "name": "Smithsonian Magazine",
+      "homepage": "https://smithsonianmag.com/",
+      "status": "full_sources_verified",
+      "discovered": 60,
+      "eligible": 2,
+      "article_checks": 2,
+      "last_checked_url": "https://www.smithsonianmag.com:443/smart-news/the-handwritten-final-draft-of-martin-luther-king-jrs-i-have-a-dream-speech-was-considered-lost-it-turned-out-to-be-sitting-in-a-desk-drawer-for-decades-180989856/",
+      "eligible_urls": [
+        "https://www.smithsonianmag.com:443/smart-news/this-adorable-orphaned-baby-walrus-was-rescued-by-two-researchers-in-alaska-now-hes-found-a-new-home-in-florida-180989847/",
+        "https://www.smithsonianmag.com:443/smart-news/the-handwritten-final-draft-of-martin-luther-king-jrs-i-have-a-dream-speech-was-considered-lost-it-turned-out-to-be-sitting-in-a-desk-drawer-for-decades-180989856/"
+      ]
+    },
+    {
+      "publisher": "guardian",
+      "name": "The Guardian",
+      "homepage": "https://theguardian.com/lifeandstyle/family/",
+      "status": "full_sources_verified",
+      "discovered": 25,
+      "eligible": 2,
+      "article_checks": 2,
+      "verified_feed": "https://www.theguardian.com/science/rss",
+      "last_checked_url": "https://www.theguardian.com/science/audio/2026/nov/10/why-we-get-sad-and-what-helps-podcast",
+      "eligible_urls": [
+        "https://www.theguardian.com/science/2026/nov/09/medical-breakthrough-offers-hope-to-people-with-same-stiff-person-syndrome-as-celine-dion",
+        "https://www.theguardian.com/science/audio/2026/nov/10/why-we-get-sad-and-what-helps-podcast"
+      ]
+    },
+    {
+      "publisher": "ap",
+      "name": "Associated Press Science",
+      "homepage": "https://apnews.com/hub/science",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": 403
+    },
+    {
+      "publisher": "mel",
+      "name": "Мел",
+      "homepage": "https://mel.fm/",
+      "status": "discovery_verified",
+      "discovered": 50,
+      "eligible": 0,
+      "article_checks": 2,
+      "verified_feed": "https://mel.fm/rss/default-news",
+      "last_checked_url": "https://mel.fm/novosti/4697852-dve-treti-par-v-velikobritanii-posle-rasstavaniya-reshayut-unichtozhit-zamorozhennyye-v-khode-eko-em",
+      "last_article_code": "RIGHTS_NOT_ESTABLISHED"
+    },
+    {
+      "publisher": "culture",
+      "name": "Культура.РФ",
+      "homepage": "https://culture.ru/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": "ROBOTS_UNVERIFIED"
+    },
+    {
+      "publisher": "arzamas",
+      "name": "Arzamas",
+      "homepage": "https://arzamas.academy/",
+      "status": "discovery_verified",
+      "discovered": 29,
+      "eligible": 0,
+      "article_checks": 2,
+      "verified_feed": "https://arzamas.academy/feed_v1.rss",
+      "last_checked_url": "https://arzamas.academy/mag/1453-fonvizin?utm_campaign=main_rss&utm_medium=rss&utm_source=rss_link",
+      "last_article_code": "RIGHTS_NOT_ESTABLISHED"
+    },
+    {
+      "publisher": "rbc",
+      "name": "РБК",
+      "homepage": "https://rbc.ru/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": 401
+    },
+    {
+      "publisher": "good-news-network",
+      "name": "Good News Network",
+      "homepage": "https://www.goodnewsnetwork.org/",
+      "status": "full_sources_verified",
+      "discovered": 50,
+      "eligible": 1,
+      "article_checks": 2,
+      "verified_feed": "https://www.goodnewsnetwork.org/feed/",
+      "last_checked_url": "https://www.goodnewsnetwork.org/nothing-short-of-a-miracle-rescuers-find-boy-with-autism-missing-for-3-days/",
+      "last_article_code": "SOURCE_EXTRACTION_PARTIAL",
+      "eligible_urls": [
+        "https://www.goodnewsnetwork.org/nothing-short-of-a-miracle-rescuers-find-boy-with-autism-missing-for-3-days/"
+      ]
+    },
+    {
+      "publisher": "positive-news",
+      "name": "Positive News",
+      "homepage": "https://www.positive.news/",
+      "status": "full_sources_verified",
+      "discovered": 10,
+      "eligible": 2,
+      "article_checks": 2,
+      "verified_feed": "https://www.positive.news/feed/",
+      "last_checked_url": "https://www.positive.news/environment/digital-advances-are-reshaping-nature-conservation-say-experts/",
+      "eligible_urls": [
+        "https://www.positive.news/society/actor-85-takes-to-the-stage-despite-alzheimers-diagnosis/",
+        "https://www.positive.news/environment/digital-advances-are-reshaping-nature-conservation-say-experts/"
+      ]
+    },
+    {
+      "publisher": "optimist-daily",
+      "name": "The Optimist Daily",
+      "homepage": "https://www.optimistdaily.com/",
+      "status": "full_sources_verified",
+      "discovered": 10,
+      "eligible": 2,
+      "article_checks": 2,
+      "verified_feed": "https://www.optimistdaily.com/feed/",
+      "last_checked_url": "https://www.optimistdaily.com/2026/11/brazil-releases-the-worlds-first-fossil-fuel-phaseout-roadmap/",
+      "eligible_urls": [
+        "https://www.optimistdaily.com/2026/11/prince-bashangezi-turned-personal-loss-into-peer-tutoring-for-refugee-students/",
+        "https://www.optimistdaily.com/2026/11/brazil-releases-the-worlds-first-fossil-fuel-phaseout-roadmap/"
+      ]
+    },
+    {
+      "publisher": "the-week",
+      "name": "The Week — Good News",
+      "homepage": "https://theweek.com/",
+      "status": "discovery_verified",
+      "discovered": 47,
+      "eligible": 0,
+      "article_checks": 2,
+      "verified_feed": "https://theweek.com/feeds.xml",
+      "last_checked_url": "https://theweek.com/defence/disinformation-and-discontent-ukraines-draft-centre-riot",
+      "last_article_code": "SOURCE_ACCESS_RESTRICTED"
+    },
+    {
+      "publisher": "upi",
+      "name": "UPI — Odd News",
+      "homepage": "https://www.upi.com/Odd_News/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": 403
+    },
+    {
+      "publisher": "mental-floss",
+      "name": "Mental Floss",
+      "homepage": "https://www.mentalfloss.com/",
+      "status": "full_sources_verified",
+      "discovered": 76,
+      "eligible": 2,
+      "article_checks": 2,
+      "verified_feed": "https://www.mentalfloss.com/feed",
+      "last_checked_url": "https://www.mentalfloss.com/literature/books/kurt-vonnegut-best-worst-books?utm_source=RSS",
+      "eligible_urls": [
+        "https://www.mentalfloss.com/literature/books/colin-meloy-wildwood-interview?utm_source=RSS",
+        "https://www.mentalfloss.com/literature/books/kurt-vonnegut-best-worst-books?utm_source=RSS"
+      ]
+    },
+    {
+      "publisher": "readers-digest",
+      "name": "Reader’s Digest",
+      "homepage": "https://www.rd.com/",
+      "status": "full_sources_verified",
+      "discovered": 45,
+      "eligible": 2,
+      "article_checks": 2,
+      "last_checked_url": "https://www.rd.com/article/what-makes-people-happy/",
+      "eligible_urls": [
+        "https://www.rd.com/article/how-to-stimulate-the-vagus-nerve/",
+        "https://www.rd.com/article/what-makes-people-happy/"
+      ]
+    },
+    {
+      "publisher": "people",
+      "name": "People — Human Interest",
+      "homepage": "https://people.com/human-interest/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": 403
+    },
+    {
+      "publisher": "npr",
+      "name": "NPR",
+      "homepage": "https://www.npr.org/",
+      "status": "full_sources_verified",
+      "discovered": 10,
+      "eligible": 1,
+      "article_checks": 2,
+      "verified_feed": "https://feeds.npr.org/1002/rss.xml",
+      "last_checked_url": "https://www.npr.org/2026/11/10/nx-s1-6036813/house-votes-to-effectively-end-the-impeachment-effort-against-pete-hegseth",
+      "last_article_code": "SOURCE_EXTRACTION_PARTIAL",
+      "eligible_urls": [
+        "https://www.npr.org/2026/11/10/nx-s1-6036135/federal-government-failed-to-hold-epstein-accountable-republican-committee-says"
+      ]
+    },
+    {
+      "publisher": "washington-post",
+      "name": "The Washington Post",
+      "homepage": "https://www.washingtonpost.com/",
+      "status": "unavailable",
+      "discovered": 0,
+      "eligible": 0,
+      "article_checks": 0,
+      "code": "TimeoutError"
+    },
+    {
+      "publisher": "afisha-daily",
+      "name": "Афиша Daily",
+      "homepage": "https://daily.afisha.ru/",
+      "status": "discovery_verified",
+      "discovered": 60,
+      "eligible": 0,
+      "article_checks": 2,
+      "verified_feed": "https://daily.afisha.ru/export/rss/google_newsstand/",
+      "last_checked_url": "https://daily.afisha.ru/news/115289-warner-bros-otkazalas-ot-semok-remeyka-koshmar-na-ulice-vyazov-proektom-zaymetsya-paramount/",
+      "last_article_code": "RIGHTS_NOT_ESTABLISHED"
+    }
+  ]
+}

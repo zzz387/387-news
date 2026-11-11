@@ -13,7 +13,7 @@ except ImportError:
     import site_checks
     import release_queue
 
-CODES={'NOT_PREPARED','READY_NOT_PUBLISHED','SITE_NOT_CURRENT','EXTERNAL_SERVICE',
+CODES={'EDITORIAL_DEFICIT','NOT_PREPARED','READY_NOT_PUBLISHED','SITE_NOT_CURRENT','EXTERNAL_SERVICE',
        'QUOTA_EXHAUSTED','EDITORIAL_HOLD','DELIVERY_RETRY_LIMIT','SETTINGS_BLOCKED','VERIFIED','WATCHDOG_GITHUB_ERROR','PRODUCTION_WORKFLOW_DISABLED',
        'WATCHDOG_RECOVERY_LIMIT','ACTIVE_PRODUCTION_TIMEOUT','RECOVERY_NOT_VERIFIED','WATCHDOG_DATE_ROLLED_OVER'}
 
@@ -97,14 +97,15 @@ def evaluate(root,status,now=None,check_public=site_checks.check_site):
     code='EXTERNAL_SERVICE' if external else 'SITE_NOT_CURRENT' if exists else 'NOT_PREPARED'
     if status.get('date')==today:
         block=status.get('block_code')
-        if block=='DAILY_QUOTA': code='QUOTA_EXHAUSTED'
+        if block=='EDITORIAL_STANDARD_NOT_MET':code='EDITORIAL_DEFICIT'
+        elif block=='DAILY_QUOTA': code='QUOTA_EXHAUSTED'
         elif block in ('API_COOLDOWN','AUDIT_EXTERNAL_ERROR','INFRASTRUCTURE_ERROR'): code='EXTERNAL_SERVICE'
         elif block=='RELEASE_DISABLED': code='SETTINGS_BLOCKED'
         elif block=='DELIVERY_RETRY_LIMIT': code='DELIVERY_RETRY_LIMIT'
         elif status.get('stage')=='BLOCKED': code='EDITORIAL_HOLD'
         elif status.get('audit_passed') and not exists: code='READY_NOT_PUBLISHED'
     # One-hour grace prevents a transient initial deploy from creating an incident.
-    alert=now.hour>=7 or code in ('EDITORIAL_HOLD','DELIVERY_RETRY_LIMIT')
+    alert=now.hour>=7 or code in ('EDITORIAL_HOLD','EDITORIAL_DEFICIT','DELIVERY_RETRY_LIMIT')
     return {'date':today,'code':code,'verified':False,'alert':alert,'publication_status':'PUBLICATION_FAILED'}
 
 
@@ -114,12 +115,12 @@ def main():
     output=os.getenv('GITHUB_OUTPUT')
     if output:
         with open(output,'a') as stream:stream.write('verified='+str(result['verified']).lower()+'\npublication_status='+result['publication_status']+'\n')
-    if os.getenv('NEWS_POLICY_VERSION')=='4.3':
+    if os.getenv('NEWS_POLICY_VERSION') in ('4.3','4.4'):
         try:
             workflow=github('GET','actions/workflows/daily-v31.yml')
             print('[daily-workflow] '+json.dumps({'state':workflow['state'],'path':workflow['path'],'release_target':'06:00 Europe/Moscow'}),flush=True)
         except Exception as exc:print('[daily-workflow] '+json.dumps({'code':'METADATA_UNAVAILABLE','error':type(exc).__name__}),flush=True)
-    result['waiting_for_authorized_special_priority']=os.getenv('SPECIAL_PRIORITY_HOLD')=='true' and os.getenv('NEWS_POLICY_VERSION')!='4.3'
+    result['waiting_for_authorized_special_priority']=os.getenv('SPECIAL_PRIORITY_HOLD')=='true' and os.getenv('NEWS_POLICY_VERSION') not in ('4.3','4.4')
     try:
         if result['verified'] or result['alert']:
             result['incident']=incident(result['date'],result['code'],result['verified'])

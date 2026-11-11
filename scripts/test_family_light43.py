@@ -28,8 +28,8 @@ class FamilyRiskTests(unittest.TestCase):
         s['candidates'] += [named('Семейные игры и воспитание детей',30),named('История велосипеда',31)]
         before=[copy.deepcopy(r['article']) for r in s['candidates']]
         with tempfile.TemporaryDirectory() as temp:chosen=stock.balance(s,root(temp),NOW)
-        self.assertEqual(len(chosen),12);self.assertTrue({'A','C'}<={pri.classify(r)['group'] for r in chosen})
-        self.assertEqual([r['article'] for r in s['candidates']],before);self.assertEqual(stock.report(s)['ready_articles'],2)
+        self.assertEqual(len(chosen),14);self.assertTrue({'A','C'}<={pri.classify(r)['group'] for r in chosen})
+        self.assertEqual([r['article'] for r in s['candidates']],before);self.assertEqual(stock.report(s)['ready_articles'],0)
     def test_missing_family_sport_never_blocks_other_verified_articles(self):
         self.assertEqual(len(sel.composition(state(8))),8)
     def test_three_stock_light_items_need_no_model_and_do_not_count_as_main(self):

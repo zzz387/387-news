@@ -119,11 +119,12 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
         items=[dict(item,url=secure_discovery_url(item['url'],row)) for item in (items or links.articles)]
         seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not advertising_story(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/')!=row['homepage'].rstrip('/') and x['url'] not in exclude]
         from scripts import selection43
-        from scripts import priorities43
-        items.sort(key=lambda item:(int(bool(preferred_group) and priorities43.classify(item)['group']!=preferred_group),int(selection43.profile(item)['space']),not item.get('heading_link',False)))
+        from scripts import priorities43,policy44
+        def item_group(item):return policy44.subject(item) if preferred_group in policy44.GROUPS else priorities43.classify(item)['group']
+        items.sort(key=lambda item:(int(bool(preferred_group) and item_group(item)!=preferred_group),int(selection43.profile(item)['space']),not item.get('heading_link',False)))
         report.update(status='discovery_verified',discovered=len(items))
         if preferred_group:
-            matching=[item for item in items if priorities43.classify(item)['group']==preferred_group]
+            matching=[item for item in items if item_group(item)==preferred_group]
             report['matching_topic_metadata']=len(matching)
             # A publisher's advertised coverage is not evidence of this story's topic.
             # Do not consume complete-original checks on unrelated section links.
@@ -179,12 +180,14 @@ def refresh(state,now=None,session=None,shortage=False):
         last=cache['publishers'].get(row['id'],{}).get('checked_at')
         return not last or now-datetime.fromisoformat(last)>=timedelta(hours=config['refresh_hours'])
     ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified' and due(r)],cache,state.get('_recent43',[]),state['date'])
+    from scripts import policy44
+    if policy44.active(state):ordered=policy44.publisher_order(ordered,state)
     if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true':
         # One public discovery slot for the independent light column; content,
         # complete originals and rights still decide eligibility, never the flag.
         core=[r for r in ordered if r.get('search_group')]
         other=[r for r in ordered if not r.get('search_group')]
-        picks=[r for r in other if r.get('light_suitable')]
+        picks=[r for r in other if policy44.active(state) or r.get('light_suitable')]
         if picks:
             light=min(picks,key=lambda r:(cache['publishers'].get(r['id'],{}).get('checked_at',''),-r.get('availability',{}).get('full_originals_verified',0),r['id']))
             other=[r for r in other if r['id']!=light['id']]
@@ -217,9 +220,9 @@ def refresh(state,now=None,session=None,shortage=False):
     while pending and len(attempted_ids)<config['publishers_per_run']:
         row=pending.pop(0)
         if row['id'] not in initial and not row.get('search_light'):
-            missing=[g for g in priorities43.CORE_GROUPS if not run['candidate_groups'].get(g) and g not in fallback_groups]
+            missing=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if not run['candidate_groups'].get(g) and g not in fallback_groups]
             for group in missing:
-                options=[r for r in ordered if r['id'] not in attempted_ids and r['id'] not in initial and any(priorities43.DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[]))]
+                options=[r for r in ordered if r['id'] not in attempted_ids and r['id'] not in initial and (bool({'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}[group]&set(r.get('priority_ids',[]))) if policy44.active(state) else any(priorities43.DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[])))]
                 if options:
                     row=dict(options[0],search_group=group);fallback_groups.add(group)
                     pending=[r for r in pending if r['id']!=row['id']];break
@@ -238,6 +241,7 @@ def refresh(state,now=None,session=None,shortage=False):
             if src['url'] in known:continue
             record=dict(id=p.digest(src['url']),url=src['url'],title=src['title'],source=src,publisher_id=row['id'],publisher_group=row['domain'].removeprefix('www.'),source_kind=row['type'],science_domain=next(iter(row['topics']),''),
                 priority_ids=row.get('priority_ids',[]),editorial_priority=row.get('editorial_priority',50),quality_score=row.get('quality_score',50),science_source=row.get('science_source',False),category_hint='Общество',discovered_at=now.isoformat(),light_suitable=row.get('light_suitable',False),status='discovered',progress={},checks={},history=[])
+            if policy44.active(state):record['topic_policy_version']='4.4'
             record['editorial43']=priorities43.evaluate(record,state.get('_recent43',[]),state['date'])
             record['category_hint']=record['editorial43']['category']
             if row.get('search_light'):
@@ -246,12 +250,12 @@ def refresh(state,now=None,session=None,shortage=False):
                     record['for_light_only']=True
                     queue=state.setdefault('light43_queue',[])
                     if record['id'] not in queue:queue.append(record['id'])
-            group=record['editorial43']['group'];run['candidate_groups'][group]=run['candidate_groups'].get(group,0)+1
+            group=(policy44.subject(record) or 'general') if policy44.active(state) else record['editorial43']['group'];run['candidate_groups'][group]=run['candidate_groups'].get(group,0)+1
             state['candidates'].append(record);known.add(src['url'])
             state.setdefault('source_cache',{})[src['url']]=src
         print('[catalog43] '+json.dumps({k:v for k,v in report.items() if k not in ('eligible_urls',)},ensure_ascii=False),flush=True)
     rotate_candidates(state)
-    run['missing_candidate_groups']=[g for g in priorities43.CORE_GROUPS if not run['candidate_groups'].get(g)]
+    run['missing_candidate_groups']=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if not run['candidate_groups'].get(g)]
     print('[discovery-coverage43] '+json.dumps(run),flush=True)
     return cache
 
@@ -276,7 +280,7 @@ def live_report(output):
 
 def core_report(output):
     # Public-source diagnostic only: no production checkpoint, drafts or model key.
-    now=datetime.now(p.TZ);state={'date':now.date().isoformat(),'candidates':[]}
+    now=datetime.now(p.TZ);state={'date':now.date().isoformat(),'policy_version':os.getenv('NEWS_POLICY_VERSION','4.3'),'candidates':[]}
     cache=refresh(state,now,shortage=True)
     result={'checked_at':now.isoformat(),'gemini_requests':0,'search':cache.get('last_run',{}),
             'publishers':cache.get('publishers',{}),'candidate_groups':cache.get('last_run',{}).get('candidate_groups',{})}

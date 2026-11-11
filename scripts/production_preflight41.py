@@ -11,7 +11,7 @@ except ImportError:
 def check(env=os.environ):
     if (env.get('GITHUB_ACTIONS')!='true' or env.get('GITHUB_REPOSITORY')!='zzz387/387-news'
             or env.get('GITHUB_REF_NAME')!='main'):raise RuntimeError('PRODUCTION_ACTIONS_MAIN_REQUIRED')
-    use43=env.get('NEWS_POLICY_VERSION')=='4.3'
+    use43=env.get('NEWS_POLICY_VERSION') in ('4.3','4.4')
     if not use43 and not env.get('GEMINI_API_KEY','').strip():raise RuntimeError('GEMINI_SECRET_MISSING')
     stage.validate_key(env.get('DRAFT_ENCRYPTION_KEY',''))
     if p.VERSION!='4.1' or p.ARTICLE_COUNT!=12 or p.RELEASE_TIME!='06:00':raise RuntimeError('PRODUCTION_POLICY_CONFIG_INVALID')
@@ -23,7 +23,7 @@ def check(env=os.environ):
         try:from scripts import editorial43
         except ImportError:import editorial43
         if not editorial43.CONFIG['enabled']:raise RuntimeError('POLICY43_DISABLED')
-        result.update(policy_version='4.3',article_target=editorial43.CONFIG['article_target'],minimum_articles=1,reserve_without_gemini=True,gemini_secret_present=bool(env.get('GEMINI_API_KEY','').strip()))
+        result.update(policy_version=env['NEWS_POLICY_VERSION'],article_target=editorial43.CONFIG['article_target'],minimum_articles=editorial43.CONFIG['minimum_articles'],reserve_without_gemini=True,gemini_secret_present=bool(env.get('GEMINI_API_KEY','').strip()))
     if not result['automation_enabled']:raise RuntimeError('AUTOMATION_VARIABLE_NOT_ENABLED')
     if not result['release_approved']:raise RuntimeError('RELEASE_VARIABLE_NOT_ENABLED')
     return result

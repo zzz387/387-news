@@ -1,5 +1,5 @@
 {
-  "version": "3-family-sport",
+  "version": "4.4-unrestricted-briefs",
   "refresh_hours": 6,
   "publishers_per_run": 5,
   "article_checks_per_run": 8,
@@ -6634,6 +6634,522 @@
         "scope": "public_discovery_only",
         "full_originals_verified": 0,
         "code": "SOURCE_EXTRACTION_PARTIAL"
+      }
+    },
+    {
+      "id": "good-news-network",
+      "name": "Good News Network",
+      "domain": "goodnewsnetwork.org",
+      "homepage": "https://www.goodnewsnetwork.org/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": true,
+      "discovery": {
+        "feeds": [
+          "https://www.goodnewsnetwork.org/feed/"
+        ],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.goodnewsnetwork.org/"
+      }
+    },
+    {
+      "id": "positive-news",
+      "name": "Positive News",
+      "domain": "positive.news",
+      "homepage": "https://www.positive.news/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": true,
+      "discovery": {
+        "feeds": [
+          "https://www.positive.news/feed/"
+        ],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.positive.news/"
+      }
+    },
+    {
+      "id": "optimist-daily",
+      "name": "The Optimist Daily",
+      "domain": "optimistdaily.com",
+      "homepage": "https://www.optimistdaily.com/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": true,
+      "discovery": {
+        "feeds": [
+          "https://www.optimistdaily.com/feed/"
+        ],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.optimistdaily.com/"
+      }
+    },
+    {
+      "id": "the-week",
+      "name": "The Week — Good News",
+      "domain": "theweek.com",
+      "homepage": "https://theweek.com/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": false,
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://theweek.com/"
+      }
+    },
+    {
+      "id": "upi",
+      "name": "UPI — Odd News",
+      "domain": "upi.com",
+      "homepage": "https://www.upi.com/Odd_News/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": false,
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.upi.com/Odd_News/"
+      }
+    },
+    {
+      "id": "mental-floss",
+      "name": "Mental Floss",
+      "domain": "mentalfloss.com",
+      "homepage": "https://www.mentalfloss.com/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": true,
+      "discovery": {
+        "feeds": [
+          "https://www.mentalfloss.com/feed"
+        ],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.mentalfloss.com/"
+      }
+    },
+    {
+      "id": "readers-digest",
+      "name": "Reader’s Digest",
+      "domain": "rd.com",
+      "homepage": "https://www.rd.com/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": true,
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.rd.com/"
+      }
+    },
+    {
+      "id": "people",
+      "name": "People — Human Interest",
+      "domain": "people.com",
+      "homepage": "https://people.com/human-interest/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": false,
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://people.com/human-interest/"
+      }
+    },
+    {
+      "id": "npr",
+      "name": "NPR",
+      "domain": "npr.org",
+      "homepage": "https://www.npr.org/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": true,
+      "discovery": {
+        "feeds": [
+          "https://feeds.npr.org/1002/rss.xml"
+        ],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.npr.org/"
+      }
+    },
+    {
+      "id": "washington-post",
+      "name": "The Washington Post",
+      "domain": "washingtonpost.com",
+      "homepage": "https://www.washingtonpost.com/",
+      "language": "en",
+      "country": "international",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": false,
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "TimeoutError"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://www.washingtonpost.com/"
+      }
+    },
+    {
+      "id": "afisha-daily",
+      "name": "Афиша Daily",
+      "domain": "daily.afisha.ru",
+      "homepage": "https://daily.afisha.ru/",
+      "language": "ru",
+      "country": "RU",
+      "type": "editorial_journalism",
+      "topics": [
+        "human_interest",
+        "culture",
+        "unusual_events"
+      ],
+      "priority_ids": [],
+      "editorial_priority": 85,
+      "quality_score": 75,
+      "light_suitable": true,
+      "science_source": false,
+      "allow_archive": true,
+      "enabled": false,
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "availability": {
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
+      },
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying or translation permission inferred",
+        "evidence_url": "https://daily.afisha.ru/"
       }
     }
   ],

@@ -62,7 +62,7 @@ def preparation_order(state,limit=None,exclude_ids=()):
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None,delivery_only=False):
     try:from scripts import selection43,catalog43,light43,priorities43
     except ImportError:import selection43,catalog43,light43,priorities43
-    from scripts import stock43
+    from scripts import stock43,policy44
     clock=(lambda:now) if now is not None else pipeline.now_moscow
     save=persist
     def persist():
@@ -81,7 +81,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     state['_recent_light43']=light43.recent(root)
     stock43.draw_light(state,root)
     due=current>=release-timedelta(minutes=10)
-    short=len(selection43.composition(state))<minimum
+    active44=policy44.active(state)
+    short=not policy44.standard(state)['compliant'] if active44 else len(selection43.composition(state))<minimum
     if short:
         state['audit_passed']=False
         pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET')
@@ -99,19 +100,27 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         persist();injected_editor=editor is not None;editor=editor or e.Editor(persist=persist)
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}|set(stock43.ensure(state)['published_urls'])
         def prepare_light():
-            if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or clock()>=release-timedelta(minutes=10) or not budget:return
+            if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or (not active44 and clock()>=release-timedelta(minutes=10)) or not budget:return
             keep=max(4,2*max(0,minimum-len(selection43.composition(state))))
-            if budget.remaining_requests()>=keep+2:
+            if budget.remaining_requests()>=(2 if active44 else keep+2):
                 light43.prepare(state,persist)
                 stock43.bank_light(state,clock())
         prepare_light()
         attempted_ids=set();extra_searches=0
         while True:
             stock43.balance(state,root,clock())
-            banking=len(selection43.composition(state))>=e.CONFIG['article_target']
+            banking=not active44 and len(selection43.composition(state))>=e.CONFIG['article_target']
             main_groups={g:sum(priorities43.classify(r)['group']==g for r in selection43.composition(state)) for g in ('A','C')}
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
-            coverage_needed=banking and bool(coverage_pending)
+            if active44:
+                needed={g for g,n in policy44.counts(selection43.composition(state)).items() if n<2}
+                coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and policy44.subject(r) in needed and not r.get('for_light_only')]
+            if active44 and needed and not coverage_pending and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
+                extra_searches+=1
+                try:catalog43.refresh(state,clock(),shortage=True)
+                except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
+                priorities43.apply_rules(state,clock());persist();continue
+            coverage_needed=bool(coverage_pending) if active44 else banking and bool(coverage_pending)
             plan_state=state
             if coverage_needed:
                 # Missing personal streams take the preparation window before
@@ -124,7 +133,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 plan_state=dict(state,candidates=stock43.available(state,date)+pending,_stock_preparation43=True)
             record=next(iter(preparation_order(plan_state,limit=1,exclude_ids=attempted_ids)),None)
             if record is None:
-                needs_supply=(len(selection43.composition(state))<e.CONFIG['article_target'] or len(stock43.available(state,date))<e.CONFIG.get('article_stock_target',20))
+                needs_supply=(active44 and not policy44.standard(state)['compliant'] or len(selection43.composition(state))<e.CONFIG['article_target'] or len(stock43.available(state,date))<e.CONFIG.get('article_stock_target',20))
                 if needs_supply and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                     extra_searches+=1
                     try:catalog43.refresh(state,clock(),shortage=True)
@@ -133,10 +142,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 break
             attempted_ids.add(record['id'])
             count=len(selection43.composition(state))
-            banking=count>=e.CONFIG['article_target'] and main_groups.get(priorities43.classify(record)['group'],2)>=2
-            if due and count>=minimum:break
+            banking=not active44 and count>=e.CONFIG['article_target'] and main_groups.get(priorities43.classify(record)['group'],2)>=2
+            if due and count>=minimum and (not active44 or policy44.standard(state)['compliant']):break
             if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):break
-            if (not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
+            if (not active44 and not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
             if record['url'] in prior:record['status']='deferred';persist();continue
@@ -184,6 +193,12 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     if len(selected)<minimum:
         state['audit_passed']=False;state['issue_kind']='preparing';state['reserve_count']=0;state['public_article_count']=0
         pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET');persist();return False
+    if active44:
+        state['editorial_standard44']=policy44.standard(state,selected)
+        print('[editorial-standard44] '+json.dumps(state['editorial_standard44']),flush=True)
+        if not state['editorial_standard44']['compliant']:
+            state['audit_passed']=False;state['main_approved44']=len(selected)>=minimum
+            pipeline.status(state,'PREPARING','continue_editorial_deficit','EDITORIAL_STANDARD_NOT_MET');persist();return False
     reserve=[] if selected else reserve_rows(state,clock())
     state['issue_kind']='articles' if selected else 'source_digest'
     state['reserve_count']=len(reserve)

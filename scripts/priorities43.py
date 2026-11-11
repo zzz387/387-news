@@ -7,7 +7,7 @@ from html import unescape
 from urllib.parse import urlparse
 from scripts import policy41 as p
 
-RULES_VERSION=3
+RULES_VERSION=4
 CORE_GROUPS=('A','B','C')
 
 CONFIG=json.loads((p.ROOT/'config/editorial_priorities43.json').read_text())
@@ -23,7 +23,15 @@ def classify(row):
         text+=' '+' '.join(b.get('text','') for b in source.get('blocks',[])[:8])
     if article:
         text=' '.join(str(article.get(k,'')) for k in ('title','teaser'))+' '+' '.join(b.get('text','') for b in article.get('blocks',[])[:8])
-    return dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))
+    result=dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))
+    if row.get('topic_policy_version')=='4.4':
+        from scripts import policy44
+        group=policy44.subject(row)
+        allowed={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}
+        direction=result['direction'] if group and result['direction'] in allowed[group] else {'family':1,'health':12,'sport':13}.get(group)
+        if direction:result.update(group='A' if group=='family' else 'C',direction=direction,category=policy44.category(row))
+        elif result['group'] in ('A','C'):result.update(group='general',direction=None,category=policy44.category(row,general_category(text)))
+    return result
 
 
 @lru_cache(maxsize=2048)
@@ -121,6 +129,7 @@ def apply_rules(state,now):
         state.setdefault('history',[]).append({'code':'SELECTION_RULES_UPDATED','previous':previous.copy(),'current':versions.copy()})
         print('[selection-rules43] '+json.dumps(dict(versions,reviewed_articles_preserved=True,quota_preserved=True)),flush=True)
     for row in state['candidates']:
+        if state.get('policy_version')=='4.4':row['topic_policy_version']='4.4'
         if row.get('article') or row.get('status')=='ready':continue
         row['editorial43']=evaluate(row,state.get('_recent43',[]),state['date'])
         row['category_hint']=row['editorial43']['category']
@@ -206,7 +215,7 @@ def published_report(root=None,check_public=None):
     from pathlib import Path
     from scripts import selection43,site_checks,publication43,source_dom41
     root=Path(root or p.ROOT);live=(check_public or site_checks.check_site)()
-    if live.get('https')!='verified' or live.get('policy_version')!='4.3':raise ValueError('PUBLIC_COMPOSITION_NOT_VERIFIED')
+    if live.get('https')!='verified' or live.get('policy_version') not in ('4.3','4.4'):raise ValueError('PUBLIC_COMPOSITION_NOT_VERIFIED')
     date=live['issue_date'];metadata=publication43.validate(root,date)
     if metadata['article_count']!=live['articles']:raise ValueError('PUBLIC_COMPOSITION_COUNT_MISMATCH')
     rows=[]

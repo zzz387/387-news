@@ -21,7 +21,7 @@ def edition_exists(root,date):
     root=Path(root)
     if (root/'issues'/date/'issue.json').is_file(): return True  # immutable legacy edition
     path=root/'issues'/date/'index.html'
-    return path.is_file() and any('data-policy-version="'+v+'"' in path.read_text(encoding='utf-8') for v in ('4.1','4.3'))
+    return path.is_file() and any('data-policy-version="'+v+'"' in path.read_text(encoding='utf-8') for v in ('4.1','4.3','4.4'))
 
 
 def pending_date(root, now):
@@ -38,7 +38,7 @@ def target_date(root, now=None, check_public=None):
     if now.strftime('%H:%M')>=policy41.RELEASE_TIME and check_public is not None:
         try:
             check_public(expected_date=today)
-            if os.getenv('NEWS_POLICY_VERSION')=='4.3':return (now.date()+timedelta(days=1)).isoformat()
+            if os.getenv('NEWS_POLICY_VERSION') in ('4.3','4.4'):return (now.date()+timedelta(days=1)).isoformat()
         except Exception:
             print('[release-context] today committed but HTTPS delivery unverified; recover deployment',flush=True)
             return today
@@ -116,7 +116,7 @@ def main():
                                 check_public=site_checks.check_site)
     if (not preview and phase in ('run','resume') and not os.environ.get('TARGET_DATE','').strip()
             and os.environ.get('GITHUB_REF_NAME')=='main'):
-        if os.getenv('NEWS_POLICY_VERSION')=='4.3':
+        if os.getenv('NEWS_POLICY_VERSION') in ('4.3','4.4'):
             # Keep old ciphertext artifacts under their original dates; don't relabel as today.
             date=unfinished_date(news.ROOT,date,production_artifacts())
             print('[release-context] policy43 resumes the oldest unpublished checkpoint before advancing dates')
