@@ -144,4 +144,14 @@ class Policy44Tests(unittest.TestCase):
         self.assertEqual(monitor.incident(status['date'],status['code'],False,request=github),'created')
         self.assertNotIn('source',str(calls[-1][2]).lower())
 
+
+    def test_watchdog_resumes_policy44_deficits_in_the_same_controller(self):
+        from scripts import delivery_watchdog as watch
+        from scripts.test_delivery_watchdog import Clock,API,at
+        clock=Clock(at('07:00'));api=API(clock)
+        with patch.dict(os.environ,NEWS_POLICY_VERSION='4.4'):
+            result=watch.run(Path('/unused'),clock=clock,sleep=clock.sleep,request=api,check=api.check)
+        self.assertTrue(result['verified']);self.assertEqual(api.posts[0][1]['inputs']['phase'],'run')
+        self.assertEqual(len(api.posts),1)
+
 if __name__=='__main__':unittest.main()
