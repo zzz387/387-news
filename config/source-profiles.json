@@ -89,6 +89,15 @@
     "vm.ru": {
       "publisher": "Вечерняя Москва",
       "evidence_url": "https://vm.ru/about"
+    },
+    "nhs.uk": {
+      "publisher": "NHS",
+      "evidence_url": "https://www.nhs.uk/"
+    },
+    "medlineplus.gov": {
+      "publisher": "MedlinePlus, National Library of Medicine (NIH)",
+      "evidence_url": "https://medlineplus.gov/",
+      "publisher_group": "nih.gov"
     }
   }
 }
