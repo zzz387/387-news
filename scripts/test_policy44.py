@@ -116,7 +116,7 @@ class Policy44Tests(unittest.TestCase):
         a=named('Живые строительные материалы',30);b=named('Самовосстанавливающийся бетон',31)
         self.assertTrue(sel.duplicate(a,b));self.assertFalse(brief.duplicate(a,b))
     def test_unverified_dates_and_false_recency_are_rejected(self):
-        src,item=response_item();item.update(time_kind='news',event_date='2026-11-11')
+        src,item=response_item();item.update(time_kind='news',event_date='2026-11-11',text='Сегодня музей восстановил 21 картину.')
         with self.assertRaisesRegex(ValueError,'BRIEF_EVENT_DATE_UNSUPPORTED'):brief.accept(item,src)
         item.update(time_kind='unusual_fact',text='Сегодня музей восстановил 21 картину.')
         with self.assertRaisesRegex(ValueError,'BRIEF_FALSE_RECENCY'):brief.accept(item,src)
@@ -313,5 +313,20 @@ class Policy44Tests(unittest.TestCase):
         self.assertEqual(src['metadata_status'],'verified');self.assertTrue(src['full_text_verified'])
         self.assertEqual(rights41.decision(src,'INDEPENDENT_ARTICLE')['status'],'allowed')
         self.assertNotEqual(rights41.decision(src,'ORIGINAL_REPUBLICATION')['status'],'allowed')
+
+
+    def test_model_date_hint_does_not_block_a_verified_undated_source_report(self):
+        src,item=response_item();item.update(time_kind='news',event_date='2026-11-11')
+        row=brief.accept(item,src);self.assertEqual(row['light_kind'],'source_report')
+        self.assertEqual(row['checks']['brief44']['event_date'],'');self.assertTrue(brief.eligible(row))
+        for text in ['Сегодня музей восстановил 21 картину.','Музей откроется завтра.','В 2026 году музей восстановил 21 картину.']:
+            case=copy.deepcopy(item);case['text']=text
+            with self.assertRaises(ValueError):brief.accept(case,src)
+
+
+    def test_medlineplus_and_nih_are_not_independent_medical_publishers(self):
+        from scripts import editorial41
+        self.assertEqual(editorial41.publisher_identity('https://magazine.medlineplus.gov/article'),editorial41.publisher_identity('https://www.nih.gov/article'))
+        self.assertNotEqual(editorial41.publisher_identity('https://www.nhs.uk/article'),editorial41.publisher_identity('https://www.nih.gov/article'))
 
 if __name__=='__main__':unittest.main()

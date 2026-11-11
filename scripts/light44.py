@@ -77,7 +77,15 @@ def accept(item,source):
     if kind!='news' and re.search(r'(?i)сегодня|вчера|на этой неделе|только что|today|yesterday',title+' '+text):raise p.Blocked('BRIEF_FALSE_RECENCY')
     if kind=='news':
         date=item.get('event_date','')
-        if not date or not any(content41.witnessed_event_date(date,q) for q in witnesses):raise p.Blocked('BRIEF_EVENT_DATE_UNSUPPORTED')
+        bound=bool(date) and any(content41.witnessed_event_date(date,q) for q in witnesses)
+        if not bound:
+            temporal=r'(?i)сегодня|вчера|сейчас|недавно|только что|на этой неделе|в настоящее время|новое исследование|завтра|состоится|откроется|пройд[её]т|будет|today|yesterday|recently|tomorrow|currently|new study|will (?:open|take place)|\b(?:19|20)\d{2}\b|\d{1,2}[./-]\d{1,2}|январ|феврал|март|апрел|\bма[йяе]\b|июн|июл|август|сентябр|октябр|ноябр|декабр|january|february|march|april|may |june|july|august|september|october|november|december'
+            if re.search(temporal,title+' '+text):raise p.Blocked('BRIEF_EVENT_DATE_UNSUPPORTED')
+            # The unsupported MODEL-only hint is not a fact in the article.
+            # Publish the verified timeless/past report without claiming its date.
+            kind='source_report'
+    if kind=='news':
+        date=item['event_date']
         # A verified old event is honestly labelled, never artificially made current.
         stamp=datetime.fromisoformat(date);stamp=stamp.replace(tzinfo=p.TZ) if stamp.tzinfo is None else stamp
         if stamp>datetime.now(p.TZ):raise p.Blocked('BRIEF_EVENT_IN_FUTURE')
@@ -87,14 +95,14 @@ def accept(item,source):
     row={'id':p.digest({'source':source['url'],'title':title}),'url':source['url'],'source':source,'mode':'INDEPENDENT_ARTICLE','rights':grant,'status':'ready','progress':{},'history':[],
          'article':{'title':title,'teaser':'','category':'Короткие истории','kind':'Короткая история','mode':'INDEPENDENT_ARTICLE','blocks':[{'kind':'paragraph','text':text}],'activities':[]},
          'light_kind':kind,'ready_checked_at':datetime.now(p.TZ).isoformat(),'checks':{}}
-    row['checks']['brief44']={'approved':True,'input_hash':fingerprint(row),'evidence':copy.deepcopy(item['evidence']),'event_date':item.get('event_date',''),'basis':'single_batched_source_check'}
+    row['checks']['brief44']={'approved':True,'input_hash':fingerprint(row),'evidence':copy.deepcopy(item['evidence']),'event_date':item.get('event_date','') if kind!='source_report' else '', 'date_basis':'not_claimed' if kind=='source_report' else 'bound_or_nonoperative','basis':'single_batched_source_check'}
     return row
 
 def prepare(state,persist=lambda:None):
     from scripts import light43
     saved=state.setdefault('light43',{'records':[]});saved.setdefault('records',[])
     batch=saved.setdefault('v44',{'completed':[],'refusals':[],'http_requests':0})
-    if batch.get('response') is not None and (not batch.get('response_applied') or batch.get('admission_revision',1)<2):
+    if batch.get('response') is not None and (not batch.get('response_applied') or batch.get('admission_revision',1)<3):
         apply_response(state,persist);return
     budget=news.runtime.ACTIVE_BUDGET
     if not budget or not budget.can_request():return
@@ -164,7 +172,7 @@ def apply_response(state,persist=lambda:None):
             if stock43.bank(state,row,datetime.now(p.TZ),'light'):
                 banked+=1;continue
         current.append(row)  # News/overflow remains in this issue; nothing is discarded.
-    batch['response_applied']=True;batch['admission_revision']=2
+    batch['response_applied']=True;batch['admission_revision']=3
     batch['banked']=batch.get('banked',0)+banked
     saved['records']+=current;batch['completed'].append({'window':window,'accepted':len(accepted),'attempts':batch['attempts']});light43.reserve_accepted_sources(state,accepted);persist()
     print('[brief44] '+json.dumps({'accepted':len(accepted),'ready':len(ready(state)),'banked':banked,'stock_ready':len(stock43.available(state,state['date'],'light')),'refusal_codes':dict(__import__('collections').Counter(r['code'] for r in batch['refusals'])),'http_requests':batch['http_requests']}),flush=True)

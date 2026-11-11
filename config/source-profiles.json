@@ -93,6 +93,11 @@
     "nhs.uk": {
       "publisher": "NHS",
       "evidence_url": "https://www.nhs.uk/"
+    },
+    "medlineplus.gov": {
+      "publisher": "MedlinePlus, National Library of Medicine (NIH)",
+      "evidence_url": "https://medlineplus.gov/",
+      "publisher_group": "nih.gov"
     }
   }
 }

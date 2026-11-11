@@ -33,7 +33,8 @@ def publisher_identity(url):
     host=(urlparse(url).hostname or '').lower().removeprefix('www.')
     roots=set(TRUSTED)|set(rights41.source_profiles()['institutions'])
     matches=[domain for domain in roots if host==domain or host.endswith('.'+domain)]
-    return min(matches,key=lambda d:len(d.split('.'))) if matches else host
+    root=min(matches,key=lambda d:len(d.split('.'))) if matches else host
+    return rights41.source_profiles()['institutions'].get(root,{}).get('publisher_group',root)
 
 
 def new_state(date):

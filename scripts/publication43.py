@@ -149,10 +149,10 @@ def render_light(items):
     html='<section id="light-news" class="light-news" aria-labelledby="light-news-heading"><h2 id="light-news-heading">НЕ ВСЁ ТАК СЕРЬЁЗНО</h2><p>Маленькие новости, от которых мир становится интереснее</p><div class="light-grid">'
     for item in items:
         source=item['source'];url=source_links43.safe_source_url(source['url'])
-        label={'news':'Короткая новость','historical_fact':'Исторический факт','unusual_fact':'Необычный факт'}.get(item.get('kind'))
+        label={'source_report':'Из материалов источника','news':'Короткая новость','historical_fact':'Исторический факт','unusual_fact':'Необычный факт'}.get(item.get('kind'))
         label_html='<p class="meta light-kind">'+label+'</p>' if label else ''
         html+='<article class="light-item">'+label_html+'<h3>'+escape(item['title'])+'</h3><p>'+escape(item['text'])+'</p><p class="light-source">Источник: <a href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+escape(source['publisher'])+'</a>'
-        if source.get('published'):html+=' · '+escape(source['published'])
+        if source.get('published'):html+=' · '+('Дата публикации: ' if item.get('kind')=='source_report' else '')+escape(source['published'])
         translated=source_links43.translation_url(url,source.get('language'))
         if translated:html+=' · <a href="'+escape(translated,quote=True)+'" target="_blank" rel="noopener noreferrer">На русском</a>'
         html+='</p></article>'

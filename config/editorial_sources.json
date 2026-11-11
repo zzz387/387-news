@@ -1,5 +1,5 @@
 {
-  "version": "4.4-unrestricted-briefs",
+  "version": "4.4-personal-health-recovery",
   "refresh_hours": 6,
   "publishers_per_run": 5,
   "article_checks_per_run": 8,
@@ -7150,6 +7150,198 @@
         "mode": "INDEPENDENT_ARTICLE",
         "basis": "Unprotected facts only; no copying or translation permission inferred",
         "evidence_url": "https://daily.afisha.ru/"
+      }
+    },
+    {
+      "id": "nhs-guidance",
+      "name": "NHS — Live Well",
+      "homepage": "https://www.nhs.uk/live-well/",
+      "domain": "nhs.uk",
+      "language": "en",
+      "country": "GB",
+      "type": "institutional_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.nhs.uk/live-well/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        16
+      ],
+      "editorial_priority": 95,
+      "quality_score": 95,
+      "allow_archive": true,
+      "availability": {
+        "status": "pending_verification",
+        "scope": "public_discovery_only"
+      }
+    },
+    {
+      "id": "nih-news-in-health",
+      "name": "NIH News in Health",
+      "homepage": "https://newsinhealth.nih.gov/",
+      "domain": "nih.gov",
+      "language": "en",
+      "country": "US",
+      "type": "institutional_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://newsinhealth.nih.gov/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        16
+      ],
+      "editorial_priority": 95,
+      "quality_score": 95,
+      "allow_archive": true,
+      "availability": {
+        "status": "pending_verification",
+        "scope": "public_discovery_only"
+      }
+    },
+    {
+      "id": "medlineplus-magazine",
+      "name": "NIH MedlinePlus Magazine",
+      "homepage": "https://magazine.medlineplus.gov/",
+      "domain": "medlineplus.gov",
+      "language": "en",
+      "country": "US",
+      "type": "institutional_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://magazine.medlineplus.gov/"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        16
+      ],
+      "editorial_priority": 95,
+      "quality_score": 95,
+      "allow_archive": true,
+      "availability": {
+        "status": "pending_verification",
+        "scope": "public_discovery_only"
+      }
+    },
+    {
+      "id": "who-features",
+      "name": "WHO — Feature Stories",
+      "homepage": "https://www.who.int/news-room/feature-stories",
+      "domain": "who.int",
+      "language": "en",
+      "country": "international",
+      "type": "institutional_journalism",
+      "topics": [
+        "Питание и долголетие",
+        "Кардиотренировки и физиология",
+        "Современная медицина"
+      ],
+      "discovery": {
+        "feeds": [],
+        "html": true,
+        "manual_search": true,
+        "feed_urls_are_hints": false
+      },
+      "enabled": false,
+      "access": {
+        "public_only": true,
+        "respect_robots": true,
+        "no_paywall_bypass": true,
+        "advertising_is_not_evidence": true,
+        "terms_review_per_article": true
+      },
+      "rights": {
+        "status": "per_article_required",
+        "mode": "INDEPENDENT_ARTICLE",
+        "basis": "Unprotected facts only; no copying, translation or licence inferred from catalogue membership",
+        "evidence_url": "https://www.who.int/news-room/feature-stories"
+      },
+      "light_suitable": false,
+      "science_source": false,
+      "priority_ids": [
+        12,
+        13,
+        16
+      ],
+      "editorial_priority": 95,
+      "quality_score": 95,
+      "allow_archive": true,
+      "availability": {
+        "status": "pending_verification",
+        "scope": "public_discovery_only"
       }
     }
   ],
