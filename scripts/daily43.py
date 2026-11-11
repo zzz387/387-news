@@ -120,6 +120,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 try:catalog43.refresh(state,clock(),shortage=True)
                 except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
                 priorities43.apply_rules(state,clock());persist();continue
+            if active44 and needed and not coverage_pending and len(selection43.composition(state))>=e.CONFIG['article_target']:break
             coverage_needed=bool(coverage_pending) if active44 else banking and bool(coverage_pending)
             plan_state=state
             if coverage_needed:
@@ -144,7 +145,9 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             count=len(selection43.composition(state))
             banking=count>=e.CONFIG['article_target'] and (all(n>=2 for n in policy44.counts(selection43.composition(state)).values()) if active44 else main_groups.get(priorities43.classify(record)['group'],2)>=2)
             if due and count>=minimum and (not active44 or policy44.standard(state)['compliant']):break
-            if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):break
+            if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):
+                stock_needed={g for g,n in policy44.counts(stock43.available(state,date)).items() if n<2}
+                if not (active44 and policy44.subject(record) in stock_needed):break
             if (not active44 and not due and clock()>=release-timedelta(minutes=10)) or not budget or not budget.can_request():break
             if not os.getenv('GEMINI_API_KEY') and not injected_editor:break
             if record.get('status') not in ('discovered','preparing','retryable_error'):continue
@@ -156,6 +159,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             try:
                 if isinstance(editor,e.Editor):
                     editor.state=state;editor.usage_record=record;priorities43.attach_evidence(record,state);editor.verify_source(record)
+                    if active44 and coverage_needed and policy44.subject(record) not in needed:
+                        record['status']='discovered';record['history'].append({'code':'SOURCE_SUBJECT_MISMATCH_AFTER_FETCH'});persist();continue
                     if banking and e.high_risk(record):
                         record['status']='discovered';persist();continue
                     if any(selection43.duplicate(record,r) for r in selection43.composition(state)+(stock43.available(state,date) if banking else [])):

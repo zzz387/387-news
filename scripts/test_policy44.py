@@ -196,4 +196,47 @@ class Policy44Tests(unittest.TestCase):
             daily43.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5),editor=Editor())
         self.assertEqual(len(sel.composition(s)),20);self.assertEqual(stock43.report(s)['ready_articles'],1)
 
+
+    def test_full_general_reserve_does_not_prevent_missing_subjects(self):
+        s=issue(16);stock43.ensure(s)['records']=[main_row(i) for i in range(30,50)]
+        row=main_row(0);self.assertTrue(stock43.bank(s,row,NOW))
+        self.assertEqual(stock43.report(s)['required_topics']['family'],1)
+        self.assertEqual(stock43.report(s)['ready_articles'],21)
+
+
+    def test_incidental_source_words_do_not_enter_targeted_writing(self):
+        row={'title':'Образование и экономика региона','source':{'title':'Образование и экономика региона','blocks':[{'text':'Исследуется промышленность, университеты и экономика. Спортивные тренировки упомянуты в студенческой жизни. Затем рассматриваются бюджет, экспорт, промышленность и занятость. Обсуждаются отрасли экономики и университеты.'}]}}
+        self.assertIsNone(v.subject(row))
+    def test_focused_publisher_precedes_mixed_convenient_feed(self):
+        rows=[{'id':'mixed','priority_ids':[1,3,18,23],'availability':{'full_originals_verified':20}}, {'id':'family','priority_ids':[1,2,3],'availability':{'full_originals_verified':2}}]
+        self.assertEqual(v.publisher_order(rows,issue(0,0))[0]['id'],'family')
+    def test_equivalent_number_notation_is_not_a_factual_refusal(self):
+        self.assertEqual(brief.numbers('1,000 and 2.5','en'),brief.numbers('1 000 и 2,5','ru'))
+        self.assertNotEqual(brief.numbers('1,000','en'),brief.numbers('999','ru'))
+    def test_surplus_general_articles_do_not_consume_missing_subject_budget(self):
+        from scripts import daily43
+        s=issue(20);s['candidates']=[r for r in s['candidates'] if v.subject(r) is None];s['candidates'] += [main_row(i) for i in range(40,50)]
+        row=main_row(90);row['status']='discovered';s['candidates'].append(row);editor=__import__('unittest.mock',fromlist=['Mock']).Mock()
+        with tempfile.TemporaryDirectory() as temp,patch.object(daily43,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+            daily43.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5),editor=editor)
+        editor.finish.assert_not_called();self.assertFalse(s['audit_passed'])
+
+
+    def test_search_targets_two_candidates_per_missing_subject(self):
+        self.assertEqual(v.search_deficits(issue(0,0)),dict(family=2,health=2,sport=2))
+        s=issue();self.assertEqual(v.search_deficits(s),dict(family=2,health=2,sport=2))  # Replenish empty protected stock.
+    def test_ordinary_bedtime_games_are_not_medical_but_infant_safety_is(self):
+        self.assertFalse(e.high_risk(named('Игры с малышом перед сном: пение и дыхание')))
+        for title in ['Как кормить младенца','Медицинская помощь младенцу при температуре','Как укладывать младенца спать на живот']:
+            self.assertTrue(e.high_risk(named(title)))
+
+
+    def test_decimal_admission_migration_recovers_saved_response_without_api(self):
+        src,item=response_item();src['blocks'][0]['text']='The museum restored 1,000 paintings in its collection.'
+        item['text']='Музей восстановил 1 000 картин из своего собрания.';item['evidence'][0]['quote']=src['blocks'][0]['text']
+        s=issue(8,0);s['light43']['v44']={'sources':[src],'response':{'items':[item]},'response_applied':True,'admission_revision':1,'window':'paid-run','attempts':1,'http_requests':1,'refusals':[{'url':src['url'],'code':'BRIEF_NUMBER_UNSUPPORTED'}],'completed':[]}
+        with patch.object(news.runtime,'ACTIVE_BUDGET',None),patch.object(news,'gemini',side_effect=AssertionError('Response already paid')):
+            brief.prepare(s);brief.prepare(s)
+        self.assertEqual(len(light43.ready(s)),1);self.assertEqual(s['light43']['v44']['http_requests'],1)
+
 if __name__=='__main__':unittest.main()

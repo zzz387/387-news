@@ -123,6 +123,9 @@ def apply_rules(state,now):
     catalog=catalog43.registry()
     versions={'rules_version':RULES_VERSION,'classifier_version':CONFIG['version'],
               'catalog_version':catalog['version'],'catalog_hash':p.digest(catalog)}
+    if state.get('policy_version')=='4.4':
+        from scripts import policy44
+        versions['content_classifier44']=policy44.REVISION
     previous=state.get('selection_policy43',{})
     changed=any(previous.get(k)!=v for k,v in versions.items())
     if changed:

@@ -93,7 +93,9 @@ def bank(state,row,now,key='records'):
     compare=light44.duplicate if key=='light' and policy44.active(state) else sel.duplicate
     if any(identity(row)==identity(r) or compare(row,r) for r in rows if not r.get('stock_published')):return False
     cap=e.CONFIG.get('article_stock_target',20) if key=='records' else e.CONFIG.get('light_stock_target',15)
-    if len(available(state,state['date'],key))>=cap:return False
+    if len(available(state,state['date'],key))>=cap:
+        needed={g for g,n in policy44.counts(available(state,state['date'])).items() if n<2}
+        if not (key=='records' and policy44.active(state) and policy44.subject(row) in needed):return False
     saved=copy.deepcopy(row);saved['stock_saved_at']=now.isoformat();saved['stock_published']=False
     rows.append(saved);row['status']='reserve_ready'
     return True

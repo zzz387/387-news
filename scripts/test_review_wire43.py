@@ -33,14 +33,14 @@ class ReviewWireTests(unittest.TestCase):
         self.assertEqual(calls,['v43_final','v43_final']);self.assertTrue(e.eligible(r));self.assertEqual(r['article'],before)
         self.assertEqual(r['progress']['v43']['write_attempts'],3);self.assertEqual(r['progress']['v43']['review_attempts']['old'],3)
 
-    def test_unbound_witnesses_stop_after_three_final_calls_and_restore_does_not_repeat(self):
+    def test_unbound_witnesses_stop_after_two_identical_failures_and_restore_does_not_repeat(self):
         r=record();r['category_hint']='Наука';calls=[]
         def model(prompt,**kw):
             calls.append(kw['schema']);v=verdict(prompt,r);v['claims'][0]['quote']='Not in source';return v
         for attempt in range(2):
-            with self.assertRaisesRegex(p.Blocked,'FINAL_REVIEW_ATTEMPTS_EXHAUSTED'):e.Editor(call=model).finish(state(),r)
+            with self.assertRaisesRegex(p.Blocked,'REPEATED_REVIEW_DIAGNOSTIC'):e.Editor(call=model).finish(state(),r)
             r=copy.deepcopy(r)
-        self.assertEqual(calls,['v43_final']*3);self.assertFalse(e.eligible(r))
+        self.assertEqual(calls,['v43_final']*2);self.assertFalse(e.eligible(r))
 
     def test_changed_synchronous_input_never_gets_a_gate(self):
         r=record();r['category_hint']='Наука'

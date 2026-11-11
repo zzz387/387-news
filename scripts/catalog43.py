@@ -31,6 +31,8 @@ def undated_evergreen(source,row):
     title=source.get('title','')
     if not row.get('allow_archive') or editorial43.high_risk({'source':source}):return False
     if re.search(r'(?i)today|breaking|new study|сегодня|новое исследование|клиническ',title):return False
+    from scripts import policy44
+    if policy44.subject({'source':source}):return True
     return bool(re.search(r'(?i)истор|биограф|архитект|культур|history|historical|biograph|heritage|philosophy|parent|child|famil|play|learn|education|paternity|воспитан|реб[её]н|дет|семейн|обучен|игр|велосипед|cycling|йог|yoga',title))
 
 
@@ -135,6 +137,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 report['last_checked_url']=item['url']
                 src=session.fetch(item['url'])
                 if not owned(src.get('canonical',src['url']),row):raise p.Blocked('PUBLISHER_REDIRECT_UNVERIFIED')
+                if preferred_group in policy44.GROUPS and policy44.subject({'source':src})!=preferred_group:raise p.Blocked('SOURCE_SUBJECT_MISMATCH')
                 # A publisher's verified RSS publication field can establish a
                 # missing bibliographic date. Never substitute updated/event dates.
                 if not src.get('published') and item.get('feed_published') and report.get('verified_feed'):
@@ -204,6 +207,8 @@ def refresh(state,now=None,session=None,shortage=False):
     known={r['url'] for r in state['candidates']};session=session or public_sources41.Session(timeout=7);deadline=time.monotonic()+(120 if shortage else 75);checks=0
     cache['last_run']={'at':now.isoformat(),'attempted_groups':[],'candidate_groups':{},'publishers_attempted':0,'article_checks':0}
     run=cache['last_run']
+    targets=policy44.search_deficits(state) if policy44.active(state) else {g:1 for g in priorities43.CORE_GROUPS}
+    run['candidate_targets']=targets
     # Reserve an independent discovery attempt for each core group. Network work
     # overlaps only across public publishers; no model calls or state mutations.
     core=[row for row in selected if row.get('search_group')]
@@ -220,7 +225,7 @@ def refresh(state,now=None,session=None,shortage=False):
     while pending and len(attempted_ids)<config['publishers_per_run']:
         row=pending.pop(0)
         if row['id'] not in initial and not row.get('search_light'):
-            missing=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if not run['candidate_groups'].get(g) and g not in fallback_groups]
+            missing=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if run['candidate_groups'].get(g,0)<targets.get(g,1) and g not in fallback_groups]
             for group in missing:
                 options=[r for r in ordered if r['id'] not in attempted_ids and r['id'] not in initial and (bool({'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}[group]&set(r.get('priority_ids',[]))) if policy44.active(state) else any(priorities43.DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[])))]
                 if options:
@@ -255,7 +260,7 @@ def refresh(state,now=None,session=None,shortage=False):
             state.setdefault('source_cache',{})[src['url']]=src
         print('[catalog43] '+json.dumps({k:v for k,v in report.items() if k not in ('eligible_urls',)},ensure_ascii=False),flush=True)
     rotate_candidates(state)
-    run['missing_candidate_groups']=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if not run['candidate_groups'].get(g)]
+    run['missing_candidate_groups']=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if run['candidate_groups'].get(g,0)<targets.get(g,1)]
     print('[discovery-coverage43] '+json.dumps(run),flush=True)
     return cache
 
