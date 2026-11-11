@@ -115,6 +115,11 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             if active44:
                 needed={g for g,n in policy44.counts(selection43.composition(state)).items() if n<2}
                 coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and policy44.subject(r) in needed and not r.get('for_light_only')]
+            if active44 and needed and not coverage_pending and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
+                extra_searches+=1
+                try:catalog43.refresh(state,clock(),shortage=True)
+                except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
+                priorities43.apply_rules(state,clock());persist();continue
             coverage_needed=bool(coverage_pending) if active44 else banking and bool(coverage_pending)
             plan_state=state
             if coverage_needed:

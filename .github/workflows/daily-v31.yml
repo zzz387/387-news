@@ -99,7 +99,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: v43-synthetic-browser-diagnostics
-          path: ${{ runner.temp }}/browser43-report.json
+          path: |
+            ${{ runner.temp }}/browser43-report.json
+            ${{ runner.temp }}/browser44-report.json
           retention-days: 7
       - uses: actions/upload-artifact@v4
         with:
@@ -120,9 +122,10 @@ jobs:
           python-version: '3.12'
       - name: Check publisher discovery robots full-text access and per-article rights (public only no Gemini)
         run: python -m scripts.catalog43 --output '${{ runner.temp }}/catalog43-report.json'
-      - name: Measure adaptive A B C and light public discovery (no checkpoint or Gemini)
+      - name: Measure adaptive family health sport and light public discovery (no checkpoint or Gemini)
         env:
           NEWS_LIGHT_NEWS_ENABLED: 'true'
+          NEWS_POLICY_VERSION: '4.4'
         run: python -m scripts.catalog43 --core-search --output '${{ runner.temp }}/core-search43-report.json'
       - uses: actions/upload-artifact@v4
         if: ${{ always() }}

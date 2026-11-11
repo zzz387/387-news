@@ -6655,16 +6655,21 @@
       "light_suitable": true,
       "science_source": false,
       "allow_archive": true,
-      "enabled": false,
+      "enabled": true,
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.goodnewsnetwork.org/feed/"
+        ],
         "html": true,
         "manual_search": true,
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       },
       "access": {
         "public_only": true,
@@ -6698,16 +6703,21 @@
       "light_suitable": true,
       "science_source": false,
       "allow_archive": true,
-      "enabled": false,
+      "enabled": true,
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.positive.news/feed/"
+        ],
         "html": true,
         "manual_search": true,
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       },
       "access": {
         "public_only": true,
@@ -6741,16 +6751,21 @@
       "light_suitable": true,
       "science_source": false,
       "allow_archive": true,
-      "enabled": false,
+      "enabled": true,
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.optimistdaily.com/feed/"
+        ],
         "html": true,
         "manual_search": true,
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       },
       "access": {
         "public_only": true,
@@ -6792,8 +6807,11 @@
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_ACCESS_RESTRICTED"
       },
       "access": {
         "public_only": true,
@@ -6835,8 +6853,11 @@
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       },
       "access": {
         "public_only": true,
@@ -6870,16 +6891,21 @@
       "light_suitable": true,
       "science_source": false,
       "allow_archive": true,
-      "enabled": false,
+      "enabled": true,
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://www.mentalfloss.com/feed"
+        ],
         "html": true,
         "manual_search": true,
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       },
       "access": {
         "public_only": true,
@@ -6913,7 +6939,7 @@
       "light_suitable": true,
       "science_source": false,
       "allow_archive": true,
-      "enabled": false,
+      "enabled": true,
       "discovery": {
         "feeds": [],
         "html": true,
@@ -6921,8 +6947,11 @@
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_DISCOVERY"
       },
       "access": {
         "public_only": true,
@@ -6964,8 +6993,11 @@
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": 403
       },
       "access": {
         "public_only": true,
@@ -6999,16 +7031,21 @@
       "light_suitable": true,
       "science_source": false,
       "allow_archive": true,
-      "enabled": false,
+      "enabled": true,
       "discovery": {
-        "feeds": [],
+        "feeds": [
+          "https://feeds.npr.org/1002/rss.xml"
+        ],
         "html": true,
         "manual_search": true,
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 1,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       },
       "access": {
         "public_only": true,
@@ -7050,8 +7087,11 @@
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "TimeoutError"
       },
       "access": {
         "public_only": true,
@@ -7093,8 +7133,11 @@
         "feed_urls_are_hints": false
       },
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T12:01:43.549438+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "RIGHTS_NOT_ESTABLISHED"
       },
       "access": {
         "public_only": true,

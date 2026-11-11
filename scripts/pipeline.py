@@ -250,6 +250,9 @@ def report(state,ledger,now=None):
         inventory['light_diagnostic']=state.get('light43',{}).get('summary',{})
         inventory['verified_source_candidates']={g:sum(priorities43.classify(r)['group']==g and r.get('status') in ('discovered','preparing','retryable_error') and r.get('source',{}).get('full_text_verified') is True for r in state.get('candidates',[])) for g in ('A','B','C')}
     if state.get('policy_version')=='4.4':
+        batch=state.get('light43',{}).get('v44',{})
+        old=inventory.get('light_preparation',{})
+        inventory['light_preparation']={'write_attempts':old.get('write_attempts',0)+batch.get('attempts',0),'review_attempts':old.get('review_attempts',0),'http_requests':old.get('http_requests',0)+batch.get('http_requests',0),'code':batch.get('code'),'protocol':'brief44'}
         from scripts import policy44
         inventory['editorial_standard']=policy44.standard(state)
     if inventory and not inventory['light_preparation']['code'] and inventory['light_preparation']['http_requests']>=2 and not inventory['light_news_ready']:

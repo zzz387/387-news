@@ -280,7 +280,7 @@ def live_report(output):
 
 def core_report(output):
     # Public-source diagnostic only: no production checkpoint, drafts or model key.
-    now=datetime.now(p.TZ);state={'date':now.date().isoformat(),'candidates':[]}
+    now=datetime.now(p.TZ);state={'date':now.date().isoformat(),'policy_version':os.getenv('NEWS_POLICY_VERSION','4.3'),'candidates':[]}
     cache=refresh(state,now,shortage=True)
     result={'checked_at':now.isoformat(),'gemini_requests':0,'search':cache.get('last_run',{}),
             'publishers':cache.get('publishers',{}),'candidate_groups':cache.get('last_run',{}).get('candidate_groups',{})}

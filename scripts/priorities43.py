@@ -212,7 +212,7 @@ def published_report(root=None,check_public=None):
     from pathlib import Path
     from scripts import selection43,site_checks,publication43,source_dom41
     root=Path(root or p.ROOT);live=(check_public or site_checks.check_site)()
-    if live.get('https')!='verified' or live.get('policy_version')!='4.3':raise ValueError('PUBLIC_COMPOSITION_NOT_VERIFIED')
+    if live.get('https')!='verified' or live.get('policy_version') not in ('4.3','4.4'):raise ValueError('PUBLIC_COMPOSITION_NOT_VERIFIED')
     date=live['issue_date'];metadata=publication43.validate(root,date)
     if metadata['article_count']!=live['articles']:raise ValueError('PUBLIC_COMPOSITION_COUNT_MISMATCH')
     rows=[]

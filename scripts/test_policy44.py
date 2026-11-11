@@ -104,4 +104,33 @@ class Policy44Tests(unittest.TestCase):
         restored=staged_news.decipher(staged_news.cipher(s,key),key)
         self.assertEqual(v.standard(s),v.standard(restored));self.assertEqual(s['_quota_snapshot'],restored['_quota_snapshot']);self.assertEqual(len(sel.composition(restored)),20)
 
+
+    def test_ready_stock_does_not_hide_the_thirteenth_article_or_note(self):
+        s=issue(12,0);stock=stock43.ensure(s)
+        stock['records']=[main_row(i) for i in range(12,25)]
+        stock['light']=[light_ready(i) for i in range(16)]
+        with tempfile.TemporaryDirectory() as temp:
+            target=root(temp);stock43.draw(s,target,NOW);stock43.draw_light(s,target)
+        self.assertEqual((len(sel.composition(s)),len(light43.ready(s))),(25,16))
+    def test_short_topics_do_not_use_main_article_family_aliases(self):
+        a=named('Живые строительные материалы',30);b=named('Самовосстанавливающийся бетон',31)
+        self.assertTrue(sel.duplicate(a,b));self.assertFalse(brief.duplicate(a,b))
+    def test_unverified_dates_and_false_recency_are_rejected(self):
+        src,item=response_item();item.update(time_kind='news',event_date='2026-11-11')
+        with self.assertRaisesRegex(ValueError,'BRIEF_EVENT_DATE_UNSUPPORTED'):brief.accept(item,src)
+        item.update(time_kind='unusual_fact',text='Сегодня музей восстановил 21 картину.')
+        with self.assertRaisesRegex(ValueError,'BRIEF_FALSE_RECENCY'):brief.accept(item,src)
+    def test_one_batched_request_is_charged_and_not_repeated_in_same_window(self):
+        from scripts import generation_runtime as rt
+        src,item=response_item();s=issue(8,0)
+        s['candidates'].append({'id':'brief-source','url':src['url'],'source':src,'status':'discovered','progress':{},'history':[],'for_light_only':True})
+        s['light43_queue']=['brief-source']  # Production queue stores IDs, not dictionaries.
+        budget=rt.RequestBudget({});budget.deadline=__import__('time').monotonic()+1000
+        alias=copy.deepcopy(item);alias.update(source_id='s1');alias['evidence'][0]['block_id']='q1'
+        def model(*a,**kw):budget.reserve('fixture-model');return {'items':[alias]}
+        with patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(news,'gemini',side_effect=model) as call:
+            brief.prepare(s);brief.prepare(s)
+        self.assertEqual(call.call_count,1);self.assertEqual(budget.used,1);self.assertEqual(s['light43']['v44']['http_requests'],1)
+        self.assertEqual(len(brief.ready(s)),1)
+
 if __name__=='__main__':unittest.main()

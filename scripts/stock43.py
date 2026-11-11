@@ -107,7 +107,7 @@ def draw(state,root,now,target=None):
     history=sel.recent(root,state['date']);selected=sel.composition(state)
     pending=list(available(state,state['date'],include_reserved=True))
     from scripts import policy44
-    while pending and (len(selected)<target or policy44.active(state) and any(v<2 for v in policy44.counts(selected).values())):
+    while pending and (policy44.active(state) or len(selected)<target):
         proxies=[dict(r,status='discovered') for r in pending]
         plan=sel.order(dict(state,candidates=selected+proxies),history,limit=1)
         if not plan:break
@@ -129,9 +129,10 @@ def draw_light(state,root):
     related=sel.ready(state)+light43.ready(state)+sel.recent(root,state['date'])
     from scripts import policy44
     target=e.CONFIG.get('light_target',12) if policy44.active(state) else 3
+    from scripts import light44
     for row in available(state,state['date'],'light',include_reserved=True):
-        if len(light43.ready(state))>=target:break
-        if any(sel.duplicate(row,r) for r in related):continue
+        if not policy44.active(state) and len(light43.ready(state))>=target:break
+        if any((light44.duplicate if policy44.active(state) else sel.duplicate)(row,r) for r in related):continue
         row['stock_reserved_for']=state['date']
         copied=copy.deepcopy(row);copied['status']='ready';copied['stock_origin']=identity(row);rows.append(copied);related.append(copied)
 
