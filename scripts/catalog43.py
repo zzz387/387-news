@@ -255,7 +255,7 @@ def refresh(state,now=None,session=None,shortage=False):
             state.setdefault('source_cache',{})[src['url']]=src
         print('[catalog43] '+json.dumps({k:v for k,v in report.items() if k not in ('eligible_urls',)},ensure_ascii=False),flush=True)
     rotate_candidates(state)
-    run['missing_candidate_groups']=[g for g in priorities43.CORE_GROUPS if not run['candidate_groups'].get(g)]
+    run['missing_candidate_groups']=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if not run['candidate_groups'].get(g)]
     print('[discovery-coverage43] '+json.dumps(run),flush=True)
     return cache
 

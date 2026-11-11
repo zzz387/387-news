@@ -26,7 +26,9 @@ def classify(row):
     result=dict(_classify(text,tuple(i for i in row.get('priority_ids',[]) if i in DIRECTIONS),'Общество'))
     if row.get('topic_policy_version')=='4.4':
         from scripts import policy44
-        group=policy44.subject(row);direction={'family':1,'health':12,'sport':13}.get(group)
+        group=policy44.subject(row)
+        allowed={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}
+        direction=result['direction'] if group and result['direction'] in allowed[group] else {'family':1,'health':12,'sport':13}.get(group)
         if direction:result.update(group='A' if group=='family' else 'C',direction=direction,category=policy44.category(row))
         elif result['group'] in ('A','C'):result.update(group='general',direction=None,category=policy44.category(row,general_category(text)))
     return result

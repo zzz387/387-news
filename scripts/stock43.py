@@ -77,13 +77,21 @@ def reusable(row,date,used=()):
 def available(state,date,key='records',include_reserved=False):
     stock=ensure(state);used=set(stock['published_urls'])
     rows=[r for r in stock[key] if reusable(r,date,used) and (not r.get('stock_reserved_for') or include_reserved and r['stock_reserved_for']==date)]
+    from scripts import policy44,light44
+    if key=='light' and policy44.active(state):
+        result=[]
+        for row in rows:
+            if not any(light44.duplicate(row,other) for other in result):result.append(row)
+        return result
     return sel.unique_ready(rows)
 
 def bank(state,row,now,key='records'):
     stock=ensure(state)
     if not reusable(row,state['date'],stock['published_urls']):return False
     rows=stock[key]
-    if any(identity(row)==identity(r) or sel.duplicate(row,r) for r in rows if not r.get('stock_published')):return False
+    from scripts import policy44,light44
+    compare=light44.duplicate if key=='light' and policy44.active(state) else sel.duplicate
+    if any(identity(row)==identity(r) or compare(row,r) for r in rows if not r.get('stock_published')):return False
     cap=e.CONFIG.get('article_stock_target',20) if key=='records' else e.CONFIG.get('light_stock_target',15)
     if len(available(state,state['date'],key))>=cap:return False
     saved=copy.deepcopy(row);saved['stock_saved_at']=now.isoformat();saved['stock_published']=False
