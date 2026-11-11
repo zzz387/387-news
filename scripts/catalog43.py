@@ -27,12 +27,15 @@ def secure_discovery_url(url,row):
 
 
 def undated_evergreen(source,row):
-    from scripts import editorial43
+    from scripts import editorial43,editorial41
     title=source.get('title','')
-    if not row.get('allow_archive') or editorial43.high_risk({'source':source}):return False
+    if not row.get('allow_archive'):return False
+    url=source.get('url','');path=urlparse(url).path
+    stable_official=editorial41.host_matches(url,{'who.int','nhs.uk','nih.gov','unicef.org'}) and bool(re.search(r'/(?:health-topics|fact-sheets|live-well|conditions|parenting|health-information|health)(?:/|$)',path)) and not re.search(r'/(?:news|press|research|studies)(?:/|$)',path)
+    if editorial43.high_risk({'source':source}) and not stable_official:return False
     if re.search(r'(?i)today|breaking|new study|сегодня|новое исследование|клиническ',title):return False
     from scripts import policy44
-    if policy44.subject({'source':source}):return True
+    if stable_official or policy44.subject({'source':source}):return True
     return bool(re.search(r'(?i)истор|биограф|архитект|культур|history|historical|biograph|heritage|philosophy|parent|child|famil|play|learn|education|paternity|воспитан|реб[её]н|дет|семейн|обучен|игр|велосипед|cycling|йог|yoga',title))
 
 
@@ -137,7 +140,10 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 report['last_checked_url']=item['url']
                 src=session.fetch(item['url'])
                 if not owned(src.get('canonical',src['url']),row):raise p.Blocked('PUBLISHER_REDIRECT_UNVERIFIED')
-                if preferred_group in policy44.GROUPS and policy44.subject({'source':src})!=preferred_group:raise p.Blocked('SOURCE_SUBJECT_MISMATCH')
+                if preferred_group in policy44.GROUPS:
+                    actual_group=policy44.subject({'source':src})
+                    if not actual_group:raise p.Blocked('SOURCE_SUBJECT_MISMATCH')
+                    if actual_group!=preferred_group:report['rerouted_group']=actual_group
                 # A publisher's verified RSS publication field can establish a
                 # missing bibliographic date. Never substitute updated/event dates.
                 if not src.get('published') and item.get('feed_published') and report.get('verified_feed'):
@@ -178,9 +184,11 @@ def refresh(state,now=None,session=None,shortage=False):
         config['publishers_per_run']=min(15,config['publishers_per_run']*3)
         config['article_checks_per_run']=min(24,config['article_checks_per_run']*3)
     cache=state.setdefault('discovery43',{'publishers':{}})
-    from scripts import priorities43
+    from scripts import priorities43,policy44
     def due(row):
-        last=cache['publishers'].get(row['id'],{}).get('checked_at')
+        saved=cache['publishers'].get(row['id'],{})
+        if policy44.active(state) and saved.get('classifier44_revision')!=policy44.REVISION:return True
+        last=saved.get('checked_at')
         return not last or now-datetime.fromisoformat(last)>=timedelta(hours=config['refresh_hours'])
     ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified' and due(r)],cache,state.get('_recent43',[]),state['date'])
     from scripts import policy44
@@ -200,8 +208,7 @@ def refresh(state,now=None,session=None,shortage=False):
     published_urls={x.get('source_url') for x in editorial41.archive_entries(p.ROOT)}
     selected=[]
     for row in ordered:
-        last=cache['publishers'].get(row['id'],{}).get('checked_at')
-        if last and now-datetime.fromisoformat(last)<timedelta(hours=config['refresh_hours']):continue
+        if not due(row):continue
         selected.append(row)
         if len(selected)>=config['publishers_per_run']:break
     known={r['url'] for r in state['candidates']};session=session or public_sources41.Session(timeout=7);deadline=time.monotonic()+(120 if shortage else 75);checks=0
@@ -220,16 +227,19 @@ def refresh(state,now=None,session=None,shortage=False):
             for key,job in jobs.items():
                 try:initial[key]=job.result()
                 except Exception as exc:initial[key]=({'article_checks':0,'status':'unavailable','code':type(exc).__name__},[])
-    attempted_ids=set();fallback_groups=set()
+    attempted_ids=set();fallback_groups=set();fallback_attempts={g:0 for g in policy44.GROUPS}
     pending=list(selected)
     while pending and len(attempted_ids)<config['publishers_per_run']:
         row=pending.pop(0)
         if row['id'] not in initial and not row.get('search_light'):
-            missing=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if run['candidate_groups'].get(g,0)<targets.get(g,1) and g not in fallback_groups]
+            missing=[g for g in (policy44.GROUPS if policy44.active(state) else priorities43.CORE_GROUPS) if run['candidate_groups'].get(g,0)<targets.get(g,1) and (policy44.active(state) or g not in fallback_groups)]
+            if policy44.active(state):missing.sort(key=lambda g:fallback_attempts[g])
             for group in missing:
                 options=[r for r in ordered if r['id'] not in attempted_ids and r['id'] not in initial and (bool({'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}[group]&set(r.get('priority_ids',[]))) if policy44.active(state) else any(priorities43.DIRECTIONS.get(i,{}).get('group')==group for i in r.get('priority_ids',[])))]
                 if options:
-                    row=dict(options[0],search_group=group);fallback_groups.add(group)
+                    chosen=min(options,key=lambda item:policy44.publisher_score(item,group)) if policy44.active(state) else options[0]
+                    row=dict(chosen,search_group=group);fallback_groups.add(group)
+                    if policy44.active(state):fallback_attempts[group]+=1
                     pending=[r for r in pending if r['id']!=row['id']];break
         if row['id'] not in initial and time.monotonic()>=deadline:break
         remaining=config['article_checks_per_run']-checks
@@ -242,6 +252,7 @@ def refresh(state,now=None,session=None,shortage=False):
         if row.get('search_group'):run['attempted_groups'].append(row['search_group'])
         report['requested_group']=row.get('search_group')
         cache['publishers'][row['id']]=dict(report,checked_at=now.isoformat())
+        if policy44.active(state):cache['publishers'][row['id']]['classifier44_revision']=policy44.REVISION
         for item,src in found:
             if src['url'] in known:continue
             record=dict(id=p.digest(src['url']),url=src['url'],title=src['title'],source=src,publisher_id=row['id'],publisher_group=row['domain'].removeprefix('www.'),source_kind=row['type'],science_domain=next(iter(row['topics']),''),

@@ -260,4 +260,58 @@ class Policy44Tests(unittest.TestCase):
         for title in ['История спорта','Физиология бега','Плавание для взрослых','Walking and physical activity']:
             self.assertEqual(v.subject({'article':{'title':title,'blocks':[{'text':title+'. '+title+' — тема этого материала.'}]}}),'sport')
 
+
+    def test_literary_family_title_is_supported_by_lead_and_repeated_actual_content(self):
+        body='Parents can support children at home. Adults often have questions. Each child develops at a different pace. Play can be shared. Parents can listen without judging. New experiences take time. The practical examples explain ordinary communication. Support can be quiet.'
+        self.assertEqual(v.subject({'article':{'title':'Small steps together','teaser':'','blocks':[{'text':body}]}}),'family')
+    def test_peruvian_hotel_does_not_become_health_because_people_sleep_there(self):
+        body='Guests sleep in a capsule. The hotel offers places to sleep. Sleeping high above the valley is unusual. Guests sleep after the climb.'
+        self.assertIsNone(v.subject({'source':{'title':'The Peruvian hotel with a terrifying check-in','blocks':[{'text':body}]}}))
+    def test_ironman_record_is_a_real_sport_subject(self):
+        body='The athlete completed the Ironman distance. The report describes swimming, cycling and running. The record was recorded at the finish.'
+        self.assertEqual(v.subject({'source':{'title':'Magnus Ditlev sets an Ironman record','blocks':[{'text':body}]}}),'sport')
+    def test_official_stable_guidance_can_be_undated_but_breaking_clinical_news_cannot(self):
+        from scripts import catalog43
+        src={'title':'Clinical guidance','url':'https://www.nhs.uk/conditions/asthma/','blocks':[{'text':'Medical treatment and medication are discussed.'}]}
+        self.assertTrue(catalog43.undated_evergreen(src,{'allow_archive':True}))
+        src['title']='New study today';src['url']='https://www.nhs.uk/news/clinical-study'
+        self.assertFalse(catalog43.undated_evergreen(src,{'allow_archive':True}))
+
+
+    def test_health_is_human_medical_content_not_a_metaphor(self):
+        body='Health concerns can include symptoms. Medical advice explains when parents should seek help. The guidance discusses healthcare and symptoms.'
+        self.assertEqual(v.subject({'source':{'title':'Newborn baby health','blocks':[{'text':body}]}}),'health')
+        for title in ['Healthy forests','Financial health','Здоровье бизнеса']:
+            self.assertIsNone(v.subject({'source':{'title':title,'blocks':[{'text':(title+'. ')*5}]}}))
+    def test_missing_groups_keep_searching_in_round_robin_within_existing_budget(self):
+        from scripts import catalog43 as catalog
+        original=catalog.registry();template=original['publishers'][0];publishers=[]
+        for group,direction in [('family',1),('health',12),('sport',13)]:
+            for i in range(1,5):
+                pub=copy.deepcopy(template);pub.update(id=group+str(i),domain=group+str(i)+'.example.org',homepage='https://'+group+str(i)+'.example.org/',priority_ids=[direction],enabled=True,availability={'status':'verified','full_originals_verified':1})
+                publishers.append(pub)
+        cfg=dict(original,publishers=publishers,publishers_per_run=5,article_checks_per_run=8)
+        calls={g:0 for g in v.GROUPS}
+        titles={'family':'Воспитание детей','health':'Здоровое питание','sport':'Йога и подвижность'}
+        def inspect(pub,session,article_limit=2,exclude=(),now=None,preferred_group=None):
+            group=preferred_group or next(g for g in v.GROUPS if pub['id'].startswith(g));calls[group]+=1;found=[]
+            if calls[group]>=3:
+                for i in range(min(2,article_limit)):
+                    src=copy.deepcopy(ready(90)['source']);src.update(id=pub['id']+str(i),url=pub['homepage']+str(i),title=titles[group]);src['blocks']=[{'id':'proof','kind':'paragraph','text':titles[group]+'. '+titles[group]+'.'}]
+                    found.append(({'url':src['url'],'title':src['title']},src))
+            return {'publisher':pub['id'],'status':'full_sources_verified' if found else 'discovery_verified','discovered':5,'eligible':len(found),'article_checks':1,'last_article_code':None},found
+        s=issue(0,0)
+        with patch.object(catalog,'registry',return_value=cfg),patch.object(catalog,'inspect_publisher',side_effect=inspect),patch.dict(os.environ,NEWS_LIGHT_NEWS_ENABLED='false'):
+            report=catalog.refresh(s,NOW,shortage=True)['last_run']
+        self.assertTrue(all(calls[g]>=3 for g in v.GROUPS));self.assertTrue(all(report['candidate_groups'][g]>=2 for g in v.GROUPS));self.assertLessEqual(report['article_checks'],24)
+
+
+    def test_official_nhs_identity_does_not_grant_republication_rights(self):
+        from scripts import source41,rights41
+        html='<html lang="en"><head><title>Food habits</title></head><body><article><h1>Food habits</h1><p>Nutrition guidance explains ordinary food habits and practical choices for adults.</p><p>The page is an official informational guide for readers.</p></article></body></html>'
+        src=source41.extract(html,'https://www.nhs.uk/live-well/eat-well/')
+        self.assertEqual(src['metadata_status'],'verified');self.assertTrue(src['full_text_verified'])
+        self.assertEqual(rights41.decision(src,'INDEPENDENT_ARTICLE')['status'],'allowed')
+        self.assertNotEqual(rights41.decision(src,'ORIGINAL_REPUBLICATION')['status'],'allowed')
+
 if __name__=='__main__':unittest.main()

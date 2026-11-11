@@ -18,7 +18,7 @@ except ImportError:
     import special_contract41 as contract
 
 TRUSTED={
-    'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org','unicef.org',
+    'who.int','nhs.uk','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org','unicef.org',
     'publication.pravo.gov.ru','consultant.ru','cbr.ru','mos.ru','nasa.gov','esa.int',
     'journals.plos.org',  # peer-reviewed primary research; health still requires WHO/NIH/etc.
 }
@@ -481,7 +481,7 @@ class Editor:
                 for url in record.get('verification_urls',[]):
                     supporting.append(self.cached_fetch(url)); self.persist()
             domains={publisher_identity(s['url']) for s in [source]+supporting if s.get('full_text_verified')}
-            allowed=({'who.int','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org'} if article['category']=='Здоровье и движение' else TRUSTED)
+            allowed=({'who.int','nhs.uk','cdc.gov','nih.gov','ncbi.nlm.nih.gov','cochrane.org'} if article['category']=='Здоровье и движение' else TRUSTED)
             authoritative=[s for s in [source]+supporting if host_matches(s['url'],allowed)]
             if len(domains)<2 or not authoritative: raise policy.Blocked('INDEPENDENT_SAFETY_EVIDENCE_REQUIRED')
         support_facts=[]

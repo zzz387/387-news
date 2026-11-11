@@ -89,6 +89,10 @@
     "vm.ru": {
       "publisher": "Вечерняя Москва",
       "evidence_url": "https://vm.ru/about"
+    },
+    "nhs.uk": {
+      "publisher": "NHS",
+      "evidence_url": "https://www.nhs.uk/"
     }
   }
 }
