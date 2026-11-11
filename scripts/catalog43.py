@@ -82,7 +82,7 @@ def article_link(item):
     if parts and parts[0] in ('rubric','rubrics','section','sections'):return False
     if path in ('/business/technology-of-business','/future','/travel','/science','/business'):return False
     if not parts or re.search(r'\.(?:pdf|zip|jpg|png|xml|rss)$',path):return False
-    if any(x in ('tag','tags','category','categories','authors','author','about','contact','subscribe','subscription','search','privacy','terms','podcasts','video','videos') for x in parts):return False
+    if any(x in ('tag','tags','category','categories','authors','author','about','contact','subscribe','subscription','search','privacy','terms','podcasts','video','videos','mega-menu') for x in parts):return False
     if re.search(r'(?:^|/)(?:pdf\d+|about-us|terms-of-use|privacy-policy|for-authors|editorial-board)$',path):return False
     return bool(item.get('feed_date') or item.get('heading_link') or len(parts)>1 or len(parts[-1])>30)
 
@@ -222,8 +222,9 @@ def refresh(state,now=None,session=None,shortage=False):
     from concurrent.futures import ThreadPoolExecutor
     initial={}
     if core:
+        initial_limit=min(2 if policy44.active(state) else 1,max(1,config['article_checks_per_run']//max(1,len(core))))
         with ThreadPoolExecutor(max_workers=3) as pool:
-            jobs={row['id']:pool.submit(inspect_publisher,row,session,article_limit=1,exclude=known|published_urls,now=now,preferred_group=row['search_group']) for row in core[:config['article_checks_per_run']]}
+            jobs={row['id']:pool.submit(inspect_publisher,row,session,article_limit=initial_limit,exclude=known|published_urls,now=now,preferred_group=row['search_group']) for row in core[:config['article_checks_per_run']]}
             for key,job in jobs.items():
                 try:initial[key]=job.result()
                 except Exception as exc:initial[key]=({'article_checks':0,'status':'unavailable','code':type(exc).__name__},[])

@@ -153,6 +153,7 @@ def render_light(items):
         label_html='<p class="meta light-kind">'+label+'</p>' if label else ''
         html+='<article class="light-item">'+label_html+'<h3>'+escape(item['title'])+'</h3><p>'+escape(item['text'])+'</p><p class="light-source">Источник: <a href="'+escape(url,quote=True)+'" target="_blank" rel="noopener noreferrer">'+escape(source['publisher'])+'</a>'
         if source.get('published'):html+=' · '+('Дата публикации: ' if item.get('kind')=='source_report' else '')+escape(source['published'])
+        if item.get('kind')=='source_report':html+=' · Дата события не установлена'
         translated=source_links43.translation_url(url,source.get('language'))
         if translated:html+=' · <a href="'+escape(translated,quote=True)+'" target="_blank" rel="noopener noreferrer">На русском</a>'
         html+='</p></article>'

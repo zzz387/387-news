@@ -291,10 +291,10 @@ class Policy44Tests(unittest.TestCase):
                 pub=copy.deepcopy(template);pub.update(id=group+str(i),domain=group+str(i)+'.example.org',homepage='https://'+group+str(i)+'.example.org/',priority_ids=[direction],enabled=True,availability={'status':'verified','full_originals_verified':1})
                 publishers.append(pub)
         cfg=dict(original,publishers=publishers,publishers_per_run=5,article_checks_per_run=8)
-        calls={g:0 for g in v.GROUPS}
+        calls={g:0 for g in v.GROUPS};limits=[]
         titles={'family':'Воспитание детей','health':'Здоровое питание','sport':'Йога и подвижность'}
         def inspect(pub,session,article_limit=2,exclude=(),now=None,preferred_group=None):
-            group=preferred_group or next(g for g in v.GROUPS if pub['id'].startswith(g));calls[group]+=1;found=[]
+            group=preferred_group or next(g for g in v.GROUPS if pub['id'].startswith(g));calls[group]+=1;limits.append(article_limit);found=[]
             if calls[group]>=3:
                 for i in range(min(2,article_limit)):
                     src=copy.deepcopy(ready(90)['source']);src.update(id=pub['id']+str(i),url=pub['homepage']+str(i),title=titles[group]);src['blocks']=[{'id':'proof','kind':'paragraph','text':titles[group]+'. '+titles[group]+'.'}]
@@ -303,7 +303,7 @@ class Policy44Tests(unittest.TestCase):
         s=issue(0,0)
         with patch.object(catalog,'registry',return_value=cfg),patch.object(catalog,'inspect_publisher',side_effect=inspect),patch.dict(os.environ,NEWS_LIGHT_NEWS_ENABLED='false'):
             report=catalog.refresh(s,NOW,shortage=True)['last_run']
-        self.assertTrue(all(calls[g]>=3 for g in v.GROUPS));self.assertTrue(all(report['candidate_groups'][g]>=2 for g in v.GROUPS));self.assertLessEqual(report['article_checks'],24)
+        self.assertEqual(limits[:3],[2,2,2]);self.assertTrue(all(calls[g]>=3 for g in v.GROUPS));self.assertTrue(all(report['candidate_groups'][g]>=2 for g in v.GROUPS));self.assertLessEqual(report['article_checks'],24)
 
 
     def test_official_nhs_identity_does_not_grant_republication_rights(self):
@@ -328,5 +328,14 @@ class Policy44Tests(unittest.TestCase):
         from scripts import editorial41
         self.assertEqual(editorial41.publisher_identity('https://magazine.medlineplus.gov/article'),editorial41.publisher_identity('https://www.nih.gov/article'))
         self.assertNotEqual(editorial41.publisher_identity('https://www.nhs.uk/article'),editorial41.publisher_identity('https://www.nih.gov/article'))
+
+
+    def test_who_navigation_is_not_a_complete_publication(self):
+        from scripts import catalog43
+        self.assertFalse(catalog43.article_link({'url':'https://www.who.int/mega-menu/health-topics/resources/questions-and-answers','heading_link':True}))
+        self.assertTrue(catalog43.article_link({'url':'https://www.who.int/news-room/feature-stories/detail/an-example','heading_link':True}))
+    def test_real_nhs_guidance_subjects_are_health(self):
+        for title,text in [('Healthy teeth and gums','Brush your teeth. Dental care matters. Your dentist can help with oral hygiene.'),('Best way to wash your hands','Handwashing is ordinary hygiene. Wash your hands carefully. Handwashing helps reduce spread.')]:
+            self.assertEqual(v.subject({'source':{'title':title,'blocks':[{'text':text}]}}),'health')
 
 if __name__=='__main__':unittest.main()

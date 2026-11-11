@@ -7159,7 +7159,7 @@
       "domain": "nhs.uk",
       "language": "en",
       "country": "GB",
-      "type": "institutional_journalism",
+      "type": "official",
       "topics": [
         "Питание и долголетие",
         "Кардиотренировки и физиология",
@@ -7171,7 +7171,7 @@
         "manual_search": true,
         "feed_urls_are_hints": false
       },
-      "enabled": false,
+      "enabled": true,
       "access": {
         "public_only": true,
         "respect_robots": true,
@@ -7196,8 +7196,11 @@
       "quality_score": 95,
       "allow_archive": true,
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "verified",
+        "checked_at": "2026-11-11T13:54:48+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 2,
+        "code": "VERIFIED_FULL_ORIGINALS"
       }
     },
     {
@@ -7207,7 +7210,7 @@
       "domain": "nih.gov",
       "language": "en",
       "country": "US",
-      "type": "institutional_journalism",
+      "type": "official",
       "topics": [
         "Питание и долголетие",
         "Кардиотренировки и физиология",
@@ -7244,8 +7247,11 @@
       "quality_score": 95,
       "allow_archive": true,
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T13:54:48+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "SOURCE_EXTRACTION_PARTIAL"
       }
     },
     {
@@ -7255,7 +7261,7 @@
       "domain": "medlineplus.gov",
       "language": "en",
       "country": "US",
-      "type": "institutional_journalism",
+      "type": "official",
       "topics": [
         "Питание и долголетие",
         "Кардиотренировки и физиология",
@@ -7292,8 +7298,11 @@
       "quality_score": 95,
       "allow_archive": true,
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T13:54:48+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "PUBLISHER_ACTIVITY_UNCONFIRMED"
       }
     },
     {
@@ -7303,7 +7312,7 @@
       "domain": "who.int",
       "language": "en",
       "country": "international",
-      "type": "institutional_journalism",
+      "type": "official",
       "topics": [
         "Питание и долголетие",
         "Кардиотренировки и физиология",
@@ -7340,8 +7349,11 @@
       "quality_score": 95,
       "allow_archive": true,
       "availability": {
-        "status": "pending_verification",
-        "scope": "public_discovery_only"
+        "status": "manual_only",
+        "checked_at": "2026-11-11T13:54:48+03:00",
+        "scope": "public_discovery_only",
+        "full_originals_verified": 0,
+        "code": "DISCOVERY_INDEX_ONLY"
       }
     }
   ],
