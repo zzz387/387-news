@@ -1,0 +1,297 @@
+{
+  "date": "2026-11-12",
+  "number": 19,
+  "policy_version": "4.4",
+  "article_count": 27,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "1019de5d08c4c82220a5231f048c9dcb62c72be8ae63fe8c869ef2e8072019ea",
+      "markdown": "df20a2f384595c641f6c8b9d58eaf5cb82a5af7d747a8e6f9e2f8bbfb6c3e39e"
+    },
+    "feature-02": {
+      "html": "d720b7d2e68ab1b466a9c0b60b5d073f68089e1cd1022a778ae666ba2e407414",
+      "markdown": "b0891adc45cdc361486734a7041a6d7b6625b0ad0e95aa1ca2b78cf9718ed9d8"
+    },
+    "feature-03": {
+      "html": "40c594f26d0dbcd0eace17906853a4329f115ddb7951fb3af29051e5149598d7",
+      "markdown": "6048273d0acff7f099e0fa2c48b020714348f282f925f38fd82698fe694f5af1"
+    },
+    "feature-04": {
+      "html": "cdbc23c83dcbe71c6d8187df40e52ea6881f1dc751ecf31f69ec0d881df1f14f",
+      "markdown": "24c067eb58197fc722d77a2af46c3efbaf7d3dc120e385c0aef1cb8e35fefa4e"
+    },
+    "feature-05": {
+      "html": "21c4b144fdde16bab74cbc40747b10f0f61b33fe8e6e55d0c329cf16a82f9072",
+      "markdown": "49c57f849eea2be3e1cbce37c684afb078ba10c693f4cf30e31f0e42f5e2b9c6"
+    },
+    "feature-06": {
+      "html": "196062904b15a6b632b3894cb67874750b3dfe0715633dde921931c47bd2d383",
+      "markdown": "08be25109a6d58ac9635e97a2c40b05c44a28fcd6c9d3507c48f3287cbe39a52"
+    },
+    "feature-07": {
+      "html": "fa97967ce16ed904869a0399f8eba2bbf1b08bb1bb095ffb46dee9ff7364ed83",
+      "markdown": "d684441d761f108d437f216ea67cd44dd94ad138010dbd35711e9c3faac5f265"
+    },
+    "feature-08": {
+      "html": "91f5d02478121b75a440689e961857e718108941a9e2256e164b93c36420101a",
+      "markdown": "6d23c01a1210619360de1a429eab5efae8887e3d6feb792ee454a99303a32b35"
+    },
+    "feature-09": {
+      "html": "34941445a514b6dbdd5844534a47d12770dacdbd2124730a9503d312703fc3ec",
+      "markdown": "abbd34cfabd689433d4dbf733d2cfe0f06552c1aa2b706e0cf7a8fa7cf8c292f"
+    },
+    "feature-10": {
+      "html": "15eff11dc08ae72a03d3fbfd9f083856203635e4e536210c52393f9c781adeac",
+      "markdown": "6547b824c69408046aa76556b99d01d22de93dceefe934d17c4ee0a20712d55d"
+    },
+    "feature-11": {
+      "html": "fff7be752e51473496b2eee3aedd336d7bd2de0885bf00e0ab4ec26106d45ace",
+      "markdown": "8bebad9dd5e83483c75e3009fdd8be7d85f173139eff88e51111d42fd45f0ec3"
+    },
+    "feature-12": {
+      "html": "5f90afce3465d9da123c4ba8782a45de4de5a62ebab122a56200588d03a5d858",
+      "markdown": "b38c85d81116f42bef921c1de760f8c308560b8201c30a9592c7d07c2ba71c01"
+    },
+    "feature-13": {
+      "html": "d1fe0699a9596716bad396d5a25788a712dadde02aeb79c7c4fe9992ed99f406",
+      "markdown": "79972e7b7e5107abd18d23ad28a185d74959509a14478ad34217d6efb7f466f7"
+    },
+    "feature-14": {
+      "html": "d7387de6284a55ffe70469b0a06fbb4888c78499be966c20a4c9cbb67a901978",
+      "markdown": "04a5e0f7c4e2604e091cc533cb505342fbdbfe173bca6763f0fdebe8ba972fe3"
+    },
+    "feature-15": {
+      "html": "115be4e0226b4139928cdf1240012492d012ddd2ae3d6e7062cf315fe5715dba",
+      "markdown": "f9fb579f1fbcc41e76d02b694cc68a31474d6f40750308bcb6b4b0f30d71c3dc"
+    },
+    "feature-16": {
+      "html": "ff65a977143e7f66a134672793f6a3ad02097fb8e092e7bc139e9572529a76dc",
+      "markdown": "ce5dad684cf906df6fec25f52d71431942e6f2089510c156ab1b6d147728fabc"
+    },
+    "feature-17": {
+      "html": "44af2c77303b92d3b826c8f842f63b1adf11214fdfd508745725f8b897a64b1a",
+      "markdown": "1897b2717728870afe0b49a43efd0dc68e781fc719a5a81e0ab72ab357b55ac4"
+    },
+    "feature-18": {
+      "html": "4ce2ee44eb5d83c40bbf96804f9ce0d374f08484ce95a1077825a0ea40b3cbf1",
+      "markdown": "f71fddac7de8bfd3ad3ad49df5da57cf03a1cb9156d52a9036d3f40cfdabe3f9"
+    },
+    "feature-19": {
+      "html": "ce8cd616df5ac65279d2b959648a1a0f78475d3c7b9b778fcee9401f55bcf5b4",
+      "markdown": "8bbe7acbc8b609a3ab56f9bcacff44a1031c50cec47601cbd197c79138809b3d"
+    },
+    "feature-20": {
+      "html": "e2f439c64c79f596a905543bacae0bb7e067ae76e2fd66e1d19f04a9a3c42659",
+      "markdown": "1cb6a845470af8109e21f3247e090d5d2e7584027d65d032c0e482d7e1d04a10"
+    },
+    "feature-21": {
+      "html": "a128a58ba41496ccae8bb395efe99a896590378f1fca93a2560bbdb87b898e15",
+      "markdown": "157572bbf762f93a5e808b8b54b4168f6203b3dc34ad0af0a2bf87eeb8fb4815"
+    },
+    "feature-22": {
+      "html": "a3fe5820b2b4d74cf1f1c471e364d9bad432d6badfa996bb8290e0214f2e9a02",
+      "markdown": "6640ea24d06dc08a5f6233f6683e90e63ff56f4f709b9367ae1c6cf222d121e0"
+    },
+    "feature-23": {
+      "html": "8b32ebc8a895ba579b73f6afd78ac17c60113134f876ab812d6996aabd6ad153",
+      "markdown": "ed30ed6cb3c00afaad4a6de357369679fc233dec9638cef09b6b5a3e72d430f3"
+    },
+    "feature-24": {
+      "html": "7e422d6005186498a45cd631948421446ae1f8b3d161028f9ea59435a433f7e0",
+      "markdown": "baf15692abc286e5d651d850b987795ac0c2c5803c96c7b417c5e126ce143ebd"
+    },
+    "feature-25": {
+      "html": "bc1910665f47a0a49a9334772b6b0991d53d8cefab67efcf590efb184d2f95f9",
+      "markdown": "6dbdc8575c7eb9dac1c8f7e2ac489321675fd8d0eadb9a36c49244444d3f2063"
+    },
+    "feature-26": {
+      "html": "51f48dd78c87cb38d3fb48aa26e18b68d827c036ce1417bb9c418f7251d5f8bd",
+      "markdown": "732484bd0b394a8ea3b4de6940230098759cd7ab69663a270c789654e22f0fbe"
+    },
+    "feature-27": {
+      "html": "f77b66e1708b7dc33a5e1c24fd88256cb1432a77524d4db2682725e76fa9e858",
+      "markdown": "92454322949131bad55b940dd76e9be2c530ef32b8234b5658add77b0d8569de"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-12T06:06:27.652367+03:00",
+  "release_not_before": "2026-11-12T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Заблуждения о пауках-крестовиках",
+      "text": "Исследования показали, что плотные узоры из шелка на паутинах этих пауков, ранее называемые «стабилиментумами» из-за гипотезы о функции укрепления сети, на самом деле не выполняют эту задачу. Ученые рассматривают другие возможные причины их создания, включая регуляцию температуры и защиту.",
+      "source": {
+        "url": "https://theconversation.com/i-heard-a-barnacle-how-paying-attention-to-natures-background-noise-can-reveal-animal-secrets-290033",
+        "title": "‘I heard a barnacle’ – how paying attention to nature’s background noise can reveal animal secrets",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-06T13:11:07Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "История понятия «равенство»",
+      "text": "Исследователь Тереза Бежан в своем эссе анализирует эволюцию концепции «равенства» в английском языке. Она отмечает, что ранние представления о равенстве часто сочетались с иерархией, а современное понимание сформировалось благодаря практике участия граждан в таких институтах, как суд присяжных.",
+      "source": {
+        "url": "https://aeon.co/essays/historical-ideas-of-equality-help-us-imagine-an-equal-world",
+        "title": "Historical ideas of equality help us imagine an equal world",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-09T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Хищные привычки чеглока Элеоноры",
+      "text": "Орнитологи обнаружили в скалах Марокко живых мигрирующих птиц с выщипанными перьями, которых соколы Элеоноры оставляют в укрытиях. Исследователи предполагают, что хищники могут содержать жертв живыми, чтобы обеспечить себя свежей пищей.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/eleonoras-falcon-facts",
+        "title": "Caught, plucked, and kept ALIVE: Does this deadly  predator take ruthlessness and cruelty to a new level, inflicting a fate worse than death on its prey?",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-10T17:11:54+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Обнаружение гигантских таликов подо льдом",
+      "text": "Исследования вечной мерзлоты в Канаде с помощью аэроэлектромагнитной съемки выявили существование скрытых таликов под водоемами. Один из таких крупных таликов под рекой Маккензи достигал двух километров в ширину и более 75 метров в глубину.",
+      "source": {
+        "url": "https://eos.org/research-spotlights/airborne-imaging-explores-a-mosaic-of-thawing-permafrost",
+        "title": "Airborne Imaging Explores a Mosaic of Thawing Permafrost - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-10T13:40:10+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Мифы о мышечной массе и здоровье",
+      "text": "Новый анализ данных британского биобанка показал, что простое увеличение мышечной массы не гарантирует защиту от метаболических расстройств. Главную роль в рисках играет то, в каких частях тела скапливается жир, особенно вокруг внутренних органов.",
+      "source": {
+        "url": "https://nautil.us/lean-muscle-mass-isnt-a-cure-all-for-metabolic-health-1286540/",
+        "title": "Lean Muscle Mass Isn’t a Cure-All for Metabolic Health",
+        "publisher": "nautil.us",
+        "language": "en",
+        "published": "2026-11-11T00:00:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Истоки математического моделирования",
+      "text": "В 1950-х годах физик Энрико Ферми с коллегами применили компьютер для симуляции колебаний атомных связей. Этот эксперимент привел к неожиданному открытию эффекта возвращения энергии и зарождению теории солитонов.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/what-happens-to-mathematics-when-ai-becames-an-oracle/",
+        "title": "What happens to mathematics when AI becomes an oracle?",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-10T20:30:01+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Редкая находка у берегов Канады",
+      "text": "Ученые обнаружили детеныша северного гладкого кита у антикостийских островов в Квебеке. Анализ данных показал, что этот малыш родился несколькими месяцами ранее и стал двадцать четвертым детенышем, учтенным за последний сезон родов.",
+      "source": {
+        "url": "https://news.mongabay.com/short-article/2026/11/scientists-discovered-an-unknown-baby-right-whale-off-canada-they-say-its-a-cause-for-joy/",
+        "title": "Scientists discovered an unknown baby right whale off Canada. They say it&#8217;s a cause for joy",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-06T17:03:15+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Историческая победа в Джорджии",
+      "text": "Кейша Ланс Боттомс была избрана новым губернатором американского штата Джорджия. Она стала первой в истории темнокожей женщиной на посту губернатора в любом из штатов США.",
+      "source": {
+        "url": "https://theconversation.com/georgia-gov-elect-keisha-lance-bottoms-stands-on-the-shoulders-of-stacey-abrams-charlotta-bass-and-countless-other-black-women-who-dreamed-296027",
+        "title": "Georgia Gov.-elect Keisha Lance Bottoms stands on the shoulders of Stacey Abrams, Charlotta Bass and countless other Black women who dreamed",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-06T17:09:28Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Премьера анимационной картины",
+      "text": "Длинная работа над созданием покадрового анимационного фильма по книге Уайлдвуд завершилась выходом картины в кинотеатры. Проект студии Laika создавался в течение шестнадцати лет при участии тысяч художников.",
+      "source": {
+        "url": "https://www.mentalfloss.com/literature/books/colin-meloy-wildwood-interview?utm_source=RSS",
+        "title": "Colin Meloy on the Folklore, Forests, and Political Message of 'Wildwood'",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-11T02:00:00Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Стрижи мурлычут",
+      "text": "Наблюдения за спасенным птенцом стрижа привели к необычному открытию: эти птицы способны издавать звуки, похожие на мурлыканье. Когда птицу гладили по голове, она расслаблялась, и ее «мурлыканье» становилось громче.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/baby-swift-recovery",
+        "title": "“I’ve got a lost baby swift – I’m going to put it in our bedroom!” What happened next is remarkable",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-09T11:24:16+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Возрождение светлячков на Бали",
+      "text": "Фермер из балийской деревни Таро основал программу по сохранению местных светлячков, популяция которых резко сократилась из-за пестицидов и застройки. Для борьбы с химикатами он разработал органический компост и безвредные пестициды из пищевых отходов, помогая соседям перейти на экологичное земледелие.",
+      "source": {
+        "url": "https://news.mongabay.com/short-article/2026/11/a-plan-to-save-balis-vanishing-fireflies-takes-root-in-organic-farming/",
+        "title": "A plan to save Bali&#8217;s vanishing fireflies takes root in organic farming",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-10T08:14:19+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Стоимость программы противоракетной обороны",
+      "text": "Оценки стоимости инициативы Дональда Трампа «Golden Dome» значительно разнятся. По данным бюджетного управления Конгресса США, реализация системы по предложенным требованиям обошлась бы в 1,2 триллиона долларов.",
+      "source": {
+        "url": "https://arstechnica.com/space/2026/11/new-democratic-congress-will-likely-strip-the-gilding-from-trumps-golden-dome/",
+        "title": "New Democratic Congress will likely strip the gilding from Trump's Golden Dome",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-09T12:00:05+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Дело о религиозной свободе в Верховном суде",
+      "text": "На прошлой неделе Верховный суд США приступил к рассмотрению дела St. Mary Catholic Parish v. Roy, которое касается требований штата Колорадо к частным религиозным дошкольным учреждениям соблюдать антидискриминационную политику при получении госфинансирования.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/st-mary-catholic-parish-v-roy-recap-religious-freedom/",
+        "title": "Why ‘St. Mary Catholic Parish v. Roy’ Could Mark a Huge Win for Religious Freedom - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-11T11:00:00+00:00"
+      }
+    },
+    {
+      "kind": "news",
+      "title": "Приговор бывшему министру Абызову",
+      "text": "Таганский суд Москвы вынес решение по второму делу в отношении Михаила Абызова. С учетом предыдущего обвинения общий срок заключения экс-министра составил 14 лет колонии.",
+      "source": {
+        "url": "https://moskvichmag.ru/lyudi/taganskij-sud-prigovoril-eks-ministra-abyzova-k-14-godam-kolonii/",
+        "title": "Таганский суд приговорил экс-министра Абызова к 14 годам колонии",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-11T11:45:47+00:00"
+      }
+    }
+  ],
+  "light_count": 14,
+  "homepage_hash": "a4ac1dcb5616dfa155fe092296fa4a9e50301699ae309485499f79feb2691626",
+  "overview_hash": "f20ad96055f4c84acb0c1f1090258276b5c524874512421d5fa2847de0f44ac1",
+  "markdown_hash": "fd837dd974ab30420a8f1e50e8ebe2901e6da7222a57fffae0494dce04d3db7e"
+}
