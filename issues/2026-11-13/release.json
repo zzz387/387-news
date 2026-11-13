@@ -1,0 +1,185 @@
+{
+  "date": "2026-11-13",
+  "number": 20,
+  "policy_version": "4.4",
+  "article_count": 8,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "dbed58699db00989b11cdfddb6a04a77f70744e736e3fac0be274408137f338a",
+      "markdown": "e9d8afcbddd5d9f114420e9dd39b5fb109fcfe0a6c771f016736b0566bf6387e"
+    },
+    "feature-02": {
+      "html": "05f8492202377706c1346b00f9cf4418b2c66016863adc3bf0a00311930ec131",
+      "markdown": "981ec04c7aea722e42c850cbe0f78285623cd6f2ed27dc697168a6e042a6ca1f"
+    },
+    "feature-03": {
+      "html": "2d56bd4b1b1df95dab361ba5b25a082a4762390a2c86b8bc89065e6f77b38077",
+      "markdown": "4b23c558b1dfc6e7aa0b66e28a65a91f2ce8c9d409c9bc08ede8b0f51fd4ec53"
+    },
+    "feature-04": {
+      "html": "a75c1efe14c858b8104724298306081583c7b1b6762beefae22356f4847d12cf",
+      "markdown": "8c11da0ae3748549aae8167496045f48a84e5ec440f2da01c66ef39858d46123"
+    },
+    "feature-05": {
+      "html": "3d49430339221ce251752b99b43a040159f339fe2f0db67ea57143bf0baf1b74",
+      "markdown": "043f6758eff2f5f53872a4a34948d611722e6c50f2bb32c528e2d08f0dd39d19"
+    },
+    "feature-06": {
+      "html": "d8ec79a8529ea4e3acc3e5b74e9979f757b81c3317304ad13914a3644dc28224",
+      "markdown": "22bbe0607ec12e1edea913c485b6156fbdb9c515286c8c3c6f2ae9742bdbf2d7"
+    },
+    "feature-07": {
+      "html": "fddbcedc5b63611c76c92d65fb13098adfa1159089b5dc5f7d12dfa4a2e5a021",
+      "markdown": "4274a11b6258b58306b779f36d078b0b760f04ba4a4f981a62641416d01eed67"
+    },
+    "feature-08": {
+      "html": "c4b83b5325a4651231224752a6d47c356b5e00e302f03943c8ee05ceb2aa62c0",
+      "markdown": "2e1624ed0271d90ae9604b4bd2f47f854db2ab514083d371893dec648730e9c1"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-13T09:48:09.862353+03:00",
+  "release_not_before": "2026-11-13T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Мировой рекорд Магнуса Дитлева",
+      "text": "Датский триатлет Магнус Дитлев установил новый мировой рекорд на полной дистанции IRONMAN во Флориде. Его итоговое время составило 7 часов 19 минут 17 секунд.",
+      "source": {
+        "url": "https://marathonec.ru/magnus-ditlev-mirovoj-rekord-ironman/",
+        "title": "Магнус Дитлев установил новый мировой рекорд на полной «железке» IRONMAN во Флориде",
+        "publisher": "\"Марафонец\"",
+        "language": "ru",
+        "published": "2026-11-08T10:51:46+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Пересмотр классификации окаменелости ребенка из Таунга",
+      "text": "Исследование окаменелости ребенка из Таунга, найденной в 1924 году, показало, что традиционное включение всех подобных находок в группу Australopithecus может быть неточным. Ученые предположили, что разнообразие гоминидов в то время было значительно выше, чем считалось ранее.",
+      "source": {
+        "url": "https://nautil.us/famous-fossil-could-be-rosetta-stone-for-hidden-hominin-diversity-1286535/",
+        "title": "Famous Fossil Could be Rosetta Stone for Hidden Hominin Diversity",
+        "publisher": "nautil.us",
+        "language": "en",
+        "published": "2026-11-10T23:00:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Морские мотивы в творчестве",
+      "text": "Писатель отмечает, что произведения Ван Гога часто пропитаны глубокой меланхолией. Примером служит картина «У врат вечности», написанная в 1890 году.",
+      "source": {
+        "url": "https://aeon.co/essays/we-need-a-language-to-name-the-grief-that-comes-without-death",
+        "title": "We need a language to name the grief that comes without death",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-10-27T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Успешное импортозамещение",
+      "text": "Эксперты ритейла отмечают бренды, сумевшие успешно заменить ушедшие компании. Одним из ярких примеров аналитики считают сеть «Вкусно — и точка».",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/eksperty-priznali-vkusno-i-tochka-i-maag-samymi-uspeshnymi-primerami-importozameshheniya/",
+        "title": "Эксперты признали «Вкусно — и точка» и Maag самыми успешными примерами импортозамещения",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-11T11:33:05+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Велосипедные фонари",
+      "text": "В зимний период велосипедные фонари становятся обязательным элементом экипировки для поездок в условиях короткого светового дня. Популярный комплект Lezyne можно приобрести со скидкой.",
+      "source": {
+        "url": "https://www.bicycling.com/bikes-gear/a71536029/best-bike-gear-deals/",
+        "title": "I Dug Through the Early Black Friday Cycling Sales—Here’s the Gear Actually Worth Buying Before Winter Hits",
+        "publisher": "Bicycling",
+        "language": "en",
+        "published": "2026-06-10T10:00:04Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Новый датчик для отслеживания спутников",
+      "text": "Компания Anduril Industries успешно продемонстрировала работу спутникового сенсора, способного фиксировать маневры объектов в тени Земли. Технология использует инфракрасный диапазон для обнаружения тепловых следов космических аппаратов.",
+      "source": {
+        "url": "https://arstechnica.com/space/2026/11/anduril-demos-night-vision-sensor-for-tracking-satellites-in-darkness/",
+        "title": "Anduril says its first satellite can see adversaries maneuver in orbital night",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-11T20:22:03+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Кооперативное движение",
+      "text": "Международный кооперативный альянс был основан в 1895 году для объединения людей в коллективные структуры. Принципы кооперации активно применяются для решения экономических задач.",
+      "source": {
+        "url": "https://aeon.co/essays/what-cooperatives-for-an-anticapitalist-peace-look-like",
+        "title": "What cooperatives for an anticapitalist peace look like",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-10-26T10:00:00.000Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Энциклика Папы Римского",
+      "text": "В 1993 году Папа Иоанн Павел II опубликовал энциклику Veritatis Splendor. Документ был направлен на утверждение позиции Католической церкви о том, что существуют действия, которые являются морально недопустимыми в любых обстоятельствах.",
+      "source": {
+        "url": "https://firstthings.com/contextuality-with-apologies-to-irving-berlin/",
+        "title": "“Contextuality” (with Apologies to Irving Berlin)",
+        "publisher": "First Things",
+        "language": "en",
+        "published": "2026-11-11T06:00:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "История архитектуры в принтах",
+      "text": "Издательство The Architectural Review выпустило ограниченную серию принтов, основанных на архивных обложках журнала. Среди них работы Ле Корбюзье и Пола Клее, созданные в середине XX века.",
+      "source": {
+        "url": "https://www.architectural-review.com/today/gift-a-piece-of-the-ars-130-year-history",
+        "title": "Gift a piece of the AR’s 130-year history",
+        "publisher": "The Architectural Review",
+        "language": "en",
+        "published": "2026-11-09T11:41:59+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Вопрос о бытии",
+      "text": "Впервые четко сформулировал вопрос «Почему существует нечто, а не ничто?» Готфрид Вильгельм Лейбниц в 1714 году. Философы до сих пор ведут дискуссии об обоснованности этого вопроса.",
+      "source": {
+        "url": "https://aeon.co/essays/a-new-answer-to-why-there-is-something-rather-than-nothing",
+        "title": "A new answer to why there is something rather than nothing",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-12T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Ранние годы Джоан Галифакс",
+      "text": "В возрасте четырех лет буддийский учитель Джоан Галифакс перенесла полиомиелит, из-за чего провела около двух лет прикованной к постели. Именно в этот период изоляции она открыла для себя внутреннюю духовную жизнь.",
+      "source": {
+        "url": "https://aeon.co/essays/how-does-roshi-joan-halifax-make-sense-of-her-buddhist-life",
+        "title": "How does Roshi Joan Halifax make sense of her Buddhist life?",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-10T11:00:00.000Z"
+      }
+    }
+  ],
+  "light_count": 11,
+  "homepage_hash": "8853e86668cf88ad0ebab53d3e7b1e9dacd3fb8baad680f0f4959bb2ebb0b5b6",
+  "overview_hash": "b1efc89be5ffa6c7358c341a2ee1f11d49e1c7c83c1b884738d59e35558c13f6",
+  "markdown_hash": "ab48fea6de18c0144186b29eb16cf5fe7247a894ee0923699643196bfb79623e"
+}
