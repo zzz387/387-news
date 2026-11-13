@@ -113,7 +113,7 @@ def wait_until_release(date,clock=None,sleep=time.sleep,maximum_wait=600,lead_se
 def main():
     phase,preview,date = context(os.environ.get('PHASE','run'),os.environ.get('PREVIEW','false')=='true',
                                 os.environ.get('TARGET_DATE',''),os.environ['GITHUB_EVENT_NAME'],
-                                check_public=site_checks.check_site)
+                                check_public=site_checks.check_delivery)
     if (not preview and phase in ('run','resume') and not os.environ.get('TARGET_DATE','').strip()
             and os.environ.get('GITHUB_REF_NAME')=='main'):
         if os.getenv('NEWS_POLICY_VERSION') in ('4.3','4.4'):
