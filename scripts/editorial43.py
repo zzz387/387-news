@@ -330,7 +330,7 @@ class Editor(old.Editor):
             if eligible(record):return
             if progress.get('wire_blocked_hash')==fp:raise p.Blocked('REPEATED_REVIEW_DIAGNOSTIC')
             reviews=progress['review_attempts'];review_key='wire2:'+fp;count=reviews.get(review_key,0)
-            if count>=1+CONFIG['repair_attempts']:raise p.Blocked('FINAL_REVIEW_ATTEMPTS_EXHAUSTED')
+            if count>=min(2,1+CONFIG['repair_attempts']):raise p.Blocked('FINAL_REVIEW_ATTEMPTS_EXHAUSTED')
             sources=[record['source']]+record.get('supporting_sources',[])
             evidence={s['id']:{b['id']:b['text'] for b in s['blocks']} for s in sources}
             wire,aliases=review_wire(record)
@@ -376,10 +376,11 @@ class Editor(old.Editor):
                 progress['last_wire_diagnostic']={'hash':fp,'codes':diagnostics};self.persist()
                 if previous==progress['last_wire_diagnostic']:
                     progress['wire_blocked_hash']=fp;self.persist();raise p.Blocked('REPEATED_REVIEW_DIAGNOSTIC')
-            if validation_errors==['NEWS_EVENT_TOO_OLD'] and not protocol_errors:
+            dated_failure=next((code for code in ('NEWS_EVENT_TOO_OLD','NEWS_EVENT_IN_FUTURE') if code in validation_errors),None)
+            if dated_failure and not protocol_errors and not any(code in validation_errors for code in ('NEWS_EVENT_WITNESS_MISSING','NEWS_EVENT_DATE_NOT_IN_WITNESS','NEWS_EVENT_FIELDS_INVALID')):
                 # A bound literal establishes an actually stale news date.
                 # Repeating the same audit cannot make this current news.
-                raise p.Blocked('NEWS_EVENT_TOO_OLD')
+                raise p.Blocked(dated_failure)
             if positive_semantics(result) and (protocol_errors or validation_errors):
                 progress['review_protocol_feedback']={'codes':protocol_errors+validation_errors,'instruction':'Уточни проверку без изменения статьи: sN и qN, дословная цитата. Для дат отличай публикацию от события и текущую новость от неоперативного объяснения; контекст переиздания сам по себе не отменяет актуальность реальной новости. Если факт/дата не подтверждаются или текст выдаёт старое за новое, отклони; не выдумывай свидетельство и не меняй дату.'}
                 self.persist();continue

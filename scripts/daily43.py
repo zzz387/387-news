@@ -92,7 +92,14 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         state['_recent43']=selection43.recent(root,date)
         priorities43.apply_rules(state,clock())
         discover(state)
-        if os.getenv('NEWS_CATALOG_REFRESH')=='true' and (short or clock()<release-timedelta(minutes=25)):
+        # Fill the last ordinary place from already verified candidates before
+        # spending a full discovery window. Exhaustion still triggers bounded search.
+        existing_supply=active44 and all(n>=2 for n in policy44.counts(selection43.composition(state)).values()) and any(
+            r.get('status') in ('discovered','preparing','retryable_error') and not r.get('for_light_only')
+            and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified'
+            and rights41.decision(r['source'],'INDEPENDENT_ARTICLE')['status']=='allowed'
+            for r in state['candidates'])
+        if os.getenv('NEWS_CATALOG_REFRESH')=='true' and not existing_supply and (short or clock()<release-timedelta(minutes=25)):
             try:catalog43.refresh(state,clock(),shortage=short)
             except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
         priorities43.apply_rules(state,clock())
@@ -109,6 +116,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         attempted_ids=set();extra_searches=0
         while True:
             stock43.balance(state,root,clock())
+            if due and len(selection43.composition(state))>=minimum and (not active44 or policy44.standard(state)['compliant']):break
             banking=len(selection43.composition(state))>=e.CONFIG['article_target'] and (not active44 or all(n>=2 for n in policy44.counts(selection43.composition(state)).values()))
             main_groups={g:sum(priorities43.classify(r)['group']==g for r in selection43.composition(state)) for g in ('A','C')}
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]

@@ -30,3 +30,6 @@ main[data-policy-version="4.1"] .front-grid{grid-template-columns:minmax(0,1.6fr
 .article-shell[data-policy-version="4.3"]{min-width:0;overflow-wrap:anywhere}
 [data-policy-version="4.3"] .article-body{display:flow-root;overflow-wrap:anywhere;min-width:0}
 main[data-policy-version="4.3"] h2,main[data-policy-version="4.3"] .toc h3{overflow-wrap:anywhere;min-width:0}
+.article-shell[data-policy-version="4.4"]{min-width:0;overflow-wrap:anywhere}
+[data-policy-version="4.4"] .article-body{display:flow-root;overflow-wrap:anywhere;min-width:0}
+main[data-policy-version="4.4"] h2,main[data-policy-version="4.4"] .toc h3{overflow-wrap:anywhere;min-width:0}

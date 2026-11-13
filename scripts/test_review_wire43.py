@@ -98,6 +98,19 @@ class DatedContextRepairTests(unittest.TestCase):
         v=copy.deepcopy(r['progress']['v43']['history'][-1]);v['is_news']=False
         self.assertEqual(e.news_errors(v,r,issue),[])
 
+    def test_bound_old_or_future_news_stops_after_one_review(self):
+        for date,code in [('2020-01-01','NEWS_EVENT_TOO_OLD'),('2099-01-01','NEWS_EVENT_IN_FUTURE')]:
+            with self.subTest(code=code):
+                row=ready(55);row['status']='preparing';row['checks'].pop('final43');row['category_hint']='Наука'
+                row['source']['blocks'][-1]['text']='The event occurred on '+date+'.'
+                calls=[]
+                def model(prompt,**kwargs):
+                    calls.append(kwargs['schema']);result=verdict(prompt,row)
+                    result.update(is_news=True,event_date=date,event_source_id=row['source']['id'],event_evidence_id=row['source']['blocks'][-1]['id'],event_quote=row['source']['blocks'][-1]['text'])
+                    return result
+                with self.assertRaisesRegex(p.Blocked,code):e.Editor(call=model).finish(state(),row)
+                self.assertEqual(calls,['v43_final'])
+
     def test_one_addressed_write_then_fresh_review_preserves_all_old_counters(self):
         issue,r=self.fixture();s.repair_dated_context_v1(issue);calls=[];before=copy.deepcopy(r['article'])
         def model(prompt,**kw):
