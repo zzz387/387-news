@@ -26,6 +26,28 @@ def response_item():
     return source,item
 
 class Policy44Tests(unittest.TestCase):
+    def test_content_subjects_table(self):
+        cases=[]
+        for expected,titles in [('family',['Развитие детей','Общение с детьми','Счастливое детство','A child learns through play','Kids and parents']),('sport',['История спорта','Физиология бега','Плавание для взрослых','Walking and physical activity'])]:
+            cases += [('article',title,title+'. '+title+' — основная тема исследования.',expected) for title in titles]
+        cases += [('source','Newborn baby health','Health concerns can include symptoms. Medical advice explains when parents should seek help. The guidance discusses healthcare and symptoms.','health'),
+                  ('source','Healthy teeth and gums','Brush your teeth. Dental care matters. Your dentist can help with oral hygiene.','health'),
+                  ('source','Best way to wash your hands','Handwashing is ordinary hygiene. Wash your hands carefully. Handwashing helps reduce spread.','health'),
+                  ('source','Magnus Ditlev sets an Ironman record','The athlete completed the Ironman distance. The report describes swimming, cycling and running. The record was recorded at the finish.','sport')]
+        for field,title,text,expected in cases:
+            with self.subTest(subject=expected,title=title):self.assertEqual(v.subject({field:{'title':title,'blocks':[{'text':text}]}}),expected)
+
+    def test_false_subjects_table(self):
+        tagged=named('Дом в центре города');tagged['article']['category']='Семья';tagged['category_hint']='Семья'
+        cases=[('stale category',tagged),('parent company',{'title':'Parent company funds research','summary':'Parent company manages its subsidiaries.'}),('child process',{'title':'Child processes in Linux','summary':'Child processes inherit parent process state.'})]
+        texts=[('Картина художницы','Семья обнаружила картину в доме. Полотно изображает горы.'),('Резервное электропитание кухни','Продукты питания сохраняются благодаря батарее.'),('Обучение модели нейросети','Тренировка модели улучшает результат.'),
+               ('Зубы мамонта','Зубы мамонта. Зубы мамонта. Зубы мамонта.'),('Родительская забота у птиц','Родители птиц кормят птенцов. Родители птиц заботятся о птенцах. Родители птиц строят гнездо.'),('Тренировки для собак','Тренировки для собак. Бег собак. Спортивные тренировки собак.'),
+               ('A Peruvian hotel with a terrifying check-in','Guests sleep in a capsule. The hotel offers places to sleep. Sleeping high above the valley is unusual. Guests sleep after the climb.')]
+        cases += [(title,{'article':{'title':title,'blocks':[{'text':text}]}}) for title,text in texts]
+        cases += [(title,{'source':{'title':title,'blocks':[{'text':(title+'. ')*5}]}}) for title in ['Healthy forests','Financial health','Здоровье бизнеса']]
+        for label,row in cases:
+            with self.subTest(risk=label):self.assertIsNone(v.subject(row))
+
     def test_uncapped_8_12_16_20_25_30_and_lights_8_12_16(self):
         for n,light in [(8,8),(12,8),(16,8),(20,8),(25,12),(30,16)]:
             with self.subTest(main=n,notes=light),tempfile.TemporaryDirectory() as temp:
@@ -52,17 +74,11 @@ class Policy44Tests(unittest.TestCase):
         editor.finish.assert_called_once();discovery.assert_not_called()
         self.assertEqual(v.standard(s)['main_articles'],8)
         self.assertEqual(v.standard(s)['light_notes'],11)
-    def test_ambiguous_old_labels_cannot_fill_a_minimum(self):
-        r=named('Дом в центре города');r['article']['category']='Семья';r['category_hint']='Семья'
-        self.assertIsNone(v.subject(r))
     def test_published_018_art_and_power_are_not_family_or_health(self):
         files=list((Path(__file__).resolve().parents[1]/'issues/2026-11-11/articles').glob('*/index.html'))
         selected=[v.from_html(f.read_text()) for f in files if any(t in f.read_text() for t in ['Утерянный пейзаж Джорджии','Автономность на кухне'])]
         self.assertEqual(len(selected),2)
         for row in selected:self.assertIsNone(v.subject(row))
-    def test_incidental_keywords_and_model_training_do_not_count(self):
-        for title,body in [('Картина художницы','Семья обнаружила картину в доме. Полотно изображает горы.'),('Резервное электропитание кухни','Продукты питания сохраняются благодаря батарее.'),('Обучение модели нейросети','Тренировка модели улучшает результат.')]:
-            self.assertIsNone(v.subject({'article':{'title':title,'blocks':[{'text':body}]}}))
     def test_cycling_health_overlap_counts_once(self):
         row=main_row(4);row['article']['blocks'][0]['text']+=' Велосипедные тренировки поддерживают здоровье.'
         self.assertEqual(sum(v.counts([row]).values()),1);self.assertEqual(v.subject(row),'sport')
@@ -262,26 +278,11 @@ class Policy44Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'INDEPENDENT_SAFETY_EVIDENCE_REQUIRED'):editor.verify_source(row)
 
 
-    def test_children_inflections_and_child_are_real_family_not_processes(self):
-        for title in ['Развитие детей','Общение с детьми','Счастливое детство','A child learns through play','Kids and parents']:
-            row={'article':{'title':title,'blocks':[{'text':title+'. '+title+' — основная тема исследования.'}]}}
-            self.assertEqual(v.subject(row),'family')
-        self.assertIsNone(v.subject({'title':'Parent company funds research','summary':'Parent company manages its subsidiaries.'}))
-        self.assertIsNone(v.subject({'title':'Child processes in Linux','summary':'Child processes inherit parent process state.'}))
-    def test_sport_inflections_and_walking_are_supported(self):
-        for title in ['История спорта','Физиология бега','Плавание для взрослых','Walking and physical activity']:
-            self.assertEqual(v.subject({'article':{'title':title,'blocks':[{'text':title+'. '+title+' — тема этого материала.'}]}}),'sport')
 
 
     def test_literary_family_title_is_supported_by_lead_and_repeated_actual_content(self):
         body='Parents can support children at home. Adults often have questions. Each child develops at a different pace. Play can be shared. Parents can listen without judging. New experiences take time. The practical examples explain ordinary communication. Support can be quiet.'
         self.assertEqual(v.subject({'article':{'title':'Small steps together','teaser':'','blocks':[{'text':body}]}}),'family')
-    def test_peruvian_hotel_does_not_become_health_because_people_sleep_there(self):
-        body='Guests sleep in a capsule. The hotel offers places to sleep. Sleeping high above the valley is unusual. Guests sleep after the climb.'
-        self.assertIsNone(v.subject({'source':{'title':'The Peruvian hotel with a terrifying check-in','blocks':[{'text':body}]}}))
-    def test_ironman_record_is_a_real_sport_subject(self):
-        body='The athlete completed the Ironman distance. The report describes swimming, cycling and running. The record was recorded at the finish.'
-        self.assertEqual(v.subject({'source':{'title':'Magnus Ditlev sets an Ironman record','blocks':[{'text':body}]}}),'sport')
     def test_official_stable_guidance_can_be_undated_but_breaking_clinical_news_cannot(self):
         from scripts import catalog43
         src={'title':'Clinical guidance','url':'https://www.nhs.uk/conditions/asthma/','blocks':[{'text':'Medical treatment and medication are discussed.'}]}
@@ -290,11 +291,6 @@ class Policy44Tests(unittest.TestCase):
         self.assertFalse(catalog43.undated_evergreen(src,{'allow_archive':True}))
 
 
-    def test_health_is_human_medical_content_not_a_metaphor(self):
-        body='Health concerns can include symptoms. Medical advice explains when parents should seek help. The guidance discusses healthcare and symptoms.'
-        self.assertEqual(v.subject({'source':{'title':'Newborn baby health','blocks':[{'text':body}]}}),'health')
-        for title in ['Healthy forests','Financial health','Здоровье бизнеса']:
-            self.assertIsNone(v.subject({'source':{'title':title,'blocks':[{'text':(title+'. ')*5}]}}))
     def test_missing_groups_keep_searching_in_round_robin_within_existing_budget(self):
         from scripts import catalog43 as catalog
         original=catalog.registry();template=original['publishers'][0];publishers=[]
@@ -346,14 +342,8 @@ class Policy44Tests(unittest.TestCase):
         from scripts import catalog43
         self.assertFalse(catalog43.article_link({'url':'https://www.who.int/mega-menu/health-topics/resources/questions-and-answers','heading_link':True}))
         self.assertTrue(catalog43.article_link({'url':'https://www.who.int/news-room/feature-stories/detail/an-example','heading_link':True}))
-    def test_real_nhs_guidance_subjects_are_health(self):
-        for title,text in [('Healthy teeth and gums','Brush your teeth. Dental care matters. Your dentist can help with oral hygiene.'),('Best way to wash your hands','Handwashing is ordinary hygiene. Wash your hands carefully. Handwashing helps reduce spread.')]:
-            self.assertEqual(v.subject({'source':{'title':title,'blocks':[{'text':text}]}}),'health')
 
 
-    def test_animal_topics_do_not_fill_human_health_family_or_sport_places(self):
-        for title,text in [('Зубы мамонта','Зубы мамонта. Зубы мамонта. Зубы мамонта.'),('Родительская забота у птиц','Родители птиц кормят птенцов. Родители птиц заботятся о птенцах. Родители птиц строят гнездо.'),('Тренировки для собак','Тренировки для собак. Бег собак. Спортивные тренировки собак.')]:
-            self.assertIsNone(v.subject({'article':{'title':title,'blocks':[{'text':text}]}}))
 
 
     def test_ordinary_prevention_is_not_disease_treatment_but_clinical_claims_remain_risky(self):

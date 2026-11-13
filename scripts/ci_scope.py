@@ -7,7 +7,7 @@ import subprocess
 def scope(files):
     shared=any(f.startswith('assets/') or f in {'scripts/news.py','scripts/browser41.py','scripts/layout43.py','scripts/source_links43.py'} for f in files)
     return {
-        'legacy':shared or any(f in {'scripts/publication41.py','scripts/browser43.py','scripts/review_viewer41.py','scripts/browser44.py'} for f in files),
+        'legacy':shared or any(f in {'scripts/publication41.py','scripts/browser43.py','scripts/review_viewer41.py'} for f in files),
         'translation':any(f in {'scripts/source_links43.py','scripts/translation_browser43.py'} for f in files),
         'sources':any(f in {'scripts/catalog43.py','scripts/source41.py','scripts/source_dom41.py','scripts/public_sources41.py','scripts/source_probe44.py','scripts/source_probe41.py','config/editorial_sources.json','config/source-profiles.json','config/light_sources44.json'} for f in files),
     }

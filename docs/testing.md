@@ -31,3 +31,9 @@ bodies. Historical tests cover code still shipped, migrations or active special
 paths, so they were not deleted merely to reduce a number. Two single-case process
 entrypoint files were consolidated without losing either scenario. Known-incident
 regressions remain separate from stylistic or implementation-detail assertions.
+
+Nine small content-classifier methods were combined into two named subtest tables.
+All positive/negative cases remain, including Russian inflections, NHS guidance,
+Ironman, animal stories, computing terms, hotel sleep, stale categories and health
+metaphors. The real published-issue regression stays separate. Final inventory:
+48 test files and 621 test methods (plus their existing parameterized subcases).
