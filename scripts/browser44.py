@@ -10,8 +10,10 @@ def main():
         target=root(temp);s=issue(20,16);s['light43']['records'][0]['light_kind']='source_report'
         for row,language in zip(s['candidates'],['ru','en','de','fr',None,'es','it','zh-Hans']):
             row['source']['language']=language
-            row['source']['title']='НепереносимоеНазваниеИсточника'*8
             row['checks']['final43']['input_hash']=editorial43.fingerprint(row)
+        row=s['candidates'][0]
+        row['source']['title']+=' '+'НепереносимоеНазваниеИсточника'*8
+        row['checks']['final43']['input_hash']=editorial43.fingerprint(row)
         # Keep full-body/long-word stress in the current reader, not just a legacy suite.
         row=s['candidates'][-1]
         row['article']['title']='НепереносимыйДлинныйЗаголовок'*7
