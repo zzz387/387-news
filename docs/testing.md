@@ -36,4 +36,4 @@ Nine small content-classifier methods were combined into two named subtest table
 All positive/negative cases remain, including Russian inflections, NHS guidance,
 Ironman, animal stories, computing terms, hotel sleep, stale categories and health
 metaphors. The real published-issue regression stays separate. Final inventory:
-48 test files and 621 test methods (plus their existing parameterized subcases).
+48 test files and 622 test methods (plus their existing parameterized subcases).

@@ -143,6 +143,7 @@ def main():
     for attempt in range(max(1,min(args.attempts,5))):
         try:
             result=check_archived(args.base,args.archive_date) if args.archive_date else check_site(args.base,args.expected_date)
+            check_assets(news.ROOT,args.base)
             print(json.dumps(result,ensure_ascii=False))
             return
         except Exception as exc:
@@ -251,6 +252,14 @@ def check_archived(base,date):
     result=check_v43(base,publication43.layout43.homepage(overview,date),date)
     result['scope']='archive'
     return result
+
+
+def check_assets(root,base='https://387.su'):
+    """Current shared CSS delivery; archived HTML is never changed or regenerated."""
+    if urlparse(base).scheme!='https':raise RuntimeError('Public health check requires verified HTTPS')
+    style=Path(root)/'assets/style.css'
+    if style.is_file() and fetch(base.rstrip('/')+'/assets/style.css').encode()!=style.read_bytes():
+        raise RuntimeError('PUBLIC_ASSET_CHANGED')
 
 
 if __name__=='__main__': main()
