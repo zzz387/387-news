@@ -19,7 +19,7 @@ def main():
     if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',date):raise ValueError('RELEASE_DATE_INVALID')
     metadata=site_checks.validate_local_release(p.ROOT,date)
     overview=(p.ROOT/'issues'/date/'index.html').read_text()
-    if 'data-policy-version="4.3"' in overview:
+    if any('data-policy-version="'+version+'"' in overview for version in ('4.3','4.4')):
         with tempfile.TemporaryDirectory(prefix='387-final43-browser-') as temp:
             report=browser41.check(p.ROOT,date,Path(temp),expected_count=metadata['article_count'])
         print('[release-browser] '+json.dumps(report));return

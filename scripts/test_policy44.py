@@ -40,6 +40,18 @@ class Policy44Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp,self.assertRaisesRegex(ValueError,'EDITORIAL_STANDARD_NOT_MET'):pub.build(s,root(temp))
     def test_six_different_articles_cover_2_2_2(self):
         self.assertEqual(v.counts(issue()['candidates']),dict(family=2,health=2,sport=2))
+    def test_last_eighth_article_uses_verified_candidate_before_large_discovery(self):
+        from scripts import daily43,catalog43
+        s=issue(7,11);row=main_row(9);row['status']='preparing'
+        s['candidates'].append(row)
+        def finish(state,row):row['status']='ready'
+        editor=__import__('unittest.mock',fromlist=['Mock']).Mock();editor.finish.side_effect=finish
+        budget=SimpleNamespace(deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:0)
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='true'),patch.object(daily43,'discover'),patch.object(catalog43,'refresh') as discovery,patch.object(news.runtime,'ACTIVE_BUDGET',budget):
+            daily43.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW,editor=editor)
+        editor.finish.assert_called_once();discovery.assert_not_called()
+        self.assertEqual(v.standard(s)['main_articles'],8)
+        self.assertEqual(v.standard(s)['light_notes'],11)
     def test_ambiguous_old_labels_cannot_fill_a_minimum(self):
         r=named('Дом в центре города');r['article']['category']='Семья';r['category_hint']='Семья'
         self.assertIsNone(v.subject(r))
