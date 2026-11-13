@@ -11,6 +11,10 @@ import sys
 import time
 from urllib.parse import urlparse
 from urllib.request import Request, urlopen
+# Direct-file entrypoints must resolve the same local package as ``python -m``.
+# Otherwise a namespace named scripts may be imported from the runner environment.
+if __package__ in (None, ''):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 try:
     from scripts import news
 except ImportError:
@@ -66,6 +70,14 @@ def check_site(base='https://387.su', expected_date=None):
     base = base.rstrip('/')
     home = fetch(base+'/')
     if any('data-policy-version="'+v+'"' in home for v in ('4.3','4.4')):
+        current=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',home)
+        if expected_date and current and current[1]>expected_date:
+            # A delayed deployment retry must not rewind the newer homepage.
+            # Verify BOTH the current release and the requested immutable archive.
+            check_v43(base,home,current[1])
+            result=check_archived(base,expected_date)
+            result['homepage_date']=current[1]
+            return result
         return check_v43(base,home,expected_date)
     links = set(re.findall(r"href=[\"']/?issues/(\d{4}-\d{2}-\d{2})/articles/([a-z0-9-]+)/",home))
     if not links:
@@ -115,18 +127,22 @@ def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--package', type=Path)
     parser.add_argument('--expected-date')
+    parser.add_argument('--archive-date',help='Verify an immutable archived issue without requiring it on the homepage')
     parser.add_argument('--base',default='https://387.su')
     parser.add_argument('--attempts',type=int,default=3)
     args=parser.parse_args()
     if args.expected_date:
         datetime.strptime(args.expected_date,'%Y-%m-%d')
+    if args.archive_date:
+        datetime.strptime(args.archive_date,'%Y-%m-%d')
+        if args.expected_date or args.package:parser.error('--archive-date is a separate verification mode')
     if args.package:
         package(news.ROOT,args.package)
         print('[public-package] only published site files included; links validated')
         return
     for attempt in range(max(1,min(args.attempts,5))):
         try:
-            result=check_site(args.base,args.expected_date)
+            result=check_archived(args.base,args.archive_date) if args.archive_date else check_site(args.base,args.expected_date)
             print(json.dumps(result,ensure_ascii=False))
             return
         except Exception as exc:
@@ -223,6 +239,18 @@ def check_v43(base,home,expected_date=None):
             actual_articles.append(policy44.from_html(page))
     if data['policy_version']=='4.4':policy44.require({'policy_version':'4.4'},actual_articles,light)
     return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':data['policy_version'],'expected_date':expected_date,'status':'ok'}
+
+
+def check_archived(base,date):
+    if urlparse(base).scheme!='https':raise RuntimeError('Public health check requires verified HTTPS')
+    from scripts import publication43
+    base=base.rstrip('/')
+    overview=fetch(f'{base}/issues/{date}/')
+    # The historic homepage is reconstructed only to reuse link/hash validation;
+    # the actual homepage remains independently checked by check_site().
+    result=check_v43(base,publication43.layout43.homepage(overview,date),date)
+    result['scope']='archive'
+    return result
 
 
 if __name__=='__main__': main()

@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+import subprocess
+import sys
 from unittest.mock import patch
 try:
     from scripts import publication as pub, site_checks as check
@@ -10,6 +12,22 @@ except ImportError:
     import site_checks as check
 
 class PublicSiteTests(unittest.TestCase):
+    def test_direct_file_and_module_use_local_policy44_package(self):
+        root=Path(__file__).resolve().parents[1]
+        code="import runpy; m=runpy.run_path(%r); from scripts import policy44; assert policy44.__file__.startswith(%r)" % (str(root/'scripts/site_checks.py'),str(root))
+        with tempfile.TemporaryDirectory() as cwd:
+            result=subprocess.run([sys.executable,'-I','-c',code],cwd=cwd,capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        self.assertEqual(subprocess.run([sys.executable,'-m','scripts.site_checks','--help'],cwd=root,capture_output=True).returncode,0)
+
+    def test_late_retry_checks_current_home_and_requested_archive(self):
+        home='<html data-policy-version="4.4" data-issue-date="2026-11-13">'
+        with patch.object(check,'fetch',return_value=home),patch.object(check,'check_v43') as current,patch.object(check,'check_archived',return_value={'issue_date':'2026-11-12'}) as archived:
+            self.assertEqual(check.check_site(expected_date='2026-11-12')['homepage_date'],'2026-11-13')
+            current.assert_called_once_with('https://387.su',home,'2026-11-13')
+            archived.assert_called_once_with('https://387.su','2026-11-12')
+        with patch.object(check,'fetch',return_value=home),patch.object(check,'check_v43',side_effect=RuntimeError('PUBLIC_CONTENT_CHANGED')):
+            with self.assertRaisesRegex(RuntimeError,'PUBLIC_CONTENT_CHANGED'):check.check_site(expected_date='2026-11-12')
     def test_public_projection_excludes_private_dossiers_and_nested_context(self):
         state={'date':'2026-10-26','articles':{},'sources':[{'id':'S1','url':'https://example.org/fact','title':'Public document','published':'2026','evidence':'PRIVATE-RESEARCH'}], 'dossiers':{'secret':'PRIVATE-DOSSIER'}}
         for i in range(8):
