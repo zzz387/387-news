@@ -81,7 +81,8 @@ def incident(date,code,healthy,request=github,*,recovery_attempts=None,public_ch
     return 'created'
 
 
-def evaluate(root,status,now=None,check_public=site_checks.check_site):
+def evaluate(root,status,now=None,check_public=None):
+    check_public=check_public or (lambda **kwargs:site_checks.check_delivery(root=root,**kwargs))
     now=now or datetime.now(news.TZ)
     today=now.date().isoformat()
     if now.hour<6:

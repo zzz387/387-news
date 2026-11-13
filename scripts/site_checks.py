@@ -262,4 +262,10 @@ def check_assets(root,base='https://387.su'):
         raise RuntimeError('PUBLIC_ASSET_CHANGED')
 
 
+def check_delivery(base='https://387.su',expected_date=None,root=None):
+    result=check_site(base,expected_date)
+    check_assets(root or news.ROOT,base)
+    return result
+
+
 if __name__=='__main__': main()
