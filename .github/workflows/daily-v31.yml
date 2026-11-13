@@ -187,7 +187,7 @@ jobs:
           elif [[ -n "$MANUAL_DATE" ]]; then
             arguments+=(--expected-date "$MANUAL_DATE")
           fi
-          python scripts/site_checks.py "${arguments[@]}"
+          python -m scripts.site_checks "${arguments[@]}"
 
   unit-tests:
     if: ${{ github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main') }}
@@ -626,7 +626,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Package only final public site files
-        run: python scripts/site_checks.py --package '${{ runner.temp }}/public-site'
+        run: python -m scripts.site_checks --package '${{ runner.temp }}/public-site'
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
       - name: Package published site
@@ -641,7 +641,11 @@ jobs:
       - name: Verify the released issue on the public HTTPS site
         env:
           EXPECTED_DATE: ${{ needs.prepare.outputs.issue_date }}
-        run: python scripts/site_checks.py --expected-date "$EXPECTED_DATE" --attempts 5
+        run: |
+          python -m scripts.site_checks --expected-date "$EXPECTED_DATE" --attempts 5
+          if [[ "$EXPECTED_DATE" == '2026-11-13' ]]; then
+            python -m scripts.site_checks --archive-date 2026-11-12 --attempts 2
+          fi
 
   monitor:
     needs: [prepare, deploy]
