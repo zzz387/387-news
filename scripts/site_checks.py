@@ -70,6 +70,14 @@ def check_site(base='https://387.su', expected_date=None):
     base = base.rstrip('/')
     home = fetch(base+'/')
     if any('data-policy-version="'+v+'"' in home for v in ('4.3','4.4')):
+        current=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',home)
+        if expected_date and current and current[1]>expected_date:
+            # A delayed deployment retry must not rewind the newer homepage.
+            # Verify BOTH the current release and the requested immutable archive.
+            check_v43(base,home,current[1])
+            result=check_archived(base,expected_date)
+            result['homepage_date']=current[1]
+            return result
         return check_v43(base,home,expected_date)
     links = set(re.findall(r"href=[\"']/?issues/(\d{4}-\d{2}-\d{2})/articles/([a-z0-9-]+)/",home))
     if not links:
