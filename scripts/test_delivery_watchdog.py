@@ -54,9 +54,11 @@ class WatchdogTests(unittest.TestCase):
         self.assertTrue(all(delay<=30 for delay in clock.sleeps));self.assertEqual(len(api.posts),1)
 
     def test_seven_am_missing_release_dispatches_exact_owner_requested_inputs(self):
-        clock=Clock(at('07:00'));api=API(clock);result=self.run_watch(clock,api)
-        self.assertEqual(api.posts[0][1],{'ref':'main','inputs':{'phase':'publish','preview':'false','target_date':DAY}})
-        self.assertTrue(result['verified']);self.assertEqual(result['gemini_requests'],0)
+        for version,committed,phase in [('4.3',False,'publish'),('4.4',True,'publish'),('4.4',False,'run')]:
+            with self.subTest(version=version,committed=committed),patch.dict(os.environ,NEWS_POLICY_VERSION=version),patch.object(q,'edition_exists',return_value=committed):
+                clock=Clock(at('07:00'));api=API(clock);result=self.run_watch(clock,api)
+                self.assertEqual(api.posts[0][1],{'ref':'main','inputs':{'phase':phase,'preview':'false','target_date':DAY}})
+                self.assertTrue(result['verified']);self.assertEqual(result['gemini_requests'],0)
 
     def test_already_verified_does_not_start_another_producer(self):
         clock=Clock(at('07:00'));api=API(clock);api.healthy_at=clock()

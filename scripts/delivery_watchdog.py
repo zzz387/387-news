@@ -83,7 +83,8 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
                     if any(r['status'] in ACTIVE for r in productions(request)):active=True
                     else:
                         attempts+=1
-                        request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'run' if os.getenv('NEWS_POLICY_VERSION')=='4.4' else 'publish','preview':'false','target_date':date}})
+                        phase='publish' if queue.edition_exists(root,date) or os.getenv('NEWS_POLICY_VERSION')!='4.4' else 'run'
+                        request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':phase,'preview':'false','target_date':date}})
                         result.update(recovery_dispatched=True,publication_status='PUBLISHING',code='RECOVERY_DISPATCHED')
                         print('[delivery-watchdog] '+json.dumps(dict(result,recovery_attempts=attempts)),flush=True)
         except Exception as exc:
@@ -102,7 +103,11 @@ def main():
     if (os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('GITHUB_REF_NAME')!='main'):
         raise RuntimeError('WATCHDOG_PROTECTED_MAIN_REQUIRED')
     if os.getenv('NEWS_AUTOMATION_V31_ENABLED')!='true' or os.getenv('NEWS_RELEASE_APPROVED')!='true':raise RuntimeError('WATCHDOG_PRODUCTION_NOT_ENABLED')
-    result=run(queue.news.ROOT)
+    def delivered(**kwargs):
+        report=site_checks.check_site(**kwargs)
+        site_checks.check_assets(queue.news.ROOT)
+        return report
+    result=run(queue.news.ROOT,check=delivered)
     print('[delivery-watchdog] '+json.dumps(result),flush=True)
     if os.getenv('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as stream:stream.write('### Independent public delivery\n\n```json\n'+json.dumps(result,indent=2)+'\n```\n')
