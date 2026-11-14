@@ -1,0 +1,225 @@
+{
+  "date": "2026-11-14",
+  "number": 21,
+  "policy_version": "4.4",
+  "article_count": 12,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "614f72b8fa98aad291b7546bdd9cb06144544d189b70c2d78cb73b717793e91f",
+      "markdown": "008a60b4d02f4be3a5ec8abd6fcdf0baf0b8143345a72f728145c949931ed52d"
+    },
+    "feature-02": {
+      "html": "8078ad7617f1e043fd82c91cb46d2b1ed34a0dd7cd9faa22d8c1bd4e987820e1",
+      "markdown": "a444521446d78401b1ae78bae6f4741559879f125b1e51af5ae32402085050e6"
+    },
+    "feature-03": {
+      "html": "4e206d15994185a634e5ddc07dd74a57a8ea1396d77948bc80ff3296237293fb",
+      "markdown": "11fd79a32182eaae882c24c0649997bc1f70d671f9850dfe644ec487469107d7"
+    },
+    "feature-04": {
+      "html": "785ac4dff7c670756cd11fa1470fc1ee2d9a616a9253374f34f65266e8fa8052",
+      "markdown": "9833590c7ce346424c7276aef060c3f01965549ac4ca4d9623283a2707085461"
+    },
+    "feature-05": {
+      "html": "b9cbaf9f4dde882152aba2fc2a2614cc1f5366cdc4980848da7021725688e044",
+      "markdown": "6fa897fb5b936367aa1bc7d0a24a82c1e6bdae54c092ac958dbaeebf9373e23a"
+    },
+    "feature-06": {
+      "html": "f88174066126ddcff0e5ddd38e07a2c1b58af3e88b44c3f71f68f4c24c0d9199",
+      "markdown": "76098f32e8d804fc5611c8f377e5867898278bd71eeb37057cfcfd66bb23dbcc"
+    },
+    "feature-07": {
+      "html": "bdd86aab2492fee03211c565d9e7e042f8c104cfef8f9d61fe12cebb5dd75321",
+      "markdown": "3bc180928e9a51fdd1b956ef5f15ced093daae9995495b978ef2022d6ca09ec0"
+    },
+    "feature-08": {
+      "html": "394f5c76515c24c8b4c4f2d594b007140d11b72995193f2501a9ffeb0166ecbe",
+      "markdown": "ee87387a56cd6e90cdd4fac316158f5e78b3feaa2d673abb777ee6480dfa2bf6"
+    },
+    "feature-09": {
+      "html": "c34fe650decf73658807203fdab3385077f554951b4f592d3b2686f5f19e7bc2",
+      "markdown": "681a6bbd68a1f1ac1e400180fd08eb4675d25f7e5e43d5dd9c6155e9098ad846"
+    },
+    "feature-10": {
+      "html": "4226626c2723b58eea6a2abe04db2ed306b4d06e231c6b29704471e46abf1ad4",
+      "markdown": "9584bda42571a29b5687f1075fe9fe4f330b5b555f12a92e5852de14615bb357"
+    },
+    "feature-11": {
+      "html": "3b7d717de8dd8a04edd3ea48fa63cb3ccef115fa17efa27d76e4f5e63be5bcd2",
+      "markdown": "4b4a5fb999ee095f3f0a4840679e537a3e9a38c3fba3aa3613369673ec676c49"
+    },
+    "feature-12": {
+      "html": "ab3b7d696d9d05c77759a0ea4fefc5a1ab338e42208124c09763e3da7d93180b",
+      "markdown": "578bf4b2cc8aee9fc762d84a431e491bc671a30d69d28c4b6c24ddf128b74734"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-14T05:55:01.957982+03:00",
+  "release_not_before": "2026-11-14T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Древнекитайская стратегия «красавицы»",
+      "text": "Согласно древним текстам, китайская военная стратегия времен периода Сражающихся царств (475–221 гг. до н. э.) включала тактику использования личных отношений для ослабления политических противников.",
+      "source": {
+        "url": "https://theconversation.com/from-ancient-asia-to-the-ai-age-has-chinas-beauty-stratagem-found-a-new-victim-in-nvidias-jensen-huang-296393",
+        "title": "From ancient Asia to the AI age: Has China’s ‘beauty stratagem’ found a new victim in Nvidia’s Jensen Huang?",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-12T20:25:32Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Популярность праздников в США",
+      "text": "Согласно исследованию 2024 года, более трети опрошенных американцев назвали Рождество своим самым любимым праздником.",
+      "source": {
+        "url": "https://www.mentalfloss.com/holidays/most-popular-holidays-us-ranked?utm_source=RSS",
+        "title": "The Most Popular Holidays in the U.S., Ranked",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-13T01:00:00Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Казнь Уильяма Берка",
+      "text": "Двадцать восьмого января 1829 года состоялась публичная казнь Уильяма Берка, собравшая огромную толпу зрителей. Впоследствии его тело было передано для анатомического рассечения.",
+      "source": {
+        "url": "https://www.mentalfloss.com/crime/burke-hare-murders-chilling-facts?utm_source=RSS",
+        "title": "7 Chilling Facts About the Burke and Hare Murders",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-13T00:00:01Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Детское восприятие расовых различий",
+      "text": "Исследования показывают, что младенцы уже в возрасте трех месяцев способны замечать разницу в цвете кожи и чертах лица. Дети помладше могут рано начинать формировать предвзятость.",
+      "source": {
+        "url": "https://theconversation.com/children-are-not-colorblind-why-early-conversations-about-race-are-essential-293500",
+        "title": "Children are not colorblind: Why early conversations about race are essential",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-12T13:41:28Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Изучение вулканических цунами",
+      "text": "Ученые провели первое прямое сравнение данных лабораторных экспериментов с натурными наблюдениями за извержениями вулкана Стромболи. Исследования, проведенные в 2019–2021 годах, помогли лучше понять динамику возникновения цунами при попадании вулканических потоков в морскую воду.",
+      "source": {
+        "url": "https://eos.org/research-spotlights/the-experiments-improving-our-understanding-of-volcanic-tsunamis",
+        "title": "The Experiments Improving Our Understanding of Volcanic Tsunamis - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-12T13:42:47+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Дебют Микки Мауса",
+      "text": "Гигантский воздушный шар в форме Микки Мауса впервые пролетел над Манхэттеном в рамках парада Macy's в 1934 году. Дизайн персонажа для надувной конструкции разработал лично Уолт Дисней.",
+      "source": {
+        "url": "https://www.mentalfloss.com/holidays/thanksgiving/macys-thanksgiving-day-parade-balloons-by-decade?utm_source=RSS",
+        "title": "The Defining Macy's Thanksgiving Day Parade Balloon of Every Decade",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-12T23:00:01Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Открытие бозона Хиггса",
+      "text": "В 2012 году на Большом адронном коллайдере в Женеве было официально подтверждено открытие квантов вакуумного поля, известных как бозоны Хиггса. Это событие стало важным дополнением к Стандартной модели физики частиц.",
+      "source": {
+        "url": "https://www.trv-science.ru/2026/11/ai-shturmuet-teoriyu-yanga-millsa/",
+        "title": "AI штурмует теорию Янга — Миллса",
+        "publisher": "Троицкий вариант — Наука",
+        "language": "ru",
+        "published": "2026-11-03T18:30:29+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Первый полный мутагенез вируса",
+      "text": "В 2026 году исследователи провели полное мутагенное сканирование генома и протеома бактериофага ΦX174. Ученые изучили влияние практически всех возможных одиночных аминокислотных замен на жизнеспособность вируса.",
+      "source": {
+        "url": "https://www.trv-science.ru/2026/11/sobrat-i-obyasnit-tri-raboty-na-odnom-viruse/",
+        "title": "Собрать и объяснить: три работы на одном вирусе",
+        "publisher": "Троицкий вариант — Наука",
+        "language": "ru",
+        "published": "2026-11-03T17:00:49+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Разрушение системы образования в Газе",
+      "text": "В ходе недавнего конфликта в секторе Газа пострадала или была полностью уничтожена большая часть образовательной инфраструктуры. По имеющимся данным, разрушены все 19 зарегистрированных высших учебных заведений региона.",
+      "source": {
+        "url": "https://aeon.co/essays/those-forced-to-cross-borders-are-imagining-a-radical-new-world",
+        "title": "Those forced to cross borders are imagining a radical new world",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-13T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Цели Парижского соглашения",
+      "text": "Парижское соглашение, принятое в 2015 году, ставит своей целью удержать глобальное потепление к 2100 году на уровне существенно ниже 2°C по сравнению с доиндустриальными показателями.",
+      "source": {
+        "url": "https://eos.org/opinions/why-metrology-matters-for-ocean-alkalinity-enhancement",
+        "title": "Why Metrology Matters for Ocean Alkalinity Enhancement - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-12T13:42:40+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Подкаст о совести и грехе",
+      "text": "В новом выпуске подкаста «ТЕТ-А-ТЕТ» православного журнала «Фома» обсуждаются вопросы природы совести и почему человек может совершать поступки, не испытывая чувства вины.",
+      "source": {
+        "url": "https://foma.ru/greshu-i-mne-ne-stydno-chto-so-mnoj-ne-tak.html",
+        "title": "Грешу и мне не стыдно. Что со мной не так?",
+        "publisher": "Православный журнал «Фома»",
+        "language": "ru",
+        "published": "2026-11-10T15:08:14+03:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Новое пространство на Сретенке",
+      "text": "Команда «Дома Культур» на Сретенке открыла новую площадку под названием «Подъезд Культур», объединившую кафе, бар и культурные мероприятия.",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/u-doma-kultur-na-sretenke-teper-est-otdelnyj-podezd/",
+        "title": "У «Дома Культур» на Сретенке теперь есть отдельный «Подъезд»",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-13T16:16:15+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Использование Псалтири в Реформации",
+      "text": "В ходе Английской Реформации Псалтирь Ковердейла определяла молитвенную практику Церкви Англии, начиная с Первой книги общих молитв 1549 года.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/why-your-favorite-worship-songs-grammar-matters/",
+        "title": "Why Your Favorite Worship Song’s Grammar Matters - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-10T11:00:00+00:00"
+      }
+    }
+  ],
+  "light_count": 13,
+  "homepage_hash": "7de7e6719f28b62189576379babe7a78341595a086b7ba22352b6884fe10e760",
+  "overview_hash": "084815bf1fafc2ba4334f94ffc516883ab9417ac2dd1e739123d17d9a13ea57b",
+  "markdown_hash": "95563b5a8a6d8f2893ed6f7c8750debcf6357d2f74d84edc5bbe43fe7bc24e1e"
+}
