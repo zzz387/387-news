@@ -1,0 +1,261 @@
+{
+  "date": "2026-11-15",
+  "number": 22,
+  "policy_version": "4.4",
+  "article_count": 15,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "0050085b47892b0fc8c2edfe3db15c59c529a9d11ce39f5c76415306b4dcb11d",
+      "markdown": "9125b42cc64b9a095c01d6439d87c477c9ec4a2a30af05dd91721865aee53c3d"
+    },
+    "feature-02": {
+      "html": "faff25b6efb18221cd319b6c5d63c1c731568d9f35785a9c0ed9c7bdc45c7ed9",
+      "markdown": "042161ed606aa1552fb5ff29281426f08e993232c216eb58473be973a3207bab"
+    },
+    "feature-03": {
+      "html": "fc5e577ee6f35841cba3a8b45bda93647f938fa8ffd48ec0a3fbf9225b95f2b3",
+      "markdown": "541a2b17fdcc421736fd81e5350bee04c83a518dab84ceccb5bb2880278e9aee"
+    },
+    "feature-04": {
+      "html": "b860c0fd84f44f5c4c4b7cef563d748d85bf97a6b3dd9748d7c22dbea28e2c11",
+      "markdown": "3c24e022977b2782e0bbf19b39cd1d74e0df0e8f03716f4a1b33799fef1701f1"
+    },
+    "feature-05": {
+      "html": "5d9b3b631b43c78c291070d8e3921448fee3871083a9d40ac80677e06d6df1c7",
+      "markdown": "3411d19f33ca5ba54034f184008a0f340ccfba66304399e887bdc265914eac3d"
+    },
+    "feature-06": {
+      "html": "5e6472c44d24e0cc95e5843ecbb3bac18fc223a03e381ff903efc87638d23c94",
+      "markdown": "ad86d81896d8d7610c537149c10128b430d99c279cad6a667c44be0724a6fc98"
+    },
+    "feature-07": {
+      "html": "1a2079b1305a9d3b1d60188c7b4fe421ff198bbe068594beda4fe13fd3eb4c00",
+      "markdown": "6c02ea3e499a6bfd95a809125332655542d5ce980c1e8dc8f159c846afcfb78c"
+    },
+    "feature-08": {
+      "html": "f71797ad37d66695c3fea07689cb1b5347e373501a777d8bf0eeccec9aa9d539",
+      "markdown": "1e17a78e7c3b9ce8d0bc66007e18c838a91c5044c1cf2ca2fdf50e1876afc7d5"
+    },
+    "feature-09": {
+      "html": "1b1db79ac6d6ca75db315fbdc74fc43fa9d7ba9ee62ed3916bd4006ebe3735ac",
+      "markdown": "9a25eeb1fb9c4ca507002c336a3312c8de2bc45d85bdbc73dbbaa7bec1227148"
+    },
+    "feature-10": {
+      "html": "49c0536e5a22e22cf507a4c1ab7b73b3a03a69f36ba1bbb0177067fb1ad72a93",
+      "markdown": "0f64cc1b4f2942e313091c4513d74f23faf0e29d7814610bbcddc94e60da1f72"
+    },
+    "feature-11": {
+      "html": "d4ffe115b94c3a1c328b6b42c759e992d77f3096e9f84ab090855b3c4180dbc9",
+      "markdown": "49fa02ba82ede9d5e903cf41dc18d59ddf28de90f03eac293248aea2af9f2c02"
+    },
+    "feature-12": {
+      "html": "a60c99e6abce3e2ae1434be6a37059eac77f3883b38ae083aaf5ed8d3e58b943",
+      "markdown": "4264202ee13da2b63dbca8c66bdae72c6884368a1c401dac6f2f3437058da495"
+    },
+    "feature-13": {
+      "html": "134c8c80b2e0c0050fd4d6b3ae5532b4fd0fc21dfc7a21d2480c59955f6f7ef9",
+      "markdown": "8a6ffff93d3478c26611162af27fddda6c0fb8f90984084eed1a3eaba4dec9ab"
+    },
+    "feature-14": {
+      "html": "73808fd1697f755466791359656675b0efde78ad1809de2c96979741470c0ecf",
+      "markdown": "40131b3ad3c68f1992123b15c5a167f983c77edcaa099db2111db62dc994c43e"
+    },
+    "feature-15": {
+      "html": "9d69831ea7794ce97d071896e22b0adc4a51deae5b735ab93811aa184a47ad17",
+      "markdown": "7c2da7940696f29c3e487f335f57a14c764835d6b0ee5cb5faf67a19b3acf8f3"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-15T05:55:40.692517+03:00",
+  "release_not_before": "2026-11-15T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Оползневая угроза на альпийских курортах",
+      "text": "В северных французских Альпах исследователи выявили 888 зон деформации горных пород, из которых 206 затрагивают территорию 69 горнолыжных курортов. В частности, 86% площади курорта Ле Менюир подвержено риску деформации скальных склонов.",
+      "source": {
+        "url": "https://eos.org/thelandslideblog/rock-slope-failures-ski-resorts",
+        "title": "The threat from rock slope failures to ski resorts",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-13T10:26:57+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Статистика ДТП в пятницу 13-го",
+      "text": "Анализ данных Aviva за десятилетний период продемонстрировал, что количество страховых случаев при дорожно-транспортных происшествиях возрастало в среднем на 13% в пятницу 13-го числа по сравнению с другими днями того же месяца.",
+      "source": {
+        "url": "https://www.theguardian.com/science/2026/nov/13/the-sinister-power-of-friday-13th-how-this-maligned-date-affects-our-lives",
+        "title": "The sinister power of Friday 13th: how this maligned date affects our lives",
+        "publisher": "the Guardian",
+        "language": "en",
+        "published": "2026-11-13T05:00:10.000Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Увольнение Аарона Айви",
+      "text": "В 2024 году пастор Аарон Айви был уволен из церкви Austin Stone из-за обвинений в сексуальных домогательствах, включая действия в отношении несовершеннолетнего из состава молодежного служения.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/hillsong-bethel-elevation-worship-bans/",
+        "title": "Churches Shouldn’t Just Ban Hillsong, Bethel, and Elevation - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-12T11:00:00+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Социальный распад у слонов",
+      "text": "Исследователи установили, что социальные структуры азиатских слонов в Шри-Ланке начали разрушаться, когда смертность превысила рождаемость. В отличие от африканских видов, азиатские слоны в данной популяции демонстрируют тенденцию к изоляции групп при нехватке пищевых ресурсов.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/in-elephants-the-resilience-of-communities-has-its-limits/",
+        "title": "In elephants, the resilience of communities has its limits",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-13T20:03:13+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Миф о страусах",
+      "text": "Страусы не прячут голову в песок при виде угрозы. В случае опасности они либо прижимаются к земле, маскируясь под объекты ландшафта, либо спасаются бегством на высокой скорости.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/do-ostrichesbury-heads-in-sand",
+        "title": "So do ostriches really bury their heads in the sand?",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-13T15:05:49+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Изучение оползней с LiDAR",
+      "text": "Сервис LiDAR Lens предоставляет доступ к топографическим данным Великобритании, позволяя археологам и исследователям выявлять следы древних оползней. Технология наглядно показывает рельефные образования, которые часто невидимы на обычных аэрофотоснимках.",
+      "source": {
+        "url": "https://eos.org/thelandslideblog/lidar-lens-1",
+        "title": "Using LiDAR Lens to examine landslides in the UK - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-12T08:00:03+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Предсказание Мартина Лютера",
+      "text": "Исторические хроники конца света включают гипотезу Мартина Лютера, который считал, что человечество не доживет как минимум до 1600 года.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/its-the-end-of-the-world-as-we-know-it-per-a-physicists-1960-prediction/",
+        "title": "It's the end of the world as we know it, per a physicist's 1960 prediction",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-13T15:09:39+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Кислородная губка древности",
+      "text": "Согласно исследованию геологов, мантия Земли поглощала кислород задолго до великой окислительной катастрофы, начав этот процесс еще 2,3 миллиарда лет назад.",
+      "source": {
+        "url": "https://eos.org/articles/crystals-indicate-early-earth-was-a-sponge-for-oxygen",
+        "title": "Crystals Indicate Early Earth Was a “Sponge” for Oxygen - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-13T14:29:24+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "История глиняных свистулек",
+      "text": "Самые древние прообразы окарин — глиняные свистульки — были обнаружены в Африке и датируются примерно 30 000 лет назад.",
+      "source": {
+        "url": "https://www.mentalfloss.com/entertainment/music/ocarina-history-explained?utm_source=RSS",
+        "title": "What Is An Ocarina? The Ancient History Behind the 'Legend of Zelda’ Instrument",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-14T00:00:00Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Терминология изменения климата",
+      "text": "Американцы лучше знакомы с терминами изменение климата и глобальное потепление и больше обеспокоены ими, чем такими понятиями, как климатический кризис или климатическая справедливость. Исследователи отмечают, что использование сложного или перегретого жаргона не повышает уровень срочности или готовность людей действовать.",
+      "source": {
+        "url": "https://theconversation.com/to-get-americans-to-care-about-climate-change-just-call-it-climate-change-296481",
+        "title": "To get Americans to care about climate change, just call it climate change",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-13T15:05:35Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Безопасность в полевых исследованиях",
+      "text": "Большинство исследователей в области наук о Земле сталкивались с вредными взаимодействиями во время полевых работ. Опрос показал, что около восьмидесяти процентов респондентов пережили хотя бы один подобный инцидент.",
+      "source": {
+        "url": "https://eos.org/research-spotlights/four-in-five-researchers-report-harmful-interactions-during-geoscience-fieldwork-a-new-survey-suggests-a-path-forward-chinese",
+        "title": "八成研究人员称在野外工作期间遭遇过有害互动 - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-13T14:28:21+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Суеверия в американских штатах",
+      "text": "Штат Род-Айленд занял первое место в списке самых суеверных регионов США, опередив другие штаты по количеству запросов, связанных с астрологией и приметами. В то же время Айдахо был признан наименее суеверным штатом.",
+      "source": {
+        "url": "https://www.mentalfloss.com/geography/states/most-least-superstitious-states-ranked?utm_source=RSS",
+        "title": "The Most—And Least—Superstitious States in America, Ranked",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-13T21:00:00Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Миграция кожистых черепах",
+      "text": "Популяция восточнотихоокеанских кожистых черепах начала менять места гнездования из-за потепления океанов, перемещаясь примерно на тысячу миль к югу в сторону Эквадора. Исторически появление самок на пляжах этой страны было крайне редким событием.",
+      "source": {
+        "url": "https://nautil.us/the-worlds-largest-marine-turtle-makes-a-move-south-1286621/",
+        "title": "The World’s Largest Marine Turtle Makes a Move South",
+        "publisher": "nautil.us",
+        "language": "en",
+        "published": "2026-11-13T23:00:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Отличия цапель от белых цапель",
+      "text": "Название цапля может применяться к любому представителю семейства ардеид, включающему цапель, выпей и белых цапель. Таким образом, все белые цапли технически являются цаплями, но не все цапли — белые цапли.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/heron-vs-egret-difference",
+        "title": "Heron vs egret: what's the difference between these two leggy, long-necked, very elegant, beautiful birds?",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-13T14:56:52+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Новый зал ресторана Матрешка",
+      "text": "В начале декабря ресторан Андрея Деллоса «Матрешка» планирует открыть новый камерный зал. Строительство этого интерьера из темного дерева с зеркальным потолком может обойтись более чем в сто миллионов рублей.",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/v-dekabre-andrej-dellos-otkroet-novyj-zal-matreshki-vot-kak-on-budet-vyglyadet/",
+        "title": "В декабре Андрей Деллос откроет новый зал «Матрешки» — вот как он будет выглядеть",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-14T02:54:31+00:00"
+      }
+    }
+  ],
+  "light_count": 15,
+  "homepage_hash": "715d9a2bfcc85a672c9e58f48ad2a5a8e5224ed57634d3475c89264cd9517236",
+  "overview_hash": "553368a5a1fba83fb85313d8aa90a3c4d618989450b3e29c212db79d3340f68a",
+  "markdown_hash": "b34d2b982a1dd570d7a338cb16f78b8515ae732a7fdee0ec25591ad9bbefe1e6"
+}
