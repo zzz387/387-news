@@ -1,0 +1,273 @@
+{
+  "date": "2026-11-16",
+  "number": 23,
+  "policy_version": "4.4",
+  "article_count": 15,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "e367aad21ecb240407cbe87a8f09fa7e2548758f6593489cf4d0f35ec6a9a599",
+      "markdown": "0dbcc67d672677dcea66cc7380bed1fec43c9fa811cf8f88416dc47ad180dcf1"
+    },
+    "feature-02": {
+      "html": "076d3dae441257302a94791670bb6969fdaf1451ba856eb31e0ef770f1cf9e43",
+      "markdown": "300f55f22a88432678c792aa11050d8ee36996684be7f5b626eb7812405ebc75"
+    },
+    "feature-03": {
+      "html": "f7c57bb1804dae0f549439e6113cdef836022bf1b76ea24d7fb735c245fb4058",
+      "markdown": "7c84957f7701ece54df2d3c9bbb0fec51e0b19acdbd44f8f73428a85b12f20f1"
+    },
+    "feature-04": {
+      "html": "98ac33179f020b847c570fec52e4d7f2f2a457854b3262621c5f9bc9a1297d99",
+      "markdown": "79bac75d5446177da952d626603d603d174a6794c8ca43d34b3f3ff64cc44647"
+    },
+    "feature-05": {
+      "html": "efe634e31504f39170e5cda5e16772a95e6229d8e09201c69df4d7f8916516a2",
+      "markdown": "060254b22c8991b334728941ed620a1a2eb05071b8e0d60e8cb78fd80b639841"
+    },
+    "feature-06": {
+      "html": "eb678cc37ff8c6cacad4a81c95988829b51a61084783e932ae275ffe0606fc64",
+      "markdown": "e514b9ede8c4884fb513f2ff41638adebf09aaacaed41cb1ae47818a6692bc07"
+    },
+    "feature-07": {
+      "html": "bf9b52d34ad8a963fefa2d09b95fc973141fde6b1d3e7da87968a0764b45ca3f",
+      "markdown": "8725f358f8d0b9aedd08868337b47fabafc5009d1e70c5f7e06656afdca95914"
+    },
+    "feature-08": {
+      "html": "1675bc139881f7f3a2e2fdd6614b8dcf2c9d6d71f8786af423c840d49fd342a7",
+      "markdown": "e833d16ff223eac7ddc9a0a747e041bac1d0c4351f64bc21212e948a9cfce922"
+    },
+    "feature-09": {
+      "html": "8ad8a223e5c9fa4f8f1c53bca5a03026a85f8e0b9ca6c6ae62b32b712259a922",
+      "markdown": "209c0a155c96d20096629cbf87808098fce82e52cfb384003af28492de736ebf"
+    },
+    "feature-10": {
+      "html": "cb15fe8f3e564e1b43b732beb8a4a204d1cbf9258f098970b60d2d6f4d5122a3",
+      "markdown": "ee7dd44704c26d129277786efd9c7fcdfd7de2e7482694fa4b15cdb619e196ab"
+    },
+    "feature-11": {
+      "html": "b9b87aad7672eecfc186b8f4ef25f5207608c6546ffeda527c9ee9a7f9ed4e91",
+      "markdown": "7e1c3f2b05313588f20e1496186af17e3a3c4182138e71e5a419c8301c1718c3"
+    },
+    "feature-12": {
+      "html": "8e69db5b1e0d8f6e8898f93c3b2cffece280baa2010ca994b97a3301df049384",
+      "markdown": "3b1435f57496748e5f1bbf339a7f95e35f8ce1673e14e636378d4d3534a40f38"
+    },
+    "feature-13": {
+      "html": "697cf23dcb72523736fbfb1ee2955cb2c3a4a55113cb5dbc74c5b8266fa1040e",
+      "markdown": "77065fa5fa807359e0cf77345158b0c081822fa7b35a4da433e4c165fd8af376"
+    },
+    "feature-14": {
+      "html": "e0790d32584e5def30b0066c892a571d1bf08f28dc4b026882dd1ff1c673e2af",
+      "markdown": "02c1238ba58f06ac5701b44599a7715ad41c80692d96379dcc96b74d2276c8c7"
+    },
+    "feature-15": {
+      "html": "9933aa5a3cee9557623bd3c4ab5d957f9fb80156d86d7a9e6d98d16776020cc4",
+      "markdown": "6138347442c62366af184b4d210ac0474f55df7c7c078e329d4d82e887b782ba"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-16T15:52:39.953678+03:00",
+  "release_not_before": "2026-11-16T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Отмена автобусной сегрегации в Монтгомери",
+      "text": "Верховный суд США признал неконституционной сегрегацию в автобусах Алабамы, что завершило знаменитый бойкот. Решение суда последовало после судебного иска и постановления нижестоящей инстанции.",
+      "source": {
+        "url": "https://www.goodnewsnetwork.org/events061113/",
+        "title": "Good News in History, November 13",
+        "publisher": "Good News Network",
+        "language": "en",
+        "published": "2026-11-13T08:00:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Поглощение углекислого газа океанами и лесами",
+      "text": "Новое научное исследование показывает, что за последние десятилетия мировые океаны и растительность поглощали около половины всех выбросов углекислого газа. Однако в будущем темпы поглощения могут замедлиться.",
+      "source": {
+        "url": "https://theconversation.com/oceans-and-forests-have-absorbed-roughly-half-our-carbon-emissions-for-decades-slowing-climate-change-but-can-they-keep-it-up-296498",
+        "title": "Oceans and forests have absorbed roughly half our carbon emissions for decades, slowing climate change – but can they keep it up?",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-13T17:43:23Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Крупнейшее хранилище сжатого воздуха в Китае",
+      "text": "В западной части Китая введена в эксплуатацию крупнейшая в мире демонстрационная установка для хранения возобновляемой энергии на основе сжатого воздуха. Объект обладает мощностью 600 мегаватт-часов и способен обеспечивать непрерывную подачу электроэнергии в течение 10 часов.",
+      "source": {
+        "url": "https://www.goodnewsnetwork.org/worlds-largest-liquid-air-renewable-energy-storage-system-switches-on/",
+        "title": "China Switches on World’s Biggest Example of New, Cheap Green Energy Storage",
+        "publisher": "Good News Network",
+        "language": "en",
+        "published": "2026-11-12T19:30:02+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Помилование блогера Лерчек",
+      "text": "Владимир Путин подписал указ о помиловании Валерии Чекалиной, известной как Лерчек, с которой была снята судимость. Ранее она была приговорена к пяти годам условно по делу о незаконном выводе денег за рубеж.",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/vladimir-putin-pomiloval-blogera-lerchek/",
+        "title": "Владимир Путин помиловал блогера Лерчек",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-14T07:29:46+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Историческое предание о царе Давиде",
+      "text": "В библейских книгах Самуила правление царя Давида представлено как сложный портрет власти, сочетающий военные успехи и политические решения с милосердием и преданностью. Несмотря на серьезные ошибки и грехи, библейский текст описывает его как правителя, действовавшего в соответствии с принципами сострадания и преданности.",
+      "source": {
+        "url": "https://firstthings.com/the-politics-of-lovingkindness/",
+        "title": "The Politics of Lovingkindness",
+        "publisher": "First Things",
+        "language": "en",
+        "published": "2026-11-13T06:00:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Марафон в джинсах",
+      "text": "Бегун Искандер Ядгаров преодолел марафон в Порту в джинсах, показав результат 2:28:29. Спортсмен занял одиннадцатое место среди мужчин.",
+      "source": {
+        "url": "https://marathonec.ru/iskander-yadgarov-marafon-v-dzhinsah/",
+        "title": "Новости из Португалии: Искандер Ядгаров пробежал марафон в джинсах",
+        "publisher": "\"Марафонец\"",
+        "language": "ru",
+        "published": "2026-11-11T21:44:10+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Древний лед у звезды Пикториса",
+      "text": "С помощью телескопа Джеймса Уэбба астрономы обнаружили в диске молодой звезды Бета Пикториса воду и углекислый газ в виде льда. Полученные данные указывают на то, что этот аморфный лед сохранился еще со времен межзвездного пространства.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/james-webb-telescope-finds-ice-older-than-the-star-it-orbits/",
+        "title": "James Webb telescope finds ice older than the star it orbits",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-14T12:15:48+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Исторические санкции против Кубы",
+      "text": "Соединенные штаты поддерживают жесткий режим санкций против Кубы еще с 1961 года, что делает данное эмбарго самым долгим в современной истории.",
+      "source": {
+        "url": "https://theconversation.com/a-new-democratic-congress-will-view-trumps-harsh-cuba-policy-skeptically-but-that-doesnt-mean-a-change-is-coming-soon-296017",
+        "title": "A new Democratic Congress will view Trump’s harsh Cuba policy skeptically – but that doesn’t mean a change is coming soon",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-14T10:45:46Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Ударные нагрузки у дятлов",
+      "text": "При постукивании по поверхности большой пестрый дятел совершает от 10 до 40 ударов в секунду. Замедление клюва при каждом таком ударе создает перегрузку, достигающую тысячи единиц силы земного притяжения.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/why-woodpeckers-dont-get-headaches",
+        "title": "Why on Earth don’t woodpeckers get headaches and concussion when drumming?",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-14T18:05:39+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Точность индекса массы тела",
+      "text": "Традиционный индекс массы тела нередко ошибается: по оценкам экспертов, он упускает ожирение у 5–9% взрослых и ошибочно диагностирует его еще у 3%.",
+      "source": {
+        "url": "https://www.theguardian.com/society/2026/nov/11/bmi-alternative-obesity-diagnosis-body-mass-index",
+        "title": "BMI alternative for identifying obesity ‘could prevent misdiagnosis in millions’",
+        "publisher": "the Guardian",
+        "language": "en",
+        "published": "2026-11-11T16:00:53.000Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Мозговые волны и сон у пожилых",
+      "text": "Во время сна медленные волны мозга стимулируют пульсацию спинномозговой жидкости, очищающую орган от накопленных за день шлаков. У пожилых участников исследования такие волна и пульсация оказались значительно слабее.",
+      "source": {
+        "url": "https://nautil.us/why-sleep-might-not-be-as-restorative-as-we-get-older-1286631/",
+        "title": "Why Sleep Might Not be as Restorative as We Get Older",
+        "publisher": "nautil.us",
+        "language": "en",
+        "published": "2026-11-13T22:00:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Виноделие в Южной Африке",
+      "text": "На территории Западно-Капской провинции ЮАР сосредоточено более 500 виноградников, производящих примерно 90 процентов всего южноафриканского вина. Регион сталкивается с ростом засух и сильной жарой.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/winemakers-are-learning-that-conservation-can-be-good-for-business/",
+        "title": "Winemakers are learning that conservation can be good for business",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-14T12:05:51+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Самая распространенная птица",
+      "text": "Домашняя курица признана самым многочисленным видом птиц на Земле: общая численность этих пернатых оценивается более чем в 20 миллиардов особей.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/most-common-bird-world",
+        "title": "What's the most common bird in the world? Clue there's a whopping 20 billion of them",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-13T13:17:13+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Назначение препаратов для похудения детям",
+      "text": "Согласно официальным данным службы здравоохранения Англии, за четырехмесячный период этого года сотням несовершеннолетних были выписаны рецепты на препараты GLP-1 для снижения веса. Среди пациентов оказались и дети младше двенадцати лет.",
+      "source": {
+        "url": "https://www.theguardian.com/science/2026/nov/14/children-iengland-prescribed-weight-loss-jabs",
+        "title": "Hundreds of children in England prescribed weight-loss jabs, figures show",
+        "publisher": "the Guardian",
+        "language": "en",
+        "published": "2026-11-14T08:00:39.000Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Рекомендации для участников испытаний нейроинтерфейсов",
+      "text": "Коалиция пионеров BCI опубликовала руководство для исследователей, призывающее к обеспечению автономии участников клинических испытаний. Документ рекомендует предоставлять добровольцам доступ к их собственным данным о мозговой активности и не препятствовать их передаче врачам.",
+      "source": {
+        "url": "https://www.technologyreview.com/2026/11/13/1148474/more-autonomy-fewer-ndas-volunteers-have-new-requests-for-brain-implant-trials/",
+        "title": "More autonomy, fewer NDAs: Volunteers have new requests for brain implant trials",
+        "publisher": "MIT Technology Review",
+        "language": "en",
+        "published": "2026-11-13T05:00:00-05:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Исследование изменчивости сердечного ритма",
+      "text": "В 2024 году было опубликовано рандомизированное контролируемое исследование, которое показало, что тренировки с биологической обратной связью по вариабельности сердечного ритма улучшают показатели покоя.",
+      "source": {
+        "url": "https://www.rd.com/article/how-to-stimulate-the-vagus-nerve/",
+        "title": "Need to Calm Down ASAP? Here’s How to Activate Your Vagus Nerve in 3 Minutes or Less and Keep Stress at Bay",
+        "publisher": "Reader's Digest",
+        "language": "en",
+        "published": "2026-10-30T22:58:14+00:00"
+      }
+    }
+  ],
+  "light_count": 16,
+  "homepage_hash": "f1477173fad984d4fd1fdbc84f1ebfd71e94261ea626ae030bb12525e3430b96",
+  "overview_hash": "c7bf1d24733e709b7398cc8e8d749c6859956d29268f013d75d2ef77da7b377d",
+  "markdown_hash": "64f10ebd348b33d9afed8f1aeda4a89f8fbe9306206ad6d5296c1b9f0561a9eb"
+}
