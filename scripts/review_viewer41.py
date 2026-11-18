@@ -90,6 +90,7 @@ def read_files(data,date):
                     or stat.S_ISLNK(entry.external_attr>>16)): raise ValueError('OWNER_REVIEW_UNSAFE_PATH')
             if entry.is_dir(): continue
             allowed=(name in ('index.html','archive/index.html','sitemap.xml','review.json')
+                or bool(re.fullmatch(r'assets/illustrations/\d{4}-\d{2}-\d{2}/manifest\.json',name))
                 or name.startswith('assets/') and path.suffix.lower() in ('.css','.js','.svg','.png','.jpg','.jpeg','.webp','.gif','.woff','.woff2','.ico')
                 or name.startswith('screenshots/') and path.suffix.lower()=='.png'
                 or bool(re.fullmatch(r'issues/'+re.escape(date)+r'/(?:index.html|articles/[a-z0-9-]+/(?:index.html|article.md))',name)))
