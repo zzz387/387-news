@@ -141,7 +141,11 @@ def render_overview(date,no,articles,permanent=False,*,policy_version="4.1"):
         anchors.add(anchor)
         out.append(f'<article class="toc" id="{anchor}"><span class="toc-num">{i:02d}</span><div><div class="meta">{escape(a["category"])}</div><h3><a href="/issues/{date}/articles/{a["slug"]}/">{escape(a["title"])}</a></h3><p>{escape(a["teaser"])}</p></div></article>')
     out.append('</div></section></main>'+news.page_footer())
-    return ''.join(out)
+    page=''.join(out)
+    if policy_version=='4.4':
+        from scripts import mosaic44
+        page=mosaic44.enhance(page,date,news.ROOT)
+    return page
 
 
 def markdown(article):

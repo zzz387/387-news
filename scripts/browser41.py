@@ -16,7 +16,7 @@ def launch_browser(playwright):
     return playwright.chromium.launch(**({'channel':channel} if channel else {}))
 
 
-def check(root,date,output,*,expected_count=12,overview_path="/"):
+def check(root,date,output,*,expected_count=12,overview_path="/",viewports=(320,390,768,1440),check_overview=False):
     from playwright.sync_api import sync_playwright
     root=Path(root); output=Path(output); output.mkdir(parents=True,exist_ok=True)
     class Silent(SimpleHTTPRequestHandler):
@@ -27,7 +27,7 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
     try:
         with sync_playwright() as playwright:
             browser=launch_browser(playwright)
-            for width in (320,390,768,1440):
+            for width in viewports:
                 page=browser.new_page(viewport={'width':width,'height':900})
                 base=f'http://127.0.0.1:{server.server_port}'
                 page.goto(base+overview_path,wait_until='networkidle')
@@ -46,6 +46,19 @@ def check(root,date,output,*,expected_count=12,overview_path="/"):
                     if width<=390 and cols!=1:raise ValueError('BROWSER_LIGHT_MOBILE_COLUMNS')
                 urls=page.locator(f'a[href^="/issues/{date}/articles/"]').evaluate_all('(nodes)=>[...new Set(nodes.map(n=>n.getAttribute("href")))]')
                 if len(urls)!=expected_count: raise ValueError('BROWSER_ARTICLE_COUNT_MISMATCH')
+                if check_overview:
+                    for path in ('/',f'/issues/{date}/'):
+                        page.goto(base+path,wait_until='networkidle')
+                        if page.evaluate('document.documentElement.scrollWidth>innerWidth+1'):raise ValueError('BROWSER_MOSAIC_HORIZONTAL_OVERFLOW')
+                        tiles=page.locator('.art-tile');links=tiles.evaluate_all('(nodes)=>nodes.map(n=>n.getAttribute("href"))')
+                        if not min(8,expected_count)<=len(links)<=12 or len(set(links))!=len(links):raise ValueError('BROWSER_MOSAIC_LINKS')
+                        if page.locator('.front-grid').count():raise ValueError('BROWSER_OLD_FRONT_REMAINS')
+                        if page.locator('#light-news .light-item').count()>12:raise ValueError('BROWSER_TOO_MANY_BRIEFS')
+                        tiles.first.focus()
+                        if not tiles.first.evaluate('(n)=>n===document.activeElement'):raise ValueError('BROWSER_MOSAIC_KEYBOARD')
+                        tiles.locator('img').evaluate_all('(nodes)=>Promise.all(nodes.map(n=>{n.loading="eager";return n.decode()}))')
+                        if tiles.locator('img').evaluate_all('(nodes)=>nodes.some(n=>!n.alt||!n.complete||n.naturalWidth===0)'):raise ValueError('BROWSER_MOSAIC_IMAGE')
+                        page.screenshot(path=str(output/f'{width}-mosaic-{path=="/"}.png'),full_page=False)
                 if expected_count==0:
                     digest=page.locator('.source-digest')
                     if digest.count()!=1 or digest.locator('li').count()<1 or not digest.is_visible():raise ValueError('BROWSER_EMPTY_DIGEST')

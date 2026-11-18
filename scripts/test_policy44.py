@@ -16,7 +16,7 @@ def main_row(i):
     return row
 
 def issue(n=8,lights=8):
-    s=state();s['policy_version']='4.4';s['candidates']=[main_row(i) for i in range(n)]
+    s=state();s['policy_version']='4.4';s['brief_policy_revision']=1;s['candidates']=[main_row(i) for i in range(n)]
     s['light43']={'records':[light_ready(i) for i in range(lights)]}
     return s
 
@@ -25,7 +25,61 @@ def response_item():
     item={'id':'note','source_id':source['id'],'title':'Реставрация коллекции','text':'Музей восстановил 21 картину из своего собрания.','time_kind':'unusual_fact','event_date':'','evidence':[{'block_id':'proof','quote':source['blocks'][0]['text']}]}
     return source,item
 
+def synthetic_art(state):
+    """Tiny explicitly synthetic WebP objects; never calls a real provider."""
+    import io,base64,hashlib
+    from PIL import Image
+    from scripts import mosaic44
+    mosaic44.prepare(state)
+    for i,item in enumerate(state['art44']['plan']):
+        image=Image.new('RGB',(48,32),(80+i*7,105,85));buffer=io.BytesIO();image.save(buffer,format='PNG')
+        data,width,height=mosaic44.encode_image(buffer.getvalue())
+        state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
+
 class Policy44Tests(unittest.TestCase):
+    def test_modern_briefs_select_eight_twelve_and_bank_overflow(self):
+        for count in (8,12,15):
+            with self.subTest(notes=count):
+                s=issue(25,count);s['brief_policy_revision']=2
+                texts=copy.deepcopy(s['light43']['records'])
+                stock43.bank_light(s,NOW)
+                self.assertEqual(len(light43.ready(s)),min(count,12))
+                self.assertEqual(len(stock43.available(s,s['date'],'light')),max(0,count-12))
+                self.assertEqual([r['article'] for r in s['light43']['records']],[r['article'] for r in texts])
+                self.assertEqual([r['checks'] for r in s['light43']['records']],[r['checks'] for r in texts])
+                self.assertTrue(v.standard(s)['compliant']);self.assertEqual(len(sel.composition(s)),25)
+    def test_brief_crime_and_tragedy_filter_is_story_specific(self):
+        from scripts import brief_selection44 as rules
+        for title,bad in [('Необычное ограбление банка',True),('A criminal gang was arrested',True),('Суд вынес приговор мошеннику',True),('При аварии пострадали люди',True),('Полицейский оркестр сыграл детям',False),('Музей восстановил картину',False),('Добровольцы посадили городской сад',False),('Killer whales reveal an unusual behaviour',False)]:
+            with self.subTest(title=title):self.assertEqual(bool(rules.excluded({'title':title})),bad)
+        src,item=response_item();src['title']='Police arrested a suspect in a robbery'
+        with self.assertRaisesRegex(ValueError,'BRIEF_CRIME'):brief.accept(item,src)
+    def test_brief_diversity_prefers_other_subjects_when_available(self):
+        from scripts import brief_selection44 as rules
+        rows=[{'id':str(i),'title':('Необычная птица '+str(i)) if i<8 else ['Музейная находка','История города','Изобретение робота','Математическая загадка','Семейная традиция','Спортивный рекорд','Предприниматель открыл дело','Музыкальное открытие'][i-8],'source':{'url':'https://example.org/'+str(i),'publisher':'Nature' if i<8 else 'Publisher '+str(i)}} for i in range(16)]
+        selected=rules.select(rows)
+        self.assertEqual(len(selected),12);self.assertLessEqual(sum(rules.topic(r)=='nature' for r in selected),4)
+    def test_mosaic_cache_reuses_generated_objects_and_disabled_provider_is_honest(self):
+        from scripts import mosaic44 as art
+        s=issue();s['brief_policy_revision']=2
+        with patch.object(art,'generate',side_effect=AssertionError('No configured free image API')):art.prepare(s);art.prepare(s)
+        self.assertEqual(s['art44']['provider_status'],'IMAGE_PROVIDER_NOT_CONFIGURED')
+        synthetic_art(s);before=copy.deepcopy(s['art44']['objects'])
+        with patch.object(art,'provider_status',return_value='READY'),patch.object(art,'generate',side_effect=AssertionError('Use saved images')):art.prepare(s)
+        self.assertEqual(s['art44']['objects'],before)
+    def test_mosaic_uses_unique_real_links_and_falls_back_for_missing_images(self):
+        from scripts import mosaic44 as art
+        s=issue(20,12);s['brief_policy_revision']=2;synthetic_art(s)
+        with tempfile.TemporaryDirectory() as temp:
+            target=root(temp);pub.build(s,target)
+            page=(target/'index.html').read_text();self.assertIn('class="art-front"',page);self.assertNotIn('class="front-grid"',page)
+            urls=__import__('re').findall(r'class="art-tile[^>]+href="([^"]+)"',page)
+            self.assertEqual(len(urls),len(set(urls)));self.assertGreaterEqual(len(urls),8)
+            self.assertIn('loading="lazy"',page);self.assertIn('Иллюстрация ИИ',page)
+            for url in urls:self.assertTrue((target/url.strip('/')/'index.html').is_file())
+            images=list((target/'assets/illustrations'/s['date']).glob('*.webp'));images[0].unlink()
+            articles=art.from_overview(page);fallback=art.render(articles,s['date'],target)
+            self.assertNotIn(images[0].name,fallback);self.assertIn('art-fallback',fallback)
     def test_content_subjects_table(self):
         cases=[]
         for expected,titles in [('family',['Развитие детей','Общение с детьми','Счастливое детство','A child learns through play','Kids and parents']),('sport',['История спорта','Физиология бега','Плавание для взрослых','Walking and physical activity'])]:
@@ -133,13 +187,14 @@ class Policy44Tests(unittest.TestCase):
         self.assertEqual(v.standard(s),v.standard(restored));self.assertEqual(s['_quota_snapshot'],restored['_quota_snapshot']);self.assertEqual(len(sel.composition(restored)),20)
 
 
-    def test_ready_stock_does_not_hide_the_thirteenth_article_or_note(self):
+    def test_ready_stock_keeps_unlimited_main_and_caps_modern_briefs(self):
         s=issue(12,0);stock=stock43.ensure(s)
         stock['records']=[main_row(i) for i in range(12,25)]
         stock['light']=[light_ready(i) for i in range(16)]
         with tempfile.TemporaryDirectory() as temp:
             target=root(temp);stock43.draw(s,target,NOW);stock43.draw_light(s,target)
-        self.assertEqual((len(sel.composition(s)),len(light43.ready(s))),(25,16))
+        self.assertEqual((len(sel.composition(s)),len(light43.ready(s))),(25,12))
+        self.assertEqual(len(brief.all_ready(s)),16)
     def test_short_topics_do_not_use_main_article_family_aliases(self):
         a=named('Живые строительные материалы',30);b=named('Самовосстанавливающийся бетон',31)
         self.assertTrue(sel.duplicate(a,b));self.assertFalse(brief.duplicate(a,b))

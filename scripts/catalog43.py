@@ -256,6 +256,9 @@ def refresh(state,now=None,session=None,shortage=False):
         if policy44.active(state):cache['publishers'][row['id']]['classifier44_revision']=policy44.REVISION
         for item,src in found:
             if src['url'] in known:continue
+            if row.get('search_light'):
+                from scripts import brief_selection44
+                if brief_selection44.excluded({'source':src}):continue
             record=dict(id=p.digest(src['url']),url=src['url'],title=src['title'],source=src,publisher_id=row['id'],publisher_group=row['domain'].removeprefix('www.'),source_kind=row['type'],science_domain=next(iter(row['topics']),''),
                 priority_ids=row.get('priority_ids',[]),editorial_priority=row.get('editorial_priority',50),quality_score=row.get('quality_score',50),science_source=row.get('science_source',False),category_hint='Общество',discovered_at=now.isoformat(),light_suitable=row.get('light_suitable',False),status='discovered',progress={},checks={},history=[])
             if policy44.active(state):record['topic_policy_version']='4.4'

@@ -58,6 +58,8 @@ def reconcile(state,root):
     return stock
 
 def reusable(row,date,used=()):
+    from scripts import brief_selection44
+    if row.get('light_kind') and brief_selection44.excluded(row):return False
     if row.get('stock_published') or source_urls(row)&set(used):return False
     from scripts import light44
     brief=light44.eligible(row)
@@ -154,7 +156,15 @@ def draw_light(state,root):
 def bank_light(state,now):
     from scripts import light43
     from scripts import policy44
-    if policy44.active(state):return  # New batches choose issue/stock BEFORE generation.
+    if policy44.active(state):
+        from scripts import light44
+        selected={identity(row) for row in light44.ready(state)}
+        for row in light44.all_ready(state):
+            if identity(row) in selected:continue
+            if bank(state,row,now,'light'):
+                for saved in ensure(state)['light']:
+                    if identity(saved)==identity(row) and saved.get('stock_reserved_for')==state['date']:saved.pop('stock_reserved_for',None)
+        return
     keep=3
     for row in light43.ready(state,limit=None)[keep:]:bank(state,row,now,'light')
 

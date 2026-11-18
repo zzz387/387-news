@@ -13,8 +13,8 @@ news.SCHEMAS['v43_light_review']=content41.schema({'reviews':{'type':'array','it
 
 def story_suitable(row):
     """No topical, humorous or positive-news gate. Safety is content-specific."""
-    from scripts import light44
-    return not light44.dangerous(selection43.story_context(row))
+    from scripts import light44,brief_selection44
+    return not brief_selection44.excluded(row) and not light44.dangerous(selection43.story_context(row))
 
 
 def recent(root):

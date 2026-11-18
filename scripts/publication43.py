@@ -60,11 +60,15 @@ def validate(root,date):
     page=(issue/'index.html').read_text()
     if f'data-article-count="{count}"' not in page or f'data-issue-date="{date}"' not in page:raise p.Blocked('PUBLIC_COUNT_INVALID')
     light=data.get('light_news',[])
+    if data.get('mosaic_revision'):
+        from scripts import mosaic44
+        for image in data.get('illustrations',[]):
+            if not mosaic44.valid_image(root,date,image['key'],image):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
     if data.get('light_count',len(light))!=len(light):raise p.Blocked('PUBLIC_LIGHT_COUNT')
     if render_light(light) and render_light(light) not in page:raise p.Blocked('PUBLIC_LIGHT_CHANGED')
     if data['policy_version']=='4.4' and not data.get('preview'):
         from scripts import policy44
-        policy44.require({'policy_version':'4.4'},[policy44.from_html(f.read_text()) for f in pages],light)
+        policy44.require({'policy_version':'4.4','brief_policy_revision':data.get('brief_policy_revision',1)},[policy44.from_html(f.read_text()) for f in pages],light)
     if count==0:
         rows=data.get('sources',[])
         if not rows or 'Обзор источников' not in page:raise p.Blocked('EMPTY_RESERVE')
@@ -107,6 +111,7 @@ def build(state,root,reserve=(),preview=False):
             data={'date':date,'number':no,'policy_version':version,'article_count':len(articles),
                   'kind':'articles' if articles else 'source_digest','minimum_articles':e.CONFIG['minimum_articles'],
                   'standard_issue':len(articles)>=e.CONFIG['minimum_articles'],'preview':preview,'pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
+            if version=='4.4':data['brief_policy_revision']=state.get('brief_policy_revision',2)
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
                 file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version=version)))
@@ -114,6 +119,10 @@ def build(state,root,reserve=(),preview=False):
                 data['pages'][a['slug']]={'html':digest_bytes(file.read_bytes()),'markdown':digest_bytes(md.read_bytes())}
             light=public_light(state)
             data['light_news']=light;data['light_count']=len(light)
+            if version=='4.4':
+                from scripts import mosaic44
+                images=mosaic44.materialize(state,articles,working)
+                data['mosaic_revision']=1;data['illustrations']=list(images.values())
             rows=[{k:r.get(k,'') for k in ('url','title','publisher','published','checked_at')} for r in reserve] if not articles else []
             if not articles:data['sources']=rows
             for permanent,target in ((True,issue/'index.html'),(False,working/'index.html')):
@@ -131,6 +140,8 @@ def build(state,root,reserve=(),preview=False):
         if not preview:
             (root/'issues').mkdir(exist_ok=True);(root/'archive').mkdir(exist_ok=True)
             shutil.move(str(issue),str(root/'issues'/date))
+            illustration_dir=working/'assets/illustrations'/date
+            if illustration_dir.is_dir():shutil.copytree(illustration_dir,root/'assets/illustrations'/date,dirs_exist_ok=True)
             for name in ('index.html','archive/index.html','sitemap.xml'):(root/name).write_bytes((working/name).read_bytes())
     return not preview
 
@@ -167,7 +178,7 @@ def refresh_home(root=None):
     date=found[1];validate(root,date);data=metadata(root,date)
     overview=(root/'issues'/date/'index.html').read_text()
     target=layout43.homepage(overview,date)
-    if digest_bytes(page.encode())!=data['homepage_hash'] and page!=target:raise p.Blocked('PUBLIC_HOME_CHANGED')
+    if digest_bytes(page.encode())!=data['homepage_hash'] and page not in (target,layout43.legacy_homepage(overview,date)):raise p.Blocked('PUBLIC_HOME_CHANGED')
     if page==target:return False,date
     (root/'index.html').write_text(target);return True,date
 

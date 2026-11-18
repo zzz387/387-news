@@ -192,8 +192,9 @@ class LightAndLayoutTests(unittest.TestCase):
             for folder in ('assets','issues','archive'):shutil.copytree(p.ROOT/folder,target/folder)
             shutil.copyfile(p.ROOT/'index.html',target/'index.html')
             before={str(f.relative_to(target)):f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()}
-            was_compact='edition-compact' in (target/'index.html').read_text()
-            changed,date=pub.refresh_home(target);self.assertEqual(changed,not was_compact);text=(target/'index.html').read_text()
+            previous=(target/'index.html').read_text()
+            changed,date=pub.refresh_home(target);text=(target/'index.html').read_text()
+            self.assertEqual(changed,previous!=pub.layout43.homepage((target/'issues'/date/'index.html').read_text(),date))
             self.assertNotIn('mast-top',text);self.assertNotIn('Каждый день есть что открыть',text);self.assertNotIn('front-intro',text)
             self.assertIn('visually-hidden',text);self.assertIn('Обзор номера</a>',text);self.assertIn('Ежедневная газета · Москва',text)
             self.assertEqual(before,{str(f.relative_to(target)):f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()})

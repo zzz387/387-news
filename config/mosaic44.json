@@ -1,0 +1,12 @@
+{
+  "enabled": true,
+  "maximum_tiles": 12,
+  "prompt_version": "387-art-1",
+  "provider": "disabled",
+  "model": "",
+  "free_tier_verified": false,
+  "requests_per_run": 1,
+  "max_image_bytes": 8388608,
+  "web_width": 1200,
+  "web_quality": 82
+}

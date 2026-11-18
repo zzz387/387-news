@@ -39,10 +39,12 @@ def duplicate(a,b):
     return len(left&right)>=10 and len(left&right)/max(1,len(left|right))>=.93
 
 
-def ready(state):
+def all_ready(state):
     from scripts import light43
     result=[];published=set(state.get('stock43',{}).get('published_urls',[]));mains=sel.ready(state)
     for row in state.get('light43',{}).get('records',[]):
+        from scripts import brief_selection44
+        if brief_selection44.excluded(row):continue
         if not eligible(row) and (not e.eligible(row) or e.news_errors(row.get('checks',{}).get('final43',{}),row,state)):continue
         if row['source']['url'] in published:continue
         try:rights41.require(row['source'],'INDEPENDENT_ARTICLE',rights41.decision(row['source'],'INDEPENDENT_ARTICLE'))
@@ -51,7 +53,15 @@ def ready(state):
         result.append(row)
     return result
 
+def ready(state):
+    from scripts import brief_selection44
+    rows=all_ready(state)
+    return rows if state.get('brief_policy_revision',2)<2 else brief_selection44.select(rows)
+
 def accept(item,source):
+    from scripts import brief_selection44
+    code=brief_selection44.excluded({'source':source,'article':{'title':item.get('title',''),'blocks':[{'text':item.get('text','')}]}})
+    if code:raise p.Blocked(code)
     title=item['title'].strip();text=item['text'].strip()
     if not title or not text or len(re.split(r'(?<=[.!?])\s+(?=[А-ЯA-Z])',text))>3:raise p.Blocked('BRIEF_FORMAT')
     if dangerous(title+' '+text):raise p.Blocked('BRIEF_UNSAFE')
@@ -115,9 +125,11 @@ def prepare(state,persist=lambda:None):
     needed={g for g,n in policy44.counts(sel.ready(state)).items() if n<2}
     candidates=sorted(state['candidates'],key=lambda r:(not r.get('for_light_only'),r.get('publisher_id','')))
     # Round-robin publisher preference, never a topical quota.
-    pending=[r for r in candidates if policy44.subject(r) not in needed and not (r.get('article') and r.get('status')=='preparing' and not r.get('for_light_only')) and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified' and r['source']['url'] not in excluded and not any(sel.duplicate(r,m) for m in mains)]
+    from scripts import brief_selection44
+    pending=[r for r in candidates if not brief_selection44.excluded(r) and policy44.subject(r) not in needed and not (r.get('article') and r.get('status')=='preparing' and not r.get('for_light_only')) and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified' and r['source']['url'] not in excluded and not any(sel.duplicate(r,m) for m in mains)]
     while pending and len(sources)<12:  # transport batch size, NEVER a publication maximum
         row=min(pending,key=lambda r:publishers.get(r.get('publisher_id') or r['source'].get('publisher'),0));pending.remove(row);src=row['source']
+        if not light43.story_suitable(row):continue
         if src['url'] in {s['url'] for s in sources}:continue
         if rights41.decision(src,'INDEPENDENT_ARTICLE')['status']!='allowed':continue
         if sources and sum(len(json.dumps(s,ensure_ascii=False)) for s in sources)+len(json.dumps(src,ensure_ascii=False))>90000:continue
@@ -132,7 +144,7 @@ def prepare(state,persist=lambda:None):
     wire,_=e.review_wire({'source':sources[0],'supporting_sources':sources[1:]})
     old_limit=budget.run_limit;start=budget.used;budget.run_limit=min(old_limit,budget.used+1)
     try:
-        prompt='Подготовь короткую газетную подборку на русском: стремись к8–12 разным сообщениям из этих источников, можно меньше при нехватке фактов. Темы любые, не требуется юмор, доброта, глубина или полный пересказ. Предпочитай самостоятельные конкретные unusual_fact без слов сегодня/недавно/новый, если оригинал не подтверждает свежесть. news только при прямом свидетельстве полной даты события. Для каждого числа приведи в evidence цитату с самим числом: дата публикации и дата события различаются, не добавляй год публикации в содержание как дату события. Для каждого: короткий собственный заголовок,1–3 собственных предложения, source_id, time_kind news/historical_fact/unusual_fact, event_date (только подтверждённая дата события для news), evidence с block_id и точной непустой цитатой. Сверь каждое утверждение с оригиналом: не выдумывай факты, числа, имена и обстоятельства, не искажай смысл. Собственная композиция и формулировки; не копируй заголовки/аннотации. Исторические факты не выдавай за сегодняшнюю новость. Никаких опасных инструкций, лечения или незаконных советов. Это краткие сообщения, не большие статьи; отдельный литературный аудит не нужен.\n'+json.dumps(wire,ensure_ascii=False)
+        prompt='Исключи криминал, уголовные процессы, насилие и трагедии, даже курьёзные. При неоднозначности пропускай сюжет. Предпочитай разные темы и издания, не только животных. Подготовь короткую газетную подборку на русском: стремись к8–12 разным сообщениям из этих источников, можно меньше при нехватке фактов. Темы любые, не требуется юмор, доброта, глубина или полный пересказ. Предпочитай самостоятельные конкретные unusual_fact без слов сегодня/недавно/новый, если оригинал не подтверждает свежесть. news только при прямом свидетельстве полной даты события. Для каждого числа приведи в evidence цитату с самим числом: дата публикации и дата события различаются, не добавляй год публикации в содержание как дату события. Для каждого: короткий собственный заголовок,1–3 собственных предложения, source_id, time_kind news/historical_fact/unusual_fact, event_date (только подтверждённая дата события для news), evidence с block_id и точной непустой цитатой. Сверь каждое утверждение с оригиналом: не выдумывай факты, числа, имена и обстоятельства, не искажай смысл. Собственная композиция и формулировки; не копируй заголовки/аннотации. Исторические факты не выдавай за сегодняшнюю новость. Никаких опасных инструкций, лечения или незаконных советов. Это краткие сообщения, не большие статьи; отдельный литературный аудит не нужен.\n'+json.dumps(wire,ensure_ascii=False)
         response=news.gemini(prompt,output_tokens=12000,schema='v44_briefs');batch['response']=response;persist()
     except news.runtime.GenerationPaused as exc:
         batch['code']='BRIEF_API_PAUSED';persist();return
