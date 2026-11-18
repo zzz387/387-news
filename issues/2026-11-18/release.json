@@ -1,0 +1,213 @@
+{
+  "date": "2026-11-18",
+  "number": 25,
+  "policy_version": "4.4",
+  "article_count": 9,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "6fe2eeae5024af53c651fb9791ac3e3a75a3b67b70a5d81d98f29d73ad23a870",
+      "markdown": "88eff3255cb1fd507afc9841ed6ac5fcbf4de63b7c494ec1c4a5501c2102ca6e"
+    },
+    "feature-02": {
+      "html": "e47ecefe683cadd292c55e9bc89d12f26dc0efe93a8c68fe137e5f31d7b5311c",
+      "markdown": "4a03de5f4b99155fa621811f50863de3f940fd92881712f0ca3108ea74120168"
+    },
+    "feature-03": {
+      "html": "daf1b247382132371eac79d7def123a85ea383e2da0547e6b5e6d901442024cf",
+      "markdown": "435d8242d1a586596b25602b7e95d71b120b90176adba3f16c138df841028425"
+    },
+    "feature-04": {
+      "html": "b4555c3f6cd96c802084736b688672e685842a840c649da054d279a98cd18db0",
+      "markdown": "006b6779f5dc813ef9976f299e7313063ee07ddbbcfbfd19323665e9a4596573"
+    },
+    "feature-05": {
+      "html": "446afc993f4b4c703f88a2eabd9cb2a03771127abf702290e90473f29a3ca455",
+      "markdown": "f4eb6711ee88e267b5ab07d7bd839eaf497031d33cbfa694a8d0d671b8a8be37"
+    },
+    "feature-06": {
+      "html": "a032010354ebdea8d94aae6b8026132ef824755fe812c7fcbec4119bb059ccba",
+      "markdown": "1ad141ae08dc0a46ea93b17c900c84e73aa1b76386f8973a14ab39b2ef279b10"
+    },
+    "feature-07": {
+      "html": "b52c2a331e840a6dc47948807572ee0723b7bd1ade77447fc6e9fbaca04d5051",
+      "markdown": "86c7852a1f93b9e8509771e513f3eebddd94f7d97a2e38fca3ce6374ee36fee7"
+    },
+    "feature-08": {
+      "html": "ff63a79faa50c3ab87884b4813d7363bdd72f7a3fbc7332ffce62a42dd5970a8",
+      "markdown": "860eb93a056f838d64ccbc85095a99b0a2536e5b50ca50e9e2ef9332ab99b1a5"
+    },
+    "feature-09": {
+      "html": "992e968452f15ea21d8be0d9ba608d13cecc67bf283a6706e295204cb23ac987",
+      "markdown": "77dbcae63fe86143157046f7cf88db84fa004bbe8cafce6473c0e5bb31d6a4e3"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-18T05:59:11.261559+03:00",
+  "release_not_before": "2026-11-18T06:00:00+03:00",
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Древние истоки животноводства",
+      "text": "Современные археологические исследования показывают, что одомашнивание растений и животных происходило примерно в одно и то же время, начинаясь не позднее 9550 года до нашей эры.",
+      "source": {
+        "url": "https://aeon.co/essays/the-origins-of-the-state-are-not-agrarian-but-pastoralist",
+        "title": "The origins of the state are not agrarian but pastoralist",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-16T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Появление White Castle",
+      "text": "Компания White Castle была основана в 1921 году. За ней последовало появление других сетей быстрого питания уже в 1940-х годах.",
+      "source": {
+        "url": "https://www.mentalfloss.com/food/fast-food/most-popular-fast-food-chain-year-you-were-born?utm_source=RSS",
+        "title": "The Most Popular Fast-Food Chain the Year You Were Born",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-16T01:00:00Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Старт эксперимента с картой «Мир»",
+      "text": "Правительство России и Банк России инициировали эксперимент «Моя карта „Мир“», который позволяет привязать социальные льготы через портал «Госуслуги». Пилотный режим проекта запущен в нескольких регионах.",
+      "source": {
+        "url": "https://expert.ru/finance/mir-edinaya-karta-dlya-lgot",
+        "title": "«Мир» — единая карта для льгот",
+        "publisher": "expert.ru",
+        "language": "ru",
+        "published": "2026-11-16T12:55:21+03:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Наследие Курта Гёделя",
+      "text": "Австрийский логик Курт Гёдель опубликовал две теоремы о неполноте в 1931 году. Его работы существенно повлияли на развитие математики и цифровой эпохи.",
+      "source": {
+        "url": "https://www.theguardian.com/science/2026/nov/13/kurt-godel-notebooks-ai-helps-unlock-hidden-discoveries-man-who-transformed-maths",
+        "title": "‘Ahead of his time’: AI helps unlock discoveries hidden in notebooks of man who transformed maths",
+        "publisher": "the Guardian",
+        "language": "en",
+        "published": "2026-11-13T16:38:27.000Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Запрет на использование акульего мяса в школах Рио-де-Жанейро",
+      "text": "После выхода расследования об использовании мяса акул в государственных учреждениях власти штата Рио-де-Жанейро ввели запрет на данный продукт в 1200 школах. Решение последовало за публикациями о рисках содержания тяжелых металлов в рыбе.",
+      "source": {
+        "url": "https://news.mongabay.com/short-article/2026/11/mongabay-shark-meat-investigation-shortlisted-for-two-journalism-awards-in-brazil/",
+        "title": "Mongabay shark meat investigation shortlisted for two journalism awards in Brazil",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-13T16:17:16+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Уникальная гибкость полярной совы",
+      "text": "Полярная сова способна поворачивать голову на 270 градусов благодаря особому строению шейного отдела. Такая анатомическая особенность позволяет птице эффективно выслеживать добычу и замечать приближение хищников.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/snowy-owl-head",
+        "title": "Mind-blowing video shows snowy owl twisting its head almost full circle",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-16T15:23:02+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Рост суррогатного материнства в Нигерии",
+      "text": "Нигерия стала вторым по популярности направлением для британских пар, прибегающих к услугам суррогатных матерей. Эксперты отмечают, что за последнее десятилетие число подобных запросов в стране увеличилось почти в десять раз.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/nigerian-christians-grapple-with-western-diaspora-driven-surrogacy-boom/",
+        "title": "Nigerian Christians Grapple with Diaspora-Driven Surrogacy Boom - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-16T11:00:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Закрытие магазинов российских модных брендов",
+      "text": "Согласно рыночным данным, в 2025 году около 20 российских fashion-брендов полностью отказались от развития офлайн-розницы. Всего же в торговых центрах и стрит-ритейле закрылось более 230 точек продаж этих компаний.",
+      "source": {
+        "url": "https://expert.ru/ekonomika/rvetsya-tam-gde-tonko",
+        "title": "Рвется там, где тонко",
+        "publisher": "expert.ru",
+        "language": "ru",
+        "published": "2026-11-16T09:00:00+03:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Верховный суд США оставил в силе судебный запрет",
+      "text": "Верховный суд США отказался рассматривать апелляцию на решение нижестоящего суда, который заблокировал отмену грантов для ряда исследователей, чье финансирование было прекращено во время президентства Дональда Трампа. Судебный запрет временно защищает гранты семи ученых, работающих в Калифорнии.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/supreme-court-keeps-injunction-against-dei-grant-defunding-in-place/",
+        "title": "Supreme Court keeps injunction against DEI grant defunding in place",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-16T19:54:21+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Выбросы парниковых газов в «плетеных» реках",
+      "text": "Исследование восьми рек в Новой Зеландии показало, что небольшие реки, питаемые горными стоками, выделяют больше закиси азота, чем крупные быстрые потоки. Оказалось, что медленные участки русла («заводи») являются основными источниками накопления и выброса этого парникового газа.",
+      "source": {
+        "url": "https://eos.org/editor-highlights/the-hidden-greenhouse-gas-emissions-woven-into-braided-rivers",
+        "title": "The Hidden Greenhouse Gas Emissions Woven into Braided Rivers - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-16T19:31:40+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Новая модель старения организма",
+      "text": "Ученые предложили «центральную догму старения», которая расширяет классическую биологическую теорию. К цепочке ДНК-РНК-белок эксперты добавили четвертый элемент — метаболиты, утверждая, что нарушение взаимодействия этих компонентов приводит к возрастным изменениям.",
+      "source": {
+        "url": "https://nautil.us/new-central-dogma-of-aging-highlights-the-complexity-of-getting-older-1286682/",
+        "title": "New “Central Dogma of Aging” Highlights the Complexity of Getting Older",
+        "publisher": "nautil.us",
+        "language": "en",
+        "published": "2026-11-17T00:30:00+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Крупнейшее пожертвование паркам Сан-Франциско",
+      "text": "Основатель Airbnb Брайан Чески выделил 100 миллионов долларов на развитие парковой инфраструктуры Сан-Франциско. Данная сумма стала самым крупным частным пожертвованием в истории города.",
+      "source": {
+        "url": "https://www.goodnewsnetwork.org/san-francisco-gets-100m-gift-for-public-parks-from-airbnb-ceo/",
+        "title": "San Francisco Gets its Largest-Ever Gift: $100M for Public Parks From Airbnb Founder",
+        "publisher": "Good News Network",
+        "language": "en",
+        "published": "2026-11-15T15:36:21+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Рост солнечной энергетики в Пакистане",
+      "text": "Благодаря активному расширению использования солнечных панелей за последние шесть лет Пакистан смог сократить расходы на импорт ископаемого топлива на сумму свыше 12 миллиардов долларов.",
+      "source": {
+        "url": "https://theconversation.com/how-the-us-elections-and-iran-war-are-influencing-the-uns-cop31-climate-talks-and-discussions-around-fossil-fuels-296682",
+        "title": "How the US elections and Iran war are influencing the UN’s COP31 climate talks – and discussions around fossil fuels",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-16T20:31:35Z"
+      }
+    }
+  ],
+  "light_count": 13,
+  "homepage_hash": "2051ba8b1291e34b4e2be3faecb64abc35bb26d0906b87178165b158f123c0e0",
+  "overview_hash": "0486cfe1e9cbf89d33dfb008aeff1cbf2dbceb6270211a0ac255436e334d3310",
+  "markdown_hash": "cb699a2b9cb5bda3b8a037af4302a6de2c44bba5937804cbc076b0c7f266f863"
+}
