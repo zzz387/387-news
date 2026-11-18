@@ -18,5 +18,7 @@
     "family": 2,
     "health": 2,
     "sport": 2
-  }
+  },
+  "light_maximum": 12,
+  "brief_policy_revision": 2
 }

@@ -217,6 +217,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         if not state['editorial_standard44']['compliant']:
             state['audit_passed']=False;state['main_approved44']=len(selected)>=minimum
             pipeline.status(state,'PREPARING','continue_editorial_deficit','EDITORIAL_STANDARD_NOT_MET');persist();return False
+    if active44:
+        from scripts import mosaic44
+        mosaic44.recover_public(state,root,persist,allow_request=not due)
+        mosaic44.prepare(state,persist,allow_request=not due)
     reserve=[] if selected else reserve_rows(state,clock())
     state['issue_kind']='articles' if selected else 'source_digest'
     state['reserve_count']=len(reserve)

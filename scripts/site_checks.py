@@ -210,7 +210,7 @@ def check_v43(base,home,expected_date=None):
     if type(count) is not int or count<0 or len(pages)!=count:raise RuntimeError('PUBLIC_COUNT_INVALID')
     overview=fetch(base+'/issues/'+date+'/')
     if publication43.digest_bytes(overview.encode())!=data.get('overview_hash'):raise RuntimeError('PUBLIC_OVERVIEW_CHANGED')
-    if publication43.digest_bytes(home.encode())!=data.get('homepage_hash') and home!=publication43.layout43.homepage(overview,date):raise RuntimeError('PUBLIC_HOME_CHANGED')
+    if publication43.digest_bytes(home.encode())!=data.get('homepage_hash') and home not in (publication43.layout43.homepage(overview,date),publication43.layout43.legacy_homepage(overview,date)):raise RuntimeError('PUBLIC_HOME_CHANGED')
     light=data.get('light_news',[])
     if not isinstance(light,list) or data.get('light_count',len(light))!=len(light):raise RuntimeError('PUBLIC_LIGHT_COUNT')
     if publication43.render_light(light) not in overview:raise RuntimeError('PUBLIC_LIGHT_CHANGED')
@@ -238,7 +238,7 @@ def check_v43(base,home,expected_date=None):
         if data['policy_version']=='4.4':
             from scripts import policy44
             actual_articles.append(policy44.from_html(page))
-    if data['policy_version']=='4.4':policy44.require({'policy_version':'4.4'},actual_articles,light)
+    if data['policy_version']=='4.4':policy44.require({'policy_version':'4.4','brief_policy_revision':data.get('brief_policy_revision',1)},actual_articles,light)
     return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':data['policy_version'],'expected_date':expected_date,'status':'ok'}
 
 
@@ -257,9 +257,28 @@ def check_archived(base,date):
 def check_assets(root,base='https://387.su'):
     """Current shared CSS delivery; archived HTML is never changed or regenerated."""
     if urlparse(base).scheme!='https':raise RuntimeError('Public health check requires verified HTTPS')
-    style=Path(root)/'assets/style.css'
-    if style.is_file() and fetch(base.rstrip('/')+'/assets/style.css').encode()!=style.read_bytes():
-        raise RuntimeError('PUBLIC_ASSET_CHANGED')
+    root=Path(root)
+    for name in ('style.css','mosaic.css','mosaic.js'):
+        file=root/'assets'/name
+        if file.is_file() and fetch(base.rstrip('/')+'/assets/'+name).encode()!=file.read_bytes():raise RuntimeError('PUBLIC_ASSET_CHANGED')
+    home=root/'index.html'
+    if not home.is_file() or 'class="art-front"' not in home.read_text():return
+    found=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',home.read_text())
+    if not found:return
+    manifest=root/'assets/illustrations'/found[1]/'manifest.json'
+    if not manifest.is_file():return
+    if fetch(base.rstrip('/')+'/'+manifest.relative_to(root).as_posix()).encode()!=manifest.read_bytes():raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
+    from scripts import mosaic44
+    for key,image in json.loads(manifest.read_text()).get('images',{}).items():
+        if not mosaic44.valid_image(root,found[1],key,image):raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
+        request=Request(base.rstrip('/')+'/'+image['path'],headers={'User-Agent':'387-News-Art-Health/1.0'})
+        with urlopen(request,timeout=20) as response:
+            data=response.read(350001)
+            if response.status!=200 or len(data)>350000 or publication_hash(data)!=image['sha256']:raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
+
+def publication_hash(data):
+    import hashlib
+    return hashlib.sha256(data).hexdigest()
 
 
 def check_delivery(base='https://387.su',expected_date=None,root=None):

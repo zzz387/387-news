@@ -73,7 +73,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49' playwright
+      - run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13' playwright
       - name: Use preinstalled runner Chromium or install bundled fallback
         shell: bash
         run: |
@@ -220,7 +220,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49'
+      - run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13'
       - name: Full offline regression with compact output
         run: python -m scripts.run_tests --full --log '${{ runner.temp }}/unit-tests.log' --report '${{ runner.temp }}/unit-summary.json'
       - uses: actions/upload-artifact@v4
@@ -245,7 +245,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49'
+      - run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13'
       - name: Verify real owner dispatch routing with no Secrets or Gemini
         env:
           TRIAL_APPROVED_SHA: ${{ inputs.trial_approved_sha }}
@@ -265,7 +265,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49'
+      - run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13'
       - name: Verify owner permission, pinned commit and required environment reviewers
         env:
           GH_TOKEN: ${{ github.token }}
@@ -321,7 +321,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49' playwright
+      - run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13' playwright
       - run: python -m playwright install --with-deps chromium
       - name: Select trial checkpoint and shared daily ledger
         id: checkpoint
@@ -451,7 +451,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install encryption library
-        run: python -m pip install 'cryptography>=44,<49'
+        run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13'
       - name: Verify existing production configuration without revealing values
         env:
           NEWS_AUTOMATION_V31_ENABLED: ${{ vars.NEWS_AUTOMATION_V31_ENABLED }}
@@ -535,6 +535,8 @@ jobs:
       - name: Diagnose saved light batch without model calls or private logs
         if: ${{ steps.checkpoint.outputs.light_diagnostic_found == 'true' }}
         run: python -m scripts.light43 --diagnose-checkpoint '${{ runner.temp }}/published-light-diagnostic/news-draft.enc'
+      - name: Report configured image capability without API calls
+        run: python -m scripts.mosaic44 --diagnose
       - name: Prepare encrypted draft checkpoint or release
         id: stage
         timeout-minutes: 20
@@ -583,7 +585,7 @@ jobs:
           retention-days: 30
       - name: Project compact current home without modifying immutable editions
         id: home
-        if: ${{ success() && steps.context.outputs.preview == 'false' && (steps.context.outputs.phase == 'run' || steps.context.outputs.phase == 'resume') && steps.stage.outputs.published != 'true' }}
+        if: ${{ success() && steps.context.outputs.preview == 'false' && (steps.context.outputs.phase == 'run' || steps.context.outputs.phase == 'resume' || steps.context.outputs.phase == 'publish') }}
         run: python -m scripts.publication43 --refresh-home
       - name: Install browser only for a fully audited release
         if: ${{ success() && (steps.stage.outputs.published == 'true' || steps.home.outputs.ready == 'true') }}
@@ -611,9 +613,11 @@ jobs:
           echo "issue_date=$ISSUE_DATE" >> "$GITHUB_OUTPUT"
           if [[ '${{ steps.stage.outputs.published }}' == 'true' ]]; then
             git add index.html archive/index.html issues/ sitemap.xml
+            if [[ -d assets/illustrations ]]; then git add assets/illustrations; fi
           else
             git diff --exit-code -- issues/ archive/index.html sitemap.xml
             git add index.html
+            if [[ -d assets/illustrations ]]; then git add assets/illustrations; fi
           fi
           if git diff --cached --quiet; then
             echo 'Approved issue already committed; retry deployment without changing the archive.'
@@ -746,7 +750,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python -m pip install 'cryptography>=44,<49'
+      - run: python -m pip install 'cryptography>=44,<49' 'Pillow>=11,<13'
       - name: Locate the current counts-only shared ledger
         id: locate
         run: python -m scripts.special003r --locate

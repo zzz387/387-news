@@ -57,9 +57,12 @@ def standard(state,rows=None,notes=None):
     from scripts import selection43,light43
     rows=selection43.ready(state) if rows is None else rows;notes=light43.ready(state) if notes is None else notes
     groups=counts(rows);deficits={g:max(0,2-groups[g]) for g in GROUPS}
+    modern=state.get('brief_policy_revision',2)>=2
+    from scripts import brief_selection44
+    invalid=modern and (len(notes)>12 or any(brief_selection44.excluded(r) for r in notes))
     return {'policy_version':'4.4','main_articles':len(rows),'topics':groups,'main_deficit':max(0,8-len(rows)),
         'topic_deficits':deficits,'light_notes':len(notes),'light_deficit':max(0,8-len(notes)),
-        'compliant':len(rows)>=8 and not any(deficits.values()) and len(notes)>=8}
+        'compliant':len(rows)>=8 and not any(deficits.values()) and len(notes)>=8 and not invalid}
 
 def require(state,rows=None,notes=None):
     result=standard(state,rows,notes)
@@ -69,7 +72,7 @@ def require(state,rows=None,notes=None):
 def migrate(state):
     """Unpublished only, called by existing CLI migration. No text/counter resets."""
     from scripts import editorial43 as e
-    previous=state.get('policy_version');state['policy_version']='4.4'
+    previous=state.get('policy_version');state['policy_version']='4.4';state['brief_policy_revision']=2
     for row in state.get('candidates',[]):
         row['topic_policy_version']='4.4'
         if not row.get('article'):continue

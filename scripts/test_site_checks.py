@@ -19,6 +19,11 @@ class PublicSiteTests(unittest.TestCase):
             with patch.object(check,'fetch',return_value='old{}\n'),self.assertRaisesRegex(RuntimeError,'PUBLIC_ASSET_CHANGED'):check.check_assets(root)
             with patch.object(check,'check_site',return_value={'https':'verified'}),patch.object(check,'fetch',return_value='old{}\n'),self.assertRaisesRegex(RuntimeError,'PUBLIC_ASSET_CHANGED'):
                 check.check_delivery(root=root)
+            for name in ('mosaic.css','mosaic.js'):
+                (root/'assets'/name).write_text('new asset')
+                with patch.object(check,'fetch',side_effect=lambda url:'body{}\n' if url.endswith('style.css') else 'old asset'),self.assertRaisesRegex(RuntimeError,'PUBLIC_ASSET_CHANGED'):
+                    check.check_assets(root)
+                (root/'assets'/name).unlink()
     def test_direct_file_and_module_use_local_policy44_package(self):
         root=Path(__file__).resolve().parents[1]
         code="import runpy; m=runpy.run_path(%r); from scripts import policy44; assert policy44.__file__.startswith(%r)" % (str(root/'scripts/site_checks.py'),str(root))
