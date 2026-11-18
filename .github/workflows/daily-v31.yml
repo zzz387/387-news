@@ -771,3 +771,29 @@ jobs:
     with:
       initialize_only: true
     secrets: inherit
+
+  backup-release:
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && contains(github.event.head_commit.message, '[backup only]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve public release and copy existing encrypted snapshots inside Actions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python -m scripts.backup44
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 387news44-backup-pre-mosaic-20261118
+          path: ${{ runner.temp }}/pre-mosaic-backup/
+          retention-days: 90
+          if-no-files-found: error
