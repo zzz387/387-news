@@ -4,7 +4,7 @@ import tempfile
 import unittest
 import subprocess
 import sys
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 try:
     from scripts import publication as pub, site_checks as check
 except ImportError:
@@ -24,6 +24,15 @@ class PublicSiteTests(unittest.TestCase):
                 with patch.object(check,'fetch',side_effect=lambda url:'body{}\n' if url.endswith('style.css') else 'old asset'),self.assertRaisesRegex(RuntimeError,'PUBLIC_ASSET_CHANGED'):
                     check.check_assets(root)
                 (root/'assets'/name).unlink()
+            date='2026-11-18';key='a'*64;data=b'RIFFxxxxWEBPimage';folder=root/'assets/illustrations'/date;folder.mkdir(parents=True)
+            (folder/(key+'.webp')).write_bytes(data)
+            manifest=folder/'manifest.json';manifest.write_text(json.dumps({'date':date,'images':{key:{'path':f'assets/illustrations/{date}/{key}.webp','sha256':check.publication_hash(data),'width':1,'height':1}}}))
+            (root/'index.html').write_text(f'<section class="art-front" data-issue-date="{date}">')
+            response=MagicMock();response.__enter__.return_value=response;response.status=200;response.read.return_value=data
+            with patch.object(check,'fetch',side_effect=lambda url:'body{}\n' if url.endswith('.css') else manifest.read_text()),patch.object(check,'urlopen',return_value=response):
+                check.check_assets(root)
+                response.read.return_value=b'old image'
+                with self.assertRaisesRegex(RuntimeError,'PUBLIC_ILLUSTRATION_CHANGED'):check.check_assets(root)
     def test_direct_file_and_module_use_local_policy44_package(self):
         root=Path(__file__).resolve().parents[1]
         code="import runpy; m=runpy.run_path(%r); from scripts import policy44; assert policy44.__file__.startswith(%r)" % (str(root/'scripts/site_checks.py'),str(root))

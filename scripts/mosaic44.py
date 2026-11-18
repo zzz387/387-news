@@ -198,9 +198,6 @@ def enhance(page,date,root=None):
     if 'class="art-front"' in page:return page
     return re.sub(r'<section class="front-grid">.*?</section>',lambda _:render(articles,date,root),page,count=1,flags=re.S)
 
-def prompt(item):
-    return 'Представь сюжет по подтверждённому описанию как самостоятельную художественную картину в жанре '+item['genre']+'. Выразительная визуальная метафора центральной идеи, не документальная фотография. Без надписей, букв, логотипов и водяных знаков. Не изображай выдуманные события как реальные. Соотношение сторон '+item['ratio']+'. Палитра: '+item['palette']+'. Композиция: '+item['composition']+'.\n'+json.dumps(item['descriptor'],ensure_ascii=False)
-
 def materialize(state,articles,root):
     date=state['date'];folder=Path(root)/'assets/illustrations'/date;folder.mkdir(parents=True,exist_ok=True)
     images={key:row for key,row in cached(root,date).items() if valid_image(root,date,key,row)};saved=state.get('art44',{});items=plan(articles,date,saved.get('plan',[]))
