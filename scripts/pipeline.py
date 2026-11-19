@@ -255,6 +255,8 @@ def report(state,ledger,now=None):
         inventory['light_preparation']={'write_attempts':old.get('write_attempts',0)+batch.get('attempts',0),'review_attempts':old.get('review_attempts',0),'http_requests':old.get('http_requests',0)+batch.get('http_requests',0),'code':batch.get('code'),'protocol':'brief44'}
         from scripts import policy44
         inventory['editorial_standard']=policy44.standard(state)
+        from scripts import mosaic44
+        inventory['artwork']=mosaic44.art_report(state)
     if inventory and not inventory['light_preparation']['code'] and inventory['light_preparation']['http_requests']>=2 and not inventory['light_news_ready']:
         inventory['light_preparation']['code']='LIGHT_BATCH_BUDGET_USED'
     return dict(**inventory,date=state['date'],policy_version=state.get('policy_version','3.2'),

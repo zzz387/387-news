@@ -536,7 +536,14 @@ jobs:
         if: ${{ steps.checkpoint.outputs.light_diagnostic_found == 'true' }}
         run: python -m scripts.light43 --diagnose-checkpoint '${{ runner.temp }}/published-light-diagnostic/news-draft.enc'
       - name: Report configured image capability without API calls
-        run: python -m scripts.mosaic44 --diagnose
+        env:
+          PROBE_IMAGE_MODELS: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-finalization]') }}
+        run: |
+          if [[ "$PROBE_IMAGE_MODELS" == 'true' ]]; then
+            python -m scripts.mosaic44 --diagnose --probe-models
+          else
+            python -m scripts.mosaic44 --diagnose
+          fi
       - name: Prepare encrypted draft checkpoint or release
         id: stage
         timeout-minutes: 20

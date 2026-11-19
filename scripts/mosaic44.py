@@ -106,46 +106,128 @@ def generate(item,budget):
             if inline.get('mimeType') in ('image/png','image/jpeg','image/webp'):return base64.b64decode(inline['data'],validate=True)
     raise RuntimeError('IMAGE_RESPONSE_MISSING')
 
+def final_text(article):
+    return {key:article.get(key,[] if key in ('blocks','activities') else '') for key in ('title','teaser','category','kind','mode','blocks','activities')}
+
+def approved_rows(state):
+    return selection43.composition(state)
+
+def approval_signature(state):
+    return p.digest([{'id':r['id'],'text':final_text(r['article'])} for r in approved_rows(state)])
+
+def approval_valid(state):
+    approval=state.get('art44',{}).get('approval',{})
+    return bool(approval and approval.get('date')==state['date'] and approval.get('signature')==approval_signature(state))
+
+def approve(state):
+    """Freeze only eligible final texts; no source, writing or image requests."""
+    from scripts import policy44
+    rows=approved_rows(state);policy44.require(state,rows)
+    saved=state.setdefault('art44',{'objects':{},'history':[]})
+    saved.setdefault('objects',{});saved.setdefault('history',[])
+    signature=approval_signature(state)
+    if saved.get('approval',{}).get('signature')!=signature:
+        saved['approval']={'date':state['date'],'signature':signature,'articles':[{'article_id':r['id'],'text_hash':p.digest(final_text(r['article']))} for r in rows]}
+        state['assembly_status44']='EDITORIAL_APPROVED'
+    state['audit_passed']=True
+    return saved['approval']
+
+def article_plans(state):
+    """All final articles, independent of the 8–12 front-page selection."""
+    rows=approved_rows(state);genres=Counter();result=[]
+    for record in rows:
+        article=record['article'];body=' '.join(b.get('text','') for b in article.get('blocks',[]))
+        activity=' '.join(a.get('title','')+' '+a.get('benefit','') for a in article.get('activities',[]))
+        sentences=[s.strip() for s in re.split(r'(?<=[.!?])\s+',body+' '+activity) if s.strip()]
+        subject=theme({'title':article['title'],'teaser':article.get('teaser','')+' '+body[:2500]})
+        genre=min(STYLES[subject],key=lambda value:(genres[value],STYLES[subject].index(value)))
+        i=len(result);text_hash=p.digest(final_text(article))
+        basis={'date':state['date'],'article_id':record['id'],'text_hash':text_hash,'prompt_version':CONFIG['prompt_version']}
+        key=p.digest(basis)
+        previous=next((row for row in state.get('art44',{}).get('plan',[]) if row.get('key')==key),None)
+        item=dict(basis,key=key,protocol=2,genre=genre,ratio=RATIOS[i%len(RATIOS)],palette=PALETTES[i%len(PALETTES)],composition=COMPOSITIONS[i%len(COMPOSITIONS)],
+            descriptor={'title':article['title'],'summary':article.get('teaser',''),'idea':sentences[0] if sentences else article['title'],
+                'full_text_summary':' '.join(sentences[:4]+sentences[-2:])[:4000], 'key_facts':sentences[:3]+sentences[-2:]})
+        if previous:
+            for key_name in ('genre','ratio','palette','composition'):item[key_name]=previous[key_name]
+        item['description_hash']=p.digest(item['descriptor'])
+        item['prompt']=prompt(item);result.append(item);genres[item['genre']]+=1
+    return result
+
+def object_valid(row):
+    try:
+        data=base64.b64decode(row['webp'],validate=True)
+        return 0<row['width']<=4096 and 0<row['height']<=4096 and 0<len(data)<=350000 and data[:4]==b'RIFF' and data[8:12]==b'WEBP' and hashlib.sha256(data).hexdigest()==row['sha256']
+    except (KeyError,ValueError,TypeError):return False
+
+def art_report(state):
+    saved=state.get('art44',{});items=saved.get('plan',[]);objects=saved.get('objects',{})
+    ready=sum(object_valid(objects.get(item['key'],{})) for item in items)
+    return {'phase':state.get('assembly_status44','NOT_APPROVED'),'articles':len(items),'ready':ready,'missing':len(items)-ready,
+        'complete':bool(items) and ready==len(items),'provider_status':saved.get('provider_status',provider_status()),'image_requests':saved.get('requests',0)}
+
 def prepare(state,persist=lambda:None,allow_request=True):
-    from scripts import selection43
-    rows=selection43.composition(state)
-    prepare_plan([r['article'] for r in rows],state['date'],state.setdefault('art44',{'objects':{},'history':[]}),persist,allow_request)
-
-def prepare_plan(articles,date,saved,persist,allow_request=True):
+    saved=state.setdefault('art44',{'objects':{},'history':[]})
+    saved.setdefault('objects',{});saved.setdefault('history',[])
+    saved['provider_status']='IMAGE_PROVIDER_FORBIDDEN' if saved.get('blocked_model')==CONFIG.get('model') and saved.get('blocked_model') else provider_status()
+    if not approval_valid(state):
+        saved['code']='ART_NOT_EDITORIAL_APPROVED';persist();return art_report(state)
+    items=article_plans(state);saved['plan']=items;state['assembly_status44']='ART_GENERATION';persist()
     from scripts import news
-    items=plan(articles,date,saved.get('plan') or list(cached(p.ROOT,date).values()));saved['plan']=[{k:v for k,v in item.items() if k!='_article'} for item in items]
-    saved['provider_status']=provider_status();persist()
-    print('[mosaic44] '+json.dumps({'date':date,'planned':len(items),'cached':len(saved['objects']),'provider_status':saved['provider_status']}),flush=True)
-    if saved['provider_status']!='READY' or not allow_request:return
-    budget=news.runtime.ACTIVE_BUDGET;window=os.getenv('GITHUB_RUN_ID','local')+':'+os.getenv('GITHUB_RUN_ATTEMPT','1')
+    budget=news.runtime.ACTIVE_BUDGET
+    # One sequential batch, bounded only by the existing request/time budgets.
     for item in items:
-        if item['key'] in saved['objects']:continue
-        public=cached(p.ROOT,date).get(item['key'])
-        if public and (p.ROOT/public['path']).is_file() and hashlib.sha256((p.ROOT/public['path']).read_bytes()).hexdigest()==public['sha256']:continue
+        if object_valid(saved['objects'].get(item['key'],{})):continue
+        if item['key'] in saved['objects']:
+            saved.setdefault('invalid_objects',{})[item['key']]=saved['objects'].pop(item['key'])
+            persist()
+        if not allow_request or saved['provider_status']!='READY' or not budget or not budget.can_request():break
         if sum(h.get('key')==item['key'] for h in saved['history'])>=3:continue
-        if not budget or not budget.can_request():break
-        if saved.get('window')==window or getattr(budget,'image44_window',None)==window:break
-        saved['window']=window;budget.image44_window=window;persist()
+        saved['current_key']=item['key'];persist()
         try:
-            raw=generate(item,budget);data,width,height=encode_image(raw)
-            saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['model']}
-        except Exception as exc:saved['history'].append({'key':item['key'],'code':str(exc) if re.fullmatch(r'[A-Z_0-9]+',str(exc)) else type(exc).__name__})
+            before=budget.used
+            try:raw=generate(item,budget)
+            finally:saved['requests']=saved.get('requests',0)+(budget.used-before)
+            data,width,height=encode_image(raw);digest=hashlib.sha256(data).hexdigest()
+            if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
+            saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
+                'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['model'],'status':'READY',
+                'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
+                'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
+        except Exception as exc:
+            if isinstance(exc,news.runtime.GenerationPaused):
+                saved['code']='IMAGE_QUOTA_OR_COOLDOWN';persist();break
+            code=str(exc) if re.fullmatch(r'[A-Z_0-9]+',str(exc)) else type(exc).__name__
+            saved['history'].append({'key':item['key'],'code':code})
+            if code in ('IMAGE_HTTP_401','IMAGE_HTTP_403'):
+                saved['blocked_model']=CONFIG.get('model');saved['provider_status']='IMAGE_PROVIDER_FORBIDDEN'
+            if code in ('IMAGE_HTTP_429','IMAGE_HTTP_503','IMAGE_HTTP_401','IMAGE_HTTP_403'):
+                persist();break
         persist()
+    saved.pop('current_key',None);report=art_report(state)
+    saved['completion']='COMPLETE' if report['complete'] else 'INCOMPLETE'
+    print('[art44] '+json.dumps(report),flush=True);persist();return report
 
-def recover_public(state,root,persist=lambda:None,allow_request=True):
-    # Public approved content only; this uses the SAME active quota and controller.
-    home=Path(root)/'index.html'
-    if not home.is_file():return
-    found=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',home.read_text())
-    if not found:return
-    date=found[1];issue=Path(root)/'issues'/date
-    if not (issue/'release.json').is_file():return
-    from scripts import publication43
-    publication43.validate(root,date)
-    articles=from_overview((issue/'index.html').read_text())
-    saved=state.setdefault('art44_public',{}).setdefault(date,{'objects':{},'history':[]})
-    prepare_plan(articles,date,saved,persist,allow_request)
-    materialize({'date':date,'art44':saved},articles,root)
+def finalize(state,root,persist,clock,release,preview=False,allow_request=True):
+    """Only the frozen approved issue reaches art; publication never waits past due."""
+    from scripts import publication43,pipeline
+    if not approval_valid(state):approve(state)
+    persist()
+    budget=__import__('scripts.news',fromlist=['runtime']).runtime.ACTIVE_BUDGET
+    if budget:
+        import time
+        budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-120))
+    prepare(state,persist,allow_request=allow_request and not preview and clock()<release)
+    report=art_report(state)
+    state['art44']['emergency_text']=not report['complete']
+    state['assembly_status44']='READY_FOR_PUBLICATION' if report['complete'] or provider_status()!='READY' or clock()>=release else 'ART_GENERATION'
+    if clock()<release and not preview:
+        pipeline.status(state,'APPROVED','publish_when_due' if state['assembly_status44']=='READY_FOR_PUBLICATION' else 'resume_missing_art');persist();return False
+    if preview:
+        publication43.build(state,root,preview=True);pipeline.status(state,'APPROVED','preview_complete');persist();return False
+    state['assembly_status44']='READY_FOR_PUBLICATION'
+    if not pipeline.reserve_delivery(state,clock()):persist();return False
+    publication43.build(state,root);pipeline.status(state,'PUBLISHING','commit_and_deploy');persist();return True
 
 
 def cached(root,date):
@@ -171,7 +253,9 @@ def render(articles,date,root=None):
     widths={8:[7,5,4,4,4,5,3,4],9:[7,5,4,4,4,3,3,3,3],10:[7,5,4,4,4,5,3,4,6,6],11:[7,5,4,4,4,3,3,3,3,6,6],12:[7,5,4,4,4,5,3,4,3,3,3,3]}.get(len(items),[6]*len(items))
     for i,item in enumerate(items):
         article=item['_article'];url='/issues/'+date+'/articles/'+article['slug']+'/'
-        image=images.get(item['key']);media=''
+        bound=next((row for row in images.values() if row.get('protocol')==2 and row.get('article_slug')==article['slug']),None)
+        if bound:item.update(key=bound['key'],genre=bound['genre'],ratio=bound['ratio'])
+        image=bound or images.get(item['key']);media=''
         if image:
             path=Path(image.get('path',''))
             if path.is_absolute() or '..' in path.parts or path.parts[:2]!=('assets','illustrations'):image=None
@@ -200,13 +284,15 @@ def enhance(page,date,root=None):
 
 def materialize(state,articles,root):
     date=state['date'];folder=Path(root)/'assets/illustrations'/date;folder.mkdir(parents=True,exist_ok=True)
-    images={key:row for key,row in cached(root,date).items() if valid_image(root,date,key,row)};saved=state.get('art44',{});items=plan(articles,date,saved.get('plan',[]))
+    images={key:row for key,row in cached(root,date).items() if valid_image(root,date,key,row)};saved=state.get('art44',{});items=article_plans(state) if approval_valid(state) else []
+    for item,article in zip(items,articles):item['article_slug']=article['slug']
     for item in items:
         row=saved.get('objects',{}).get(item['key'])
         if not row:continue
         try:
             data=base64.b64decode(row['webp'],validate=True)
-            if hashlib.sha256(data).hexdigest()!=row['sha256'] or len(data)>350000:raise ValueError('IMAGE_CACHE_INTEGRITY')
+            if not object_valid(row):raise ValueError('IMAGE_CACHE_INTEGRITY')
+            if any(other.get('sha256')==row['sha256'] and key!=item['key'] for key,other in images.items()):raise ValueError('IMAGE_NOT_UNIQUE')
             file=folder/(item['key']+'.webp')
             if file.exists() and file.read_bytes()!=data:raise ValueError('IMAGE_ARCHIVE_OVERWRITE_FORBIDDEN')
             file.write_bytes(data)
@@ -214,14 +300,34 @@ def materialize(state,articles,root):
             failure={'key':item['key'],'code':'IMAGE_CACHE_UNAVAILABLE'}
             if failure not in saved.setdefault('history',[]):saved['history'].append(failure)
             continue
-        images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version')},
+        images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version','date','text_hash','protocol','article_slug')},
             **{k:row[k] for k in ('sha256','width','height','provider','model')},'path':file.relative_to(root).as_posix()}
     (folder/'manifest.json').write_text(json.dumps({'date':date,'images':images,'provider_status':provider_status()},ensure_ascii=False,indent=2)+'\n')
     return images
 
+def diagnose(probe=False):
+    result={'status':provider_status(),'image_model':CONFIG.get('model') or None,'free_image_tier_verified':CONFIG['free_tier_verified'],
+        'image_api_requests':0,'publication_blocking':False,'pricing_url':'https://aistudio.google.com/docs/pricing',
+        'pricing_checked':'2026-11-19','image_generation_access':'UNVERIFIED','billing_access':'NOT_AVAILABLE',
+        'free_image_tier':'NOT_AVAILABLE_FOR_DOCUMENTED_GEMINI_IMAGE_MODELS','next_action':'authorized_image_api_required'}
+    if probe:
+        if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('GITHUB_REF_NAME')!='main':raise RuntimeError('IMAGE_PROTECTED_ACTIONS_REQUIRED')
+        from urllib.request import Request,urlopen
+        from urllib.error import HTTPError
+        result['models']=[]
+        for model in ('gemini-3.1-flash-lite-image','gemini-3.1-flash-image','gemini-2.5-flash-image'):
+            row={'model':model,'generation_smoke':'NOT_RUN_PAID_ACCESS_NOT_AUTHORIZED'}
+            try:
+                request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+model,headers={'x-goog-api-key':os.environ['GEMINI_API_KEY']})
+                with urlopen(request,timeout=15) as response:data=json.loads(response.read(100000))
+                row.update(metadata='AVAILABLE',methods=data.get('supportedGenerationMethods',[]))
+            except HTTPError as exc:row['metadata']='HTTP_'+str(exc.code)
+            except Exception as exc:row['metadata']=type(exc).__name__
+            result['models'].append(row)
+    print('[mosaic44-capability] '+json.dumps(result),flush=True)
+    return result
+
 if __name__=='__main__':
     import argparse
-    parser=argparse.ArgumentParser();parser.add_argument('--diagnose',action='store_true',required=True);parser.parse_args()
-    print('[mosaic44-capability] '+json.dumps({'status':provider_status(),'image_model':CONFIG.get('model') or None,
-        'configured_text_models':os.getenv('GEMINI_MODELS','').split(','),'free_image_tier_verified':CONFIG['free_tier_verified'],
-        'image_api_requests':0,'publication_blocking':False,'next_action':'configure_verified_free_image_api' if provider_status()!='READY' else 'resume_existing_quota_and_cache'}))
+    parser=argparse.ArgumentParser();parser.add_argument('--diagnose',action='store_true',required=True);parser.add_argument('--probe-models',action='store_true');args=parser.parse_args()
+    diagnose(args.probe_models)
