@@ -74,6 +74,10 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         verify=check_public or (lambda **kwargs:pipeline.site_checks.check_delivery(root=root,**kwargs))
         ready=pipeline.published_delivery(state,date,ops,preview,current,verify);persist();return ready
     release=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
+    if policy44.active(state):
+        from scripts import mosaic44
+        if mosaic44.approval_valid(state) and policy44.standard(state)['compliant']:
+            return mosaic44.finalize(state,root,persist,clock,release,preview,allow_request=not delivery_only,allow_wait=now is None)
     budget=news.runtime.ACTIVE_BUDGET
     minimum=e.CONFIG['minimum_articles']
     stock43.restore_backlog(state,root)
@@ -219,8 +223,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             pipeline.status(state,'PREPARING','continue_editorial_deficit','EDITORIAL_STANDARD_NOT_MET');persist();return False
     if active44:
         from scripts import mosaic44
-        mosaic44.recover_public(state,root,persist,allow_request=not due)
-        mosaic44.prepare(state,persist,allow_request=not due)
+        mosaic44.approve(state)
+        return mosaic44.finalize(state,root,persist,clock,release,preview,allow_request=not delivery_only,allow_wait=now is None)
     reserve=[] if selected else reserve_rows(state,clock())
     state['issue_kind']='articles' if selected else 'source_digest'
     state['reserve_count']=len(reserve)

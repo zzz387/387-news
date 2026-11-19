@@ -74,6 +74,11 @@ def check(root,date,output,*,expected_count=12,overview_path="/",viewports=(320,
                     if metrics['scroll']>metrics['client']+1:
                         if metrics['overflow']!='visible': raise ValueError('BROWSER_BODY_CLIPPED')
                         report['visible_overflow_pages']+=1
+                    if page.locator('.article-art44').count():
+                        art=page.locator('.article-art44 img')
+                        art.evaluate('(n)=>n.decode()')
+                        if not art.get_attribute('alt') or not art.evaluate('(n)=>n.naturalWidth>0'):raise ValueError('BROWSER_ARTICLE_ART_INVALID')
+                        if 'Художественная иллюстрация, созданная ИИ' not in page.locator('.article-art44').inner_text():raise ValueError('BROWSER_ARTICLE_ART_UNLABELLED')
                     if page.locator('.source-primary').count()!=1: raise ValueError('BROWSER_SOURCE_BLOCK_COUNT')
                     source=page.locator('.source-primary')
                     if source.locator('[data-source-links-version="1"]').count():

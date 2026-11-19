@@ -30,13 +30,92 @@ def synthetic_art(state):
     import io,base64,hashlib
     from PIL import Image
     from scripts import mosaic44
-    mosaic44.prepare(state)
+    mosaic44.approve(state);mosaic44.prepare(state)
     for i,item in enumerate(state['art44']['plan']):
-        image=Image.new('RGB',(48,32),(80+i*7,105,85));buffer=io.BytesIO();image.save(buffer,format='PNG')
+        image=Image.new('RGB',(48,32),((80+i*7)%251,105,85));buffer=io.BytesIO();image.save(buffer,format='PNG')
         data,width,height=mosaic44.encode_image(buffer.getvalue())
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_final_art_uses_existing_morning_wait_without_early_public_files(self):
+        from scripts import mosaic44 as art,release_queue
+        from datetime import datetime,timedelta
+        s=issue();s['brief_policy_revision']=2;synthetic_art(s)
+        release=datetime.fromisoformat(s['date']+'T06:00').replace(tzinfo=v.p.TZ)
+        clock=[release-timedelta(minutes=6)]
+        with tempfile.TemporaryDirectory() as temp:
+            target=root(temp)
+            def wait(date):
+                self.assertFalse((target/'issues'/date/'index.html').exists())
+                self.assertFalse((target/'assets/illustrations'/date).exists())
+                clock[0]=release
+            with patch.dict(os.environ,GITHUB_ACTIONS='true',GITHUB_REF_NAME='main',NEWS_RELEASE_APPROVED='true'),patch.object(release_queue,'wait_until_release',side_effect=wait) as gate:
+                self.assertTrue(art.finalize(s,target,lambda:None,lambda:clock[0],release,allow_request=False,allow_wait=True))
+            gate.assert_called_once_with(s['date'])
+            self.assertEqual(pub.validate(target,s['date'])['art44']['ready'],8)
+
+    def test_all_final_articles_have_unique_art_and_one_shared_file(self):
+        from scripts import mosaic44 as art,generation_runtime as rt
+        from datetime import datetime,timezone
+        import io
+        from PIL import Image
+        for n in (8,12,20,27):
+            with self.subTest(articles=n),tempfile.TemporaryDirectory() as temp:
+                s=issue(n,12);s['brief_policy_revision']=2;calls=[]
+                def fake(item,budget):
+                    budget.reserve('fixture-image');calls.append(item['article_id'])
+                    image=Image.new('RGB',(48,32),tuple(bytes.fromhex(item['key'][:6])));buffer=io.BytesIO();image.save(buffer,format='PNG');return buffer.getvalue()
+                ledger={'day':datetime.now(timezone.utc).date().isoformat(),'requests':0,'models':{},'cooldowns':{}}
+                art.approve(s)
+                with patch.object(art,'provider_status',return_value='READY'),patch.object(art,'generate',side_effect=fake):
+                    for _ in range(2):
+                        budget=rt.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0,seconds=5000)
+                        with patch.object(news.runtime,'ACTIVE_BUDGET',budget):art.prepare(s)
+                        s=json.loads(json.dumps(s))  # Independent restore, not a shared object.
+                self.assertEqual(len(calls),n);self.assertEqual(art.art_report(s)['ready'],n)
+                self.assertEqual(ledger['requests'],n)
+                target=root(temp);pub.build(s,target);data=pub.validate(target,s['date'])
+                self.assertEqual(len(data['illustrations']),n);self.assertTrue(data['art44']['status']=='COMPLETE')
+                self.assertEqual(len({r['sha256'] for r in data['illustrations']}),n)
+                for row in data['illustrations']:
+                    page=(target/'issues'/s['date']/'articles'/row['article_slug']/'index.html').read_text()
+                    self.assertIn('src="/'+row['path']+'"',page);self.assertIn('Художественная иллюстрация, созданная ИИ',page)
+                front=(target/'index.html').read_text()
+                for filename in __import__('re').findall(r'<img src="/([^"]+)"',front):self.assertIn(filename,{r['path'] for r in data['illustrations']})
+
+    def test_art_requires_final_approval_and_text_changes_invalidate_only_one_picture(self):
+        from scripts import mosaic44 as art
+        s=issue();s['brief_policy_revision']=2
+        with patch.object(art,'generate',side_effect=AssertionError('Unapproved text must not reach provider')):
+            art.prepare(s);self.assertFalse(s['art44'].get('plan'))
+        synthetic_art(s);old={r['article_id']:r['key'] for r in s['art44']['plan']}
+        record=s['candidates'][0];record['article']['blocks'][0]['text']+=' Новая проверенная подробность.'
+        record['checks']['final43']['input_hash']=e.fingerprint(record)
+        self.assertFalse(art.approval_valid(s))
+        with patch.object(art,'generate',side_effect=AssertionError('Reapproval required')):art.prepare(s)
+        art.approve(s);art.prepare(s,allow_request=False)
+        changed={r['article_id']:r['key'] for r in s['art44']['plan']}
+        self.assertEqual(sum(old[k]!=changed[k] for k in old),1);self.assertEqual(art.art_report(s)['ready'],7)
+        self.assertEqual(len(s['art44']['objects']),8)  # Old approved bytes retained, never silently overwritten.
+
+    def test_art_resume_after_eighteen_of_twenty_and_failure_preserves_progress(self):
+        from scripts import mosaic44 as art,generation_runtime as rt
+        from datetime import datetime,timezone
+        import io
+        from PIL import Image
+        s=issue(20,12);s['brief_policy_revision']=2;synthetic_art(s)
+        for row in s['art44']['plan'][18:]:s['art44']['objects'].pop(row['key'])
+        before=copy.deepcopy(s['art44']['objects']);ledger={'day':datetime.now(timezone.utc).date().isoformat(),'requests':0,'models':{}};calls=[]
+        def fake(item,budget):
+            budget.reserve('fixture-image');calls.append(item['key']);image=Image.new('RGB',(48,32),tuple(bytes.fromhex(item['key'][:6])));buffer=io.BytesIO();image.save(buffer,format='PNG');return buffer.getvalue()
+        with patch.object(art,'provider_status',return_value='READY'),patch.object(news.runtime,'ACTIVE_BUDGET',rt.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0,seconds=5000)):
+            with patch.object(art,'generate',side_effect=RuntimeError('IMAGE_HTTP_503')):art.prepare(s)
+            self.assertEqual(s['art44']['objects'],before)
+            restored=json.loads(json.dumps(s))
+            with patch.object(art,'generate',side_effect=fake):art.prepare(restored);art.prepare(restored)
+        self.assertEqual(len(calls),2);self.assertEqual(art.art_report(restored)['ready'],20)
+        self.assertEqual({k:restored['art44']['objects'][k] for k in before},before)
+
     def test_modern_briefs_select_eight_twelve_and_bank_overflow(self):
         for count in (8,12,15):
             with self.subTest(notes=count):

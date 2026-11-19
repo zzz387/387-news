@@ -64,6 +64,12 @@ def validate(root,date):
         from scripts import mosaic44
         for image in data.get('illustrations',[]):
             if not mosaic44.valid_image(root,date,image['key'],image):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
+        if data['mosaic_revision']>=2:
+            art=data['art44'];images=data['illustrations']
+            if art['required']!=count or art['ready']!=len(images) or art['missing']!=count-len(images) or len({r['sha256'] for r in images})!=len(images):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
+            for image in images:
+                article_page=(issue/'articles'/image['article_slug']/'index.html').read_text()
+                if ('src="/'+image['path']+'"') not in article_page or 'Художественная иллюстрация, созданная ИИ' not in article_page:raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
     if data.get('light_count',len(light))!=len(light):raise p.Blocked('PUBLIC_LIGHT_COUNT')
     if render_light(light) and render_light(light) not in page:raise p.Blocked('PUBLIC_LIGHT_CHANGED')
     if data['policy_version']=='4.4' and not data.get('preview'):
@@ -112,17 +118,22 @@ def build(state,root,reserve=(),preview=False):
                   'kind':'articles' if articles else 'source_digest','minimum_articles':e.CONFIG['minimum_articles'],
                   'standard_issue':len(articles)>=e.CONFIG['minimum_articles'],'preview':preview,'pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
             if version=='4.4':data['brief_policy_revision']=state.get('brief_policy_revision',2)
+            if version=='4.4':
+                from scripts import mosaic44
+                if not preview and not mosaic44.approval_valid(state):mosaic44.approve(state)
+                images=mosaic44.materialize(state,articles,working)
+                data['mosaic_revision']=2;data['illustrations']=list(images.values())
+                current={row['article_slug']:row for row in images.values() if row.get('protocol')==2}
+                for a in articles:a['artwork44']=current.get(a['slug'])
+                complete=len(current)==len(articles) and bool(articles)
+                data['art44']={'status':'COMPLETE' if complete else 'INCOMPLETE','required':len(articles),'ready':len(current),'missing':len(articles)-len(current),'emergency_text':not complete,'provider_status':mosaic44.provider_status()}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
-                file.write_text(reader_chrome(render.render_article(date,no,a,root,policy_version=version)))
+                file.write_text(reader_chrome(render.render_article(date,no,a,working,policy_version=version)))
                 md=file.with_name('article.md');md.write_text(render.markdown(a))
                 data['pages'][a['slug']]={'html':digest_bytes(file.read_bytes()),'markdown':digest_bytes(md.read_bytes())}
             light=public_light(state)
             data['light_news']=light;data['light_count']=len(light)
-            if version=='4.4':
-                from scripts import mosaic44
-                images=mosaic44.materialize(state,articles,working)
-                data['mosaic_revision']=1;data['illustrations']=list(images.values())
             rows=[{k:r.get(k,'') for k in ('url','title','publisher','published','checked_at')} for r in reserve] if not articles else []
             if not articles:data['sources']=rows
             for permanent,target in ((True,issue/'index.html'),(False,working/'index.html')):
