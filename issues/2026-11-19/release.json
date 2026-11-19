@@ -1,0 +1,208 @@
+{
+  "date": "2026-11-19",
+  "number": 26,
+  "policy_version": "4.4",
+  "article_count": 10,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "a8d711eb57314ae7d84bc81e720df4b64143875bc42d8e6f84b9213dc4a3fbae",
+      "markdown": "480a3bd7d9657799a98d479b1d1ad6fab23b329f6d5ddb0bb0f1f2ae644bd4f0"
+    },
+    "feature-02": {
+      "html": "2adafbe1f540c4c3c3fcf3fac392daa39f476e4ef18640b1d3351d5e0cea5cf4",
+      "markdown": "80e6f6443c8cc24f75f8c31f705cb61d0b977b5b50103d0e3a2839367d85e8b1"
+    },
+    "feature-03": {
+      "html": "c4f3906ef1de056d73b1da15adb8a94957fde8103d069dc23a9738eab9a6b84a",
+      "markdown": "9e5e803e5a65c893cba55355f47f254f3c512b2217d02f8402f4c6d517402f9c"
+    },
+    "feature-04": {
+      "html": "f6ed511244e0824279bf38779aedf5d454bf910b6570884264e53500a5974e53",
+      "markdown": "f11d36931712a603ad24c8ffc9ef5220f7c73d97eaca5dd2931d62303f81b0a7"
+    },
+    "feature-05": {
+      "html": "38896df79a5fbf04bb5080cd6085dc2899cb9a5d58bdd46df5f374100893c186",
+      "markdown": "0e656703b691a113a1965f85527247acf4b02326805c0247106772434fe43e3d"
+    },
+    "feature-06": {
+      "html": "32078213314c65174cc4d6b7a18de4ebf64ff8ccf1586e6b04264d20ef042fec",
+      "markdown": "6fc383f3e2abf46b12789979ba48ef3922708988fa1b8b9ad29b537ab7a9e28c"
+    },
+    "feature-07": {
+      "html": "39e67ec253951ad5e42eb1467f82be6c680471ce3991ba4b095cf00e2e3b1678",
+      "markdown": "1d51c00579e71b0e9cbca5cfb5b41ecf50cc452ac70696b75d958874f05f4eda"
+    },
+    "feature-08": {
+      "html": "019f8b5abc183f5ab791b82dea4c927a304fd4b5cb53b3c1571889349fc388f2",
+      "markdown": "0dec5489c131ec4f9b7e5100b2a23d46f71635c5e1d9806d621ffb494153f6e2"
+    },
+    "feature-09": {
+      "html": "dfdbf2ea08420fecd3049c6964228ecb40d5c9e4fccaabaa5bc2aa076f6ba549",
+      "markdown": "854f8fdf9c7b49f8443670f24ef04ad3da79f49f103c1cf45e6fd6e4a02f5c4a"
+    },
+    "feature-10": {
+      "html": "081d6bf580b3fe2a67338cdfb1abfc6c5a8f24e0dc342b0d3d7afc8ffb2979bc",
+      "markdown": "0d1811c19cf9bbd611f7541376c3453c5035eebd45661a5738b151b40874ed8c"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-19T06:02:34.545427+03:00",
+  "release_not_before": "2026-11-19T06:00:00+03:00",
+  "brief_policy_revision": 2,
+  "light_news": [
+    {
+      "kind": "source_report",
+      "title": "Искусственный интеллект для распознавания запахов",
+      "text": "Стартап Osmo объявил о создании модели искусственного интеллекта, способной распознавать и различать запахи на уровне среднего человека. Технология уже применяется в парфюмерной индустрии и тестируется для обнаружения контрафактных товаров.",
+      "source": {
+        "url": "https://www.technologyreview.com/2026/11/18/1148816/smell-startup-osmo-ai-nose-good-as-humans/",
+        "title": "This smell startup says its AI nose is as good as a human’s",
+        "publisher": "MIT Technology Review",
+        "language": "en",
+        "published": "2026-11-18T05:20:30-05:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Осенний упадок сил у москвичей",
+      "text": "Большинство жителей Москвы сталкиваются с ухудшением настроения и снижением энергии в осенний период. Согласно опросу, 68% горожан связывают свое состояние с неблагоприятной погодой, коротким световым днем и нехваткой времени.",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/v-osennem-upadke-sil-priznalis-68-moskvichej/",
+        "title": "В осеннем упадке сил признались 68% москвичей",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-17T17:01:32+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Этикет золотого века: правила приема пищи",
+      "text": "В период позолоченного века в США столовый этикет был чрезвычайно строгим. Одно из правил предписывало есть зеленый горошек исключительно с помощью вилки, использование ножа для этого блюда считалось неприемлемым.",
+      "source": {
+        "url": "https://www.mentalfloss.com/history/gilded-age-etiquette-rules?utm_source=RSS",
+        "title": "5 Gilded Age Etiquette Rules That Would Shock Modern People",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-16T23:00:02Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Успешное размножение журавлей в дикой природе",
+      "text": "В 2006 году впервые за столетие в американском Среднем Западе был зафиксирован случай вылупления птенца американского журавля в естественных условиях.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/teaching-cranes-to-fly",
+        "title": "\"Saving them would take an ultralight aircraft, a white smock and a hand puppet.\" The man who taught captive-bred chicks how and where to fly",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-17T11:59:21+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Роботизированные контейнеры для мусора в Токио",
+      "text": "В попытке справиться с проблемой нехватки общественных урн, власти Токио начали использовать роботизированные системы и контейнеры с солнечными батареями. Технология позволяет уплотнять отходы, что увеличивает вместимость в пять раз.",
+      "source": {
+        "url": "https://www.goodnewsnetwork.org/tokyo-tackles-trash-troubles-with-new-generation-of-robotic-street-waste-bins/",
+        "title": "Tokyo Tackles Trash Troubles with New Generation of Robotic Street Waste Bins",
+        "publisher": "Good News Network",
+        "language": "en",
+        "published": "2026-11-16T14:00:03+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Микроскопические хищники в почве",
+      "text": "В Сибирском НИИ земледелия и химизации сельского хозяйства еще в 1971 году начались систематические исследования хищных грибов, способных уничтожать вредных нематод.",
+      "source": {
+        "url": "https://scfh.ru/papers/gribnoe-tsarstvo-mini-khishchniki-i-maksi-lekari/",
+        "title": "Грибное царство: мини-ХИЩНИКИ и макси-ЛЕКАРИ",
+        "publisher": "Наука из первых рук",
+        "language": "ru",
+        "published": "2024-09-25"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Разработка лекарства PF-231",
+      "text": "Исследователи из компании Pfizer представили ингибитор главной протеазы коронавируса под кодовым названием PF-231 еще в 2004 году. Несмотря на его высокую эффективность против SARS-CoV в лабораторных условиях, препарат не смог стать лекарством из-за плохой всасываемости и проблем с растворимостью.",
+      "source": {
+        "url": "https://scfh.ru/papers/kak-sozdayutsya-lekarstva-ili-po-virusu-pryamoy-navodkoy/",
+        "title": "Как создаются лекарства, или По вирусу – прямой наводкой",
+        "publisher": "Наука из первых рук",
+        "language": "ru",
+        "published": "2022-10-22"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Кулинария как полезное бремя",
+      "text": "Философ Альберт Боргманн считает приготовление сложной еды и разделение трапезы с близкими примерами «хорошего бремени», которое приносит пользу человеку.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/good-burdens-lords-table-between-hurry-heaven/",
+        "title": "How ‘Good Burdens’ Bring You to the Lord’s Table - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-17T11:00:00+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Потребление электричества дата-центрами в США",
+      "text": "Исследование показало, что крупные дата-центры в США потребляют от 1,5 до 2,2 процента всей электроэнергии страны. Этот объем сопоставим с энергопотреблением целых штатов, таких как Индиана или Висконсин.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/hyperscale-data-centers-use-2-of-us-electricity/",
+        "title": "Hyperscale data centers use 2% of US electricity",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-16T20:52:10+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Стиль тегеранской молодежи",
+      "text": "В Тегеране на улице Ираншахр молодые люди собираются, чтобы обмениваться модными образами и снимать видео для социальных сетей. При этом полиция нравов практически исчезла с улиц, а правительство старается не вмешиваться в частную жизнь горожан, пока те не устраивают уличных протестов.",
+      "source": {
+        "url": "https://aeon.co/essays/its-not-political-the-young-fashionistas-of-tehran",
+        "title": "It’s not political: the young fashionistas of Tehran",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-17T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Новый релиз Джессики Симпсон",
+      "text": "Известная поп-исполнительница Джессика Симпсон вернулась к музыкальной деятельности, представив мини-альбом Nashville Canyon, Pt. 1 в 2025 году.",
+      "source": {
+        "url": "https://www.mentalfloss.com/entertainment/music/biggest-pop-stars-1990s-where-are-they-now?utm_source=RSS",
+        "title": "20 Biggest Pop Stars of the 1990s: Where Are They Now?",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-16T21:00:01Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Миграция полярных сов в аэропорт Бостона",
+      "text": "Аэропорт Логан в Бостоне является популярным местом зимовки полярных сов из-за схожести открытой местности и климатических условий с арктической тундрой.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/snowy-owl-boston-migration",
+        "title": "“I once saw one on the tail of an airplane.” Why is Boston airport such a popular layover for snowy owls?",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-17T15:57:04+00:00"
+      }
+    }
+  ],
+  "light_count": 12,
+  "mosaic_revision": 1,
+  "illustrations": [],
+  "homepage_hash": "33426319a0ca9cc880aae4ae0012f4978c17da5afae0eb9c38befb19e23e90bc",
+  "overview_hash": "316db9d5a596a928f351ec101ae558c53d208cc2f3f77e3dc3b0a417d51452cd",
+  "markdown_hash": "aaf1711e9e7340a9f5f6d2cdd7ce95f8610b751bb3c19e61e730b3e897894e62"
+}
