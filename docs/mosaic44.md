@@ -119,3 +119,9 @@ verification so the next unpublished checkpoint is exercised with the new code.
 It uses the existing global production mutex and schedule; dispatch events cannot
 re-enter the push-only continuation. The existing monitor requests actions:write
 for this authenticated dispatch, without new Secrets or a public trigger URL.
+
+The existing 05:54 wake-up may wait through the bounded final ten-minute release
+gate when the Actions stage has sufficient time. Image requests stop before
+06:00; private artwork is materialized into the public worktree only after the
+release gate. The morning gate has its own regression case and does not depend
+on the image API being available.

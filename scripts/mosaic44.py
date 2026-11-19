@@ -208,19 +208,25 @@ def prepare(state,persist=lambda:None,allow_request=True):
     saved['completion']='COMPLETE' if report['complete'] else 'INCOMPLETE'
     print('[art44] '+json.dumps(report),flush=True);persist();return report
 
-def finalize(state,root,persist,clock,release,preview=False,allow_request=True):
+def finalize(state,root,persist,clock,release,preview=False,allow_request=True,allow_wait=False):
     """Only the frozen approved issue reaches art; publication never waits past due."""
     from scripts import publication43,pipeline
     if not approval_valid(state):approve(state)
     persist()
     budget=__import__('scripts.news',fromlist=['runtime']).runtime.ACTIVE_BUDGET
+    import time
+    stage_deadline=budget.deadline if budget else None
     if budget:
-        import time
         budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-120))
     prepare(state,persist,allow_request=allow_request and not preview and clock()<release)
     report=art_report(state)
     state['art44']['emergency_text']=not report['complete']
     state['assembly_status44']='READY_FOR_PUBLICATION' if report['complete'] or provider_status()!='READY' or clock()>=release else 'ART_GENERATION'
+    remaining=(release-clock()).total_seconds()
+    if (allow_wait and not preview and 0<remaining<=600 and os.getenv('GITHUB_ACTIONS')=='true' and os.getenv('GITHUB_REF_NAME')=='main'
+            and (stage_deadline is None or stage_deadline-time.monotonic()>remaining+90)):
+        from scripts import release_queue
+        release_queue.wait_until_release(state['date'])
     if clock()<release and not preview:
         pipeline.status(state,'APPROVED','publish_when_due' if state['assembly_status44']=='READY_FOR_PUBLICATION' else 'resume_missing_art');persist();return False
     if preview:

@@ -37,6 +37,23 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_final_art_uses_existing_morning_wait_without_early_public_files(self):
+        from scripts import mosaic44 as art,release_queue
+        from datetime import datetime,timedelta
+        s=issue();s['brief_policy_revision']=2;synthetic_art(s)
+        release=datetime.fromisoformat(s['date']+'T06:00').replace(tzinfo=v.p.TZ)
+        clock=[release-timedelta(minutes=6)]
+        with tempfile.TemporaryDirectory() as temp:
+            target=root(temp)
+            def wait(date):
+                self.assertFalse((target/'issues'/date/'index.html').exists())
+                self.assertFalse((target/'assets/illustrations'/date).exists())
+                clock[0]=release
+            with patch.dict(os.environ,GITHUB_ACTIONS='true',GITHUB_REF_NAME='main',NEWS_RELEASE_APPROVED='true'),patch.object(release_queue,'wait_until_release',side_effect=wait) as gate:
+                self.assertTrue(art.finalize(s,target,lambda:None,lambda:clock[0],release,allow_request=False,allow_wait=True))
+            gate.assert_called_once_with(s['date'])
+            self.assertEqual(pub.validate(target,s['date'])['art44']['ready'],8)
+
     def test_all_final_articles_have_unique_art_and_one_shared_file(self):
         from scripts import mosaic44 as art,generation_runtime as rt
         from datetime import datetime,timezone
