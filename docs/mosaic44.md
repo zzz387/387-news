@@ -113,3 +113,9 @@ text, failure persistence, uniqueness, shared article/mosaic paths and hashes.
 Synthetic codecs/providers never call an external image API. Browser checks cover
 320/390/768/1024/1440px. HTTPS checks preserve archive/article hashes and verify
 all published image assets, including those outside the 8–12 front-page tiles.
+
+The tagged rollout performs one ordinary workflow_dispatch after successful HTTPS
+verification so the next unpublished checkpoint is exercised with the new code.
+It uses the existing global production mutex and schedule; dispatch events cannot
+re-enter the push-only continuation. The existing monitor requests actions:write
+for this authenticated dispatch, without new Secrets or a public trigger URL.

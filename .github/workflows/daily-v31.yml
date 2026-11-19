@@ -696,7 +696,7 @@ jobs:
     timeout-minutes: 8
     permissions:
       contents: read
-      actions: read
+      actions: write
       issues: write
     steps:
       - uses: actions/checkout@v4
@@ -725,6 +725,15 @@ jobs:
           path: ${{ runner.temp }}/editorial-composition43.json
           retention-days: 30
           if-no-files-found: warn
+      - name: Continue the next unpublished issue once after final-art rollout
+        if: ${{ steps.verify.outputs.verified == 'true' && github.event_name == 'push' && contains(github.event.head_commit.message, '[art-finalization]') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          # Same workflow and global mutex: queued until this delivery finishes.
+          # A dispatch event cannot enter this push-only step again.
+          gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=run -f preview=false
 
   special-003-r:
     needs: [prepare, deploy, monitor]
