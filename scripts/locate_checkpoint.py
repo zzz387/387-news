@@ -24,7 +24,7 @@ def newest_artifact(records: list, label: str) -> dict | None:
 
 def main():
     phase = os.environ.get('PHASE','').strip()
-    if phase not in ('auto','plan','research','write','audit','publish','check','resume','run','inspect'):
+    if phase not in ('auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art'):
         raise RuntimeError('Unknown requested phase')
     raw_date = os.environ.get('TARGET_DATE','').strip() or None
     date = staged_news.phase_date(phase,datetime.now(staged_news.TZ),raw_date)

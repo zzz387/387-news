@@ -238,6 +238,7 @@ def check_v43(base,home,expected_date=None):
         if data['policy_version']=='4.4':
             from scripts import policy44
             actual_articles.append(policy44.from_html(page))
+    for image in data.get('illustrations',[]):check_public_image(base,image)
     if data['policy_version']=='4.4':policy44.require({'policy_version':'4.4','brief_policy_revision':data.get('brief_policy_revision',1)},actual_articles,light)
     return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':data['policy_version'],'expected_date':expected_date,'status':'ok'}
 
@@ -271,10 +272,14 @@ def check_assets(root,base='https://387.su'):
     from scripts import mosaic44
     for key,image in json.loads(manifest.read_text()).get('images',{}).items():
         if not mosaic44.valid_image(root,found[1],key,image):raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
-        request=Request(base.rstrip('/')+'/'+image['path'],headers={'User-Agent':'387-News-Art-Health/1.0'})
-        with urlopen(request,timeout=20) as response:
-            data=response.read(350001)
-            if response.status!=200 or len(data)>350000 or publication_hash(data)!=image['sha256']:raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
+        check_public_image(base,image)
+
+def check_public_image(base,image):
+    if not re.fullmatch(r'assets/illustrations/\d{4}-\d{2}-\d{2}/[a-f0-9]{64}\.webp',image.get('path','')):raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
+    request=Request(base.rstrip('/')+'/'+image['path'],headers={'User-Agent':'387-News-Art-Health/1.0'})
+    with urlopen(request,timeout=20) as response:
+        data=response.read(350001)
+        if response.status!=200 or len(data)>350000 or publication_hash(data)!=image['sha256']:raise RuntimeError('PUBLIC_ILLUSTRATION_CHANGED')
 
 def publication_hash(data):
     import hashlib

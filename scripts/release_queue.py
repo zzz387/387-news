@@ -50,6 +50,10 @@ def context(phase, preview, date, event, root=None, now=None, check_public=None)
     now = moscow(now)
     if date:
         datetime.strptime(date,'%Y-%m-%d')
+    if phase=='backfill_issue_art' and date:
+        return phase,preview,date
+    if phase=='recover_missing_issue' and date=='2026-11-20':
+        return 'run',preview,date
     if event in ('push','schedule'):
         return 'run',False,target_date(root,now,check_public)
     if date:

@@ -68,7 +68,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     def persist():
         state['publication_status']=pipeline.delivery_state(state,clock());save()
     current=clock();root=Path(ops.ROOT)
-    if any(path.name>date for path in (root/'issues').glob('*') if path.is_dir() and len(path.name)==10) and not (root/'issues'/date/'index.html').is_file():
+    if not publication43.historical_recovery(date) and any(path.name>date for path in (root/'issues').glob('*') if path.is_dir() and len(path.name)==10) and not (root/'issues'/date/'index.html').is_file():
         pipeline.status(state,'DEFERRED','preserve_old_checkpoint','SUPERSEDED_UNFINISHED_DATE');persist();return False
     if (root/'issues'/date/'index.html').is_file():
         verify=check_public or (lambda **kwargs:pipeline.site_checks.check_delivery(root=root,**kwargs))

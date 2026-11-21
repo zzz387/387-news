@@ -25,6 +25,12 @@ def merge_snapshot(ledger, snapshot):
             if type(value) is not int or value < 0: raise ValueError('Invalid model accounting')
         for value in item.get('cooldowns', {}).values():
             if type(value) not in (int, float) or value < 0: raise ValueError('Invalid model cooldown')
+    cf_rows=[copy.deepcopy(d['cloudflare_ai']) for d in (ledger,snapshot) if d.get('cloudflare_ai')]
+    import math
+    for record in cf_rows:
+        if (not isinstance(record,dict) or not isinstance(record.get('day'),str) or type(record.get('requests')) is not int or record['requests']<0
+                or any(type(record.get(n,0)) not in (int,float) or not math.isfinite(record.get(n,0)) or record.get(n,0)<0 for n in ('reserved_neurons','estimated_neurons','cooldown_until'))):raise ValueError('Invalid Cloudflare quota snapshot')
+    if len({r.get('account_hash') for r in cf_rows})>1:raise ValueError('Cloudflare account mismatch')
     cooldowns={model:max(ledger.get('cooldowns',{}).get(model,0),snapshot.get('cooldowns',{}).get(model,0))
                for model in set(ledger.get('cooldowns',{})) | set(snapshot.get('cooldowns',{}))}
     if snapshot['day'] > ledger.get('day',''):
@@ -34,6 +40,16 @@ def merge_snapshot(ledger, snapshot):
         models=ledger.setdefault('models',{})
         for model,count in snapshot['models'].items():models[model]=max(models.get(model,0),count)
     ledger['cooldowns']=cooldowns
+    if cf_rows:
+        if any(not isinstance(r,dict) or not isinstance(r.get('day'),str) or not isinstance(r.get('requests'),int) or r['requests']<0 for r in cf_rows):raise ValueError('Invalid Cloudflare quota snapshot')
+        if len({r.get('account_hash') for r in cf_rows})!=1:raise ValueError('Cloudflare account mismatch')
+        current=max(cf_rows,key=lambda r:r['day']);merged=copy.deepcopy(current)
+        for name in ('reserved_neurons','estimated_neurons','requests','cooldown_until'):
+            merged[name]=max(r.get(name,0) for r in cf_rows if r['day']==current['day'])
+        merged['cooldown_until']=max(r.get('cooldown_until',0) for r in cf_rows)
+        observed=[r.get('observed_account_neurons') for r in cf_rows if r['day']==current['day'] and isinstance(r.get('observed_account_neurons'),(int,float))]
+        merged['observed_account_neurons']=max(observed,default=None)
+        ledger['cloudflare_ai']=merged
     return ledger
 
 
@@ -83,8 +99,10 @@ class RequestBudget:
         day = datetime.now(timezone.utc).date().isoformat()
         if self.ledger.get('day') != day:
             cooldowns=dict(self.ledger.get('cooldowns',{}))
+            cloudflare=copy.deepcopy(self.ledger.get('cloudflare_ai'))
             self.ledger.clear()
             self.ledger.update(day=day, requests=0, models={},cooldowns=cooldowns)
+            if cloudflare:self.ledger['cloudflare_ai']=cloudflare
         now = time.monotonic()
         if self.used >= self.run_limit or self.ledger['requests'] >= self.day_limit:
             raise GenerationPaused('API request budget exhausted; encrypted progress retained')

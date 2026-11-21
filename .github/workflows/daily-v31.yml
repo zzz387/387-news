@@ -22,7 +22,7 @@ on:
       phase:
         description: 'run: automatic next action; inspect: restore only; preview prevents publication'
         type: choice
-        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, trial, trial-inspect, trial-route]
+        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, backfill_issue_art, recover_missing_issue, trial, trial-inspect, trial-route]
         default: run
         required: true
       preview:
@@ -432,6 +432,10 @@ jobs:
       NEWS_LIGHT_NEWS_ENABLED: "true"
       GH_TOKEN: ${{ github.token }}
       GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      NEWS_HISTORICAL_RECOVERY_DATE: ${{ inputs.phase == 'recover_missing_issue' && inputs.target_date == '2026-11-20' && '2026-11-20' || '' }}
+      CF_FREE_SMOKE: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[cf-art]') }}
       DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
       NEWS_RELEASE_APPROVED: ${{ vars.NEWS_RELEASE_APPROVED }}
       NEWS_MAX_REQUESTS_PER_RUN: "24"
@@ -464,6 +468,7 @@ jobs:
           MANUAL_PHASE: ${{ inputs.phase }}
           MANUAL_PREVIEW: ${{ inputs.preview }}
           MANUAL_DATE: ${{ inputs.target_date }}
+          CF_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[cf-art]') }}
         run: |
           if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
             phase="$MANUAL_PHASE"
@@ -472,6 +477,7 @@ jobs:
             phase=run
             preview=false
           fi
+          if [[ "$CF_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-21; fi
           PHASE="$phase" PREVIEW="$preview" TARGET_DATE="$MANUAL_DATE" python scripts/release_queue.py
       - name: Find previously saved encrypted checkpoint
         id: checkpoint
@@ -535,9 +541,9 @@ jobs:
       - name: Diagnose saved light batch without model calls or private logs
         if: ${{ steps.checkpoint.outputs.light_diagnostic_found == 'true' }}
         run: python -m scripts.light43 --diagnose-checkpoint '${{ runner.temp }}/published-light-diagnostic/news-draft.enc'
-      - name: Report configured image capability without API calls
+      - name: Check Cloudflare Free safeguards without billing changes
         env:
-          PROBE_IMAGE_MODELS: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-finalization]') }}
+          PROBE_IMAGE_MODELS: ${{ github.event_name == 'push' && (contains(github.event.head_commit.message, '[art-finalization]') || contains(github.event.head_commit.message, '[cf-art]')) }}
         run: |
           if [[ "$PROBE_IMAGE_MODELS" == 'true' ]]; then
             python -m scripts.mosaic44 --diagnose --probe-models
@@ -633,7 +639,7 @@ jobs:
           fi
           git config user.name '387 News Bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git commit -m "387 News: staged verified issue $(TZ=Europe/Moscow date +%F)"
+          git commit -m "387 News: staged verified issue $ISSUE_DATE"
           git push origin HEAD:main
           echo 'ready=true' >> "$GITHUB_OUTPUT"
 
@@ -726,14 +732,25 @@ jobs:
           retention-days: 30
           if-no-files-found: warn
       - name: Continue the next unpublished issue once after final-art rollout
-        if: ${{ steps.verify.outputs.verified == 'true' && github.event_name == 'push' && contains(github.event.head_commit.message, '[art-finalization]') }}
+        if: ${{ steps.verify.outputs.verified == 'true' && github.event_name == 'push' && (contains(github.event.head_commit.message, '[art-finalization]') || contains(github.event.head_commit.message, '[cf-art]')) }}
         env:
           GH_TOKEN: ${{ github.token }}
+          RECOVER_20: ${{ contains(github.event.head_commit.message, '[cf-art]') }}
         shell: bash
         run: |
           # Same workflow and global mutex: queued until this delivery finishes.
           # A dispatch event cannot enter this push-only step again.
-          gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=run -f preview=false
+          if [[ "$RECOVER_20" == 'true' ]]; then
+            gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=recover_missing_issue -f preview=false -f target_date=2026-11-20
+          else
+            gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=run -f preview=false
+          fi
+
+      - name: Continue bounded historical recovery while useful free progress remains
+        if: ${{ steps.verify.outputs.verified == 'true' && github.event_name == 'workflow_dispatch' && inputs.phase == 'recover_missing_issue' && inputs.target_date == '2026-11-20' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').stage == 'PREPARING' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').historical_recovery_runs < 3 && fromJSON(needs.prepare.outputs.pipeline_status || '{}').run_used > 0 }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=recover_missing_issue -f preview=false -f target_date=2026-11-20
 
   special-003-r:
     needs: [prepare, deploy, monitor]

@@ -13,7 +13,7 @@ STYLES={
  'sport':['Футуризм','Экспрессионизм','Плакатная графика'],
  'moscow':['Офорт','Историческая живопись','Ар-нуво'],
  'architecture':['Конструктивизм','Кубизм','Ар-деко'],
- 'nature':['Ботаническая живопись','Линогравюра','Натурализм'],
+ 'nature':['Натурализм','Линогравюра','Ботаническая живопись'],
  'history':['Романтизм','Графика тушью','Темпера'],
  'philosophy':['Символизм','Метафизическая живопись','Абстракционизм'],
  'economy':['Геометрическая абстракция','Супрематизм','Коллаж'],
@@ -22,17 +22,17 @@ STYLES={
  'culture':['Ар-нуво','Коллаж','Масло']}
 THEMES={
  'yoga':r'йог|подвижност|растяж|yoga|mobility',
- 'sport':r'велосип|бег|кардио|спорт|плаван|cycling|athlet|sport',
+ 'sport':r'вело|велосип|(?<![а-яё])бег(?:[ауеом]|ун|ов)?|кардио|спорт|плаван|cycling|athlet|sport',
  'family':r'реб[её]н|дет[иес]|семь|родител|супруж|parent|child|family',
  'moscow':r'москв|подмосков|усадьб|moscow',
  'architecture':r'архитект|интерьер|здани|architect|interior',
  'nature':r'птиц|природ|животн|растен|лес|болот|эколог|nature|bird|wildlife',
- 'health':r'медицин|здоров|сон|сна|диагност|болезн|лечени|мозг|health|medical|sleep',
+ 'health':r'психолог|благополучи|медицин|здоров|сон|сна|диагност|болезн|лечени|мозг|health|medical|sleep',
  'philosophy':r'философ|богослов|христиан|philosoph|theolog',
  'history':r'истори|археолог|древн|historic|archaeolog',
  'economy':r'эконом|предприним|бизнес|банкрот|econom|business',
  'technology':r'технолог|инженер|производ|имплантат|дрон|robot|technolog|engineer',
- 'culture':r'музе|искусств|культур|худож|museum|culture|art',
+ 'culture':r'музе|искусств|культур|худож|авангард|галере|коллекционер|museum|culture|art',
  'science':r'наук|исследован|уч[её]н|математ|science|research'}
 PALETTES=['приглушённые охра, кремовый и зелёный','монохромная графика и тёплая бумага','индиго, серебристый и мягкий коралловый','пыльная роза, оливковый и слоновая кость','терракота, угольный и бледно-голубой']
 COMPOSITIONS=['асимметричная композиция с отрицательным пространством','широкий план с небольшим центральным акцентом','крупный фрагмент и выразительная фактура','ритм диагоналей и несколько масштабов','многослойная спокойная композиция']
@@ -66,9 +66,8 @@ def prompt(item):
     return 'Представь сюжет этой статьи в виде самостоятельного произведения изобразительного искусства. Передай центральную идею выразительной визуальной метафорой, не документальной фотографией. Жанр: '+item['genre']+'. Палитра: '+item['palette']+'. '+item['composition']+'. Соотношение сторон '+item['ratio']+'. Не добавляй надписей, букв, заголовков, водяных знаков и логотипов. Не выдумывай события, устройства или факты, противоречащие описанию; не изображай реальных людей и медицинские результаты как документальное свидетельство. '+json.dumps(item['descriptor'],ensure_ascii=False)
 
 def provider_status():
-    if CONFIG['provider']=='disabled' or not CONFIG.get('model'):return 'IMAGE_PROVIDER_NOT_CONFIGURED'
-    if CONFIG['provider']!='gemini' or CONFIG.get('free_tier_verified') is not True:return 'IMAGE_FREE_TIER_NOT_VERIFIED'
-    return 'READY'
+    from scripts import cloudflare44
+    return cloudflare44.status(CONFIG)
 
 def encode_image(data):
     from PIL import Image
@@ -84,27 +83,8 @@ def encode_image(data):
         return output.getvalue(),image.width,image.height
 
 def generate(item,budget):
-    """Disabled until a specific free image model is independently confirmed."""
-    if provider_status()!='READY':raise RuntimeError(provider_status())
-    if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('GITHUB_REF_NAME')!='main':raise RuntimeError('IMAGE_PROTECTED_ACTIONS_REQUIRED')
-    from urllib.request import Request,urlopen
-    from urllib.error import HTTPError
-    model=CONFIG['model']
-    if not re.fullmatch(r'[a-zA-Z0-9.-]+',model):raise RuntimeError('IMAGE_MODEL_INVALID')
-    budget.reserve(model)
-    request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',
-        data=json.dumps({'contents':[{'parts':[{'text':prompt(item)}]}],'generationConfig':{'responseModalities':['IMAGE']}}).encode(),
-        headers={'Content-Type':'application/json','x-goog-api-key':os.environ['GEMINI_API_KEY']},method='POST')
-    try:
-        with urlopen(request,timeout=60) as response:data=json.loads(response.read(CONFIG['max_image_bytes']*2))
-    except HTTPError as exc:
-        if exc.code in (429,503):budget.defer(model,1800)
-        raise RuntimeError('IMAGE_HTTP_'+str(exc.code)) from None
-    for candidate in data.get('candidates',[]):
-        for part in candidate.get('content',{}).get('parts',[]):
-            inline=part.get('inlineData',{})
-            if inline.get('mimeType') in ('image/png','image/jpeg','image/webp'):return base64.b64decode(inline['data'],validate=True)
-    raise RuntimeError('IMAGE_RESPONSE_MISSING')
+    from scripts import cloudflare44
+    return cloudflare44.generate(item,budget,CONFIG)
 
 def final_text(article):
     return {key:article.get(key,[] if key in ('blocks','activities') else '') for key in ('title','teaser','category','kind','mode','blocks','activities')}
@@ -132,24 +112,25 @@ def approve(state):
     state['audit_passed']=True
     return saved['approval']
 
-def article_plans(state):
+def article_plans(state,rows=None):
     """All final articles, independent of the 8–12 front-page selection."""
-    rows=approved_rows(state);genres=Counter();result=[]
+    rows=approved_rows(state) if rows is None else rows;genres=Counter();result=[]
     for record in rows:
         article=record['article'];body=' '.join(b.get('text','') for b in article.get('blocks',[]))
         activity=' '.join(a.get('title','')+' '+a.get('benefit','') for a in article.get('activities',[]))
         sentences=[s.strip() for s in re.split(r'(?<=[.!?])\s+',body+' '+activity) if s.strip()]
-        subject=theme({'title':article['title'],'teaser':article.get('teaser','')+' '+body[:2500]})
+        subject=theme(article)
         genre=min(STYLES[subject],key=lambda value:(genres[value],STYLES[subject].index(value)))
         i=len(result);text_hash=p.digest(final_text(article))
         basis={'date':state['date'],'article_id':record['id'],'text_hash':text_hash,'prompt_version':CONFIG['prompt_version']}
         key=p.digest(basis)
-        previous=next((row for row in state.get('art44',{}).get('plan',[]) if row.get('key')==key),None)
+        previous=next((row for row in (state.get('art44',{}).get('plan') or list(cached(p.ROOT,state['date']).values())) if row.get('key')==key),None)
         item=dict(basis,key=key,protocol=2,genre=genre,ratio=RATIOS[i%len(RATIOS)],palette=PALETTES[i%len(PALETTES)],composition=COMPOSITIONS[i%len(COMPOSITIONS)],
             descriptor={'title':article['title'],'summary':article.get('teaser',''),'idea':sentences[0] if sentences else article['title'],
                 'full_text_summary':' '.join(sentences[:4]+sentences[-2:])[:4000], 'key_facts':sentences[:3]+sentences[-2:]})
         if previous:
-            for key_name in ('genre','ratio','palette','composition'):item[key_name]=previous[key_name]
+            for key_name in ('genre','ratio','palette','composition'):
+                if key_name in previous:item[key_name]=previous[key_name]
         item['description_hash']=p.digest(item['descriptor'])
         item['prompt']=prompt(item);result.append(item);genres[item['genre']]+=1
     return result
@@ -172,22 +153,34 @@ def prepare(state,persist=lambda:None,allow_request=True):
     saved['provider_status']='IMAGE_PROVIDER_FORBIDDEN' if saved.get('blocked_model')==CONFIG.get('model') and saved.get('blocked_model') else provider_status()
     if not approval_valid(state):
         saved['code']='ART_NOT_EDITORIAL_APPROVED';persist();return art_report(state)
-    items=article_plans(state);saved['plan']=items;state['assembly_status44']='ART_GENERATION';persist()
+    return prepare_items(state,article_plans(state),persist,allow_request)
+
+def prepare_items(state,items,persist=lambda:None,allow_request=True):
+    saved=state.setdefault('art44',{'objects':{},'history':[]})
+    saved.setdefault('objects',{});saved.setdefault('history',[])
+    saved['provider_status']=provider_status()
+    saved['plan']=items;state['assembly_status44']='ART_GENERATION';persist()
     from scripts import news
     budget=news.runtime.ACTIVE_BUDGET
     # One sequential batch, bounded only by the existing request/time budgets.
     for item in items:
+        public=cached(p.ROOT,state['date']).get(item['key'])
+        if public and valid_image(p.ROOT,state['date'],item['key'],public) and not object_valid(saved['objects'].get(item['key'],{})):
+            saved['objects'][item['key']]={**public,'webp':base64.b64encode((p.ROOT/public['path']).read_bytes()).decode(),'status':'READY'}
+            persist()
         if object_valid(saved['objects'].get(item['key'],{})):continue
         if item['key'] in saved['objects']:
             saved.setdefault('invalid_objects',{})[item['key']]=saved['objects'].pop(item['key'])
             persist()
-        if not allow_request or saved['provider_status']!='READY' or not budget or not budget.can_request():break
-        if sum(h.get('key')==item['key'] for h in saved['history'])>=3:continue
+        if not allow_request or saved['provider_status']!='READY' or not budget or (budget.remaining_seconds()<90 if CONFIG.get('provider')=='cloudflare_workers_ai' else not budget.can_request()):break
+        if sum(h.get('key')==item['key'] for h in saved['history'])>=CONFIG.get('max_retries_per_article',2):continue
         saved['current_key']=item['key'];persist()
         try:
-            before=budget.used
+            before=budget.ledger.get('cloudflare_ai',{}).get('requests',0) if CONFIG.get('provider')=='cloudflare_workers_ai' else budget.used
             try:raw=generate(item,budget)
-            finally:saved['requests']=saved.get('requests',0)+(budget.used-before)
+            finally:
+                after=budget.ledger.get('cloudflare_ai',{}).get('requests',0) if CONFIG.get('provider')=='cloudflare_workers_ai' else budget.used
+                saved['requests']=saved.get('requests',0)+max(0,after-before)
             data,width,height=encode_image(raw);digest=hashlib.sha256(data).hexdigest()
             if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
             saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
@@ -198,6 +191,8 @@ def prepare(state,persist=lambda:None,allow_request=True):
             if isinstance(exc,news.runtime.GenerationPaused):
                 saved['code']='IMAGE_QUOTA_OR_COOLDOWN';persist();break
             code=str(exc) if re.fullmatch(r'[A-Z_0-9]+',str(exc)) else type(exc).__name__
+            if code.startswith('CF_') and code!='CF_IMAGE_INVALID':
+                saved['provider_status']=code;persist();break
             saved['history'].append({'key':item['key'],'code':code})
             if code in ('IMAGE_HTTP_401','IMAGE_HTTP_403'):
                 saved['blocked_model']=CONFIG.get('model');saved['provider_status']='IMAGE_PROVIDER_FORBIDDEN'
@@ -216,9 +211,10 @@ def finalize(state,root,persist,clock,release,preview=False,allow_request=True,a
     budget=__import__('scripts.news',fromlist=['runtime']).runtime.ACTIVE_BUDGET
     import time
     stage_deadline=budget.deadline if budget else None
-    if budget:
+    historical=publication43.historical_recovery(state['date'])
+    if budget and not historical:
         budget.deadline=min(budget.deadline,time.monotonic()+max(0,(release-clock()).total_seconds()-120))
-    prepare(state,persist,allow_request=allow_request and not preview and clock()<release)
+    prepare(state,persist,allow_request=allow_request and not preview and (clock()<release or historical))
     report=art_report(state)
     state['art44']['emergency_text']=not report['complete']
     state['assembly_status44']='READY_FOR_PUBLICATION' if report['complete'] or provider_status()!='READY' or clock()>=release else 'ART_GENERATION'
@@ -234,6 +230,23 @@ def finalize(state,root,persist,clock,release,preview=False,allow_request=True,a
     state['assembly_status44']='READY_FOR_PUBLICATION'
     if not pipeline.reserve_delivery(state,clock()):persist();return False
     publication43.build(state,root);pipeline.status(state,'PUBLISHING','commit_and_deploy');persist();return True
+
+
+def published_records(root,date,allow_missing_art=False):
+    from scripts import publication43,source_dom41
+    data=publication43.validate(root,date,allow_missing_art=allow_missing_art);rows=[]
+    for slug in data['pages']:
+        page=(Path(root)/'issues'/date/'articles'/slug/'index.html').read_text()
+        doc=source_dom41.Document();doc.feed(page);nodes=list(doc.root.all())
+        title=next(n.text() for n in nodes if n.tag=='h1')
+        teaser=next((n.text() for n in nodes if 'dek' in n.attrs.get('class','').split()),'')
+        body=next(n for n in nodes if 'article-body' in n.attrs.get('class','').split())
+        blocks,_=source_dom41.blocks([body])
+        meta=next((n.text() for n in nodes if n.tag=='div' and n.attrs.get('class')=='meta'),'Общество')
+        article={'title':title,'teaser':teaser,'category':meta.split(' · ')[0],'kind':meta.split(' · ')[-1],
+            'mode':'','blocks':blocks,'activities':[],'slug':slug}
+        rows.append({'id':'published:'+date+'/'+slug,'article':article})
+    return data,rows
 
 
 def cached(root,date):
@@ -288,9 +301,11 @@ def enhance(page,date,root=None):
     if 'class="art-front"' in page:return page
     return re.sub(r'<section class="front-grid">.*?</section>',lambda _:render(articles,date,root),page,count=1,flags=re.S)
 
-def materialize(state,articles,root):
+def materialize(state,articles,root,items=None):
     date=state['date'];folder=Path(root)/'assets/illustrations'/date;folder.mkdir(parents=True,exist_ok=True)
-    images={key:row for key,row in cached(root,date).items() if valid_image(root,date,key,row)};saved=state.get('art44',{});items=article_plans(state) if approval_valid(state) else []
+    images={key:row for key,row in cached(root,date).items() if valid_image(root,date,key,row)};saved=state.get('art44',{});items=(article_plans(state) if approval_valid(state) else []) if items is None else items
+    active={item['key'] for item in items}
+    images={key:row for key,row in images.items() if key in active}
     for item,article in zip(items,articles):item['article_slug']=article['slug']
     for item in items:
         row=saved.get('objects',{}).get(item['key'])
@@ -312,26 +327,8 @@ def materialize(state,articles,root):
     return images
 
 def diagnose(probe=False):
-    result={'status':provider_status(),'image_model':CONFIG.get('model') or None,'free_image_tier_verified':CONFIG['free_tier_verified'],
-        'image_api_requests':0,'publication_blocking':False,'pricing_url':'https://aistudio.google.com/docs/pricing',
-        'pricing_checked':'2026-11-19','image_generation_access':'UNVERIFIED','billing_access':'NOT_AVAILABLE',
-        'free_image_tier':'NOT_AVAILABLE_FOR_DOCUMENTED_GEMINI_IMAGE_MODELS','next_action':'authorized_image_api_required'}
-    if probe:
-        if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or os.getenv('GITHUB_REF_NAME')!='main':raise RuntimeError('IMAGE_PROTECTED_ACTIONS_REQUIRED')
-        from urllib.request import Request,urlopen
-        from urllib.error import HTTPError
-        result['models']=[]
-        for model in ('gemini-3.1-flash-lite-image','gemini-3.1-flash-image','gemini-2.5-flash-image'):
-            row={'model':model,'generation_smoke':'NOT_RUN_PAID_ACCESS_NOT_AUTHORIZED'}
-            try:
-                request=Request('https://generativelanguage.googleapis.com/v1beta/models/'+model,headers={'x-goog-api-key':os.environ['GEMINI_API_KEY']})
-                with urlopen(request,timeout=15) as response:data=json.loads(response.read(100000))
-                row.update(metadata='AVAILABLE',methods=data.get('supportedGenerationMethods',[]))
-            except HTTPError as exc:row['metadata']='HTTP_'+str(exc.code)
-            except Exception as exc:row['metadata']=type(exc).__name__
-            result['models'].append(row)
-    print('[mosaic44-capability] '+json.dumps(result),flush=True)
-    return result
+    from scripts import cloudflare44
+    return cloudflare44.diagnose(CONFIG,probe)
 
 if __name__=='__main__':
     import argparse

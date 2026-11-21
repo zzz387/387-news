@@ -21,7 +21,9 @@ def main():
     overview=(p.ROOT/'issues'/date/'index.html').read_text()
     if any('data-policy-version="'+version+'"' in overview for version in ('4.3','4.4')):
         with tempfile.TemporaryDirectory(prefix='387-final43-browser-') as temp:
-            report=browser41.check(p.ROOT,date,Path(temp),expected_count=metadata['article_count'])
+            current=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',(p.ROOT/'index.html').read_text())
+            overview_path='/' if current and current[1]==date else '/issues/'+date+'/'
+            report=browser41.check(p.ROOT,date,Path(temp),expected_count=metadata['article_count'],overview_path=overview_path)
         print('[release-browser] '+json.dumps(report));return
     if 'data-policy-version="4.1"' not in overview:
         print('[release-browser] immutable legacy delivery; applicable historical validation passed');return
