@@ -55,6 +55,7 @@ class Policy44Tests(unittest.TestCase):
             self.assertEqual(cf.generate(item,budget,art.CONFIG),raw)
             posts=[(path,data) for path,data in seen if '/ai/run/' in path]
             self.assertEqual(len(posts),1);self.assertEqual(set(posts[0][1]),{'prompt','steps'});self.assertLessEqual(len(posts[0][1]['prompt']),2048);self.assertEqual(posts[0][1]['prompt'],item['prompt'])
+            self.assertIn('$account:string!',next(data['query'] for path,data in seen if path=='/graphql'))
             self.assertEqual(ledger['requests'],17);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
             with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
             self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
