@@ -59,7 +59,7 @@ class RolloutTests(unittest.TestCase):
         self.assertGreaterEqual(len(config),12)
         self.assertTrue(set(p.REQUIRED)<={r['category_hint'] for r in config})
         for item in config:
-            self.assertTrue(set(item)<= {'url','category_hint','verification_urls'})
+            self.assertTrue(set(item)<= {'url','category_hint','verification_urls','title','summary','priority_ids'})
             self.assertTrue(item['url'].startswith('https://'))
             if item['category_hint'] in ('Семья','Здоровье и движение'):self.assertTrue(item['verification_urls'])
 

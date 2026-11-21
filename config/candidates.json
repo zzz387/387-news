@@ -9,7 +9,9 @@
         1,
         2
       ],
-      "verification_urls": []
+      "verification_urls": [
+        "https://developingchild.harvard.edu/resources/handouts-tools/brainbuildingthroughplay/"
+      ]
     },
     {
       "url": "https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/how-to-read-food-labels/",
@@ -19,7 +21,9 @@
       "priority_ids": [
         12
       ],
-      "verification_urls": []
+      "verification_urls": [
+        "https://www.who.int/news-room/fact-sheets/detail/healthy-diet"
+      ]
     },
     {
       "url": "https://www.unicef.org/parenting/child-development/baby-tips",
