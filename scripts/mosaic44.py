@@ -63,6 +63,9 @@ def plan(articles,date,existing=()):
     return selected
 
 def prompt(item):
+    if CONFIG.get('provider')=='cloudflare_workers_ai':
+        from scripts import cloudflare44
+        return cloudflare44.prompt(item)
     return 'Представь сюжет этой статьи в виде самостоятельного произведения изобразительного искусства. Передай центральную идею выразительной визуальной метафорой, не документальной фотографией. Жанр: '+item['genre']+'. Палитра: '+item['palette']+'. '+item['composition']+'. Соотношение сторон '+item['ratio']+'. Не добавляй надписей, букв, заголовков, водяных знаков и логотипов. Не выдумывай события, устройства или факты, противоречащие описанию; не изображай реальных людей и медицинские результаты как документальное свидетельство. '+json.dumps(item['descriptor'],ensure_ascii=False)
 
 def provider_status():
