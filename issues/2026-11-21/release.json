@@ -1,0 +1,228 @@
+{
+  "date": "2026-11-21",
+  "number": 27,
+  "policy_version": "4.4",
+  "article_count": 13,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "7af0bd7c6a848989e520fbe68c2e8757ac9715db80bede6b75ca32945804b815",
+      "markdown": "194cae3a8996864dc8e9705bbc3821c954f10eb74fe51267c4e4d24d86d9aae2"
+    },
+    "feature-02": {
+      "html": "6c27392f44b3cf6c5b42e28bd0dfe47105b26d2f6e0cbe7903a15772c00cd523",
+      "markdown": "67b1145653d161b7f4ec8fc1b82b978569d7da5b88bbe6621c3d43a0651ec77c"
+    },
+    "feature-03": {
+      "html": "99da8ab6aa1dcf9a8182b2e39bae8c3ed1b795bdb3c2408232e84912b7bc9f16",
+      "markdown": "b44e221c4ba3070a3ae3a34d39bbd608e4d5fec0721b2332e7de924be8594517"
+    },
+    "feature-04": {
+      "html": "b595d94b19acef061cba060fbad30ef48958d5d3a09af2e7bae734c3a51a2a72",
+      "markdown": "ae929b8bf643a92411dff2f2afc4c55a4fd5f3b62a956e520b971d56ac112144"
+    },
+    "feature-05": {
+      "html": "5418509a2adcbe4e052da5c484e7f5dc9a844b20b0fd6909f8b3c94da9ec7013",
+      "markdown": "cdc7641f26add2a753af37c3eb9a944abed5d7c9ee8e230d28541caf70f03d88"
+    },
+    "feature-06": {
+      "html": "9b649a9c155b2e3108cd4af8fc39a1399c5b35202446f8f37e9060253abe6b62",
+      "markdown": "dd99111aad2f67942c301f18ec27867b8b6ddb2eabc16b7fbf1d3e9336d1cea0"
+    },
+    "feature-07": {
+      "html": "75bc73ea11aab462dca2381007f7ed1da3b7c16e74b4e6b73df8e774e1d3cf48",
+      "markdown": "c6cc285fd68b6734fa252dc573fc65895d59c562a1ce8afbcd8ad7b3d76bc9aa"
+    },
+    "feature-08": {
+      "html": "d5c26695b049fd65d85099c45bb73f8011379e245606b5ec8226d2469c9ceb00",
+      "markdown": "2a20b4c35f2b5021545fa06288ca573e2ac9772d026fe0b2681b13ca360b5f2c"
+    },
+    "feature-09": {
+      "html": "3836e18e35c3312349ed147e0a7d47c7ac2bdc1a035a6e1215cff4861fe6dff2",
+      "markdown": "8c67de23208df83f26a60cf0a67369acee5adee9dfbceb034bd05d5f6a0b3043"
+    },
+    "feature-10": {
+      "html": "b6fb914c4b44421f90c9cb6133073eeab8a89a107f0ba095f95c6ef8a327e4b3",
+      "markdown": "7ed89e128f0645b7d0ba0ab6d5bff4ac517c3b4815d0241ded37fb91df4073a2"
+    },
+    "feature-11": {
+      "html": "1ddee5adcfea8a7e0aa85bdb791b603d736631f3432f190dc921b918cab1f38c",
+      "markdown": "da7ad7243761df4b25f1792851db4280af1555ae4c050e59507ed217bf0f2a7d"
+    },
+    "feature-12": {
+      "html": "7213f2496a23d58cb783b56c3a27b89010d8732f8429c9d4d22017bace90b35b",
+      "markdown": "106702708bceac129e2b6aee05842d611bb980467716394a0361b7182acd9d60"
+    },
+    "feature-13": {
+      "html": "95fee0bb31531bf8516782735097efca69b3f8a1af5e3839397132375b8da2e7",
+      "markdown": "97774b08bb21bfffee5c27777cc580025063858a46e710984242fa83dd5cd311"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-21T06:18:46.014684+03:00",
+  "release_not_before": "2026-11-21T06:00:00+03:00",
+  "brief_policy_revision": 2,
+  "mosaic_revision": 2,
+  "illustrations": [],
+  "art44": {
+    "status": "INCOMPLETE",
+    "required": 13,
+    "ready": 0,
+    "missing": 13,
+    "emergency_text": true,
+    "provider_status": "IMAGE_PROVIDER_NOT_CONFIGURED"
+  },
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Изменение состава энциклопедий",
+      "text": "Британская энциклопедия прекратила выпуск печатных версий в 2012 году, перейдя исключительно в цифровой формат. Это позволило ресурсу постоянно обновлять статьи, в отличие от массивных бумажных томов прошлого.",
+      "source": {
+        "url": "https://physicsworld.com/a/what-can-old-encyclopedias-tell-us-about-the-development-of-scientific-ideas/",
+        "title": "What can old encyclopedias tell us about the development of scientific ideas?",
+        "publisher": "Physics World",
+        "language": "en",
+        "published": "2026-11-18T14:20:54+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Ирландские поверья о людях-тюленях",
+      "text": "В ирландском фольклоре существуют легенды о селках — существах, способных превращаться из тюленей в людей. Многие жители прибрежных регионов Ирландии исторически верили в наличие у себя «тюленьих» предков, что иногда приводило к табу на охоту на этих животных.",
+      "source": {
+        "url": "https://aeon.co/essays/do-you-have-a-selkie-or-a-seal-in-the-family",
+        "title": "Do you have a selkie or a seal in the family?",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-20T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Экранизация классической повести Диккенса",
+      "text": "В новом художественном фильме режиссер переосмысляет историю о скупом брокере Скрудже. Картина предлагает мрачную и глубокую атмосферу духовного преображения.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/ebenezer-movie-review/",
+        "title": "Review: ‘Ebenezer’ - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-18T11:00:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Геологическое прошлое кратера Езеро",
+      "text": "Марсоход Perseverance обнаружил в кратере Езеро следы древних потоков лавы с низкой вязкостью. Исследователи полагают, что эти горные породы сформировались почти 4 миллиарда лет назад в условиях, схожих с земными лавовыми озерами.",
+      "source": {
+        "url": "https://eos.org/articles/low-viscosity-lavas-reveal-a-key-to-marss-past",
+        "title": "Low-Viscosity Lavas Reveal a Key to Mars’s Past - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-18T13:36:16+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Успех на высокогорном трейле",
+      "text": "Российская спортсменка Елена Меньшикова завоевала серебряную медаль на сложнейшем высокогорном трейле Ultra Tour Mount Siguniang в китайской провинции Сычуань.",
+      "source": {
+        "url": "https://marathonec.ru/elena-menshikova-vtoraya-na-utms-v-kitae-2026/",
+        "title": "Выше 4000 м: Елена Меньшикова взяла серебро на Ultra Tour Mount Siguniang в Китае",
+        "publisher": "\"Марафонец\"",
+        "language": "ru",
+        "published": "2026-11-17T15:37:02+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Изучение поведения мышей-зрителей",
+      "text": "Ученые выяснили, что самцы мышей, наблюдающие за поединками сородичей, лучше защищаются от сильных соперников. В экспериментах грызуны проходили многодневную подготовку, а затем участвовали в испытаниях на арене.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/watching-mouse-fight-club-teaches-the-critters-how-to-fight/",
+        "title": "Mouse fight club might explain why we like to watch violent things",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-19T14:04:38+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Сертификация открытого железа",
+      "text": "Ассоциация открытого аппаратного обеспечения ведет базу данных свободных проектов, где насчитывается более трех тысяч сертификаций.",
+      "source": {
+        "url": "https://makezine.com/article/technology/open-source/open-source-hardware-certifications-for-october-2026/",
+        "title": "Open Source Hardware Certifications for October 2026 ",
+        "publisher": "Make: DIY Projects and Ideas for Makers",
+        "language": "en",
+        "published": "2026-11-15T23:39:51+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Квантовые процессоры на кремнии",
+      "text": "Австралийская компания Silicon Quantum Computing, основанная в 2017 году, специализируется на создании твердотельных квантовых процессоров. В их основе используются отдельные атомы фосфора в кремнии в качестве кубитов.",
+      "source": {
+        "url": "https://physicsworld.com/a/taking-an-atomic-approach-to-silicon-quantum-computing/",
+        "title": "Taking an atomic approach to silicon quantum computing",
+        "publisher": "Physics World",
+        "language": "en",
+        "published": "2026-11-19T14:00:37+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Модернизированный надувной робот",
+      "text": "Инженеры разработали новую версию мягкого робота с шестью ногами без использования сложной электроники. Устройство стало значительно быстрее за счет повышенного давления и технических решений, заимствованных у паровых машин.",
+      "source": {
+        "url": "https://makezine.com/article/technology/robotics/soft-robot-is-faster-stronger-than-before/",
+        "title": "Soft Robot is Faster, Stronger than Before",
+        "publisher": "Make: DIY Projects and Ideas for Makers",
+        "language": "en",
+        "published": "2026-11-19T23:30:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Критика фильма «Дьяволы» в 1971 году",
+      "text": "В 1971 году кинематографические критики резко осудили фильм Кена Рассела «Дьяволы», назвав его провокационным зрелищем для садистов и извращенцев.",
+      "source": {
+        "url": "https://firstthings.com/move-fast-and-break-everything/",
+        "title": "Move Fast and Break Everything",
+        "publisher": "First Things",
+        "language": "en",
+        "published": "2026-11-18T20:03:18+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Скоростные характеристики орлов",
+      "text": "В семействе орлиных насчитывается около 68 видов птиц, обитающих в разных частях света. Беркут признан самым быстрым среди них и способен развивать впечатляющую скорость при пикировании на добычу.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/brutal-eagle-photos",
+        "title": "10 jaw-dropping powerful eagle moments captured in photos and film that reveal the brutal hunting behaviour of this majestic bird of prey",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-19T20:10:02+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Универсальный аксессуар для велопрогулок",
+      "text": "Многие велосипедисты используют простой эластичный шейный платок в качестве универсального и недорогого средства защиты от холода и ветра в широком диапазоне температур.",
+      "source": {
+        "url": "https://www.bicycling.com/bikes-gear/a74478630/cycling-neck-warmer-winter-rides/",
+        "title": "The One Piece of Cold-Weather Gear I Never Leave at Home",
+        "publisher": "Bicycling",
+        "language": "en",
+        "published": "2026-11-19T16:40:42Z"
+      }
+    }
+  ],
+  "light_count": 12,
+  "homepage_hash": "4cc0c2b161a83d5bd7f14cbf300a3bf7e153c71e740c837a1448df9988d4350b",
+  "overview_hash": "c3380d77428add87f023c7ff9b9fc8679d54f91e8f32931416d0abc7c8c16474",
+  "markdown_hash": "a98a4bd693266a535fb8499920d8a78a5df227f86ef1cbe8c6c8c1dafb90c275"
+}
