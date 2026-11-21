@@ -1,6 +1,27 @@
 {
   "candidates": [
     {
+      "url": "https://www.unicef.org/parenting/child-care/what-is-free-play",
+      "title": "What is free play and why should you encourage it at home?",
+      "summary": "UNICEF Parenting explains how children choose their own play and how parents can support it safely.",
+      "category_hint": "Семья",
+      "priority_ids": [
+        1,
+        2
+      ],
+      "verification_urls": []
+    },
+    {
+      "url": "https://www.nhs.uk/live-well/eat-well/food-guidelines-and-food-labels/how-to-read-food-labels/",
+      "title": "Food labels",
+      "summary": "UK NHS nutrition guidance: reading food labels, comparing portions and using nutrition information for healthy eating. UK labelling rules are described as UK guidance.",
+      "category_hint": "Здоровье и движение",
+      "priority_ids": [
+        12
+      ],
+      "verification_urls": []
+    },
+    {
       "url": "https://www.unicef.org/parenting/child-development/baby-tips",
       "category_hint": "Семья",
       "verification_urls": [
