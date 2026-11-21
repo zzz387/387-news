@@ -257,6 +257,8 @@ def report(state,ledger,now=None):
         inventory['editorial_standard']=policy44.standard(state)
         from scripts import mosaic44
         inventory['artwork']=mosaic44.art_report(state)
+        inventory['historical_recovery_runs']=state.get('historical_recovery_runs',0)
+        inventory['cloudflare_art']={k:ledger.get('cloudflare_ai',{}).get(k) for k in ('day','requests','reserved_neurons','estimated_neurons','observed_account_neurons','cooldown_until')}
     if inventory and not inventory['light_preparation']['code'] and inventory['light_preparation']['http_requests']>=2 and not inventory['light_news_ready']:
         inventory['light_preparation']['code']='LIGHT_BATCH_BUDGET_USED'
     return dict(**inventory,date=state['date'],policy_version=state.get('policy_version','3.2'),

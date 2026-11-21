@@ -41,7 +41,7 @@ def metadata(root,date):
     return data
 
 
-def validate(root,date):
+def validate(root,date,allow_missing_art=False):
     root=Path(root);data=metadata(root,date);issue=root/'issues'/date
     count=data.get('article_count');kind=data.get('kind')
     if type(count) is not int or count<0:raise p.Blocked('PUBLIC_COUNT_INVALID')
@@ -63,7 +63,8 @@ def validate(root,date):
     if data.get('mosaic_revision'):
         from scripts import mosaic44
         for image in data.get('illustrations',[]):
-            if not mosaic44.valid_image(root,date,image['key'],image):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
+            if not re.fullmatch(r'assets/illustrations/'+re.escape(date)+r'/[a-f0-9]{64}\.webp',image.get('path','')):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
+            if not allow_missing_art and not mosaic44.valid_image(root,date,image['key'],image):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
         if data['mosaic_revision']>=2:
             art=data['art44'];images=data['illustrations']
             if art['required']!=count or art['ready']!=len(images) or art['missing']!=count-len(images) or len({r['sha256'] for r in images})!=len(images):raise p.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
@@ -84,9 +85,22 @@ def validate(root,date):
     if f'/issues/{date}/' not in (root/'archive/index.html').read_text():raise p.Blocked('ARCHIVE_LINK_MISSING')
     previous=news.ROOT
     try:
-        news.ROOT=root;news.validate_local_links(pages+[issue/'index.html',root/'archive/index.html'])
+        news.ROOT=root
+        if allow_missing_art:
+            art_paths={'/'+r['path'] for r in data.get('illustrations',[])}
+            for file in pages+[issue/'index.html',root/'archive/index.html']:
+                for uri in re.findall(r'(?:href|src)="(/[^"#?]+)',file.read_text()):
+                    dest=root/uri.lstrip('/');dest=dest/'index.html' if uri.endswith('/') else dest
+                    if uri not in art_paths and not dest.is_file():raise RuntimeError('Broken local link')
+        else:news.validate_local_links(pages+[issue/'index.html',root/'archive/index.html'])
     finally:news.ROOT=previous
     return data
+
+
+def historical_recovery(date):
+    import os
+    return (date=='2026-11-20' and os.getenv('NEWS_HISTORICAL_RECOVERY_DATE')==date and os.getenv('GITHUB_ACTIONS')=='true'
+        and os.getenv('GITHUB_REPOSITORY')=='zzz387/387-news' and os.getenv('GITHUB_REF_NAME')=='main')
 
 
 def build(state,root,reserve=(),preview=False):
@@ -104,7 +118,7 @@ def build(state,root,reserve=(),preview=False):
     for i,r in enumerate(records,1):
         a=public_article(r);a['slug']=news.slugify(a['title'],i);articles.append(a)
     if not articles and not reserve:raise p.Blocked('NO_SAFE_RESERVE')
-    if (root/'issues').exists() and any(d.name>date for d in (root/'issues').iterdir() if re.fullmatch(r'\d{4}-\d{2}-\d{2}',d.name)):
+    if not historical_recovery(date) and (root/'issues').exists() and any(d.name>date for d in (root/'issues').iterdir() if re.fullmatch(r'\d{4}-\d{2}-\d{2}',d.name)):
         raise p.Blocked('BACKDATED_HOME_REPLACEMENT_FORBIDDEN')
     with tempfile.TemporaryDirectory(prefix='387-daily43-') as directory:
         working=Path(directory)
@@ -112,12 +126,14 @@ def build(state,root,reserve=(),preview=False):
             if (root/name).is_dir():shutil.copytree(root/name,working/name)
         (working/'archive').mkdir(exist_ok=True);(working/'issues').mkdir(exist_ok=True)
         previous=news.ROOT;news.ROOT=working
+        preserved_home=(root/'index.html').read_bytes() if historical_recovery(date) and (root/'index.html').is_file() else None
         try:
             no=news.get_next_number();issue=working/'issues'/date;issue.mkdir()
             data={'date':date,'number':no,'policy_version':version,'article_count':len(articles),
                   'kind':'articles' if articles else 'source_digest','minimum_articles':e.CONFIG['minimum_articles'],
                   'standard_issue':len(articles)>=e.CONFIG['minimum_articles'],'preview':preview,'pages':{},'source_links_version':1,'prepared_at':datetime.now(p.TZ).isoformat(),'release_not_before':date+'T06:00:00+03:00'}
             if version=='4.4':data['brief_policy_revision']=state.get('brief_policy_revision',2)
+            if historical_recovery(date):data['recovered_at']=datetime.now(p.TZ).isoformat()
             if version=='4.4':
                 from scripts import mosaic44
                 if not preview and not mosaic44.approval_valid(state):mosaic44.approve(state)
@@ -126,12 +142,15 @@ def build(state,root,reserve=(),preview=False):
                 current={row['article_slug']:row for row in images.values() if row.get('protocol')==2}
                 for a in articles:a['artwork44']=current.get(a['slug'])
                 complete=len(current)==len(articles) and bool(articles)
-                data['art44']={'status':'COMPLETE' if complete else 'INCOMPLETE','required':len(articles),'ready':len(current),'missing':len(articles)-len(current),'emergency_text':not complete,'provider_status':mosaic44.provider_status()}
+                data['art44']={'status':'COMPLETE' if complete else 'ARTWORK_INCOMPLETE','required':len(articles),'ready':len(current),'missing':len(articles)-len(current),'emergency_text':not complete,'provider_status':mosaic44.provider_status()}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
                 file.write_text(reader_chrome(render.render_article(date,no,a,working,policy_version=version)))
                 md=file.with_name('article.md');md.write_text(render.markdown(a))
                 data['pages'][a['slug']]={'html':digest_bytes(file.read_bytes()),'markdown':digest_bytes(md.read_bytes())}
+            if version=='4.4':
+                items=mosaic44.article_plans(state) if mosaic44.approval_valid(state) else []
+                data['art44']['bindings']=[{**{k:item[k] for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol')},'article_slug':a['slug']} for item,a in zip(items,articles)]
             light=public_light(state)
             data['light_news']=light;data['light_count']=len(light)
             rows=[{k:r.get(k,'') for k in ('url','title','publisher','published','checked_at')} for r in reserve] if not articles else []
@@ -146,7 +165,9 @@ def build(state,root,reserve=(),preview=False):
             data.update(overview_hash=digest_bytes((issue/'index.html').read_bytes()),markdown_hash=digest_bytes((issue/'overview.md').read_bytes()))
             (issue/'release.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
             (working/'archive/index.html').write_text(reader_chrome(news.render_archive()).replace('Редакция 2.0','Редакция 4.3'))
-            (working/'sitemap.xml').write_text(news.sitemap());validate(working,date)
+            (working/'sitemap.xml').write_text(news.sitemap())
+            if preserved_home is not None:(working/'index.html').write_bytes(preserved_home)
+            validate(working,date)
         finally:news.ROOT=previous
         if not preview:
             (root/'issues').mkdir(exist_ok=True);(root/'archive').mkdir(exist_ok=True)
@@ -201,3 +222,76 @@ if __name__=='__main__':
     if os.getenv('GITHUB_OUTPUT'):
         with open(os.environ['GITHUB_OUTPUT'],'a') as out:out.write('ready='+str(changed).lower()+'\nissue_date='+str(date or '')+'\n')
     print('[home43] '+json.dumps({'changed':changed,'date':date,'archives_unchanged':True}))
+
+
+def without_art44(page):
+    page=re.sub(r'<figure class="article-art44">.*?</figure>','',page,flags=re.S)
+    return page.replace('<link rel="stylesheet" href="/assets/mosaic.css">','')
+
+
+def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
+    """Owner-authorized artwork-only transaction on one verified public issue."""
+    from scripts import mosaic44
+    root=Path(root)
+    allowed=date in ('2026-11-20','2026-11-21') or date>=mosaic44.CONFIG.get('first_automatic_issue','9999-12-31')
+    if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',date) or not allowed:raise p.Blocked('ART_BACKFILL_DATE_NOT_AUTHORIZED')
+    data,rows=mosaic44.published_records(root,date,allow_missing_art=True)
+    sub=parent.setdefault('art44_backfills',{}).setdefault(date,{'date':date,'art44':{'objects':{},'history':[]}})
+    items=mosaic44.article_plans(sub,rows)
+    bindings={r['article_slug']:r for r in data.get('art44',{}).get('bindings',data.get('illustrations',[]))}
+    for item,row in zip(items,rows):
+        prior=bindings.get(row['article']['slug'])
+        if prior:
+            basis={k:prior[k] for k in ('date','article_id','text_hash','prompt_version')}
+            if basis['date']!=date or p.digest(basis)!=prior['key']:raise p.Blocked('ART_PUBLIC_BINDING_INVALID')
+            for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
+    sub['assembly_status44']='EDITORIAL_APPROVED'
+    sub['art44']['approval']={'date':date,'manifest_hash':p.digest(data),'signature':p.digest([{'id':r['id'],'article':mosaic44.final_text(r['article'])} for r in rows])}
+    mosaic44.prepare_items(sub,items,persist,allow_request)
+    articles=[r['article'] for r in rows]
+    before={slug:(root/'issues'/date/'articles'/slug/'index.html').read_text() for slug in data['pages']}
+    # Work in a private temporary tree. Commit only after the complete issue validates.
+    with tempfile.TemporaryDirectory(prefix='387-art-backfill-') as temp:
+        work=Path(temp)
+        for name in ('assets','issues','archive'):shutil.copytree(root/name,work/name)
+        (work/'index.html').write_bytes((root/'index.html').read_bytes())
+        images=mosaic44.materialize(sub,articles,work,items)
+        bound={r.get('article_slug'):r for r in images.values() if r.get('protocol')==2}
+        if not bound:return False
+        updated=copy.deepcopy(data);updated['illustrations']=list(images.values());updated['mosaic_revision']=2
+        updated['art44']={'status':'COMPLETE' if len(bound)==len(rows) else 'ARTWORK_INCOMPLETE','required':len(rows),'ready':len(bound),'missing':len(rows)-len(bound),'emergency_text':len(bound)!=len(rows),'provider_status':mosaic44.provider_status()}
+        updated['art44']['bindings']=[{**{k:item[k] for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol')},'article_slug':a['slug']} for item,a in zip(items,articles)]
+        for slug,page in before.items():
+            art=bound.get(slug)
+            if not art:
+                changed=without_art44(page)
+                (work/'issues'/date/'articles'/slug/'index.html').write_text(changed)
+                updated['pages'][slug]['html']=digest_bytes(changed.encode())
+                continue
+            base=without_art44(page)
+            figure='<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+next(a['title'] for a in articles if a['slug']==slug),quote=True)+'" decoding="async"><figcaption>Художественная иллюстрация, созданная ИИ · '+escape(art['genre'])+'</figcaption></figure>'
+            changed=base.replace('</head>','<link rel="stylesheet" href="/assets/mosaic.css"></head>',1).replace('<div class="article-body">',figure+'<div class="article-body">',1)
+            if without_art44(changed)!=without_art44(page):raise p.Blocked('ART_BACKFILL_CONTENT_CHANGED')
+            file=work/'issues'/date/'articles'/slug/'index.html';file.write_text(changed)
+            updated['pages'][slug]['html']=digest_bytes(changed.encode())
+        overview=(root/'issues'/date/'index.html').read_text()
+        front=mosaic44.render(articles,date,work)
+        if 'class="art-front"' in overview:
+            overview=re.sub(r'<section class="art-front".*?</section>(?:<script src="/assets/mosaic.js" defer></script>)?',lambda _:front,overview,count=1,flags=re.S)
+        else:
+            overview=re.sub(r'<section class="front-grid">.*?</section>',lambda _:front,overview,count=1,flags=re.S)
+        if '/assets/mosaic.css' not in overview:overview=overview.replace('</head>','<link rel="stylesheet" href="/assets/mosaic.css"></head>',1)
+        (work/'issues'/date/'index.html').write_text(overview);updated['overview_hash']=digest_bytes(overview.encode())
+        projected=layout43.homepage(overview,date);updated['homepage_hash']=digest_bytes(projected.encode())
+        if 'data-issue-date="'+date+'"' in (root/'index.html').read_text():(work/'index.html').write_text(projected)
+        (work/'issues'/date/'release.json').write_text(json.dumps(updated,ensure_ascii=False,indent=2)+'\n')
+        validate(work,date)
+        changed=any((work/'issues'/date/f).read_bytes()!=(root/'issues'/date/f).read_bytes() for f in ('index.html','release.json'))
+        changed=changed or any((work/'issues'/date/'articles'/slug/'index.html').read_text()!=page for slug,page in before.items())
+        changed=changed or any(not (root/image['path']).is_file() or (root/image['path']).read_bytes()!=(work/image['path']).read_bytes() for image in images.values())
+        if changed:
+            shutil.copytree(work/'issues'/date,root/'issues'/date,dirs_exist_ok=True)
+            shutil.copytree(work/'assets/illustrations'/date,root/'assets/illustrations'/date,dirs_exist_ok=True)
+            (root/'index.html').write_bytes((work/'index.html').read_bytes())
+    print('[art-backfill44] '+json.dumps({'date':date,'images':len(bound),'articles':len(rows),'complete':len(bound)==len(rows),'changed':changed,'article_text_unchanged':True,'other_archives_unchanged':True}),flush=True)
+    return changed

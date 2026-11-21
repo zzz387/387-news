@@ -198,7 +198,8 @@ class LightAndLayoutTests(unittest.TestCase):
             self.assertNotIn('mast-top',text);self.assertNotIn('Каждый день есть что открыть',text);self.assertNotIn('front-intro',text)
             self.assertIn('visually-hidden',text);self.assertIn('Обзор номера</a>',text);self.assertIn('Ежедневная газета · Москва',text)
             self.assertEqual(before,{str(f.relative_to(target)):f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()})
-            with patch.object(site_checks,'fetch',side_effect=web(target)):self.assertEqual(site_checks.check_site(expected_date=date)['https'],'verified')
+            from scripts import mosaic44
+            with patch.object(site_checks,'fetch',side_effect=web(target)),patch.object(site_checks,'check_public_image',side_effect=lambda base,row:self.assertTrue(mosaic44.valid_image(target,date,row['key'],row))):self.assertEqual(site_checks.check_site(expected_date=date)['https'],'verified')
             self.assertFalse(pub.refresh_home(target)[0]);(target/'index.html').write_text(text.replace('387 <span>NEWS','HACKED <span>NEWS'))
             with patch.object(site_checks,'fetch',side_effect=web(target)),self.assertRaisesRegex(RuntimeError,'PUBLIC_HOME_CHANGED'):site_checks.check_site(expected_date=date)
 

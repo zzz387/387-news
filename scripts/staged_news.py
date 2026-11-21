@@ -17,6 +17,7 @@ import shutil
 import tempfile
 import json
 import os
+import re
 from pathlib import Path
 import secrets
 import sys
@@ -531,7 +532,7 @@ def recover_special_quota(ledger, key):
 def main():
     global PERSIST
     p = argparse.ArgumentParser()
-    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume','run','inspect'], required=True)
+    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art'], required=True)
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
     args = p.parse_args()
@@ -601,7 +602,7 @@ def main():
                 if state:
                     f.write(f'checkpoint=true\nartifact_name={label}\n')
 
-    if state is None and args.phase in ('run','resume','write','audit','auto','plan'):
+    if state is None and args.phase in ('run','resume','write','audit','auto','plan','backfill_issue_art'):
         state=editorial43.migrate(None,date) if use43 else editorial41.new_state(date)
 
     if state and use43 and not args.preview and os.getenv('NEWS_STOCK_FILE'):
@@ -618,7 +619,22 @@ def main():
         if state is None:
             raise RuntimeError('Encrypted draft missing; run plan first')
         ready=False
-        if state.get('version')==43:
+        if os.getenv('NEWS_HISTORICAL_RECOVERY_DATE')==date:
+            state['historical_recovery_runs']=state.get('historical_recovery_runs',0)+1;persist()
+        if os.getenv('CF_FREE_SMOKE')=='true' and not state.get('cf_free_smoke'):
+            from scripts import mosaic44,cloudflare44
+            if cloudflare44.status(mosaic44.CONFIG)=='READY':
+                try:
+                    raw=cloudflare44.generate({'descriptor':{'title':'Free inference smoke test','summary':'A peaceful abstract landscape with a sunrise, no people.','full_text_summary':''},'genre':'watercolor','palette':'ochre and green','composition':'landscape'},RUNTIME.ACTIVE_BUDGET,mosaic44.CONFIG)
+                    data,w,h=mosaic44.encode_image(raw);state['cf_free_smoke']={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':w,'height':h,'free_plan_verified':True};persist()
+                    print('[cf-free-smoke] verified=true real_image=true billing_allowed=false',flush=True)
+                except Exception as exc:print('[cf-free-smoke] '+json.dumps({'verified':False,'code':str(exc) if re.fullmatch('[A-Z_0-9]+',str(exc)) else type(exc).__name__}),flush=True)
+        if args.phase=='backfill_issue_art':
+            from scripts import publication43
+            changed=publication43.backfill_issue_art(ROOT,date,state,persist)
+            ready=changed or publication43.metadata(ROOT,date).get('art44',{}).get('ready',0)>0
+            pipeline.status(state,'PUBLISHING' if ready else 'PUBLISHED','commit_and_deploy' if ready else 'resume_missing_art')
+        elif state.get('version')==43:
             operation=daily43.deliver if args.phase=='publish' else daily43.advance
             ready=operation(state,date,args.preview,sys.modules[__name__],persist)
         elif state.get('version')==41:
@@ -635,9 +651,20 @@ def main():
         elif args.phase=='publish':
             ready=render(state,args.preview)
             pipeline.status(state,'PUBLISHING' if ready else 'APPROVED','commit_and_deploy' if ready else 'preview_complete')
+        publication_date=date
+        if not ready and args.phase in ('run','resume'):
+            from scripts import mosaic44,publication43
+            candidates=sorted((d.name for d in (ROOT/'issues').iterdir() if (d/'release.json').is_file() and re.fullmatch(r'\d{4}-\d{2}-\d{2}',d.name)),reverse=True)
+            if mosaic44.provider_status()=='READY' and RUNTIME.ACTIVE_BUDGET.remaining_seconds()>90:
+                for candidate in candidates:
+                    if candidate not in ('2026-11-20','2026-11-21') and candidate<mosaic44.CONFIG['first_automatic_issue']:continue
+                    record=publication43.metadata(ROOT,candidate)
+                    if record.get('art44',{}).get('ready',0)>=record['article_count']:continue
+                    if publication43.backfill_issue_art(ROOT,candidate,state,persist):ready=True;publication_date=candidate
+                    break
         if output and ready:
             with open(output,'a',encoding='utf-8') as stream:
-                stream.write(f'published=true\nissue_date={state["date"]}\n')
+                stream.write(f'published=true\nissue_date={publication_date}\n')
     except RUNTIME.GenerationPaused as exc:
         print(f'[paused] {exc}', flush=True)
         if state:

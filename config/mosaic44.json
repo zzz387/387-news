@@ -1,11 +1,21 @@
 {
   "enabled": true,
   "maximum_tiles": 12,
-  "prompt_version": "387-art-final-2",
-  "provider": "disabled",
-  "model": "",
+  "prompt_version": "387-art-cloudflare-3",
+  "provider": "cloudflare_workers_ai",
+  "model": "@cf/black-forest-labs/flux-1-schnell",
   "free_tier_verified": false,
   "max_image_bytes": 8388608,
   "web_width": 1200,
-  "web_quality": 82
+  "web_quality": 82,
+  "free_plan_only": true,
+  "billing_allowed": false,
+  "first_automatic_issue": "2026-11-22",
+  "steps": 4,
+  "max_retries_per_article": 2,
+  "daily_neuron_limit": 10000,
+  "image_neuron_budget": 7500,
+  "reserve_neurons_per_request": 256,
+  "account_headroom": 1500,
+  "request_gap_seconds": 3
 }

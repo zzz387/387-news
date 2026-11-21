@@ -37,6 +37,79 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_cloudflare_free_guard_payload_and_neuron_accounting(self):
+        from scripts import cloudflare44 as cf,generation_runtime as rt,mosaic44 as art
+        import io,base64
+        from PIL import Image
+        image=Image.new('RGB',(64,64),(40,90,70));buffer=io.BytesIO();image.save(buffer,format='PNG');raw=buffer.getvalue()
+        ledger={'day':'2026-11-21','requests':17,'models':{}};budget=rt.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0,seconds=1000)
+        item=art.article_plans({'date':'2026-11-22','art44':{}},[{'id':'one','article':main_row(0)['article']}])[0]
+        seen=[]
+        def api(path,data=None):
+            seen.append((path,data))
+            if '/subscriptions?' in path:return {'result':[]}
+            if path=='/graphql':return {'data':{'viewer':{'accounts':[{'aiInferenceAdaptiveGroups':[{'sum':{'totalNeurons':100}}]}]}}}
+            return {'result':{'image':base64.b64encode(raw).decode()}}
+        env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
+        with patch.dict(os.environ,env),patch.object(cf,'api',side_effect=api),patch.object(cf,'_LAST',0):
+            self.assertEqual(cf.generate(item,budget,art.CONFIG),raw)
+            posts=[(path,data) for path,data in seen if '/ai/run/' in path]
+            self.assertEqual(len(posts),1);self.assertEqual(set(posts[0][1]),{'prompt','steps'});self.assertLessEqual(len(posts[0][1]['prompt']),2048);self.assertEqual(posts[0][1]['prompt'],item['prompt'])
+            self.assertEqual(ledger['requests'],17);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
+            with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
+            self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
+            with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'paid'},'price':5}]}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
+            bad=dict(art.CONFIG,billing_allowed=True)
+            with self.assertRaisesRegex(RuntimeError,'CF_FREE_CONFIGURATION_REQUIRED'):cf.generate(item,budget,bad)
+        with patch.dict(os.environ,{'CLOUDFLARE_ACCOUNT_ID':'','CLOUDFLARE_API_TOKEN':''}):self.assertEqual(cf.status(art.CONFIG),'CLOUDFLARE_CREDENTIALS_MISSING')
+
+    def test_cloudflare_ledger_restore_preserves_other_daily_counters(self):
+        from scripts import generation_runtime as rt
+        ledger={'day':'2026-11-20','requests':20,'models':{},'cloudflare_ai':{'day':'2026-11-21','account_hash':'one','requests':3,'reserved_neurons':768}}
+        newer={'day':'2026-11-21','requests':2,'models':{}}
+        rt.merge_snapshot(ledger,newer);self.assertEqual(ledger['cloudflare_ai']['reserved_neurons'],768)
+        rt.merge_snapshot(ledger,dict(newer,cloudflare_ai={'day':'2026-11-21','account_hash':'one','requests':1,'reserved_neurons':256}))
+        self.assertEqual(ledger['cloudflare_ai']['requests'],3)
+        before=copy.deepcopy(ledger)
+        with self.assertRaises(ValueError):rt.merge_snapshot(ledger,dict(newer,cloudflare_ai={'day':'2026-11-21','account_hash':'other','requests':9,'reserved_neurons':-1}))
+        self.assertEqual(ledger,before)
+
+    def test_art_backfill_is_idempotent_and_preserves_all_editorial_text(self):
+        from scripts import mosaic44 as art
+        for n in (13,25):
+            with self.subTest(articles=n),tempfile.TemporaryDirectory() as temp:
+                s=issue(n,12);s['date']='2026-11-22';s['brief_policy_revision']=2;synthetic_art(s);target=root(temp);pub.build(s,target)
+                before={f.relative_to(target).as_posix():f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()}
+                body={slug:pub.without_art44((target/'issues'/s['date']/'articles'/slug/'index.html').read_text()) for slug in pub.metadata(target,s['date'])['pages']}
+                # Existing article files are reused; no second picture for backfill.
+                with patch.object(art.p,'ROOT',target),patch.object(art,'generate',side_effect=AssertionError('Do not regenerate published artwork')):
+                    parent={};pub.backfill_issue_art(target,s['date'],parent,allow_request=False)
+                    self.assertFalse(pub.backfill_issue_art(target,s['date'],parent,allow_request=False))
+                    image=pub.metadata(target,s['date'])['illustrations'][0];file=target/image['path'];original=file.read_bytes();file.unlink()
+                    self.assertTrue(pub.backfill_issue_art(target,s['date'],parent,allow_request=False));self.assertEqual(file.read_bytes(),original)
+                data=pub.validate(target,s['date']);self.assertEqual(len(data['illustrations']),n)
+                for slug,text in body.items():self.assertEqual(pub.without_art44((target/'issues'/s['date']/'articles'/slug/'index.html').read_text()),text)
+                for name,data_bytes in before.items():
+                    if name.endswith('.md'):self.assertEqual((target/name).read_bytes(),data_bytes)
+
+    def test_historical_recovery_keeps_newer_issue_number_and_home(self):
+        from scripts import mosaic44 as art
+        with tempfile.TemporaryDirectory() as temp:
+            target=root(temp);new=issue();new['date']='2026-11-21';new['brief_policy_revision']=2;pub.build(new,target)
+            before={f.relative_to(target).as_posix():f.read_bytes() for f in (target/'issues/2026-11-21').rglob('*') if f.is_file()};home=(target/'index.html').read_bytes()
+            old=issue();old['date']='2026-11-20';old['brief_policy_revision']=2
+            with self.assertRaisesRegex(Exception,'BACKDATED_HOME_REPLACEMENT_FORBIDDEN'):pub.build(old,target)
+            env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','NEWS_HISTORICAL_RECOVERY_DATE':'2026-11-20'}
+            with patch.dict(os.environ,env):pub.build(old,target)
+            self.assertEqual((target/'index.html').read_bytes(),home)
+            self.assertEqual(before,{f.relative_to(target).as_posix():f.read_bytes() for f in (target/'issues/2026-11-21').rglob('*') if f.is_file()})
+            self.assertGreater(pub.metadata(target,'2026-11-20')['number'],pub.metadata(target,'2026-11-21')['number'])
+            self.assertEqual(pub.validate(target,'2026-11-20')['date'],'2026-11-20')
+            from scripts import release_browser41
+            with patch.object(release_browser41.p,'ROOT',target),patch.dict(os.environ,ISSUE_DATE='2026-11-20'),patch.object(release_browser41.production_preflight41,'require_pages'),patch.object(release_browser41.browser41,'check',return_value={}) as browser:
+                release_browser41.main()
+            self.assertEqual(browser.call_args.kwargs['overview_path'],'/issues/2026-11-20/')
+
     def test_final_art_uses_existing_morning_wait_without_early_public_files(self):
         from scripts import mosaic44 as art,release_queue
         from datetime import datetime,timedelta
@@ -142,7 +215,7 @@ class Policy44Tests(unittest.TestCase):
         from scripts import mosaic44 as art
         s=issue();s['brief_policy_revision']=2
         with patch.object(art,'generate',side_effect=AssertionError('No configured free image API')):art.prepare(s);art.prepare(s)
-        self.assertEqual(s['art44']['provider_status'],'IMAGE_PROVIDER_NOT_CONFIGURED')
+        self.assertEqual(s['art44']['provider_status'],'CLOUDFLARE_CREDENTIALS_MISSING')
         synthetic_art(s);before=copy.deepcopy(s['art44']['objects'])
         with patch.object(art,'provider_status',return_value='READY'),patch.object(art,'generate',side_effect=AssertionError('Use saved images')):art.prepare(s)
         self.assertEqual(s['art44']['objects'],before)

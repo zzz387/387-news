@@ -125,3 +125,89 @@ gate when the Actions stage has sufficient time. Image requests stop before
 06:00; private artwork is materialized into the public worktree only after the
 release gate. The morning gate has its own regression case and does not depend
 on the image API being available.
+
+## Cloudflare Workers AI Free rollout — November 21
+
+Provider: `cloudflare_workers_ai`; pinned model:
+`@cf/black-forest-labs/flux-1-schnell`. Gemini Image and paid fallback are disabled.
+Only `prompt` (maximum 2048 Unicode characters) and `steps` (four; model maximum
+eight) are submitted. Cloudflare returns Base64 JPEG/PNG, verified with Pillow
+and encoded using the existing bounded WebP codec. No Worker or DNS change is
+needed. The daily article generator, schedule and editorial policy stay in place.
+
+Production reads `CLOUDFLARE_ACCOUNT_ID` from Secrets (or its existing Repository
+Variable) and `CLOUDFLARE_API_TOKEN` only from Secrets. Credentials are never
+exported. The current tool connections do not provide a Cloudflare account token.
+The protected rollout diagnoses their actual availability without printing values.
+If absent, the one owner action is to add these two Actions Secrets from a
+**Workers Free** account. The token must be scoped to that account and permit
+Workers AI Read/Edit, Billing Read (subscription verification only) and Account
+Analytics Read (whole-account Neurons). Billing Write is neither needed nor used.
+Do not put credentials in chat, code, Variables containing tokens, or artifacts.
+
+Before every inference the client reads all account subscriptions and rejects
+paid/ambiguous plans; it accepts default accounts without paid subscriptions or
+explicit free subscriptions. It reads the entire account's current-UTC-day
+`aiInferenceAdaptiveGroups.sum.totalNeurons`. Failed permission/schema checks
+stop generation. The model is called directly, without AI Gateway unified billing
+or prepaid credits. No code creates subscriptions or activates billing.
+
+Cloudflare documents 10,000 free Neurons/day, resetting at 00:00 UTC. Free plans
+fail above their allocation; they do not charge for overage. The app also reserves
+256 Neurons before each attempt within a 7,500/day image budget and checks a
+1,500-Neuron account headroom against observed total usage. Reservations include
+failed attempts and survive checkpoint merges/Gemini day rollover. Other tasks'
+usage is included in the live account check. The server's Free-plan hard cap
+remains the financial protection if telemetry is delayed or another task races.
+
+Documented FLUX pricing is 4.8 Neurons per 512×512 output tile plus 9.6 per step.
+For a 1024×1024 result at four steps this predicts 57.6 Neurons, not a measured
+per-request charge. The client records this dimension-based estimate separately
+from reservations and observed account totals. The image response does not expose
+per-request Neurons; do not call an estimate an actual measurement. The tagged
+rollout runs one smoke image only after live Free-plan verification, saving it in
+the existing encrypted checkpoint. Missing credentials mean no smoke request.
+
+References:
+https://developers.cloudflare.com/workers-ai/platform/pricing/
+https://developers.cloudflare.com/workers-ai/models/flux-1-schnell/
+https://developers.cloudflare.com/workers-ai/get-started/rest-api/
+
+### Explicit and automatic backfill
+
+`backfill_issue_art` is a phase of the existing production workflow. It validates
+the published manifest and all article/Markdown hashes, then prepares only missing
+images. A narrow recovery validator may tolerate missing illustration files, but
+never changes the text/source/date checks. Existing valid public pictures and
+private checkpoint bytes are reused. It patches only the dedicated AI figure,
+shared stylesheet link and mosaic, then recalculates HTML/overview hashes.
+`without_art44(before) == without_art44(after)` protects each article byte-for-byte.
+Markdown is unchanged. A private temporary tree must validate before copying the
+one authorized date into the worktree. A repeated complete backfill is a no-op.
+
+All future releases retain public ID/text-hash/key bindings for every approved
+article, including missing images. This allows a later 14/20 backfill to retain
+exactly those fourteen files and generate six. One already-published incomplete
+issue may be backfilled after ordinary daily work if the Free provider and time
+budget permit; it never runs another producer or delays a new due release.
+Dates before November 22 are limited to the explicitly authorized November 20
+and 21 recovery. Missing artwork is reported as `ARTWORK_INCOMPLETE`.
+
+The thirteen November 21 illustrations are real one-time outputs of the available
+ChatGPT image tool, as authorized for this recovery. No external paid API, billing
+plan or credit purchase was used. Their public provenance says `chatgpt_image_tool`,
+not Cloudflare; they do not prove the Cloudflare REST integration works. Original
+PNG files are retained; thirteen unique WebP files total about 2.66 MB.
+
+### November 20 historical publication
+
+`recover_missing_issue` explicitly selects and restores the November 20 encrypted
+checkpoint. A protected-main date-specific switch permits that one backdated
+publication, while preserving the newer homepage and every newer archive. It
+keeps approved texts and fills actual policy 4.4 deficits. Published numbers are
+not reassigned: November 19 is already number26 and November 21 is number27, so
+the later-published recovered November 20 issue receives the next free integer.
+Its issue date remains November 20; `recovered_at` records actual recovery time.
+The tagged rollout first delivers November 21 artwork, then queues this recovery
+through the existing mutex. Useful textual progress may continue at most three
+controlled runs; quotas/cooldowns are never reset.
