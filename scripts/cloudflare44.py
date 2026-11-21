@@ -59,7 +59,7 @@ def free_usage():
         plan=sub.get('rate_plan',{})
         if plan.get('id')!='free' or sub.get('price',0)!=0:raise RuntimeError('CF_FREE_PLAN_UNVERIFIED')
     start=datetime.now(timezone.utc).replace(hour=0,minute=0,second=0,microsecond=0)
-    query='query($account:String!,$start:Time!,$end:Time!){viewer{accounts(filter:{accountTag:$account}){aiInferenceAdaptiveGroups(limit:10000,filter:{datetime_geq:$start,datetime_lt:$end}){sum{totalNeurons}}}}}'
+    query='query($account:string!,$start:Time!,$end:Time!){viewer{accounts(filter:{accountTag:$account}){aiInferenceAdaptiveGroups(limit:10000,filter:{datetime_geq:$start,datetime_lt:$end}){sum{totalNeurons}}}}}'
     result=api('/graphql',{'query':query,'variables':{'account':account,'start':start.isoformat(),'end':(start+timedelta(days=1)).isoformat()}})
     try:
         accounts=result['data']['viewer']['accounts']
