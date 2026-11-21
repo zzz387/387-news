@@ -654,6 +654,7 @@ jobs:
       contents: read
       pages: write
       id-token: write
+      actions: read
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -681,6 +682,20 @@ jobs:
         with:
           name: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
           path: ${{ runner.temp }}/public-site
+      - name: Wait for Pages artifact metadata to become visible
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_NAME: github-pages-${{ github.run_id }}-${{ github.run_attempt }}
+        shell: bash
+        run: |
+          for attempt in {1..10}; do
+            if found=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID/artifacts?per_page=100" --jq ".artifacts[] | select(.name == \"$ARTIFACT_NAME\" and .expired == false) | .id"); then
+              if [[ -n "$found" ]]; then exit 0; fi
+            fi
+            sleep 2
+          done
+          echo '::error::PAGES_ARTIFACT_METADATA_NOT_VISIBLE'
+          exit 1
       - name: Deploy published edition
         id: deployment
         uses: actions/deploy-pages@v4
@@ -751,6 +766,19 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=recover_missing_issue -f preview=false -f target_date=2026-11-20
+
+      - name: Resume authorized historical recovery after daily preparation is approved
+        if: ${{ steps.verify.outputs.verified == 'true' && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (inputs.phase == 'run' || inputs.phase == 'resume'))) && fromJSON(needs.prepare.outputs.pipeline_status || '{}').audit_passed == true }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          # A missed historical date precedes the newest archive and is not an
+          # ordinary next-date task. Reuse the same mutex/restore path, only after
+          # daily approval. Recovery dispatches cannot recurse through this step.
+          if [[ ! -f issues/2026-11-20/release.json ]]; then
+            gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=recover_missing_issue -f preview=false -f target_date=2026-11-20
+          fi
 
   special-003-r:
     needs: [prepare, deploy, monitor]

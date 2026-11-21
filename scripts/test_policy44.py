@@ -55,6 +55,7 @@ class Policy44Tests(unittest.TestCase):
             self.assertEqual(cf.generate(item,budget,art.CONFIG),raw)
             posts=[(path,data) for path,data in seen if '/ai/run/' in path]
             self.assertEqual(len(posts),1);self.assertEqual(set(posts[0][1]),{'prompt','steps'});self.assertLessEqual(len(posts[0][1]['prompt']),2048);self.assertEqual(posts[0][1]['prompt'],item['prompt'])
+            self.assertIn('$account:string!',next(data['query'] for path,data in seen if path=='/graphql'))
             self.assertEqual(ledger['requests'],17);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
             with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
             self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
@@ -452,9 +453,9 @@ class Policy44Tests(unittest.TestCase):
         from scripts import daily43
         s=issue(20);s['candidates']=[r for r in s['candidates'] if v.subject(r) is None];s['candidates'] += [main_row(i) for i in range(40,50)]
         row=main_row(90);row['status']='discovered';s['candidates'].append(row);editor=__import__('unittest.mock',fromlist=['Mock']).Mock()
-        with tempfile.TemporaryDirectory() as temp,patch.object(daily43,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_LIGHT_NEWS_ENABLED='true'),patch.object(light43,'prepare') as extra_briefs,patch.object(daily43,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:24)):
             daily43.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5),editor=editor)
-        editor.finish.assert_not_called();self.assertFalse(s['audit_passed'])
+        editor.finish.assert_not_called();extra_briefs.assert_not_called();self.assertFalse(s['audit_passed'])
 
 
     def test_search_targets_two_candidates_per_missing_subject(self):
