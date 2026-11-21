@@ -113,6 +113,8 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         prior={r.get('source_url') for r in editorial41.archive_entries(root)}|set(stock43.ensure(state)['published_urls'])
         def prepare_light():
             if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or (not active44 and clock()>=release-timedelta(minutes=10)) or not budget:return
+            standard=policy44.standard(state) if active44 else None
+            if standard and not standard['compliant'] and standard['light_deficit']==0:return
             keep=max(4,2*max(0,minimum-len(selection43.composition(state))))
             if budget.remaining_requests()>=(2 if active44 else keep+2):
                 light43.prepare(state,persist)

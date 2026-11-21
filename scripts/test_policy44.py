@@ -453,9 +453,9 @@ class Policy44Tests(unittest.TestCase):
         from scripts import daily43
         s=issue(20);s['candidates']=[r for r in s['candidates'] if v.subject(r) is None];s['candidates'] += [main_row(i) for i in range(40,50)]
         row=main_row(90);row['status']='discovered';s['candidates'].append(row);editor=__import__('unittest.mock',fromlist=['Mock']).Mock()
-        with tempfile.TemporaryDirectory() as temp,patch.object(daily43,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True)):
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_LIGHT_NEWS_ENABLED='true'),patch.object(light43,'prepare') as extra_briefs,patch.object(daily43,'discover'),patch.object(news.runtime,'ACTIVE_BUDGET',SimpleNamespace(deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:24)):
             daily43.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5),editor=editor)
-        editor.finish.assert_not_called();self.assertFalse(s['audit_passed'])
+        editor.finish.assert_not_called();extra_briefs.assert_not_called();self.assertFalse(s['audit_passed'])
 
 
     def test_search_targets_two_candidates_per_missing_subject(self):
