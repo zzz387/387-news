@@ -10,7 +10,13 @@ BASE='https://api.cloudflare.com/client/v4'
 _LAST=0
 
 def credentials():
-    return os.getenv('CLOUDFLARE_ACCOUNT_ID',''),os.getenv('CLOUDFLARE_API_TOKEN','')
+    def unquote(value):
+        value=value.strip()
+        return value[1:-1].strip() if len(value)>1 and value[0]==value[-1] and value[0] in ('\"',"'") else value
+    account=unquote(os.getenv('CLOUDFLARE_ACCOUNT_ID',''))
+    token=unquote(os.getenv('CLOUDFLARE_API_TOKEN',''))
+    token=unquote(re.sub(r'(?i)^(?:authorization:\s*)?bearer\s+','',token,count=1))
+    return account,token
 
 def credential_fingerprint():
     # Stored only in the encrypted editorial checkpoint, never public metadata.
@@ -22,6 +28,8 @@ def status(config):
     account,token=credentials()
     if not account or not token:return 'CLOUDFLARE_CREDENTIALS_MISSING'
     if not re.fullmatch(r'[a-fA-F0-9]{32}',account):return 'CLOUDFLARE_ACCOUNT_INVALID'
+    if not token.isascii() or any(ch.isspace() for ch in token):return 'CLOUDFLARE_TOKEN_FORMAT_INVALID'
+    if os.getenv('NEWS_CF_PROBE_STATUS') and os.getenv('NEWS_CF_PROBE_STATUS')!='READY':return os.environ['NEWS_CF_PROBE_STATUS']
     return 'READY'
 
 def protected():
@@ -36,6 +44,9 @@ def safe_errors(body):
         message=re.sub(r'[A-Za-z0-9_-]{24,}','[redacted]',message)
         details.append({'code':error.get('code'),'message':message[:240]})
     return details
+
+def authentication_code(details):
+    return next(('CF_AUTHENTICATION_FAILED_'+str(e['code']) for e in details if e.get('code') in (9106,10000)),None)
 
 def api(path,data=None):
     protected();_,token=credentials()
@@ -56,11 +67,11 @@ def api(path,data=None):
         except Exception:pass
         print('[cf-api-error] '+json.dumps({'stage':stage,'http_status':code,'errors':details}),flush=True)
         if code in (429,503):raise GenerationPaused('CF_HTTP_'+str(code)) from None
-        error=RuntimeError('CF_HTTP_'+str(code));error.stage=stage
+        error=RuntimeError(authentication_code(details) or 'CF_HTTP_'+str(code));error.stage=stage
         raise error from None
     if result.get('success') is False or result.get('errors'):
         print('[cf-api-error] '+json.dumps({'stage':stage,'http_status':200,'errors':safe_errors(result)}),flush=True)
-        error=RuntimeError('CF_RESPONSE_REJECTED');error.stage=stage
+        error=RuntimeError(authentication_code(safe_errors(result)) or 'CF_RESPONSE_REJECTED');error.stage=stage
         raise error
     return result
 
@@ -163,10 +174,14 @@ def github_secret_metadata():
     return result
 
 def diagnose(config,probe=False):
-    result={'provider':'cloudflare_workers_ai','model':MODEL,'status':status(config),'credentials_present':{name:bool(os.getenv(name)) for name in ('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN')},'missing_secrets':[name for name in ('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN') if not os.getenv(name)],'free_plan_verified':False,'authorization_verified':False,'billing_allowed':False,'image_requests':0}
+    normalized=dict(zip(('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN'),credentials()))
+    result={'provider':'cloudflare_workers_ai','model':MODEL,'status':status(config),'credentials_present':{name:bool(os.getenv(name)) for name in normalized},'credential_normalization_applied':{name:os.getenv(name,'')!=value for name,value in normalized.items()},'missing_secrets':[name for name in normalized if not os.getenv(name)],'free_plan_verified':False,'authorization_verified':False,'billing_allowed':False,'image_requests':0}
     if probe and result['status']=='READY':
         try:result.update(free_plan_verified=True,authorization_verified=True,observed_account_neurons=free_usage())
         except Exception as exc:result.update(free_plan_verified=False,failure_stage=getattr(exc,'stage','configuration'),status=str(exc) if re.fullmatch('[A-Z_0-9]+',str(exc)) else type(exc).__name__)
     elif result['status']=='READY':result['status']='CLOUDFLARE_AUTH_UNVERIFIED'
     if probe and os.getenv('GITHUB_ACTIONS')=='true' and os.getenv('GITHUB_REPOSITORY')=='zzz387/387-news':result['github_secret_metadata']=github_secret_metadata()
+    if probe and os.getenv('GITHUB_ACTIONS')=='true' and os.getenv('GITHUB_REF_NAME')=='main' and os.getenv('GITHUB_ENV'):
+        code=result['status'] if re.fullmatch('[A-Z_0-9]+',result['status']) else 'CF_PROBE_FAILED'
+        with open(os.environ['GITHUB_ENV'],'a') as stream:stream.write('NEWS_CF_PROBE_STATUS='+code+'\n')
     print('[cloudflare-capability] '+json.dumps(result),flush=True);return result

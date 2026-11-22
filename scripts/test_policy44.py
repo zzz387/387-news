@@ -52,9 +52,18 @@ class Policy44Tests(unittest.TestCase):
                 self.assertEqual(generate.call_count,1);self.assertEqual(state['art44']['provider_status'],'CF_HTTP_403')
             with patch.dict(os.environ,CLOUDFLARE_API_TOKEN='SYNTHETIC_UPDATED'),patch.object(art,'generate',return_value=stream.getvalue()) as generate:
                 self.assertTrue(art.prepare_items(state,plans)['complete']);generate.assert_called_once()
-            with patch.object(cf,'free_usage',side_effect=RuntimeError('CF_HTTP_401')),patch.object(cf,'github_secret_metadata',return_value={}):
+            with patch.object(cf,'free_usage',side_effect=RuntimeError('CF_HTTP_401')),patch.object(cf,'github_secret_metadata',return_value={}),patch.dict(os.environ,GITHUB_ENV=''):
                 report=cf.diagnose(art.CONFIG,probe=True)
                 self.assertEqual(report['status'],'CF_HTTP_401');self.assertFalse(report['authorization_verified'])
+            with patch.dict(os.environ,CLOUDFLARE_API_TOKEN='  "Bearer SYNTHETIC"  '):
+                self.assertEqual(cf.credentials(),('a'*32,'SYNTHETIC'))
+            self.assertEqual(cf.authentication_code([{'code':9106}]),'CF_AUTHENTICATION_FAILED_9106')
+            with patch.dict(os.environ,NEWS_CF_PROBE_STATUS='CF_AUTHENTICATION_FAILED_9106'):
+                self.assertEqual(cf.status(art.CONFIG),'CF_AUTHENTICATION_FAILED_9106')
+                empty={'date':'2026-11-22','art44':{'objects':{},'history':[]}}
+                with patch.object(art,'generate') as generate:
+                    art.prepare_items(empty,plans);generate.assert_not_called()
+                self.assertEqual(empty['art44']['provider_status'],'CF_AUTHENTICATION_FAILED_9106')
 
     def test_cloudflare_free_guard_payload_and_neuron_accounting(self):
         from scripts import cloudflare44 as cf,generation_runtime as rt,mosaic44 as art
