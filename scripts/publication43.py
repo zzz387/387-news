@@ -241,7 +241,8 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
     bindings={r['article_slug']:r for r in data.get('art44',{}).get('bindings',data.get('illustrations',[]))}
     for item,row in zip(items,rows):
         prior=bindings.get(row['article']['slug'])
-        if prior:
+        repair=mosaic44.CONFIG.get('visual_brief_repairs',{}).get(item['text_hash'],{})
+        if prior and prior.get('prompt_version')!=repair.get('replace_prompt_version'):
             basis={k:prior[k] for k in ('date','article_id','text_hash','prompt_version')}
             if basis['date']!=date or p.digest(basis)!=prior['key']:raise p.Blocked('ART_PUBLIC_BINDING_INVALID')
             for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]

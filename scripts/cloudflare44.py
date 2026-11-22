@@ -102,12 +102,18 @@ def free_usage():
     except (KeyError,TypeError,ValueError):raise RuntimeError('CF_ACCOUNT_USAGE_UNVERIFIED') from None
     return total
 
+# FLUX Schnell follows English visual descriptions more reliably than Russian prose.
+STYLE_EN=dict(zip(
+    ('Акварель','Импрессионизм','Пастель','Символизм','Метафизическая живопись','Сюрреализм','Японская гравюра','Минималистичная живопись','Графика тушью','Футуризм','Экспрессионизм','Плакатная графика','Офорт','Историческая живопись','Ар-нуво','Конструктивизм','Кубизм','Ар-деко','Натурализм','Линогравюра','Ботаническая живопись','Романтизм','Темпера','Абстракционизм','Геометрическая абстракция','Супрематизм','Коллаж','Индустриальная графика','Масло'),
+    ('watercolor','impressionism','pastel painting','symbolism','metaphysical painting','surrealism','Japanese woodblock print','minimalist painting','ink drawing','futurism','expressionism','painted poster art','etching','historical painting','art nouveau','constructivism','cubism','art deco','naturalist painting','linocut','botanical painting','romanticism','tempera','abstract painting','geometric abstraction','suprematism','paper collage','industrial graphic art','oil painting')))
+
 def prompt(item):
-    d=item['descriptor']
-    lead=('Create an original artistic painting, not a documentary photo. Style: '+item['genre']+'. Palette: '+item['palette']+'. Composition: '+item['composition']+'. No text, letters, logos or watermarks. Do not invent factual events. ')
-    title='Article: '+d['title']+'. '
-    content=d.get('summary','')+' '+d.get('full_text_summary','')
-    return (lead+title+content)[:2048]
+    d=item['descriptor'];scene=d.get('visual_subject_en','').strip()
+    style=STYLE_EN.get(item['genre'],'editorial painting')
+    lead='Original fine-art illustration. '+style+'. Visible brushwork or hand-printed texture, expressive visual metaphor, not a photograph. '
+    # Put the actual subject first; long Russian source prose previously drowned it out.
+    if not scene:scene=d['title']+'. '+d.get('summary','')
+    return (lead+'Subject: '+scene[:1400]+'. Balanced editorial composition, muted ochre, cream, deep green and indigo. Entirely pictorial, blank unmarked surfaces, unsigned. No text, writing, letters, signatures, logos, watermarks, labels or borders.')[:2048]
 
 def generate(item,budget,config):
     global _LAST

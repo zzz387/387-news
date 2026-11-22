@@ -37,6 +37,25 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_flux_prompt_uses_english_subject_before_long_russian_prose(self):
+        from scripts import cloudflare44 as cf,mosaic44 as art
+        row=main_row(0);before=art.final_text(row['article'])
+        row['article']['art_brief_en']='Children build a cardboard castle in a sunlit playroom.'
+        row['article']['teaser']='Проверенный русский текст. '*300
+        expected=art.final_text(row['article'])
+        item=art.article_plans({'date':'2026-11-23'},[row])[0]
+        self.assertIn('Subject: Children build a cardboard castle',item['prompt'])
+        self.assertIn('watercolor',item['prompt']);self.assertNotIn('Проверенный',item['prompt'])
+        self.assertLessEqual(len(item['prompt']),2048)
+        self.assertEqual(expected,art.final_text(row['article']))
+        self.assertNotIn('art_brief_en',art.final_text(row['article']))
+        for styles in art.STYLES.values():
+            for style in styles:
+                with self.subTest(style=style):self.assertIn(style,cf.STYLE_EN)
+        del row['article']['art_brief_en'];row['source']['title']='American elm restoration and genetic diversity'
+        item=art.article_plans({'date':'2026-11-23'},[row])[0]
+        self.assertIn('American elm restoration',item['prompt'])
+
     def test_cloudflare_auth_failure_waits_for_changed_credentials(self):
         from scripts import cloudflare44 as cf,mosaic44 as art
         import io
