@@ -34,6 +34,8 @@ def normalized(s):return re.sub(r'[^\w]+','',unicodedata.normalize('NFKD',s).cas
 def identity(work):
     author=re.sub(r'\([^)]*\)','',work['artist']);year=re.search(r'\d{4}',str(work.get('year','')))
     return normalized(author)+'|'+normalized(work['title'])+'|'+(year[0] if year else str(work.get('year','')))
+def known(registry,work):return any(w['museum_id']==work['museum_id'] or identity(w)==identity(work) for w in registry['artworks'].values())
+
 def genre_id(genre):
     if genre not in GENRES:raise ValueError('ART_GENRE_UNSUPPORTED')
     return GENRES[genre][0]
@@ -100,19 +102,20 @@ class Museum:
             data=response.read(limit+1)
             if len(data)>limit:raise ValueError('ART_RESPONSE_TOO_LARGE')
             return data
-    def candidates(self,genre):
+    def candidates(self,genre,start_page=1):
         query=GENRES[genre][1]
         fields='id,title,artist_title,date_display,date_start,image_id,is_public_domain,style_titles,medium_display'
         url='https://api.artic.edu/api/v1/artworks/search?'+urlencode({'q':query,'limit':60,'fields':fields})
         try:
-            rows=json.loads(self.get(url))['data']
-            for row in rows:
-                tokens=' '.join(row.get('style_titles') or [])+' '+row.get('medium_display','')
-                if row.get('is_public_domain') is not True or not row.get('image_id') or query.casefold() not in tokens.casefold():continue
-                if not row.get('artist_title') or not row.get('date_display') or not row.get('title'):continue
-                yield {'museum':'Art Institute of Chicago','museum_id':'aic:'+str(row['id']),'title':row['title'],'artist':row['artist_title'],'year':row['date_display'],
-                    'source_url':'https://www.artic.edu/artworks/'+str(row['id']),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images',
-                    'image_url':'https://www.artic.edu/iiif/2/'+row['image_id']+'/full/480,/0/default.jpg','genre_evidence':tokens,'genre_id':genre_id(genre),'verified':True}
+            for page in range(start_page,start_page+2):
+                rows=json.loads(self.get(url+'&page='+str(page)))['data']
+                for row in rows:
+                    tokens=' '.join(row.get('style_titles') or [])+' '+row.get('medium_display','')
+                    if row.get('is_public_domain') is not True or not row.get('image_id') or query.casefold() not in tokens.casefold():continue
+                    if not row.get('artist_title') or not row.get('date_display') or not row.get('title'):continue
+                    yield {'museum':'Art Institute of Chicago','museum_id':'aic:'+str(row['id']),'title':row['title'],'artist':row['artist_title'],'year':row['date_display'],
+                        'source_url':'https://www.artic.edu/artworks/'+str(row['id']),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images',
+                        'image_url':'https://www.artic.edu/iiif/2/'+row['image_id']+'/full/480,/0/default.jpg','search_page':page,'genre_evidence':tokens,'genre_id':genre_id(genre),'verified':True}
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
@@ -136,7 +139,7 @@ def ingest(root,registry,work,raw,state,persist):
         if urlparse(url).scheme!='https' or urlparse(url).hostname not in HOSTS:raise ValueError('ART_METADATA_URL_INVALID')
     if work.get('genre_id') not in {g[0] for g in GENRES.values()}:raise ValueError('ART_GENRE_UNSUPPORTED')
     if work.get('license')!='CC0' or work.get('verified') is not True:raise ValueError('ART_RIGHTS_UNVERIFIED')
-    if any(w['museum_id']==work['museum_id'] or identity(w)==identity(work) for w in registry['artworks'].values()):return None
+    if known(registry,work):return None
     original_hash=digest(raw)
     if any(w['original_sha256']==original_hash for w in registry['artworks'].values()):return None
     with Image.open(io.BytesIO(raw)) as image:
@@ -181,7 +184,9 @@ def prepare_sets(root,state,items,persist=lambda:None,discover=True,identity_ove
         try:
             row=assign(root,registry,issue,state['date'],genre,number,persist)
             if row is None and discover:
-                for work in client.candidates(genre):
+                start_page=max((w.get('search_page',1) for w in registry['artworks'].values() if w['genre_id']==genre_id(genre)),default=1)
+                for work in client.candidates(genre,start_page=start_page):
+                    if known(registry,work):continue
                     try:ingest(root,registry,work,client.get(work.pop('image_url')),state,persist)
                     except Exception as exc:
                         print('[art-reference] '+json.dumps({'genre':genre,'code':safe_code(exc)}),flush=True)

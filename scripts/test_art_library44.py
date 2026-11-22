@@ -70,6 +70,19 @@ class ArtLibraryTests(unittest.TestCase):
             self.assertIsNone(lib.ingest(temp,reg,work,picture(0),state,lambda:None))
             work['license']='Unknown'
             with self.assertRaisesRegex(ValueError,'RIGHTS'):lib.ingest(temp,reg,work,picture(99),state,lambda:None)
+    def test_next_issue_skips_known_works_before_downloading(self):
+        with tempfile.TemporaryDirectory() as temp:
+            state=self.stock(temp,4);lib.prepare_sets(temp,state,self.items(1),discover=False)
+            old=list(state['art_library44']['registry']['artworks'].values());candidates=[]
+            for i,row in enumerate(old):candidates.append(dict(row,image_url='https://www.artic.edu/existing/'+str(i)))
+            for i,row in enumerate(old):candidates.append(dict(row,museum_id='new:'+str(i),title='New fixture '+str(i),artist='New author '+str(i),image_url='https://www.artic.edu/new/'+str(i)))
+            def get(client,url):
+                self.assertNotIn('/existing/',url)
+                return picture(100+int(url.rsplit('/',1)[1]))
+            with patch.object(lib.Museum,'candidates',return_value=iter(candidates)),patch.object(lib.Museum,'get',autospec=True,side_effect=get) as download:
+                sets=lib.prepare_sets(temp,{'date':'2026-11-24'},self.items(1))
+                self.assertEqual(len(sets),1);self.assertEqual(download.call_count,4)
+
     def test_insufficient_stock_is_explicit_and_never_fabricates_a_set(self):
         with tempfile.TemporaryDirectory() as temp:
             state=self.stock(temp,3);items=self.items(5)
