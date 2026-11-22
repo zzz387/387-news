@@ -44,6 +44,13 @@ def issue_id(state):
     if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,95}',value):raise ValueError('ART_ISSUE_ID_INVALID')
     return value
 
+def genre_matches(genre,tokens):
+    text=tokens.casefold()
+    if genre=='Японская гравюра':return ('japan' in text or 'ukiyo' in text) and ('woodblock' in text or 'woodcut' in text)
+    if genre=='Акварель':return 'watercolor' in text or 'watercolour' in text
+    if genre=='Масло':return bool(re.search(r'\boil\b',text))
+    return GENRES[genre][1].casefold() in text
+
 def empty():return {'version':1,'artworks':{},'sets':{},'studies':{}}
 def load(root,state=None):
     root=Path(root);path=root/'art/registry.json';public=json.loads(path.read_text()) if path.is_file() else empty()
@@ -104,14 +111,15 @@ class Museum:
             return data
     def candidates(self,genre,start_page=1):
         query=GENRES[genre][1]
-        fields='id,title,artist_title,date_display,date_start,image_id,is_public_domain,style_titles,medium_display'
+        fields='id,title,artist_title,date_display,date_start,image_id,is_public_domain,style_titles,medium_display,artwork_type_title,place_of_origin'
         url='https://api.artic.edu/api/v1/artworks/search?'+urlencode({'q':query,'limit':60,'fields':fields})
         try:
             for page in range(start_page,start_page+2):
                 rows=json.loads(self.get(url+'&page='+str(page)))['data']
                 for row in rows:
-                    tokens=' '.join(row.get('style_titles') or [])+' '+row.get('medium_display','')
-                    if row.get('is_public_domain') is not True or not row.get('image_id') or query.casefold() not in tokens.casefold():continue
+                    tokens=' '.join(row.get('style_titles') or [])+' '+row.get('medium_display','')+' '+str(row.get('place_of_origin',''))
+                    if not any(t in str(row.get('artwork_type_title','')).casefold() for t in ('painting','drawing','print')):continue
+                    if row.get('is_public_domain') is not True or not row.get('image_id') or not genre_matches(genre,tokens):continue
                     if not row.get('artist_title') or not row.get('date_display') or not row.get('title'):continue
                     yield {'museum':'Art Institute of Chicago','museum_id':'aic:'+str(row['id']),'title':row['title'],'artist':row['artist_title'],'year':row['date_display'],
                         'source_url':'https://www.artic.edu/artworks/'+str(row['id']),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images',
@@ -123,7 +131,8 @@ class Museum:
             for row in json.loads(self.get(url))['data']:
                 tokens=' '.join(str(row.get(k) or '') for k in ('title','technique','description','culture','type','period'))
                 image=(row.get('images') or {}).get('web',{}).get('url')
-                if row.get('share_license_status')!='CC0' or not image or query.casefold() not in tokens.casefold():continue
+                if row.get('type') not in ('Painting','Drawing','Print'):continue
+                if row.get('share_license_status')!='CC0' or not image or not genre_matches(genre,tokens):continue
                 authors=row.get('creators') or [];artist='; '.join(a.get('description','') for a in authors)
                 if not artist or not row.get('creation_date') or not row.get('title'):continue
                 yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],

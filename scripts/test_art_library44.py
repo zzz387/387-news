@@ -90,7 +90,9 @@ class ArtLibraryTests(unittest.TestCase):
             self.assertEqual(sets,{});self.assertEqual(state['art_library44']['deficits'],['Импрессионизм'])
             self.assertTrue(all(i['reference_status']=='REFERENCE_SET_UNAVAILABLE' for i in items))
     def test_museum_metadata_and_access_checks_fail_closed(self):
-        museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','style_titles':['Impressionism'],'is_public_domain':True}]}
+        self.assertTrue(lib.genre_matches('Японская гравюра','Japan Color woodblock print'))
+        self.assertFalse(lib.genre_matches('Японская гравюра','European oil painting'))
+        museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','artwork_type_title':'Painting','style_titles':['Impressionism'],'is_public_domain':True}]}
         with patch.object(museum,'get',return_value=json.dumps(data).encode()):
             work=next(museum.candidates('Импрессионизм'));self.assertEqual(work['license'],'CC0');self.assertEqual(work['genre_id'],'impressionism')
         with self.assertRaisesRegex(ValueError,'HOST'):museum.get('https://attacker.invalid/image.webp')
