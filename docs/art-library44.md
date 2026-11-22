@@ -69,3 +69,8 @@ reference registry and unpublished media also travel in the existing encrypted
 editorial inventory, preventing cross-issue reassignment before a Git commit.
 Already committed media are omitted from this shared duplicate cache. Pending
 issues are labelled as preparing instead of publishing broken release links.
+
+Art navigation is added with the explicit current publication root; legacy renderers
+retain their original markup. Temporary legacy/special publication projections copy
+the existing gallery dependencies so current-home links remain valid without
+rewriting archived issue pages.
