@@ -1,6 +1,165 @@
 {
   "version": 1,
-  "artworks": {},
-  "sets": {},
-  "studies": {}
+  "artworks": {
+    "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:320778",
+      "title": "Banks of the Oise at Dawn",
+      "artist": "Louis Hayet (French, 1864–1940)",
+      "year": "1888",
+      "source_url": "https://clevelandart.org/art/2019.18",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "genre_evidence": "Banks of the Oise at Dawn Oil on canvas Louis Hayet was an important, early practitioner of Neo-Impressionism, or Pointillism, the practice of applying small strokes or dots of paint so that from a distance the hues visually blend together and create an intense sensation of color and light. Notice the way in which Hayet painted the pale dawn sky—and its reflection in the River Oise—with strokes of pink, orange, blue, yellow, and green paint. When seen at a distance, the effect is of early morning, before the sun has fully risen. ['France'] Painting ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843",
+      "path": "assets/art/impressionism/4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843.webp",
+      "sha256": "23f07b227f2dc61cec15d2431280465ef16c3c578c4e0c6fbbd4eeabd13675cb",
+      "original_sha256": "cd5f8fd096470135b2f3535cf03c1a842ed0c6fa516ecfcc9d649c71e97caf7c",
+      "visual_hash": "4050056529993401344",
+      "width": 480,
+      "height": 343,
+      "added_at": "2026-11-22T18:57:56.992659+00:00"
+    },
+    "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:135382",
+      "title": "The Red Kerchief",
+      "artist": "Claude Monet (French, 1840–1926)",
+      "year": "c. 1868–73",
+      "source_url": "https://clevelandart.org/art/1958.39",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "genre_evidence": "The Red Kerchief oil on fabric This painting depicts Monet's first wife, Camille, outside on a snowy day passing by the French doors of their home at Argenteuil. Her face is rendered in a radically bold Impressionist technique of mere daubs of paint quickly applied, just as the snow and trees are defined by broad, broken strokes of pure white and green. ['France'] Painting ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5",
+      "path": "assets/art/impressionism/b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5.webp",
+      "sha256": "b33f9d51a672877adf9c0d15579808104eff001b2bcf9cd724f070f3da80f173",
+      "original_sha256": "ac1a6162b5249c1ba985965ada21246bf6370d6dfc0954a551656d0e0529c7e4",
+      "visual_hash": "17349793040420359404",
+      "width": 386,
+      "height": 480,
+      "added_at": "2026-11-22T18:58:00.322205+00:00"
+    },
+    "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:128392",
+      "title": "Edge of the Woods Near L'Hermitage, Pontoise",
+      "artist": "Camille Pissarro (French, 1830–1903)",
+      "year": "1879",
+      "source_url": "https://clevelandart.org/art/1951.356",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "genre_evidence": "Edge of the Woods Near L'Hermitage, Pontoise oil on fabric Born to a French-Jewish family on St. Thomas island in the Caribbean, Pissarro painted this monumental landscape when he was desperately poor and struggling to sell his paintings. It depicts a man slumbering in the sun-dappled backwoods of the Hermitage, a rural village near Pontoise, where the artist had been living since 1872. Restricting his palette to pure hues, Pissarro applied brushstrokes in systematic diagonal patterns, producing an effect that he likened to knitting. This canvas was included in the fourth Impressionist exhibition of 1879. ['France'] Painting ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb",
+      "path": "assets/art/impressionism/e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb.webp",
+      "sha256": "31d74d1365ee9c42a7bcbbcbb79211b2d0936ddb2d81c1ce33edd6009a9d5bdd",
+      "original_sha256": "8523ded8b988852fcb25e5b723af374730b6133875582f20615cb0cbd3674db6",
+      "visual_hash": "8714720232319775972",
+      "width": 480,
+      "height": 368,
+      "added_at": "2026-11-22T18:58:03.865846+00:00"
+    },
+    "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:135173",
+      "title": "The Brook",
+      "artist": "Paul Cezanne (French, 1839–1906)",
+      "year": "c. 1895–1900",
+      "source_url": "https://clevelandart.org/art/1958.20",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "genre_evidence": "The Brook oil on fabric Although Cezanne exhibited twice with the Impressionists, he rejected his friends’ goals of capturing the fleeting effects of light and atmosphere in their art. Instead, he sought to create balance among the forms and colors in his compositions. This painting depicts the valley of the Arc River that runs southeast of Cezanne’s home in Aix-en-Provence. Throughout the composition, he juxtaposed strokes of different hues, describing the leaves, branches, and the stream with color rather than drawing the outlines of forms. ['France, late 19th-early 20th Century'] Painting ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3",
+      "path": "assets/art/impressionism/53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3.webp",
+      "sha256": "ac61b80e76ad8c828b8ef6a7ca8c1737df43651e4d333c59b80eef72bd609eb2",
+      "original_sha256": "ccfc44b5b35f80043650badc069ab3cda0e90c9b3817d79222bea664facca7c4",
+      "visual_hash": "14468027711904518690",
+      "width": 480,
+      "height": 347,
+      "added_at": "2026-11-22T18:58:07.367707+00:00"
+    }
+  },
+  "sets": {
+    "art-study-2026-11-22/impressionism": {
+      "id": "art-study-2026-11-22/impressionism",
+      "issue_id": "art-study-2026-11-22",
+      "issue_date": "2026-11-22",
+      "issue_number": null,
+      "genre_id": "impressionism",
+      "genre": "Импрессионизм",
+      "artwork_ids": [
+        "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843",
+        "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5",
+        "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb",
+        "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3"
+      ],
+      "selected_at": "2026-11-22T18:58:10.622393+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "23f07b227f2dc61cec15d2431280465ef16c3c578c4e0c6fbbd4eeabd13675cb",
+        "b33f9d51a672877adf9c0d15579808104eff001b2bcf9cd724f070f3da80f173",
+        "31d74d1365ee9c42a7bcbbcbb79211b2d0936ddb2d81c1ce33edd6009a9d5bdd",
+        "ac61b80e76ad8c828b8ef6a7ca8c1737df43651e4d333c59b80eef72bd609eb2"
+      ]
+    }
+  },
+  "studies": {
+    "536a90b208880c5393c3c11f2f0c8a19469c6ae885da1b9a4a0bef4719e4f8bb": {
+      "key": "536a90b208880c5393c3c11f2f0c8a19469c6ae885da1b9a4a0bef4719e4f8bb",
+      "path": "assets/illustrations/art-study-2026-11-22/536a90b208880c5393c3c11f2f0c8a19469c6ae885da1b9a4a0bef4719e4f8bb.webp",
+      "width": 1024,
+      "height": 768,
+      "sha256": "7f9798e4f6a69c316e7f8f45326b0ea35a4a696f9238006619d2142bbfb43747",
+      "title": "Тридцать три письма: как детская искренность исцеляет раны прошлого",
+      "article_url": "/issues/2026-11-22/articles/feature-06/",
+      "reference_set_id": "art-study-2026-11-22/impressionism",
+      "reference_artwork_ids": [
+        "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843",
+        "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5",
+        "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb",
+        "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3"
+      ],
+      "reference_sha256": [
+        "23f07b227f2dc61cec15d2431280465ef16c3c578c4e0c6fbbd4eeabd13675cb",
+        "b33f9d51a672877adf9c0d15579808104eff001b2bcf9cd724f070f3da80f173",
+        "31d74d1365ee9c42a7bcbbcbb79211b2d0936ddb2d81c1ce33edd6009a9d5bdd",
+        "ac61b80e76ad8c828b8ef6a7ca8c1737df43651e4d333c59b80eef72bd609eb2"
+      ],
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "created_at": "2026-11-22T18:58:31.423597+00:00"
+    },
+    "95e28fbe967b37968ba4d0bfc9cf55af67aa23c90ef41bca879d0ed291f3fbc3": {
+      "key": "95e28fbe967b37968ba4d0bfc9cf55af67aa23c90ef41bca879d0ed291f3fbc3",
+      "path": "assets/illustrations/art-study-2026-11-22/95e28fbe967b37968ba4d0bfc9cf55af67aa23c90ef41bca879d0ed291f3fbc3.webp",
+      "width": 1024,
+      "height": 768,
+      "sha256": "8cb00e04387c4e62ab7432ac49c003856801c2540d587e03521c8cd5db0aa0fa",
+      "title": "Свобода в игре: зачем детям нужно время без участия взрослых",
+      "article_url": "/issues/2026-11-22/articles/feature-08/",
+      "reference_set_id": "art-study-2026-11-22/impressionism",
+      "reference_artwork_ids": [
+        "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843",
+        "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5",
+        "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb",
+        "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3"
+      ],
+      "reference_sha256": [
+        "23f07b227f2dc61cec15d2431280465ef16c3c578c4e0c6fbbd4eeabd13675cb",
+        "b33f9d51a672877adf9c0d15579808104eff001b2bcf9cd724f070f3da80f173",
+        "31d74d1365ee9c42a7bcbbcbb79211b2d0936ddb2d81c1ce33edd6009a9d5bdd",
+        "ac61b80e76ad8c828b8ef6a7ca8c1737df43651e4d333c59b80eef72bd609eb2"
+      ],
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "created_at": "2026-11-22T18:58:48.830113+00:00"
+    }
+  }
 }
