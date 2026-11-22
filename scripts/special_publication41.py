@@ -80,6 +80,7 @@ def build(state,root):
     with tempfile.TemporaryDirectory(prefix='387-special-final-') as temp:
         work=Path(temp)
         for name in ('issues','archive','assets'):shutil.copytree(root/name,work/name)
+        if (root/'art').is_dir():shutil.copytree(root/'art',work/'art')
         shutil.copyfile(root/'index.html',work/'index.html')
         issue=work/'issues'/sc.SLUG
         existing=issue.exists()

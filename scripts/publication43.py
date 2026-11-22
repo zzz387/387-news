@@ -11,8 +11,10 @@ except ImportError:
 
 def digest_bytes(data):return hashlib.sha256(data).hexdigest()
 
-def reader_chrome(page):
-    return re.sub(r'(<nav class="topics wrap"[^>]*>).*?(</nav>)',r'\1<a href="/">Обзор номера</a><a href="/archive/">Архив</a>\2',page,count=1,flags=re.S)
+def reader_chrome(page,root=None):
+    menu='<a href="/">Обзор номера</a><a href="/archive/">Архив</a>'
+    if root is not None and (Path(root)/'art/index.html').is_file():menu+='<a href="/art/">Искусство</a>'
+    return re.sub(r'(<nav class="topics wrap"[^>]*>).*?(</nav>)',lambda m:m[1]+menu+m[2],page,count=1,flags=re.S)
 
 
 def public_article(record):
@@ -145,7 +147,7 @@ def build(state,root,reserve=(),preview=False):
                 data['art44']={'status':'COMPLETE' if complete else 'ARTWORK_INCOMPLETE','required':len(articles),'ready':len(current),'missing':len(articles)-len(current),'emergency_text':not complete,'provider_status':mosaic44.provider_status()}
             for a in articles:
                 file=issue/'articles'/a['slug']/'index.html';file.parent.mkdir(parents=True)
-                file.write_text(reader_chrome(render.render_article(date,no,a,working,policy_version=version)))
+                file.write_text(reader_chrome(render.render_article(date,no,a,working,policy_version=version),working))
                 md=file.with_name('article.md');md.write_text(render.markdown(a))
                 data['pages'][a['slug']]={'html':digest_bytes(file.read_bytes()),'markdown':digest_bytes(md.read_bytes())}
             if version=='4.4':
@@ -156,7 +158,7 @@ def build(state,root,reserve=(),preview=False):
             rows=[{k:r.get(k,'') for k in ('url','title','publisher','published','checked_at')} for r in reserve] if not articles else []
             if not articles:data['sources']=rows
             for permanent,target in ((True,issue/'index.html'),(False,working/'index.html')):
-                page=reader_chrome(render.render_overview(date,no,articles,permanent,policy_version=version)) if articles else overview(date,no,rows,permanent)
+                page=reader_chrome(render.render_overview(date,no,articles,permanent,policy_version=version),working) if articles else overview(date,no,rows,permanent)
                 target.write_text(page.replace('</main>',render_light(light)+'</main>',1))
             markdown=('# Обзор источников\n\nПроверенные ссылки; не полноценные статьи. Без генерации Gemini.\n\n'+'\n'.join('- ['+r['title']+']('+r['url']+') — '+r['publisher']+'; '+(r.get('published') or 'дата не сохранена') for r in rows)) if not articles else '# Выпуск '+date+'\n\n'+'\n'.join('- ['+a['title']+'](/issues/'+date+'/articles/'+a['slug']+'/)' for a in articles)
             if light:markdown+='\n\n# НЕ ВСЁ ТАК СЕРЬЁЗНО\n\nМаленькие новости, от которых мир становится интереснее\n\n'+'\n\n'.join('## '+x['title']+'\n\n'+x['text']+'\n\nИсточник: ['+x['source']['publisher']+']('+x['source']['url']+')' for x in light)
@@ -164,7 +166,7 @@ def build(state,root,reserve=(),preview=False):
             data['homepage_hash']=digest_bytes((working/'index.html').read_bytes())
             data.update(overview_hash=digest_bytes((issue/'index.html').read_bytes()),markdown_hash=digest_bytes((issue/'overview.md').read_bytes()))
             (issue/'release.json').write_text(json.dumps(data,ensure_ascii=False,indent=2)+'\n')
-            (working/'archive/index.html').write_text(reader_chrome(news.render_archive()).replace('Редакция 2.0','Редакция 4.3'))
+            (working/'archive/index.html').write_text(reader_chrome(news.render_archive(),working).replace('Редакция 2.0','Редакция 4.3'))
             (working/'sitemap.xml').write_text(news.sitemap())
             if preserved_home is not None:(working/'index.html').write_bytes(preserved_home)
             validate(working,date)
@@ -175,6 +177,9 @@ def build(state,root,reserve=(),preview=False):
             illustration_dir=working/'assets/illustrations'/date
             if illustration_dir.is_dir():shutil.copytree(illustration_dir,root/'assets/illustrations'/date,dirs_exist_ok=True)
             for name in ('index.html','archive/index.html','sitemap.xml'):(root/name).write_bytes((working/name).read_bytes())
+            if state.get('art_library44'):
+                from scripts import art_library44
+                art_library44.render(root,art_library44.load(root,state))
     return not preview
 
 
@@ -257,6 +262,12 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
                 for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
     sub['assembly_status44']='EDITORIAL_APPROVED'
     sub['art44']['approval']={'date':date,'manifest_hash':p.digest(data),'signature':p.digest([{'id':r['id'],'article':mosaic44.final_text(r['article'])} for r in rows])}
+    if mosaic44.CONFIG.get('references_enabled') and date>=mosaic44.CONFIG.get('first_reference_issue','9999-12-31'):
+        from scripts import art_library44,news
+        reference_state={'date':date,'issue_id':data.get('issue_id',date),'art_library44':parent.setdefault('art_library44',{})}
+        budget=news.runtime.ACTIVE_BUDGET
+        sets=art_library44.prepare_sets(root,reference_state,items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180),number=data.get('number'))
+        art_library44.attach(root,reference_state,items,sets)
     progress=mosaic44.prepare_items(sub,items,persist,allow_request)
     parent['art44_backfill_status']={'date':date,**progress};persist()
     articles=[r['article'] for r in rows]

@@ -146,6 +146,7 @@ class HistoricalSpecialLinksTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             target=root(temp);shutil.copytree(p.ROOT/'issues',target/'issues')
             shutil.copyfile(p.ROOT/'index.html',target/'index.html')
+            if (p.ROOT/'art').is_dir():shutil.copytree(p.ROOT/'art',target/'art')
             before={str(f.relative_to(target)):f.read_bytes() for f in (target/'issues/2026-10-26-v41').rglob('*') if f.is_file()}
             with self.assertRaisesRegex(p.Blocked,'SPECIAL_IMMUTABLE_ARCHIVE_CHANGED'):special.build(ready_issue(),target)
             self.assertEqual(before,{str(f.relative_to(target)):f.read_bytes() for f in (target/'issues/2026-10-26-v41').rglob('*') if f.is_file()})

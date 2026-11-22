@@ -60,3 +60,27 @@ Official documentation checked on 2026-11-22:
 - https://api.artic.edu/docs/
 - https://www.artic.edu/open-access/open-access-images
 - https://www.clevelandart.org/open-access
+
+Production recovery: forbidden museum hosts open a per-run circuit after one
+401/403/429/server error, leaving requests for the independent museum fallback.
+Official Cleveland image URLs are read from API records, including its
+`openaccess-cdn.clevelandart.org` host; protected URLs are not bypassed. The global
+reference registry and unpublished media also travel in the existing encrypted
+editorial inventory, preventing cross-issue reassignment before a Git commit.
+Already committed media are omitted from this shared duplicate cache. Pending
+issues are labelled as preparing instead of publishing broken release links.
+
+Art navigation is added with the explicit current publication root; legacy renderers
+retain their original markup. Temporary legacy/special publication projections copy
+the existing gallery dependencies so current-home links remain valid without
+rewriting archived issue pages.
+
+A further independent fallback uses the Met Collection API for a narrowly curated
+selection of explicitly public-domain Claude Monet paintings. Object IDs, original
+image URLs, titles, artists and dates come from the API; no image URL is invented.
+https://metmuseum.github.io/
+https://www.metmuseum.org/policies/image-resources
+
+Met searches use the documented paginated `/public/collection/v1.1/search` endpoint
+(the previous v1 search retired in October 2026), with a 60-ID page. Public-domain
+status is checked on the individual object, not an unsupported search parameter.

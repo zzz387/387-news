@@ -585,6 +585,9 @@ def main():
             if os.getenv('NEWS_STOCK_FILE') and not args.preview:
                 if os.getenv('GITHUB_ACTIONS')!='true' or os.getenv('GITHUB_REPOSITORY')!='zzz387/387-news' or branch!='main':raise RuntimeError('EDITORIAL_STOCK_PROTECTED_ACTIONS_REQUIRED')
                 stock=stock43.ensure(state);stock['quota_snapshot']=json.loads(json.dumps(ledger))
+                if state.get('art_library44'):
+                    from scripts import art_library44
+                    stock['art_library44']=art_library44.checkpoint(state,ROOT)
                 destination=ARTIFACT_FILE.parent/'editorial-stock.enc';temporary=destination.with_suffix('.tmp')
                 temporary.write_bytes(cipher(stock,key));temporary.chmod(0o600);temporary.replace(destination)
                 if output:
@@ -725,6 +728,9 @@ def restore_editorial_stock(state,key,ledger,path,expected=False):
     if expected and not path.is_file():raise RuntimeError('Editorial inventory download missing; refusing empty restore')
     if path.is_file():
         inventory=decipher(path.read_bytes(),key)
+        if inventory.get('art_library44'):
+            from scripts import art_library44
+            art_library44.merge_checkpoint(state,inventory['art_library44'])
         stock43.merge(state,inventory);RUNTIME.merge_snapshot(ledger,inventory.get('quota_snapshot',{}));stock43.restore_backlog(state,ROOT)
     return stock43.report(state)
 

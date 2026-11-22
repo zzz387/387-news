@@ -203,7 +203,7 @@ def build(state,root,preview=False):
     # Work only in a private temporary tree; no output is committed until every page passes.
     with tempfile.TemporaryDirectory(prefix='387-v41-build-') as directory:
         working=Path(directory)
-        for name in ('assets','archive','issues'):
+        for name in ('assets','archive','issues','art'):
             if (root/name).is_dir(): shutil.copytree(root/name,working/name)
         previous=news.ROOT; news.ROOT=working
         try:

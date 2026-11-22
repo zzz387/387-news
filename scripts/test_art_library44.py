@@ -150,9 +150,71 @@ class ArtLibraryTests(unittest.TestCase):
                 with patch.object(site_checks,'urlopen',return_value=Response(b'corrupted image')):
                     with self.assertRaisesRegex(RuntimeError,'PUBLIC_ART_IMAGE_CHANGED'):site_checks.check_art_library(root)
 
+    def test_forbidden_image_host_opens_circuit_and_preserves_museum_fallback(self):
+        from urllib.error import HTTPError
+        museum=lib.Museum()
+        with patch.object(lib,'urlopen',side_effect=HTTPError('https://www.artic.edu/image',403,'Forbidden',{},None)) as request:
+            with self.assertRaises(HTTPError):museum.get('https://www.artic.edu/image',robots=False)
+            with self.assertRaisesRegex(ValueError,'ART_SOURCE_UNAVAILABLE'):museum.get('https://www.artic.edu/other-image',robots=False)
+            self.assertEqual(request.call_count,1)
+        data={'data':[{'id':i,'title':'Fixture painting '+str(i),'type':'Painting','description':'An Impressionist painting.','share_license_status':'CC0','creation_date':'1890','creators':[{'description':'Fixture artist'}],'images':{'web':{'url':'https://openaccess-cdn.clevelandart.org/fixture'+str(i)+'.jpg'}},'url':'https://www.clevelandart.org/art/fixture'+str(i)} for i in range(4)]}
+        with patch.object(museum,'get',return_value=json.dumps(data).encode()) as fetch:
+            works=list(museum.candidates('Импрессионизм'))
+            self.assertEqual(len(works),4);self.assertTrue(fetch.call_args_list[0].args[0].startswith('https://openaccess-api.clevelandart.org/'))
+            self.assertTrue(all(w['museum']=='Cleveland Museum of Art' for w in works))
+        self.assertIn('openaccess-cdn.clevelandart.org',lib.HOSTS)
+
+    def test_met_fallback_only_accepts_explicit_public_domain_monet_paintings(self):
+        museum=lib.Museum();museum.blocked_hosts.add('www.artic.edu')
+        def get(url):
+            if 'clevelandart.org' in url:return json.dumps({'data':[]}).encode()
+            if '/search?' in url:
+                self.assertIn('/v1.1/search?',url);self.assertNotIn('isPublicDomain=',url)
+                return json.dumps({'objectIDs':[1,2,3]}).encode()
+            identity=int(url.rsplit('/',1)[1])
+            return json.dumps({'isPublicDomain':identity!=3,'artistDisplayName':'Claude Monet','classification':'Paintings','title':'Fixture Monet '+str(identity),'objectDate':'1890','objectURL':'https://www.metmuseum.org/art/collection/search/'+str(identity),'primaryImageSmall':'https://images.metmuseum.org/fixture.jpg','medium':'Oil on canvas'}).encode()
+        with patch.object(museum,'get',side_effect=get):
+            works=list(museum.candidates('Импрессионизм'))
+            self.assertEqual(len(works),2);self.assertTrue(all(w['museum']=='The Metropolitan Museum of Art' and w['license']=='CC0' for w in works))
+
+    def test_shared_encrypted_inventory_keeps_unpublished_cross_issue_reservations(self):
+        with tempfile.TemporaryDirectory() as first,tempfile.TemporaryDirectory() as second:
+            a=self.stock(first,8);sets=lib.prepare_sets(first,a,self.items(5),discover=False)
+            shared=lib.checkpoint(a,first)
+            b={'date':'2026-11-24'};lib.merge_checkpoint(b,shared)
+            with patch.object(lib.Museum,'get',side_effect=AssertionError('Do not redownload shared media')):
+                second_sets=lib.prepare_sets(second,b,self.items(5),discover=False)
+            self.assertTrue(set(sets['Импрессионизм']['artwork_ids']).isdisjoint(second_sets['Импрессионизм']['artwork_ids']))
+            self.assertEqual(len(b['art_library44']['registry']['sets']),2)
+            bad=copy.deepcopy(shared);next(iter(bad['registry']['sets'].values()))['status']='tampered'
+            with self.assertRaisesRegex(ValueError,'ART_REGISTRY_CONFLICT'):lib.merge_checkpoint(b,bad)
+
+    def test_published_missing_image_resumes_same_quartet_from_next_issue_state(self):
+        from scripts.test_policy44 import issue,synthetic_art
+        from scripts.test_daily43 import root as site_root
+        from scripts import publication43 as pub
+        with tempfile.TemporaryDirectory() as temp:
+            target=site_root(temp);s=issue();s['date']='2026-11-23';s['brief_policy_revision']=2
+            s['art_library44']=self.stock(target,4)['art_library44']
+            styles={key:['Импрессионизм'] for key in art.STYLES}
+            with patch.object(art,'STYLES',styles),patch.object(art,'CONFIG',dict(art.CONFIG,references_enabled=False)):
+                synthetic_art(s);sets=lib.prepare_sets(target,s,self.items(8),discover=False)
+                reference=sets['Импрессионизм']
+                for obj in s['art44']['objects'].values():obj.update(reference_status='FOUR_REFERENCES_READY',reference_set_id=reference['id'],reference_artwork_ids=reference['artwork_ids'],reference_sha256=reference['sha256'])
+                pub.build(s,target)
+            metadata=pub.validate(target,s['date']);missing=metadata['illustrations'][-1];(target/missing['path']).unlink()
+            later={'date':'2026-11-24'};lib.merge_checkpoint(later,lib.checkpoint(s,target))
+            budget=type('Budget',(),{'ledger':{},'remaining_seconds':lambda self:1000})()
+            with patch.object(art.p,'ROOT',target),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget),patch.object(lib.Museum,'get',side_effect=AssertionError('Do not search another quartet')),patch.object(art,'generate',return_value=picture(888)) as generate:
+                self.assertTrue(pub.backfill_issue_art(target,s['date'],later))
+                generate.assert_called_once();item=generate.call_args.args[0]
+                self.assertEqual(item['reference_set_id'],'2026-11-23/impressionism');self.assertEqual(len(item['reference_images']),4)
+                self.assertEqual(pub.validate(target,s['date'])['art44']['ready'],8)
+
     def test_pages_keep_original_proportions_sources_and_issue_grouping(self):
         with tempfile.TemporaryDirectory() as temp:
-            state=self.stock(temp,8);lib.prepare_sets(temp,state,self.items(5),discover=False,number=29)
+            state=self.stock(temp,8);folder=Path(temp)/'issues/2026-11-23';folder.mkdir(parents=True);(folder/'index.html').write_text('Synthetic published fixture')
+            lib.prepare_sets(temp,state,self.items(5),discover=False,number=29)
             reg=state['art_library44']['registry'];page=(Path(temp)/'art/impressionism/index.html').read_text()
             self.assertIn('Выпуск №29',page);self.assertIn('/issues/2026-11-23/',page);self.assertIn('Вся коллекция',page)
             for work in reg['artworks'].values():
