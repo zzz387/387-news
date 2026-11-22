@@ -26,7 +26,7 @@ GENRES={
  'Геометрическая абстракция':('geometric-abstraction','Geometric abstraction'),
  'Супрематизм':('suprematism','Suprematism'), 'Коллаж':('collage','Collage'),
  'Индустриальная графика':('industrial','Industrial'), 'Масло':('oil','Oil on canvas')}
-HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org'}
+HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org'}
 
 def stamp():return datetime.now(timezone.utc).isoformat()
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -89,7 +89,7 @@ def restore(root,state):
 
 class Museum:
     """A bounded official-API client. robots, bytes and deadline fail closed."""
-    def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set()
+    def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set();self.known_ids=set()
     def get(self,url,limit=5000000,robots=True):
         parsed=urlparse(url)
         if parsed.scheme!='https' or parsed.hostname not in HOSTS or parsed.username or parsed.password:raise ValueError('ART_SOURCE_HOST_INVALID')
@@ -148,6 +148,25 @@ class Museum:
                 yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],
                     'source_url':row['url'],'license':'CC0','license_url':'https://www.clevelandart.org/open-access','image_url':image,'genre_evidence':tokens[:1000],'genre_id':genre_id(genre),'verified':True}
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'cleveland','code':safe_code(exc)}),flush=True)
+        # A third independent open collection, with a deliberately narrow curatorial
+        # fallback: documented Monet paintings, not arbitrary search matches.
+        if genre=='Импрессионизм':
+            try:
+                base='https://collectionapi.metmuseum.org/public/collection/v1/'
+                search=base.replace('/v1/','/v1.1/')+'search?'+urlencode({'q':'Claude Monet','artistOrCulture':'true','hasImages':'true','medium':'Paintings','offset':0,'limit':60})
+                ids=json.loads(self.get(search)).get('objectIDs') or []
+                for identity in ids:
+                    if 'met:'+str(identity) in self.known_ids:continue
+                    if 'images.metmuseum.org' in self.blocked_hosts:break
+                    row=json.loads(self.get(base+'objects/'+str(identity)))
+                    if row.get('isPublicDomain') is not True or row.get('artistDisplayName')!='Claude Monet' or row.get('classification')!='Paintings':continue
+                    image=row.get('primaryImageSmall')
+                    if not image or not row.get('objectDate') or not row.get('title'):continue
+                    yield {'museum':'The Metropolitan Museum of Art','museum_id':'met:'+str(identity),'title':row['title'],'artist':row['artistDisplayName'],'year':row['objectDate'],
+                        'source_url':row['objectURL'],'license':'CC0','license_url':'https://www.metmuseum.org/policies/image-resources',
+                        'image_url':image,'genre_evidence':'Curatorial selection: Claude Monet painting; '+row.get('medium',''),'genre_id':genre_id(genre),'verified':True}
+            except Exception as exc:print('[art-museum] '+json.dumps({'museum':'met','code':safe_code(exc)}),flush=True)
+
 
 def safe_code(exc):
     value=str(exc)
@@ -198,6 +217,7 @@ def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None)
 
 def prepare_sets(root,state,items,persist=lambda:None,discover=True,identity_override=None,number=None):
     registry=restore(root,state);issue=identity_override or issue_id(state);result={};client=Museum()
+    client.known_ids={w['museum_id'] for w in registry['artworks'].values()}
     genres=list(dict.fromkeys(item['genre'] for item in items))
     for genre in genres:
         try:

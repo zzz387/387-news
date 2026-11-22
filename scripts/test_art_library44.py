@@ -160,9 +160,22 @@ class ArtLibraryTests(unittest.TestCase):
         data={'data':[{'id':i,'title':'Fixture painting '+str(i),'type':'Painting','description':'An Impressionist painting.','share_license_status':'CC0','creation_date':'1890','creators':[{'description':'Fixture artist'}],'images':{'web':{'url':'https://openaccess-cdn.clevelandart.org/fixture'+str(i)+'.jpg'}},'url':'https://www.clevelandart.org/art/fixture'+str(i)} for i in range(4)]}
         with patch.object(museum,'get',return_value=json.dumps(data).encode()) as fetch:
             works=list(museum.candidates('Импрессионизм'))
-            self.assertEqual(len(works),4);self.assertEqual(fetch.call_count,1)
+            self.assertEqual(len(works),4);self.assertTrue(fetch.call_args_list[0].args[0].startswith('https://openaccess-api.clevelandart.org/'))
             self.assertTrue(all(w['museum']=='Cleveland Museum of Art' for w in works))
         self.assertIn('openaccess-cdn.clevelandart.org',lib.HOSTS)
+
+    def test_met_fallback_only_accepts_explicit_public_domain_monet_paintings(self):
+        museum=lib.Museum();museum.blocked_hosts.add('www.artic.edu')
+        def get(url):
+            if 'clevelandart.org' in url:return json.dumps({'data':[]}).encode()
+            if '/search?' in url:
+                self.assertIn('/v1.1/search?',url);self.assertNotIn('isPublicDomain=',url)
+                return json.dumps({'objectIDs':[1,2,3]}).encode()
+            identity=int(url.rsplit('/',1)[1])
+            return json.dumps({'isPublicDomain':identity!=3,'artistDisplayName':'Claude Monet','classification':'Paintings','title':'Fixture Monet '+str(identity),'objectDate':'1890','objectURL':'https://www.metmuseum.org/art/collection/search/'+str(identity),'primaryImageSmall':'https://images.metmuseum.org/fixture.jpg','medium':'Oil on canvas'}).encode()
+        with patch.object(museum,'get',side_effect=get):
+            works=list(museum.candidates('Импрессионизм'))
+            self.assertEqual(len(works),2);self.assertTrue(all(w['museum']=='The Metropolitan Museum of Art' and w['license']=='CC0' for w in works))
 
     def test_shared_encrypted_inventory_keeps_unpublished_cross_issue_reservations(self):
         with tempfile.TemporaryDirectory() as first,tempfile.TemporaryDirectory() as second:

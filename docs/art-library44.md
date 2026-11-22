@@ -74,3 +74,13 @@ Art navigation is added with the explicit current publication root; legacy rende
 retain their original markup. Temporary legacy/special publication projections copy
 the existing gallery dependencies so current-home links remain valid without
 rewriting archived issue pages.
+
+A further independent fallback uses the Met Collection API for a narrowly curated
+selection of explicitly public-domain Claude Monet paintings. Object IDs, original
+image URLs, titles, artists and dates come from the API; no image URL is invented.
+https://metmuseum.github.io/
+https://www.metmuseum.org/policies/image-resources
+
+Met searches use the documented paginated `/public/collection/v1.1/search` endpoint
+(the previous v1 search retired in October 2026), with a 60-ID page. Public-domain
+status is checked on the individual object, not an unsupported search parameter.
