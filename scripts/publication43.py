@@ -247,7 +247,8 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
             for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
     sub['assembly_status44']='EDITORIAL_APPROVED'
     sub['art44']['approval']={'date':date,'manifest_hash':p.digest(data),'signature':p.digest([{'id':r['id'],'article':mosaic44.final_text(r['article'])} for r in rows])}
-    mosaic44.prepare_items(sub,items,persist,allow_request)
+    progress=mosaic44.prepare_items(sub,items,persist,allow_request)
+    parent['art44_backfill_status']={'date':date,**progress};persist()
     articles=[r['article'] for r in rows]
     before={slug:(root/'issues'/date/'articles'/slug/'index.html').read_text() for slug in data['pages']}
     # Work in a private temporary tree. Commit only after the complete issue validates.

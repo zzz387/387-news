@@ -162,6 +162,11 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
     saved=state.setdefault('art44',{'objects':{},'history':[]})
     saved.setdefault('objects',{});saved.setdefault('history',[])
     saved['provider_status']=provider_status()
+    from scripts import cloudflare44
+    auth_failure=saved.get('authorization_failure',{})
+    if auth_failure.get('credentials_hash')==cloudflare44.credential_fingerprint():
+        saved['provider_status']=auth_failure['code']
+    elif auth_failure:saved.pop('authorization_failure',None)
     saved['plan']=items;state['assembly_status44']='ART_GENERATION';persist()
     from scripts import news
     budget=news.runtime.ACTIVE_BUDGET
@@ -195,6 +200,8 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
                 saved['code']='IMAGE_QUOTA_OR_COOLDOWN';persist();break
             code=str(exc) if re.fullmatch(r'[A-Z_0-9]+',str(exc)) else type(exc).__name__
             if code.startswith('CF_') and code!='CF_IMAGE_INVALID':
+                if code in ('CF_HTTP_401','CF_HTTP_403'):
+                    saved['authorization_failure']={'credentials_hash':cloudflare44.credential_fingerprint(),'code':code}
                 saved['provider_status']=code;persist();break
             saved['history'].append({'key':item['key'],'code':code})
             if code in ('IMAGE_HTTP_401','IMAGE_HTTP_403'):

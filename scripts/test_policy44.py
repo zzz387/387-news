@@ -37,6 +37,25 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_cloudflare_auth_failure_waits_for_changed_credentials(self):
+        from scripts import cloudflare44 as cf,mosaic44 as art
+        import io
+        from PIL import Image
+        stream=io.BytesIO();Image.new('RGB',(32,32),(70,90,80)).save(stream,format='PNG')
+        state={'date':'2026-11-22','art44':{'objects':{},'history':[]}}
+        plans=art.article_plans(state,[{'id':'one','article':main_row(0)['article']}])
+        env={'CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
+        budget=SimpleNamespace(remaining_seconds=lambda:1000,ledger={})
+        with patch.dict(os.environ,env),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(art,'cached',return_value={}):
+            with patch.object(art,'generate',side_effect=RuntimeError('CF_HTTP_403')) as generate:
+                art.prepare_items(state,plans);art.prepare_items(state,plans)
+                self.assertEqual(generate.call_count,1);self.assertEqual(state['art44']['provider_status'],'CF_HTTP_403')
+            with patch.dict(os.environ,CLOUDFLARE_API_TOKEN='SYNTHETIC_UPDATED'),patch.object(art,'generate',return_value=stream.getvalue()) as generate:
+                self.assertTrue(art.prepare_items(state,plans)['complete']);generate.assert_called_once()
+            with patch.object(cf,'free_usage',side_effect=RuntimeError('CF_HTTP_401')),patch.object(cf,'github_secret_metadata',return_value={}):
+                report=cf.diagnose(art.CONFIG,probe=True)
+                self.assertEqual(report['status'],'CF_HTTP_401');self.assertFalse(report['authorization_verified'])
+
     def test_cloudflare_free_guard_payload_and_neuron_accounting(self):
         from scripts import cloudflare44 as cf,generation_runtime as rt,mosaic44 as art
         import io,base64
@@ -77,7 +96,7 @@ class Policy44Tests(unittest.TestCase):
 
     def test_art_backfill_is_idempotent_and_preserves_all_editorial_text(self):
         from scripts import mosaic44 as art
-        for n in (13,25):
+        for n in (8,13,25):
             with self.subTest(articles=n),tempfile.TemporaryDirectory() as temp:
                 s=issue(n,12);s['date']='2026-11-22';s['brief_policy_revision']=2;synthetic_art(s);target=root(temp);pub.build(s,target)
                 before={f.relative_to(target).as_posix():f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()}
