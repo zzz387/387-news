@@ -60,3 +60,12 @@ Official documentation checked on 2026-11-22:
 - https://api.artic.edu/docs/
 - https://www.artic.edu/open-access/open-access-images
 - https://www.clevelandart.org/open-access
+
+Production recovery: forbidden museum hosts open a per-run circuit after one
+401/403/429/server error, leaving requests for the independent museum fallback.
+Official Cleveland image URLs are read from API records, including its
+`openaccess-cdn.clevelandart.org` host; protected URLs are not bypassed. The global
+reference registry and unpublished media also travel in the existing encrypted
+editorial inventory, preventing cross-issue reassignment before a Git commit.
+Already committed media are omitted from this shared duplicate cache. Pending
+issues are labelled as preparing instead of publishing broken release links.

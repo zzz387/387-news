@@ -175,6 +175,9 @@ def build(state,root,reserve=(),preview=False):
             illustration_dir=working/'assets/illustrations'/date
             if illustration_dir.is_dir():shutil.copytree(illustration_dir,root/'assets/illustrations'/date,dirs_exist_ok=True)
             for name in ('index.html','archive/index.html','sitemap.xml'):(root/name).write_bytes((working/name).read_bytes())
+            if state.get('art_library44'):
+                from scripts import art_library44
+                art_library44.render(root,art_library44.load(root,state))
     return not preview
 
 
