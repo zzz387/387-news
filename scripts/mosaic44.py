@@ -134,6 +134,12 @@ def article_plans(state,rows=None):
         if previous:
             for key_name in ('genre','ratio','palette','composition'):
                 if key_name in previous:item[key_name]=previous[key_name]
+        brief=CONFIG.get('visual_brief_repairs',{}).get(text_hash,{})
+        # Repairs are bound to immutable approved text, never to a mutable title/slug.
+        source=record.get('source',{})
+        source_title=source.get('title','')
+        visual=brief.get('scene_en') or article.get('art_brief_en') or (source_title if source_title.isascii() else '')
+        if visual:item['descriptor']['visual_subject_en']=visual[:1400]
         item['description_hash']=p.digest(item['descriptor'])
         item['prompt']=prompt(item);result.append(item);genres[item['genre']]+=1
     return result

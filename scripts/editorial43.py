@@ -9,7 +9,7 @@ except ImportError:
 CONFIG=json.loads((p.ROOT/'config/daily43.json').read_text())
 VERSION=CONFIG.get('version','4.3')
 S={'type':'string'}; B={'type':'boolean'}
-news.SCHEMAS['v43_article']=content41.schema({'finished':B,'title':S,'teaser':S,
+news.SCHEMAS['v43_article']=content41.schema({'finished':B,'title':S,'teaser':S,'art_brief_en':S,
     'blocks':{'type':'array','items':content41.schema({'kind':{'type':'string','enum':['heading','paragraph','item']},'text':S})}})
 CHECKS=('facts','safety','rights','independence','title_matches','complete','evidence_sufficient')
 news.SCHEMAS['v43_final']=content41.schema({'approve':B,**{name:B for name in CHECKS},
@@ -300,6 +300,7 @@ class Editor(old.Editor):
                             'Заголовок должен соответствовать фактически раскрытому аспекту. Не давай рискованные советы без доказательной базы; '
                             'не придумывай цифры и даты, различай дату публикации и события, корреляцию и причинность. Практическое объяснение о семье или движении не превращай в оперативную новость: не добавляй сегодня, недавно или новое исследование без прямого подтверждения. Не вводи в обычную семейную или спортивную статью медицинские советы. '
                             'Для медицинских исследований укажи дизайн и ограничения, не подменяй исследование пресс-релизом. '
+                            'В служебном art_brief_en дай 1–2 предложения на английском: конкретная визуальная метафора центральной идеи статьи для художника. Без надписей, вымышленных фактов и документального изображения реальных людей. Этот блок не входит в текст статьи. '
                             'finished=true только для законченной заметки. URL только в служебном блоке источника, не в тексте. '
                             '\nПолные материалы: '+json.dumps(self.writing_basis(record),ensure_ascii=False)+
                             '\nРедакторский контекст текущего номера: '+json.dumps(self.issue_context(state,record),ensure_ascii=False)+'\nПредыдущий отказ: '+json.dumps(progress.get('feedback',{}),ensure_ascii=False),output_tokens=12000,schema='v43_article')

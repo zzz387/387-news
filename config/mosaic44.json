@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "maximum_tiles": 12,
-  "prompt_version": "387-art-cloudflare-3",
+  "prompt_version": "387-art-cloudflare-4",
   "provider": "cloudflare_workers_ai",
   "model": "@cf/black-forest-labs/flux-1-schnell",
   "free_tier_verified": false,
@@ -17,5 +17,39 @@
   "image_neuron_budget": 7500,
   "reserve_neurons_per_request": 256,
   "account_headroom": 1500,
-  "request_gap_seconds": 3
+  "request_gap_seconds": 3,
+  "visual_brief_repairs": {
+    "5e39e937e188e1ed35f2bbb4d9cf9dea6f07f85494c55906a152c7ef384cd891": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "A lone ultramarathon runner on a circular forest trail at dawn, several translucent overlapping silhouettes suggesting many repeated laps and endurance through the night. Curving dynamic brushstrokes, no phone, no city buildings."
+    },
+    "10e33e4addbb6b77627fea9c93c1b2bdb49d0033352adf487b81193ff1a4ebb1": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "A quiet Moscow apartment sanctuary: sculptural pale stone and warm wooden surfaces, a soft sofa, a large window framing distant city rooftops. Geometric architectural planes, calm generous light and contemplative empty space."
+    },
+    "095b6c31c553e38134a5277f1b06ee026e69be73b6702a6baffea8b9989fb17e": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "An American elm tree with a broad vase-shaped crown, new green seedlings emerging beneath it. Delicate branching roots connect genetically diverse young trees, a visual metaphor for restoring disease-resistant elm populations. No city streets or buildings."
+    },
+    "58464c0b913c8eb7e26f4a7c9a122e169065d2bf90c525336b8e36c880dc8779": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "In a Central African village, a community spiritual elder and a healthcare worker meet with families under a large tree, an open circle and a bridge of warm light symbolizing trust during Ebola response. Abstract human figures, no portrait likeness, no hospital signs, no snow or European buildings."
+    },
+    "69e87f49e218b714a71851b9aa8442ba557481c3bbd1bab8f1c310d303f86677": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "A close-up still life of winter running shoes with deeply textured gripping soles, snow crystals and rain droplets, a winding icy trail receding into the background. Flowing decorative curves and botanical patterns. No brand marks or written labels."
+    },
+    "622864a94513688d9a15f84f52eca43aed8ecc4a8d58d320e8e4bd73dbdd93ec": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "A bundle of blank envelopes and small colorful childlike drawings glowing warmly in the hands of an elderly man, with a distant classroom and a connecting ribbon of light. Metaphor for letters from schoolchildren sustaining a soldier and kindness remembered across generations. No writing on paper."
+    },
+    "076df96c6dcc1a9d23622e45fd9eca5ec1259b7adf969ae4bc7fda839b33ece0": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "A person sitting awake beside a bed holding a softly glowing phone, a dark window and a small bedside lamp, the blanket extending like a quiet river toward sleep. Metaphor for bedtime procrastination, boredom and the temptation to keep scrolling. No visible screen text, no forest."
+    },
+    "32c35848803d0dc46fb768fdc14d2a1f3fa04d10eb311bd28e2d4904e7969c8a": {
+      "replace_prompt_version": "387-art-cloudflare-3",
+      "scene_en": "Children absorbed in free imaginative play on a safe sunlit playroom floor, assembling wooden blocks, a cardboard arch and fabric tents while an adult quietly watches from the doorway. Loose warm brushstrokes, a visual metaphor for autonomy and creativity, no written letters."
+    }
+  }
 }

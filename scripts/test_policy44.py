@@ -37,6 +37,25 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_flux_prompt_uses_english_subject_before_long_russian_prose(self):
+        from scripts import cloudflare44 as cf,mosaic44 as art
+        row=main_row(0);before=art.final_text(row['article'])
+        row['article']['art_brief_en']='Children build a cardboard castle in a sunlit playroom.'
+        row['article']['teaser']='Проверенный русский текст. '*300
+        expected=art.final_text(row['article'])
+        item=art.article_plans({'date':'2026-11-23'},[row])[0]
+        self.assertIn('Subject: Children build a cardboard castle',item['prompt'])
+        self.assertIn('watercolor',item['prompt']);self.assertNotIn('Проверенный',item['prompt'])
+        self.assertLessEqual(len(item['prompt']),2048)
+        self.assertEqual(expected,art.final_text(row['article']))
+        self.assertNotIn('art_brief_en',art.final_text(row['article']))
+        for styles in art.STYLES.values():
+            for style in styles:
+                with self.subTest(style=style):self.assertIn(style,cf.STYLE_EN)
+        del row['article']['art_brief_en'];row['source']['title']='American elm restoration and genetic diversity'
+        item=art.article_plans({'date':'2026-11-23'},[row])[0]
+        self.assertIn('American elm restoration',item['prompt'])
+
     def test_cloudflare_auth_failure_waits_for_changed_credentials(self):
         from scripts import cloudflare44 as cf,mosaic44 as art
         import io
@@ -121,6 +140,28 @@ class Policy44Tests(unittest.TestCase):
                 for slug,text in body.items():self.assertEqual(pub.without_art44((target/'issues'/s['date']/'articles'/slug/'index.html').read_text()),text)
                 for name,data_bytes in before.items():
                     if name.endswith('.md'):self.assertEqual((target/name).read_bytes(),data_bytes)
+
+    def test_visual_repair_migrates_only_bound_image_and_reuses_it(self):
+        from scripts import mosaic44 as art
+        import io
+        from PIL import Image
+        with tempfile.TemporaryDirectory() as temp:
+            s=issue();s['date']='2026-11-22';s['brief_policy_revision']=2;synthetic_art(s)
+            target=root(temp);pub.build(s,target);old=pub.validate(target,s['date'])
+            image=old['illustrations'][0]
+            repairs={image['text_hash']:{'replace_prompt_version':image['prompt_version'],'scene_en':'Children build a castle.'}}
+            config=dict(art.CONFIG,prompt_version='fixture-visual-repair',visual_brief_repairs=repairs)
+            raw=io.BytesIO();Image.new('RGB',(48,32),(230,130,30)).save(raw,format='PNG')
+            body={slug:pub.without_art44((target/'issues'/s['date']/'articles'/slug/'index.html').read_text()) for slug in old['pages']}
+            budget=SimpleNamespace(remaining_seconds=lambda:1000,ledger={})
+            with patch.object(art,'CONFIG',config),patch.object(art.p,'ROOT',target),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(art,'provider_status',return_value='READY'),patch.object(art,'generate',return_value=raw.getvalue()) as generate:
+                parent={};self.assertTrue(pub.backfill_issue_art(target,s['date'],parent))
+                generate.assert_called_once();self.assertIn('Children build a castle',generate.call_args.args[0]['prompt'])
+                new=pub.validate(target,s['date']);self.assertEqual(new['art44']['ready'],8)
+                self.assertTrue((target/image['path']).is_file())
+                self.assertEqual(len(set(r['key'] for r in old['illustrations']) & set(r['key'] for r in new['illustrations'])),7)
+                self.assertFalse(pub.backfill_issue_art(target,s['date'],parent));generate.assert_called_once()
+                for slug,text in body.items():self.assertEqual(pub.without_art44((target/'issues'/s['date']/'articles'/slug/'index.html').read_text()),text)
 
     def test_historical_recovery_keeps_newer_issue_number_and_home(self):
         from scripts import mosaic44 as art

@@ -244,7 +244,17 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
         if prior:
             basis={k:prior[k] for k in ('date','article_id','text_hash','prompt_version')}
             if basis['date']!=date or p.digest(basis)!=prior['key']:raise p.Blocked('ART_PUBLIC_BINDING_INVALID')
-            for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
+            repair=mosaic44.CONFIG.get('visual_brief_repairs',{}).get(prior['text_hash'],{})
+            if prior.get('prompt_version')==repair.get('replace_prompt_version'):
+                # Public reconstruction lacks the private record's mode/category metadata.
+                # Bind the one-time visual correction to the validated original text identity.
+                basis['prompt_version']=mosaic44.CONFIG['prompt_version']
+                item.update(basis,key=p.digest(basis))
+                item['descriptor']['visual_subject_en']=repair['scene_en']
+                item['description_hash']=p.digest(item['descriptor'])
+                item['prompt']=mosaic44.prompt(item)
+            else:
+                for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
     sub['assembly_status44']='EDITORIAL_APPROVED'
     sub['art44']['approval']={'date':date,'manifest_hash':p.digest(data),'signature':p.digest([{'id':r['id'],'article':mosaic44.final_text(r['article'])} for r in rows])}
     progress=mosaic44.prepare_items(sub,items,persist,allow_request)
