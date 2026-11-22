@@ -12,6 +12,10 @@ _LAST=0
 def credentials():
     return os.getenv('CLOUDFLARE_ACCOUNT_ID',''),os.getenv('CLOUDFLARE_API_TOKEN','')
 
+def credential_fingerprint():
+    # Stored only in the encrypted editorial checkpoint, never public metadata.
+    return hashlib.sha256('\0'.join(credentials()).encode()).hexdigest()
+
 def status(config):
     if config.get('provider')!='cloudflare_workers_ai':return 'IMAGE_PAID_PROVIDER_DISABLED'
     if config.get('billing_allowed') is not False or config.get('free_plan_only') is not True or config.get('model')!=MODEL:return 'CF_FREE_CONFIGURATION_REQUIRED'
@@ -128,9 +132,25 @@ def generate(item,budget,config):
         except (KeyError,ValueError,TypeError):raise RuntimeError('CF_IMAGE_INVALID') from None
     raise last_error or RuntimeError('CF_IMAGE_MISSING')
 
+def github_secret_metadata():
+    """Names/visibility only; GitHub's endpoint never returns secret values."""
+    token=os.getenv('GH_TOKEN')
+    if not token:return {'status':'GITHUB_METADATA_UNAVAILABLE'}
+    result={}
+    for name in ('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN'):
+        request=Request('https://api.github.com/repos/zzz387/387-news/actions/secrets/'+name,headers={'Authorization':'Bearer '+token,'Accept':'application/vnd.github+json','User-Agent':'387-News-Secret-Metadata'})
+        try:
+            with urlopen(request,timeout=15) as response:
+                data=json.loads(response.read(16384));result[name]='PRESENT' if data.get('name')==name else 'UNVERIFIED'
+        except HTTPError as exc:result[name]='HTTP_'+str(exc.code)
+        except Exception:result[name]='UNAVAILABLE'
+    return result
+
 def diagnose(config,probe=False):
-    result={'provider':'cloudflare_workers_ai','model':MODEL,'status':status(config),'missing_secrets':[name for name in ('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN') if not os.getenv(name)],'free_plan_verified':False,'billing_allowed':False,'image_requests':0}
+    result={'provider':'cloudflare_workers_ai','model':MODEL,'status':status(config),'credentials_present':{name:bool(os.getenv(name)) for name in ('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN')},'missing_secrets':[name for name in ('CLOUDFLARE_ACCOUNT_ID','CLOUDFLARE_API_TOKEN') if not os.getenv(name)],'free_plan_verified':False,'authorization_verified':False,'billing_allowed':False,'image_requests':0}
     if probe and result['status']=='READY':
-        try:result.update(free_plan_verified=True,observed_account_neurons=free_usage())
+        try:result.update(free_plan_verified=True,authorization_verified=True,observed_account_neurons=free_usage())
         except Exception as exc:result.update(free_plan_verified=False,status=str(exc) if re.fullmatch('[A-Z_0-9]+',str(exc)) else type(exc).__name__)
+    elif result['status']=='READY':result['status']='CLOUDFLARE_AUTH_UNVERIFIED'
+    if probe and os.getenv('GITHUB_ACTIONS')=='true' and os.getenv('GITHUB_REPOSITORY')=='zzz387/387-news':result['github_secret_metadata']=github_secret_metadata()
     print('[cloudflare-capability] '+json.dumps(result),flush=True);return result

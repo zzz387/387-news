@@ -435,7 +435,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || vars.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       NEWS_HISTORICAL_RECOVERY_DATE: ${{ inputs.phase == 'recover_missing_issue' && inputs.target_date == '2026-11-20' && '2026-11-20' || '' }}
-      CF_FREE_SMOKE: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[cf-art]') }}
+      CF_FREE_SMOKE: ${{ github.event_name == 'push' && (contains(github.event.head_commit.message, '[cf-art]') || contains(github.event.head_commit.message, '[art-nov22]')) }}
       DRAFT_ENCRYPTION_KEY: ${{ secrets.DRAFT_ENCRYPTION_KEY }}
       NEWS_RELEASE_APPROVED: ${{ vars.NEWS_RELEASE_APPROVED }}
       NEWS_MAX_REQUESTS_PER_RUN: "24"
@@ -469,6 +469,7 @@ jobs:
           MANUAL_PREVIEW: ${{ inputs.preview }}
           MANUAL_DATE: ${{ inputs.target_date }}
           CF_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[cf-art]') }}
+          NOV22_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-nov22]') }}
         run: |
           if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
             phase="$MANUAL_PHASE"
@@ -478,6 +479,7 @@ jobs:
             preview=false
           fi
           if [[ "$CF_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-21; fi
+          if [[ "$NOV22_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-22; fi
           PHASE="$phase" PREVIEW="$preview" TARGET_DATE="$MANUAL_DATE" python scripts/release_queue.py
       - name: Find previously saved encrypted checkpoint
         id: checkpoint
@@ -543,7 +545,7 @@ jobs:
         run: python -m scripts.light43 --diagnose-checkpoint '${{ runner.temp }}/published-light-diagnostic/news-draft.enc'
       - name: Check Cloudflare Free safeguards without billing changes
         env:
-          PROBE_IMAGE_MODELS: ${{ github.event_name == 'push' && (contains(github.event.head_commit.message, '[art-finalization]') || contains(github.event.head_commit.message, '[cf-art]')) }}
+          PROBE_IMAGE_MODELS: ${{ github.event_name == 'push' && (contains(github.event.head_commit.message, '[art-finalization]') || contains(github.event.head_commit.message, '[cf-art]') || contains(github.event.head_commit.message, '[art-nov22]')) }}
         run: |
           if [[ "$PROBE_IMAGE_MODELS" == 'true' ]]; then
             python -m scripts.mosaic44 --diagnose --probe-models

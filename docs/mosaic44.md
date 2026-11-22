@@ -211,3 +211,26 @@ Its issue date remains November 20; `recovered_at` records actual recovery time.
 The tagged rollout first delivers November 21 artwork, then queues this recovery
 through the existing mutex. Useful textual progress may continue at most three
 controlled runs; quotas/cooldowns are never reset.
+
+## November 22 recovery and artwork monitoring
+
+Eight distinct paintings for the published November 22 issue are imported through
+`backfill_issue_art` with provider `chatgpt_image_tool` and model `image_gen`.
+This one-time recovery does not establish Cloudflare authentication. Article text,
+Markdown, issue number/date and other archives are preserved; cached images are
+reused on the next assembly.
+
+The daily controller first offers a window to missing art in today's already
+published issue, then continues ordinary editorial preparation when no art delivery
+was produced. The same global mutex, quota ledger and encrypted checkpoint apply.
+Publication monitoring reports PUBLICATION and ARTWORK separately, counts valid
+unique article WebP files, and reconciles one artwork incident per date. Complete
+artwork is marked successful only after the normal public HTTPS verification.
+
+A 401/403 holds that issue's image requests in the encrypted checkpoint until the
+credential fingerprint changes. No token or fingerprint enters public metadata.
+`--diagnose --probe-models` reports boolean availability of both credentials,
+authorization and Free-plan verification separately. Its optional GitHub Secrets
+metadata lookup reads names only: HTTP 403 means that the calling token cannot
+inspect secret metadata, not that a repository secret is absent. Operational
+availability is checked inside the actual protected prepare job.
