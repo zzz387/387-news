@@ -66,7 +66,7 @@ class Policy44Tests(unittest.TestCase):
         seen=[]
         def api(path,data=None):
             seen.append((path,data))
-            if '/subscriptions?' in path:return {'result':[]}
+            if path.endswith('/subscriptions'):return {'result':[]}
             if path=='/graphql':return {'data':{'viewer':{'accounts':[{'aiInferenceAdaptiveGroups':[{'sum':{'totalNeurons':100}}]}]}}}
             return {'result':{'image':base64.b64encode(raw).decode()}}
         env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
@@ -79,6 +79,7 @@ class Policy44Tests(unittest.TestCase):
             with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
             self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
             with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'paid'},'price':5}]}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
+            with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'free'},'price':0}],'result_info':{'total_count':2}}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
             bad=dict(art.CONFIG,billing_allowed=True)
             with self.assertRaisesRegex(RuntimeError,'CF_FREE_CONFIGURATION_REQUIRED'):cf.generate(item,budget,bad)
         with patch.dict(os.environ,{'CLOUDFLARE_ACCOUNT_ID':'','CLOUDFLARE_API_TOKEN':''}):self.assertEqual(cf.status(art.CONFIG),'CLOUDFLARE_CREDENTIALS_MISSING')
