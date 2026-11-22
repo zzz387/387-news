@@ -67,6 +67,7 @@ class Special43Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp:
             root=Path(temp)
             for folder in ('assets','issues','archive'):shutil.copytree(p.ROOT/folder,root/folder)
+            if (p.ROOT/'art').is_dir():shutil.copytree(p.ROOT/'art',root/'art')
             # A published real reissue is not the synthetic build under test.
             existing=root/'issues/2026-10-26-v41'
             if existing.exists():shutil.rmtree(existing)
