@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "maximum_tiles": 12,
-  "prompt_version": "387-art-cloudflare-4",
+  "prompt_version": "387-art-cloudflare-5",
   "provider": "cloudflare_workers_ai",
   "model": "@cf/black-forest-labs/flux-1-schnell",
   "free_tier_verified": false,
@@ -51,5 +51,8 @@
       "replace_prompt_version": "387-art-cloudflare-3",
       "scene_en": "Children absorbed in free imaginative play on a safe sunlit playroom floor, assembling wooden blocks, a cardboard arch and fabric tents while an adult quietly watches from the doorway. Loose warm brushstrokes, a visual metaphor for autonomy and creativity, no written letters."
     }
-  }
+  },
+  "references_enabled": true,
+  "reference_model": "@cf/black-forest-labs/flux-2-klein-4b",
+  "first_reference_issue": "2026-11-23"
 }

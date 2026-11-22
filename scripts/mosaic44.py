@@ -154,7 +154,8 @@ def art_report(state):
     saved=state.get('art44',{});items=saved.get('plan',[]);objects=saved.get('objects',{})
     ready=sum(object_valid(objects.get(item['key'],{})) for item in items)
     return {'phase':state.get('assembly_status44','NOT_APPROVED'),'articles':len(items),'ready':ready,'missing':len(items)-ready,
-        'complete':bool(items) and ready==len(items),'provider_status':saved.get('provider_status',provider_status()),'image_requests':saved.get('requests',0)}
+        'complete':bool(items) and ready==len(items),
+        'reference_guided':sum(object_valid(objects.get(i['key'],{})) and objects[i['key']].get('reference_status')=='FOUR_REFERENCES_READY' for i in items),'provider_status':saved.get('provider_status',provider_status()),'image_requests':saved.get('requests',0)}
 
 def prepare(state,persist=lambda:None,allow_request=True):
     saved=state.setdefault('art44',{'objects':{},'history':[]})
@@ -162,7 +163,14 @@ def prepare(state,persist=lambda:None,allow_request=True):
     saved['provider_status']='IMAGE_PROVIDER_FORBIDDEN' if saved.get('blocked_model')==CONFIG.get('model') and saved.get('blocked_model') else provider_status()
     if not approval_valid(state):
         saved['code']='ART_NOT_EDITORIAL_APPROVED';persist();return art_report(state)
-    return prepare_items(state,article_plans(state),persist,allow_request)
+    items=article_plans(state)
+    if CONFIG.get('references_enabled') and state['date']>=CONFIG.get('first_reference_issue','9999-12-31'):
+        from scripts import art_library44
+        from scripts import news
+        budget=news.runtime.ACTIVE_BUDGET
+        sets=art_library44.prepare_sets(p.ROOT,state,items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180))
+        art_library44.attach(p.ROOT,state,items,sets)
+    return prepare_items(state,items,persist,allow_request)
 
 def prepare_items(state,items,persist=lambda:None,allow_request=True):
     saved=state.setdefault('art44',{'objects':{},'history':[]})
@@ -201,7 +209,8 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             data,width,height=encode_image(raw);digest=hashlib.sha256(data).hexdigest()
             if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
             saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
-                'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['model'],'status':'READY',
+                'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['reference_model'] if item.get('reference_images') else CONFIG['model'],'status':'READY',
+                **{k:item[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256') if k in item},
                 'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
                 'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
         except Exception as exc:
@@ -341,7 +350,8 @@ def materialize(state,articles,root,items=None):
             if failure not in saved.setdefault('history',[]):saved['history'].append(failure)
             continue
         images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version','date','text_hash','protocol','article_slug')},
-            **{k:row[k] for k in ('sha256','width','height','provider','model')},'path':file.relative_to(root).as_posix()}
+            **{k:row[k] for k in ('sha256','width','height','provider','model')},
+            **{k:row[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256') if k in row},'path':file.relative_to(root).as_posix()}
     (folder/'manifest.json').write_text(json.dumps({'date':date,'images':images,'provider_status':provider_status()},ensure_ascii=False,indent=2)+'\n')
     return images
 

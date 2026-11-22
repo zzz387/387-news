@@ -24,6 +24,9 @@ def main():
             current=re.search(r'data-issue-date="(\d{4}-\d{2}-\d{2})"',(p.ROOT/'index.html').read_text())
             overview_path='/' if current and current[1]==date else '/issues/'+date+'/'
             report=browser41.check(p.ROOT,date,Path(temp),expected_count=metadata['article_count'],overview_path=overview_path)
+            if (p.ROOT/'art/registry.json').is_file():
+                from scripts import art_library44
+                art_library44.check_browser(p.ROOT,Path(temp)/'art')
         print('[release-browser] '+json.dumps(report));return
     if 'data-policy-version="4.1"' not in overview:
         print('[release-browser] immutable legacy delivery; applicable historical validation passed');return

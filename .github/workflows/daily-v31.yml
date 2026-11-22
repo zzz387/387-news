@@ -428,6 +428,7 @@ jobs:
     timeout-minutes: 30
     env:
       NEWS_POLICY_VERSION: "4.4"
+      NEWS_ART_LIBRARY_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-library]') }}
       NEWS_CATALOG_REFRESH: "true"
       NEWS_LIGHT_NEWS_ENABLED: "true"
       GH_TOKEN: ${{ github.token }}
@@ -469,6 +470,7 @@ jobs:
           MANUAL_PREVIEW: ${{ inputs.preview }}
           MANUAL_DATE: ${{ inputs.target_date }}
           CF_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[cf-art]') }}
+          ART_LIBRARY_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-library]') }}
           NOV22_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-nov22]') }}
         run: |
           if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
@@ -480,6 +482,10 @@ jobs:
           fi
           if [[ "$CF_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-21; fi
           if [[ "$NOV22_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-22; fi
+          if [[ "$ART_LIBRARY_ROLLOUT" == 'true' ]]; then
+            phase=backfill_issue_art
+            MANUAL_DATE=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Europe/Moscow")).date())')
+          fi
           PHASE="$phase" PREVIEW="$preview" TARGET_DATE="$MANUAL_DATE" python scripts/release_queue.py
       - name: Find previously saved encrypted checkpoint
         id: checkpoint
@@ -634,6 +640,8 @@ jobs:
             git add index.html
             if [[ -d assets/illustrations ]]; then git add assets/illustrations; fi
           fi
+          if [[ -d art ]]; then git add art assets/art.css; fi
+          if [[ -d assets/art ]]; then git add assets/art; fi
           if git diff --cached --quiet; then
             echo 'Approved issue already committed; retry deployment without changing the archive.'
             echo 'ready=true' >> "$GITHUB_OUTPUT"
