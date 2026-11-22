@@ -40,9 +40,10 @@ def incident_attempts(body):
     return min(3,int(match[1])) if match else 0
 
 
-def find_incident(date,request=github):
+def find_incident(date,request=github,*,kind='release'):
     datetime.strptime(date,'%Y-%m-%d')
-    marker=f'<!-- 387-news-release:{date} -->'
+    if kind not in ('release','artwork'):raise ValueError('Invalid incident kind')
+    marker=f'<!-- 387-news-{kind}:{date} -->'
     existing=None
     for page in range(1,6):
         batch=request('GET',f'issues?state=all&per_page=100&page={page}')
@@ -110,6 +111,37 @@ def evaluate(root,status,now=None,check_public=None):
     return {'date':today,'code':code,'verified':False,'alert':alert,'publication_status':'PUBLICATION_FAILED'}
 
 
+def artwork_status(root,date,verified,status=None):
+    from scripts import publication43,mosaic44
+    data=publication43.metadata(root,date)
+    required=data['article_count'];slugs=set(data['pages']);bound=set();digests=set()
+    for row in data.get('illustrations',[]):
+        slug=row.get('article_slug')
+        if slug in slugs and row.get('sha256') not in digests and row.get('protocol')==2 and mosaic44.valid_image(root,date,row['key'],row):
+            bound.add(slug);digests.add(row.get('sha256'))
+    ready=len(bound);missing=required-ready
+    progress=(status or {}).get('artwork_backfill',{})
+    reason=(progress.get('provider_status') if progress.get('date')==date else None) or data.get('art44',{}).get('provider_status') or 'ARTWORK_INCOMPLETE'
+    if reason=='READY':reason='ARTWORK_INCOMPLETE'
+    return {'date':date,'PUBLICATION':'SUCCESS' if verified else 'UNVERIFIED','ARTWORK':'SUCCESS' if verified and missing==0 else 'FAILED',
+        'ARTWORK_REQUIRED':required,'ARTWORK_READY':ready,'ARTWORK_MISSING':missing,'ARTWORK_REASON':None if verified and missing==0 else reason if missing else 'HTTPS_NOT_VERIFIED'}
+
+def artwork_incident(date,report,request=github):
+    existing=find_incident(date,request,kind='artwork')
+    marker=f'<!-- 387-news-artwork:{date} -->'
+    if report['ARTWORK']=='SUCCESS':
+        if existing and existing.get('state')!='closed':
+            request('PATCH',f'issues/{existing["number"]}',{'state':'closed','body':marker+'\n\nArtwork complete and verified over HTTPS.\n'})
+        return 'resolved' if existing else 'none'
+    code=report.get('ARTWORK_REASON') or 'ARTWORK_INCOMPLETE'
+    if not re.fullmatch('[A-Z_0-9]+',code):code='ARTWORK_INCOMPLETE'
+    body=marker+'\n\n'+json.dumps({k:report[k] for k in ('ARTWORK_REQUIRED','ARTWORK_READY','ARTWORK_MISSING')})+'\nReason: '+code+'\nThe existing production controller retains progress and retries in permitted windows. No paid fallback.\n'
+    if existing:
+        if existing.get('state')!='open' or existing.get('body')!=body:request('PATCH',f'issues/{existing["number"]}',{'state':'open','body':body})
+        return 'updated'
+    request('POST','issues',{'title':f'387 News: artwork incomplete {date}','body':body})
+    return 'created'
+
 def main():
     raw=json.loads(os.getenv('PIPELINE_STATUS','{}') or '{}')
     result=evaluate(news.ROOT,raw)
@@ -130,10 +162,17 @@ def main():
     except Exception as exc:
         result['notification_error']=type(exc).__name__
     print('[delivery-status] '+json.dumps(result),flush=True)
+    art=None
+    if result['date']>='2026-11-22' and release_queue.edition_exists(news.ROOT,result['date']):
+        art=artwork_status(news.ROOT,result['date'],result['verified'],raw)
+        try:art['incident']=artwork_incident(result['date'],art)
+        except Exception as exc:art['notification_error']=type(exc).__name__
+        print('[artwork-status] '+json.dumps(art),flush=True)
     summary=os.getenv('GITHUB_STEP_SUMMARY')
     if summary:
         with open(summary,'a') as stream:
             stream.write('### Public delivery\n\n```json\n'+json.dumps(result,indent=2)+'\n```\n')
+            if art:stream.write('\n### Artwork delivery\n\n```json\n'+json.dumps(art,indent=2)+'\n```\n')
     if not result['verified'] and not result.get('not_due') and not result['waiting_for_authorized_special_priority']:
         raise RuntimeError('Daily edition is not verified on the public site; incident/retry status recorded')
 

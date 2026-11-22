@@ -40,6 +40,25 @@ class API:
         raise AssertionError('Unexpected endpoint '+path)
 
 class WatchdogTests(unittest.TestCase):
+    def test_artwork_count_is_separate_from_successful_text_publication(self):
+        from scripts import publication43,mosaic44
+        metadata={'article_count':8,'pages':{str(i):{} for i in range(8)},'illustrations':[],
+            'art44':{'ready':8,'provider_status':'CLOUDFLARE_CREDENTIALS_MISSING'}}
+        with patch.object(publication43,'metadata',return_value=metadata),patch.object(mosaic44,'valid_image',return_value=True):
+            report=m.artwork_status(Path('/unused'),'2026-11-22',True)
+            self.assertEqual(report['PUBLICATION'],'SUCCESS');self.assertEqual(report['ARTWORK'],'FAILED');self.assertEqual(report['ARTWORK_READY'],0)
+            metadata['illustrations']=[{'key':str(i),'sha256':str(i),'article_slug':str(i),'protocol':2} for i in range(8)]
+            self.assertEqual(m.artwork_status(Path('/unused'),'2026-11-22',True)['ARTWORK'],'SUCCESS')
+            with patch.object(mosaic44,'valid_image',return_value=False):self.assertEqual(m.artwork_status(Path('/unused'),'2026-11-22',True)['ARTWORK_READY'],0)
+
+    def test_artwork_incident_is_deduplicated_and_closes_after_https_recovery(self):
+        api=API(Clock(at('07:00')))
+        report={'ARTWORK':'FAILED','ARTWORK_REQUIRED':8,'ARTWORK_READY':0,'ARTWORK_MISSING':8,'ARTWORK_REASON':'CLOUDFLARE_CREDENTIALS_MISSING'}
+        m.artwork_incident(DAY,report,api);m.artwork_incident(DAY,report,api)
+        self.assertEqual(len(api.issues),1)
+        report.update(ARTWORK='SUCCESS',ARTWORK_READY=8,ARTWORK_MISSING=0,ARTWORK_REASON=None)
+        m.artwork_incident(DAY,report,api);self.assertEqual(api.issues[0]['state'],'closed')
+
     def run_watch(self,clock,api,**kw):
         with patch.object(news,'gemini',side_effect=AssertionError('No model in delivery watchdog')):
             return w.run(Path('/unused'),clock=clock,sleep=clock.sleep,request=api,check=api.check,**kw)

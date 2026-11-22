@@ -619,6 +619,7 @@ def main():
         if state is None:
             raise RuntimeError('Encrypted draft missing; run plan first')
         ready=False
+        art_publication_date=None
         if os.getenv('NEWS_HISTORICAL_RECOVERY_DATE')==date:
             state['historical_recovery_runs']=state.get('historical_recovery_runs',0)+1;persist()
         if os.getenv('CF_FREE_SMOKE')=='true' and not state.get('cf_free_smoke'):
@@ -629,7 +630,16 @@ def main():
                     data,w,h=mosaic44.encode_image(raw);state['cf_free_smoke']={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':w,'height':h,'free_plan_verified':True};persist()
                     print('[cf-free-smoke] verified=true real_image=true billing_allowed=false',flush=True)
                 except Exception as exc:print('[cf-free-smoke] '+json.dumps({'verified':False,'code':str(exc) if re.fullmatch('[A-Z_0-9]+',str(exc)) else type(exc).__name__}),flush=True)
-        if args.phase=='backfill_issue_art':
+        if args.phase in ('run','resume'):
+            from scripts import mosaic44,publication43
+            today=datetime.now(TZ).date().isoformat()
+            if today>=mosaic44.CONFIG['first_automatic_issue'] and (ROOT/'issues'/today/'release.json').is_file() and mosaic44.provider_status()=='READY':
+                published=publication43.metadata(ROOT,today)
+                if published.get('art44',{}).get('ready',0)<published['article_count'] and publication43.backfill_issue_art(ROOT,today,state,persist):
+                    ready=True;art_publication_date=today
+        if art_publication_date:
+            pipeline.status(state,'PUBLISHING','commit_and_deploy')
+        elif args.phase=='backfill_issue_art':
             from scripts import publication43
             changed=publication43.backfill_issue_art(ROOT,date,state,persist)
             ready=changed or publication43.metadata(ROOT,date).get('art44',{}).get('ready',0)>0
@@ -651,7 +661,7 @@ def main():
         elif args.phase=='publish':
             ready=render(state,args.preview)
             pipeline.status(state,'PUBLISHING' if ready else 'APPROVED','commit_and_deploy' if ready else 'preview_complete')
-        publication_date=date
+        publication_date=art_publication_date or date
         if not ready and args.phase in ('run','resume'):
             from scripts import mosaic44,publication43
             candidates=sorted((d.name for d in (ROOT/'issues').iterdir() if (d/'release.json').is_file() and re.fullmatch(r'\d{4}-\d{2}-\d{2}',d.name)),reverse=True)
