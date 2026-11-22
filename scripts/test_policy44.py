@@ -66,7 +66,7 @@ class Policy44Tests(unittest.TestCase):
         seen=[]
         def api(path,data=None):
             seen.append((path,data))
-            if '/subscriptions?' in path:return {'result':[]}
+            if path.endswith('/subscriptions'):return {'result':[]}
             if path=='/graphql':return {'data':{'viewer':{'accounts':[{'aiInferenceAdaptiveGroups':[{'sum':{'totalNeurons':100}}]}]}}}
             return {'result':{'image':base64.b64encode(raw).decode()}}
         env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
