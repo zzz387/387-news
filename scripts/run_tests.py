@@ -23,6 +23,7 @@ def quick_modules(components=(),changed=()):
     for group in components:names.extend(COMPONENTS[group])
     for file in changed:
         name=Path(file).name
+        if 'art_library44' in name or 'cloudflare44' in name or 'mosaic44' in name:names.append('test_art_library44')
         if name.startswith('test_') and name.endswith('.py'):names.append(name[:-3]);continue
         groups=[]
         if any(s in name for s in ('daily','editorial','selection','policy44','light')):groups+=['editorial','safety']

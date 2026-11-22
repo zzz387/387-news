@@ -20,7 +20,7 @@ try:
 except ImportError:
     import news
 
-PUBLIC_DIRS = ('assets','archive','issues')
+PUBLIC_DIRS = ('assets','archive','issues','art')
 PUBLIC_FILES = ('index.html','CNAME','robots.txt','sitemap.xml')
 PRIVATE_SUFFIXES = {'.enc','.pem','.key','.env'}
 
@@ -144,6 +144,7 @@ def main():
         try:
             result=check_archived(args.base,args.archive_date) if args.archive_date else check_site(args.base,args.expected_date)
             check_assets(news.ROOT,args.base)
+            check_art_library(news.ROOT,args.base)
             print(json.dumps(result,ensure_ascii=False))
             return
         except Exception as exc:
@@ -286,9 +287,42 @@ def publication_hash(data):
     return hashlib.sha256(data).hexdigest()
 
 
+def check_art_library(root,base='https://387.su'):
+    """Verify the public append-only registry, gallery pages and exact image bytes."""
+    root=Path(root);path=root/'art/registry.json'
+    if not path.is_file():return None
+    expected=json.loads(path.read_text());actual=json.loads(fetch(base+'/art/registry.json'))
+    if actual!=expected:raise RuntimeError('PUBLIC_ART_REGISTRY_CHANGED')
+    if 'Искусство' not in fetch(base+'/art/'):raise RuntimeError('PUBLIC_ART_LIBRARY_MISSING')
+    if publication_hash(fetch(base+'/assets/art.css').encode())!=publication_hash((root/'assets/art.css').read_bytes()):raise RuntimeError('PUBLIC_ART_STYLE_CHANGED')
+    genres={w['genre_id'] for w in actual['artworks'].values()}
+    for genre in genres:
+        if not re.fullmatch('[a-z0-9-]+',genre):raise RuntimeError('PUBLIC_ART_GENRE_INVALID')
+        page=fetch(base+'/art/'+genre+'/')
+        if 'Вся коллекция' not in page:raise RuntimeError('PUBLIC_ART_GALLERY_MISSING')
+    for group in actual['sets'].values():
+        if len(group['artwork_ids'])!=4 or len(set(group['artwork_ids']))!=4:raise RuntimeError('PUBLIC_ART_SET_INVALID')
+        if [actual['artworks'][i]['sha256'] for i in group['artwork_ids']]!=group['sha256']:raise RuntimeError('PUBLIC_ART_SET_CHANGED')
+    latest=max((g['issue_date'] for g in actual['sets'].values()),default='')
+    current={i for g in actual['sets'].values() if g['issue_date']==latest for i in g['artwork_ids']}
+    images=[actual['artworks'][i] for i in current]+[s for s in actual['studies'].values() if '/'+latest+'/' in s['article_url']]
+    # The complete immutable registry is compared above; binary HTTPS checks stay
+    # bounded to the newest assignments rather than growing with the whole archive.
+    for image in images:
+        relative=image['path']
+        if not re.fullmatch(r'assets/(?:art|illustrations)/[a-zA-Z0-9_-]+/[a-f0-9]{64}\.webp',relative):raise RuntimeError('PUBLIC_ART_PATH_INVALID')
+        with urlopen(Request(base+'/'+relative,headers={'User-Agent':'387-News-Art-Health/1.0'}),timeout=20) as response:
+            data=response.read(1000001)
+            if response.status!=200 or len(data)>1000000 or publication_hash(data)!=image['sha256']:raise RuntimeError('PUBLIC_ART_IMAGE_CHANGED')
+    if actual['studies'] and 'Художественная мастерская' not in fetch(base+'/art/studies/'):raise RuntimeError('PUBLIC_ART_STUDIES_MISSING')
+    result={'artworks':len(actual['artworks']),'sets':len(actual['sets']),'studies':len(actual['studies']),'images_checked':len(images),'https':'verified'}
+    print('[art-library-health] '+json.dumps(result),flush=True);return result
+
+
 def check_delivery(base='https://387.su',expected_date=None,root=None):
     result=check_site(base,expected_date)
     check_assets(root or news.ROOT,base)
+    check_art_library(root or news.ROOT,base)
     return result
 
 

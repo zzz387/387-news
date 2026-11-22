@@ -6,6 +6,7 @@ from urllib.error import HTTPError
 from scripts.generation_runtime import GenerationPaused
 
 MODEL='@cf/black-forest-labs/flux-1-schnell'
+REFERENCE_MODEL='@cf/black-forest-labs/flux-2-klein-4b'
 BASE='https://api.cloudflare.com/client/v4'
 _LAST=0
 
@@ -48,11 +49,20 @@ def safe_errors(body):
 def authentication_code(details):
     return next(('CF_AUTHENTICATION_FAILED_'+str(e['code']) for e in details if e.get('code') in (9106,10000)),None)
 
-def api(path,data=None):
+def multipart_payload(fields,images):
+    boundary='387-art-'+hashlib.sha256(b''.join(images)).hexdigest()[:24]
+    chunks=[]
+    for key,value in fields.items():chunks.append(('--'+boundary+'\r\nContent-Disposition: form-data; name="'+key+'"\r\n\r\n'+str(value)+'\r\n').encode())
+    for i,data in enumerate(images):chunks.extend([('--'+boundary+'\r\nContent-Disposition: form-data; name="input_image_'+str(i)+'"; filename="reference-'+str(i)+'.webp"\r\nContent-Type: image/webp\r\n\r\n').encode(),data,b'\r\n'])
+    chunks.append(('--'+boundary+'--\r\n').encode())
+    return b''.join(chunks),'multipart/form-data; boundary='+boundary
+
+def api(path,data=None,images=None):
     protected();_,token=credentials()
     stage='subscriptions' if '/subscriptions' in path else 'analytics' if path=='/graphql' else 'inference'
-    req=Request(BASE+path,data=json.dumps(data).encode() if data is not None else None,
-        headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'},method='POST' if data is not None else 'GET')
+    body=json.dumps(data).encode() if data is not None else None;content_type='application/json'
+    if images is not None:body,content_type=multipart_payload(data,images)
+    req=Request(BASE+path,data=body,headers={'Authorization':'Bearer '+token,'Content-Type':content_type},method='POST' if data is not None else 'GET')
     try:
         with urlopen(req,timeout=60) as response:
             if response.headers.get_content_type()!='application/json':raise RuntimeError('CF_RESPONSE_TYPE_INVALID')
@@ -113,12 +123,32 @@ def prompt(item):
     lead='Original fine-art illustration. '+style+'. Visible brushwork or hand-printed texture, expressive visual metaphor, not a photograph. '
     # Put the actual subject first; long Russian source prose previously drowned it out.
     if not scene:scene=d['title']+'. '+d.get('summary','')
+    if item.get('reference_images'):lead+='Use all four attached museum paintings as references for painting technique, texture, light, composition and artistic language. Create an independent composition for the new subject, never copy a reference scene. Avoid plastic textures, artificial glow, hyper-detail, excessive symmetry and random decoration. '
     return (lead+'Subject: '+scene[:1400]+'. Balanced editorial composition, muted ochre, cream, deep green and indigo. Entirely pictorial, blank unmarked surfaces, unsigned. No text, writing, letters, signatures, logos, watermarks, labels or borders.')[:2048]
 
 def generate(item,budget,config):
     global _LAST
     if status(config)!='READY':raise RuntimeError(status(config))
     protected()
+    references=item.get('reference_images')
+    images=[];input_tiles=0;model=MODEL
+    if references is not None:
+        if len(references)!=4 or len({ref['sha256'] for ref in references})!=4:raise RuntimeError('CF_FOUR_REFERENCES_REQUIRED')
+        if config.get('reference_model')!=REFERENCE_MODEL:raise RuntimeError('CF_REFERENCE_MODEL_NOT_AUTHORIZED')
+        from scripts import policy41
+        from PIL import Image
+        import io
+        for ref in references:
+            path=__import__('pathlib').Path(ref['path'])
+            if path.is_absolute() or '..' in path.parts or path.parts[:2]!=('assets','art'):raise RuntimeError('CF_REFERENCE_PATH_INVALID')
+            raw=(policy41.ROOT/path).read_bytes()
+            if hashlib.sha256(raw).hexdigest()!=ref['sha256']:raise RuntimeError('CF_REFERENCE_HASH_INVALID')
+            with Image.open(io.BytesIO(raw)) as image:
+                image.verify();w,h=image.size
+                if not 0<w<512 or not 0<h<512:raise RuntimeError('CF_REFERENCE_DIMENSIONS_INVALID')
+                input_tiles+=math.ceil(w/512)*math.ceil(h/512)
+            images.append(raw)
+        model=REFERENCE_MODEL
     date=item.get('date')
     if not date and os.getenv('CF_FREE_SMOKE')!='true':raise RuntimeError('CF_FINAL_APPROVAL_DATE_REQUIRED')
     if date and date<config['first_automatic_issue'] and date not in ('2026-11-20','2026-11-21'):raise RuntimeError('CF_DATE_NOT_AUTHORIZED')
@@ -141,7 +171,9 @@ def generate(item,budget,config):
         time.sleep(max(0,config.get('request_gap_seconds',3)-(time.monotonic()-_LAST)))
         state['reserved_neurons']+=reserve;state['requests']+=1;budget.persist();_LAST=time.monotonic()
         try:
-            result=api('/accounts/'+account+'/ai/run/'+MODEL,{'prompt':prompt(item),'steps':config['steps']})
+            if images:
+                result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'width':1024,'height':768},images=images)
+            else:result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'steps':config['steps']})
             data=base64.b64decode(result['result']['image'],validate=True)
             if not data:raise ValueError()
             from PIL import Image
@@ -149,13 +181,13 @@ def generate(item,budget,config):
             with Image.open(io.BytesIO(data)) as image:
                 image.verify();w,h=image.size
                 if not 0<w<=2048 or not 0<h<=2048:raise ValueError()
-            estimate=4.8*math.ceil(w/512)*math.ceil(h/512)+9.6*config['steps']
+            estimate=5.37*input_tiles+26.05*math.ceil(w/512)*math.ceil(h/512) if images else 4.8*math.ceil(w/512)*math.ceil(h/512)+9.6*config['steps']
             state['estimated_neurons']+=estimate
             state['reserved_neurons']+=max(0,estimate-reserve)
             try:state['observed_account_neurons']=free_usage()
             except Exception:state['usage_after_pending']=True
             budget.persist()
-            print('[cloudflare-art] '+json.dumps({'free_plan_verified':True,'image_bytes':len(data),'estimated_neurons':estimate,'reserved_today':state['reserved_neurons'],'account_usage_observed':state['observed_account_neurons'],'actual_per_request_neurons':'NOT_EXPOSED_BY_IMAGE_RESPONSE'}),flush=True)
+            print('[cloudflare-art] '+json.dumps({'free_plan_verified':True,'model':model,'reference_images':len(images),'image_bytes':len(data),'estimated_neurons':estimate,'reserved_today':state['reserved_neurons'],'account_usage_observed':state['observed_account_neurons'],'actual_per_request_neurons':'NOT_EXPOSED_BY_IMAGE_RESPONSE'}),flush=True)
             return data
         except GenerationPaused as exc:
             last_error=exc

@@ -122,7 +122,7 @@ def build(state,root,reserve=(),preview=False):
         raise p.Blocked('BACKDATED_HOME_REPLACEMENT_FORBIDDEN')
     with tempfile.TemporaryDirectory(prefix='387-daily43-') as directory:
         working=Path(directory)
-        for name in ('assets','archive','issues'):
+        for name in ('assets','archive','issues','art'):
             if (root/name).is_dir():shutil.copytree(root/name,working/name)
         (working/'archive').mkdir(exist_ok=True);(working/'issues').mkdir(exist_ok=True)
         previous=news.ROOT;news.ROOT=working
@@ -264,7 +264,8 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
     # Work in a private temporary tree. Commit only after the complete issue validates.
     with tempfile.TemporaryDirectory(prefix='387-art-backfill-') as temp:
         work=Path(temp)
-        for name in ('assets','issues','archive'):shutil.copytree(root/name,work/name)
+        for name in ('assets','issues','archive','art'):
+            if (root/name).is_dir():shutil.copytree(root/name,work/name)
         (work/'index.html').write_bytes((root/'index.html').read_bytes())
         images=mosaic44.materialize(sub,articles,work,items)
         bound={r.get('article_slug'):r for r in images.values() if r.get('protocol')==2}

@@ -2,6 +2,12 @@
 import re
 
 
+def art_navigation(page):
+    from scripts import news
+    if not (news.ROOT/'art/index.html').is_file():return page
+    if 'href="/art/"' not in page:page=page.replace('href="/archive/">Архив</a>','href="/archive/">Архив</a><a href="/art/">Искусство</a>',1)
+    return page
+
 def compact(page):
     page=page.replace('<body>','<body class="edition-compact">',1)
     page=re.sub(r'<div class="mast-top">.*?</div>','',page,count=1,flags=re.S)
@@ -11,7 +17,7 @@ def compact(page):
 
 
 def legacy_homepage(overview,date):
-    return compact(overview).replace('href="https://387.su/issues/'+date+'/"','href="https://387.su/"',1)
+    return art_navigation(compact(overview)).replace('href="https://387.su/issues/'+date+'/"','href="https://387.su/"',1)
 
 def homepage(overview,date):
     page=legacy_homepage(overview,date)

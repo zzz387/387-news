@@ -637,7 +637,11 @@ def main():
                 published=publication43.metadata(ROOT,today)
                 if published.get('art44',{}).get('ready',0)<published['article_count'] and publication43.backfill_issue_art(ROOT,today,state,persist):
                     ready=True;art_publication_date=today
-        if art_publication_date:
+        if os.getenv('NEWS_ART_LIBRARY_ROLLOUT')=='true':
+            from scripts import art_library44
+            ready=art_library44.rollout(ROOT,date,state,persist)
+            pipeline.status(state,'PUBLISHING','commit_and_deploy')
+        elif art_publication_date:
             pipeline.status(state,'PUBLISHING','commit_and_deploy')
         elif args.phase=='backfill_issue_art':
             from scripts import publication43
