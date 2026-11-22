@@ -52,9 +52,18 @@ class Policy44Tests(unittest.TestCase):
                 self.assertEqual(generate.call_count,1);self.assertEqual(state['art44']['provider_status'],'CF_HTTP_403')
             with patch.dict(os.environ,CLOUDFLARE_API_TOKEN='SYNTHETIC_UPDATED'),patch.object(art,'generate',return_value=stream.getvalue()) as generate:
                 self.assertTrue(art.prepare_items(state,plans)['complete']);generate.assert_called_once()
-            with patch.object(cf,'free_usage',side_effect=RuntimeError('CF_HTTP_401')),patch.object(cf,'github_secret_metadata',return_value={}):
+            with patch.object(cf,'free_usage',side_effect=RuntimeError('CF_HTTP_401')),patch.object(cf,'github_secret_metadata',return_value={}),patch.dict(os.environ,GITHUB_ENV=''):
                 report=cf.diagnose(art.CONFIG,probe=True)
                 self.assertEqual(report['status'],'CF_HTTP_401');self.assertFalse(report['authorization_verified'])
+            with patch.dict(os.environ,CLOUDFLARE_API_TOKEN='  "Bearer SYNTHETIC"  '):
+                self.assertEqual(cf.credentials(),('a'*32,'SYNTHETIC'))
+            self.assertEqual(cf.authentication_code([{'code':9106}]),'CF_AUTHENTICATION_FAILED_9106')
+            with patch.dict(os.environ,NEWS_CF_PROBE_STATUS='CF_AUTHENTICATION_FAILED_9106'):
+                self.assertEqual(cf.status(art.CONFIG),'CF_AUTHENTICATION_FAILED_9106')
+                empty={'date':'2026-11-22','art44':{'objects':{},'history':[]}}
+                with patch.object(art,'generate') as generate:
+                    art.prepare_items(empty,plans);generate.assert_not_called()
+                self.assertEqual(empty['art44']['provider_status'],'CF_AUTHENTICATION_FAILED_9106')
 
     def test_cloudflare_free_guard_payload_and_neuron_accounting(self):
         from scripts import cloudflare44 as cf,generation_runtime as rt,mosaic44 as art
@@ -66,7 +75,7 @@ class Policy44Tests(unittest.TestCase):
         seen=[]
         def api(path,data=None):
             seen.append((path,data))
-            if '/subscriptions?' in path:return {'result':[]}
+            if path.endswith('/subscriptions'):return {'result':[]}
             if path=='/graphql':return {'data':{'viewer':{'accounts':[{'aiInferenceAdaptiveGroups':[{'sum':{'totalNeurons':100}}]}]}}}
             return {'result':{'image':base64.b64encode(raw).decode()}}
         env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
@@ -79,6 +88,7 @@ class Policy44Tests(unittest.TestCase):
             with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
             self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
             with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'paid'},'price':5}]}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
+            with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'free'},'price':0}],'result_info':{'total_count':2}}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
             bad=dict(art.CONFIG,billing_allowed=True)
             with self.assertRaisesRegex(RuntimeError,'CF_FREE_CONFIGURATION_REQUIRED'):cf.generate(item,budget,bad)
         with patch.dict(os.environ,{'CLOUDFLARE_ACCOUNT_ID':'','CLOUDFLARE_API_TOKEN':''}):self.assertEqual(cf.status(art.CONFIG),'CLOUDFLARE_CREDENTIALS_MISSING')
