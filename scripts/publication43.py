@@ -262,6 +262,12 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
                 for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
     sub['assembly_status44']='EDITORIAL_APPROVED'
     sub['art44']['approval']={'date':date,'manifest_hash':p.digest(data),'signature':p.digest([{'id':r['id'],'article':mosaic44.final_text(r['article'])} for r in rows])}
+    if mosaic44.CONFIG.get('references_enabled') and date>=mosaic44.CONFIG.get('first_reference_issue','9999-12-31'):
+        from scripts import art_library44,news
+        reference_state={'date':date,'issue_id':data.get('issue_id',date),'art_library44':parent.setdefault('art_library44',{})}
+        budget=news.runtime.ACTIVE_BUDGET
+        sets=art_library44.prepare_sets(root,reference_state,items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180),number=data.get('number'))
+        art_library44.attach(root,reference_state,items,sets)
     progress=mosaic44.prepare_items(sub,items,persist,allow_request)
     parent['art44_backfill_status']={'date':date,**progress};persist()
     articles=[r['article'] for r in rows]

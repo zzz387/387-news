@@ -189,6 +189,28 @@ class ArtLibraryTests(unittest.TestCase):
             bad=copy.deepcopy(shared);next(iter(bad['registry']['sets'].values()))['status']='tampered'
             with self.assertRaisesRegex(ValueError,'ART_REGISTRY_CONFLICT'):lib.merge_checkpoint(b,bad)
 
+    def test_published_missing_image_resumes_same_quartet_from_next_issue_state(self):
+        from scripts.test_policy44 import issue,synthetic_art
+        from scripts.test_daily43 import root as site_root
+        from scripts import publication43 as pub
+        with tempfile.TemporaryDirectory() as temp:
+            target=site_root(temp);s=issue();s['date']='2026-11-23';s['brief_policy_revision']=2
+            s['art_library44']=self.stock(target,4)['art_library44']
+            styles={key:['Импрессионизм'] for key in art.STYLES}
+            with patch.object(art,'STYLES',styles),patch.object(art,'CONFIG',dict(art.CONFIG,references_enabled=False)):
+                synthetic_art(s);sets=lib.prepare_sets(target,s,self.items(8),discover=False)
+                reference=sets['Импрессионизм']
+                for obj in s['art44']['objects'].values():obj.update(reference_status='FOUR_REFERENCES_READY',reference_set_id=reference['id'],reference_artwork_ids=reference['artwork_ids'],reference_sha256=reference['sha256'])
+                pub.build(s,target)
+            metadata=pub.validate(target,s['date']);missing=metadata['illustrations'][-1];(target/missing['path']).unlink()
+            later={'date':'2026-11-24'};lib.merge_checkpoint(later,lib.checkpoint(s,target))
+            budget=type('Budget',(),{'ledger':{},'remaining_seconds':lambda self:1000})()
+            with patch.object(art.p,'ROOT',target),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget),patch.object(lib.Museum,'get',side_effect=AssertionError('Do not search another quartet')),patch.object(art,'generate',return_value=picture(888)) as generate:
+                self.assertTrue(pub.backfill_issue_art(target,s['date'],later))
+                generate.assert_called_once();item=generate.call_args.args[0]
+                self.assertEqual(item['reference_set_id'],'2026-11-23/impressionism');self.assertEqual(len(item['reference_images']),4)
+                self.assertEqual(pub.validate(target,s['date'])['art44']['ready'],8)
+
     def test_pages_keep_original_proportions_sources_and_issue_grouping(self):
         with tempfile.TemporaryDirectory() as temp:
             state=self.stock(temp,8);folder=Path(temp)/'issues/2026-11-23';folder.mkdir(parents=True);(folder/'index.html').write_text('Synthetic published fixture')
