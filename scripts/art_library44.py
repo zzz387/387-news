@@ -48,8 +48,8 @@ def genre_matches(genre,tokens):
     text=''.join(c for c in unicodedata.normalize('NFKD',tokens) if not unicodedata.combining(c)).casefold().replace('-',' ')
     if genre=='Конструктивизм':return bool(re.search(r'\b(?:constructivis(?:m|t)|konstruktivis(?:m|t))',text))
     if genre=='Романтизм':return bool(re.search(r'\b(?:romantic(?:ism)?|romantik)\b',text))
-    if genre=='Кубизм' and 'kubisme' in text:return True
-    if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',text):return False
+    if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis|progressed from cubism',text):return False
+    if genre=='Кубизм':return bool(re.search(r'\b(?:cubism|cubist|kubisme)\b',text))
     if genre=='Японская гравюра':return ('japan' in text or 'ukiyo' in text) and ('woodblock' in text or 'woodcut' in text)
     if genre=='Импрессионизм':return bool(re.search(r'\bimpressionis',text))
     if genre=='Ар-нуво' and re.search(r'\b(jugendstil|skønvirke|skonvirke)\b',text):return True
@@ -141,7 +141,13 @@ PARIS_SEEDS={
  'Ар-нуво':{i:('Mucha','Art Nouveau — Mucha/Fouquet-shop designs; Paris Musées Paris 1900 collection') for i in (320028394,320073266,320073209)},
  'Кубизм':{729:('Gris, Juan','Cubism — Juan Gris, Compotier; museum catalogue: Les chemins du cubisme')},
  'Романтизм':{160000895:('Delacroix','Romanticism — Eugène Delacroix, Salon de la Paix sketch; Petit Palais catalogue')},
- 'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956)}}
+ 'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956,160025973,160025974,160025969,160025947)}}
+SMK_CUBIST_WORKS={'KMSr61':('Guitarspillersken','1926'),'KMSr162':('Opstilling','1916')}
+
+def curated_smk_cubist(identity,artist,title,year):
+    # Exact two documented paintings; never classify every work by an artist.
+    return artist=='Gris, Juan' and SMK_CUBIST_WORKS.get(identity)==(title,str(year))
+
 MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,)}
 
 def met_seed_work(row,identifier,genre):
@@ -246,7 +252,7 @@ class Museum:
         # Public Linked Data / IIIF: no search-API key, paid plan or access bypass.
         # Fetch rights and metadata live before admitting any seed's actual file.
         if genre in ('Конструктивизм','Коллаж'):
-            for identifier in {'Конструктивизм':(1260,1247,11016,1207,11026,11269),'Коллаж':(10954,10956)}[genre]:
+            for identifier in {'Конструктивизм':(1260,1247,11016,1207,11026,11269),'Коллаж':(10954,10956,15441,15429)}[genre]:
                 mid='momus:'+str(identifier)
                 if mid in self.known_ids:continue
                 source='https://www.searchculture.gr/aggregator/edm/momus/000179-'+str(identifier)
@@ -293,7 +299,7 @@ class Museum:
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
-            query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial'}.get(genre,query)
+            query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial','Кубизм':'Cubist'}.get(genre,query)
             for page in range(start_page,start_page+2):
                 url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,'skip':(page-1)*60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
                 for row in json.loads(self.get(url))['data']:
@@ -335,7 +341,7 @@ class Museum:
         # Independent official open collection. Only explicit public-domain rights
         # and matching museum metadata are admitted; no API key or paid service.
         try:
-            queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('kubisme',),'Романтизм':('romantik',)}.get(genre,()))))
+            queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('Juan Gris','kubisme'),'Романтизм':('romantik',)}.get(genre,()))))
             for query in queries:
                 url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
                 payload=json.loads(self.get(url));items=payload.get('items')
@@ -347,7 +353,6 @@ class Museum:
                     license={'https://creativecommons.org/publicdomain/zero/1.0/':'CC0','https://creativecommons.org/publicdomain/mark/1.0/':'Public Domain Mark'}.get(rights)
                     if row.get('public_domain') is not True or not license:continue
                     evidence=' '.join(str(row.get(k) or '') for k in ('titles','techniques','styles','artwork_type','description','content_description','object_names'))
-                    if not genre_matches(genre,evidence):continue
                     media=str(row.get('techniques') or '')+' '+str(row.get('object_names') or '')+' '+str(row.get('artwork_type') or '')
                     if not re.search(r'(?i)\b(painting|drawing|print|collage|maleri|tegning|grafik|litografi|olie|akvarel|watercolor|oil|etching|radering|linocut|traesnit|træsnit|gouache)\b',media):continue
                     image=row.get('image_thumbnail')
@@ -358,6 +363,9 @@ class Museum:
                     year=next((r.get('period') or r.get('start') for r in dates if isinstance(r,dict)),None)
                     identity=row.get('object_number')
                     if not all((identity,title,artist,year)):continue
+                    if genre=='Кубизм' and curated_smk_cubist(identity,artist,title,year):
+                        evidence='Cubism — curated Juan Gris painting '+identity+'; '+evidence
+                    if not genre_matches(genre,evidence):continue
                     mid='smk:'+identity
                     if mid in self.known_ids:continue
                     self.known_ids.add(mid)
@@ -410,7 +418,7 @@ def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None)
         if len(row['artwork_ids'])!=4 or len(set(row['artwork_ids']))!=4 or not all(file_valid(root,registry['artworks'][i]) for i in row['artwork_ids']):raise ValueError('ART_SET_INTEGRITY')
         return row
     used={i for row in registry['sets'].values() for i in row['artwork_ids']}
-    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w) and not (genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',w.get('genre_evidence',''),re.I))]
+    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w) and not (genre=='Кубизм' and not genre_matches(genre,w.get('genre_evidence','')))]
     if len(available)<4:return None
     from scripts import art_reference44 as color
     profiles={w['id']:color.work_profile(root,w,{}) for w in available}
@@ -626,7 +634,7 @@ def checkpoint(state,root):
 
 def probe_source(output):
     """One public read-only contract probe; no checkpoint, credentials or model."""
-    source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260';client=Museum(seconds=55,requests=10)
+    source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260';client=Museum(seconds=55,requests=16)
     report={'source':source,'admitted':False,'model_requests':0}
     try:
         work=client.linked_work(source,'Конструктивизм');report.update(admitted=bool(work),work=work)
@@ -646,8 +654,25 @@ def probe_source(output):
                     for index,child in enumerate(value[:3]):visit(child,path+'/'+str(index))
             visit(payload);report.update(public_root_keys=list(payload) if isinstance(payload,dict) else [],public_metadata_facts=facts)
         except Exception as exc:report['diagnostic_code']=safe_code(exc)
+    # Diagnose rejected curated records without relaxing any rights gate. Only
+    # public catalogue facts are retained; no originals, secrets or inference.
+    report['met_contracts']=[]
+    for identifier in (490060,498962,486744,497126):
+        try:
+            row=json.loads(client.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+str(identifier),accept='application/json'))
+            report['met_contracts'].append({k:row.get(k) for k in ('objectID','isPublicDomain','artistDisplayName','classification','medium','title')})
+        except Exception as exc:report['met_contracts'].append({'objectID':identifier,'code':safe_code(exc)})
+    report['cubist_search_contracts']=[]
+    for museum,url,key in (
+        ('cleveland','https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':'Cubist','cc0':1,'has_image':1,'limit':20}),'data'),
+        ('smk','https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':'Juan Gris','filters':'[public_domain:true],[has_image:true]','offset':0,'rows':20}),'items')):
+        try:
+            payload=json.loads(client.get(url));rows=payload.get(key,[])
+            facts=[{k:row.get(k) for k in ('id','object_number','title','titles','production','production_date','rights','public_domain','share_license_status','type','description','techniques','styles','content_description')} for row in rows]
+            report['cubist_search_contracts'].append({'museum':museum,'records':len(rows),'facts':facts})
+        except Exception as exc:report['cubist_search_contracts'].append({'museum':museum,'code':safe_code(exc)})
     Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-    print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys')}),flush=True)
+    print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys','met_contracts','cubist_search_contracts')}),flush=True)
     return report
 
 
