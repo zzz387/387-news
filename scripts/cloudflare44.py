@@ -49,6 +49,9 @@ def safe_errors(body):
 def authentication_code(details):
     return next(('CF_AUTHENTICATION_FAILED_'+str(e['code']) for e in details if e.get('code') in (9106,10000)),None)
 
+def output_rejection_code(details):
+    return 'CF_OUTPUT_REJECTED' if any(e.get('code')==3030 and re.search(r'output.*flagged',e.get('message',''),re.I) for e in details) else None
+
 def multipart_payload(fields,images):
     boundary='387-art-'+hashlib.sha256(b''.join(images)).hexdigest()[:24]
     chunks=[]
@@ -77,11 +80,11 @@ def api(path,data=None,images=None):
         except Exception:pass
         print('[cf-api-error] '+json.dumps({'stage':stage,'http_status':code,'errors':details}),flush=True)
         if code in (429,503):raise GenerationPaused('CF_HTTP_'+str(code)) from None
-        error=RuntimeError(authentication_code(details) or 'CF_HTTP_'+str(code));error.stage=stage
+        error=RuntimeError(authentication_code(details) or output_rejection_code(details) or 'CF_HTTP_'+str(code));error.stage=stage
         raise error from None
     if result.get('success') is False or result.get('errors'):
         print('[cf-api-error] '+json.dumps({'stage':stage,'http_status':200,'errors':safe_errors(result)}),flush=True)
-        error=RuntimeError(authentication_code(safe_errors(result)) or 'CF_RESPONSE_REJECTED');error.stage=stage
+        error=RuntimeError(authentication_code(safe_errors(result)) or output_rejection_code(safe_errors(result)) or 'CF_RESPONSE_REJECTED');error.stage=stage
         raise error
     return result
 

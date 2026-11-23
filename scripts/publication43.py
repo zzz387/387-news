@@ -267,7 +267,12 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
             if basis['date']!=date or p.digest(basis)!=prior['key']:raise p.Blocked('ART_PUBLIC_BINDING_INVALID')
             repair=mosaic44.CONFIG.get('visual_brief_repairs',{}).get(prior['text_hash'],{})
             if repair_legacy_images and next((r for r in data['illustrations'] if r['article_slug']==item['article_slug']),{}).get('model')==mosaic44.CONFIG['model']:
-                basis['prompt_version']=mosaic44.CONFIG['prompt_version'];item.update(basis,key=p.digest(basis),genre=prior['genre'])
+                basis['prompt_version']=mosaic44.CONFIG['prompt_version']
+                reviewed=mosaic44.CONFIG['repair_legacy_art'].get('reviewed_images',{}).get(prior['text_hash'])
+                if reviewed:
+                    candidate=dict(basis,prompt_version=reviewed['prompt_version']);obj=sub['art44']['objects'].get(p.digest(candidate),{})
+                    if mosaic44.object_valid(obj) and obj.get('sha256')==reviewed['sha256']:basis=candidate
+                item.update(basis,key=p.digest(basis),genre=prior['genre'])
                 scene=mosaic44.CONFIG['repair_legacy_art'].get('visual_subjects',{}).get(prior['text_hash'])
                 if scene:
                     item['descriptor']['visual_subject_en']=scene;item['description_hash']=p.digest(item['descriptor'])

@@ -189,6 +189,7 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
     budget=news.runtime.ACTIVE_BUDGET
     # One sequential batch, bounded only by the existing request/time budgets.
     for item in items:
+        if item['key'] in saved.get('rejected_keys',{}):continue
         public=cached(p.ROOT,state['date']).get(item['key'])
         if public and valid_image(p.ROOT,state['date'],item['key'],public) and not object_valid(saved['objects'].get(item['key'],{})):
             saved['objects'][item['key']]={**public,'webp':base64.b64encode((p.ROOT/public['path']).read_bytes()).decode(),'status':'READY'}
@@ -233,6 +234,9 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             if isinstance(exc,news.runtime.GenerationPaused):
                 saved['code']='IMAGE_QUOTA_OR_COOLDOWN';persist();break
             code=str(exc) if re.fullmatch(r'[A-Z_0-9]+',str(exc)) else type(exc).__name__
+            if code=='CF_OUTPUT_REJECTED':
+                saved.setdefault('rejected_keys',{})[item['key']]=code
+                saved['history'].append({'key':item['key'],'code':code});persist();continue
             if code.startswith('CF_') and code!='CF_IMAGE_INVALID':
                 if code.startswith('CF_AUTHENTICATION_FAILED_') or code in ('CF_HTTP_401','CF_HTTP_403'):
                     saved['authorization_failure']={'credentials_hash':cloudflare44.credential_fingerprint(),'code':code}
