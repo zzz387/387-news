@@ -92,9 +92,14 @@ class ArtLibraryTests(unittest.TestCase):
     def test_museum_metadata_and_access_checks_fail_closed(self):
         self.assertTrue(lib.genre_matches('Японская гравюра','Japan Color woodblock print'))
         self.assertFalse(lib.genre_matches('Японская гравюра','European oil painting'))
+        self.assertTrue(lib.genre_matches('Конструктивизм','Constructivist design'))
+        self.assertTrue(lib.genre_matches('Ар-деко','Art Déco'))
+        self.assertFalse(lib.genre_matches('Кубизм','Neo-Plasticism evolved from Cubism'))
         museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','artwork_type_title':'Painting','style_titles':['Impressionism'],'is_public_domain':True}]}
         with patch.object(museum,'get',return_value=json.dumps(data).encode()):
             work=next(museum.candidates('Импрессионизм'));self.assertEqual(work['license'],'CC0');self.assertEqual(work['genre_id'],'impressionism')
+        null_row=dict(data['data'][0],medium_display=None,style_titles=None)
+        with patch.object(museum,'get',return_value=json.dumps({'data':[null_row,data['data'][0]]}).encode()):self.assertEqual(next(museum.candidates('Импрессионизм'))['museum_id'],'aic:1')
         with self.assertRaisesRegex(ValueError,'HOST'):museum.get('https://attacker.invalid/image.webp')
     def test_color_profiles_selection_and_style_instructions_are_deterministic(self):
         from scripts import art_reference44 as color
@@ -104,6 +109,9 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertEqual(color.compare(a,a)['status'],'COLOR_MATCH_OK')
         self.assertEqual(color.compare(a,b)['status'],'COLOR_MISMATCH')
         self.assertGreater(color.distance(a,b),50);self.assertEqual(a['dominant'],['#c82314'])
+        mass_a={'groups':[{'share':.9,'lab':[50,60,0]},{'share':.1,'lab':[50,-60,0]}],'lightness':50,'saturation_value':.6}
+        mass_b=dict(mass_a,groups=[{'share':.1,'lab':[50,60,0]},{'share':.9,'lab':[50,-60,0]}])
+        self.assertGreater(color.distance(mass_a,mass_b),90)
         with tempfile.TemporaryDirectory() as temp:
             state=self.stock(temp,4);items=self.items(5);sets=lib.prepare_sets(temp,state,items,discover=False)
             lib.attach(temp,state,items,sets);selected=[i['selected_reference_id'] for i in items]
@@ -152,6 +160,23 @@ class ArtLibraryTests(unittest.TestCase):
                         self.assertEqual(image['reference_images_sent'],1);self.assertEqual(image['model'],cf.REFERENCE_MODEL)
                 self.assertFalse(pub.backfill_issue_art(target,s['date'],later,repair_legacy_images=True));self.assertEqual(calls.call_count,11)
             self.assertTrue(all(p.read_bytes()==content for p,content in texts.items()))
+
+    def test_smk_requires_explicit_open_rights_and_matching_metadata(self):
+        museum=lib.Museum()
+        record={'object_number':'fixture-1','public_domain':True,'rights_url':'https://creativecommons.org/publicdomain/mark/1.0/',
+                'titles':[{'title':'Constructivist study'}],'techniques':['Constructivism, painting'],
+                'production':[{'creator':'Fixture painter'}],'production_dates':[{'period':'1920'}],
+                'image_thumbnail':'https://iip-thumb.smk.dk/fixture.jpg'}
+        def get(url,*args,**kwargs):
+            if url.startswith('https://api.smk.dk/'):return json.dumps({'items':[dict(record,object_number='private',public_domain=False),record]}).encode()
+            raise ValueError('SYNTHETIC_SOURCE_UNAVAILABLE')
+        with patch.object(museum,'get',side_effect=get):
+            works=list(museum.candidates('Конструктивизм'))
+        self.assertEqual(len(works),1);self.assertEqual(works[0]['license'],'Public Domain Mark')
+        with tempfile.TemporaryDirectory() as temp:
+            state={};registry=lib.empty();key=lib.ingest(temp,registry,works[0],picture(93),state,lambda:None)
+            self.assertTrue(lib.file_valid(temp,registry['artworks'][key]));self.assertFalse(lib.file_valid(temp,dict(registry['artworks'][key],public_domain=False)))
+            with self.assertRaisesRegex(ValueError,'RIGHTS'):lib.ingest(temp,registry,dict(works[0],public_domain=False),picture(94),state,lambda:None)
 
     def test_real_multipart_sends_one_selected_binary_image_part(self):
         images=[picture(0)]

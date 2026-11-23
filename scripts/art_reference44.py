@@ -39,13 +39,19 @@ def profile(raw):
             'contrast':'high' if contrast>55 else 'low' if contrast<25 else 'moderate','contrast_value':round(contrast,2)}
 
 def distance(a,b):
-    def directed(x,y):return sum(g['share']*min(delta(g['lab'],h['lab']) for h in y['groups']) for g in x['groups'])
-    return (directed(a,b)+directed(b,a))/2 + .15*abs(a['lightness']-b['lightness']) + 10*abs(a['saturation_value']-b['saturation_value'])
+    # Greedy CIELAB transport conserves color-group mass. Matching only nearest
+    # colors would incorrectly accept the same hues with inverted area ratios.
+    x=a['groups'];y=b['groups'];sx=sum(g['share'] for g in x);sy=sum(g['share'] for g in y)
+    left=[g['share']/sx for g in x];right=[g['share']/sy for g in y];cost=0
+    edges=sorted((delta(g['lab'],h['lab']),i,j) for i,g in enumerate(x) for j,h in enumerate(y))
+    for dist,i,j in edges:
+        mass=min(left[i],right[j]);cost+=mass*dist;left[i]-=mass;right[j]-=mass
+    return cost+.15*abs(a['lightness']-b['lightness'])+10*abs(a['saturation_value']-b['saturation_value'])
 
 def compare(reference,generated):
     score=distance(reference,generated);thresholds=CONFIG['color_thresholds']
     status='COLOR_MATCH_OK' if score<=thresholds['ok'] else 'COLOR_MATCH_WARNING' if score<=thresholds['warning'] else 'COLOR_MISMATCH'
-    return {'status':status,'lab_distance':round(score,3),'reference_temperature':reference['temperature'],'generated_temperature':generated['temperature'],
+    return {'metric':'CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1','status':status,'lab_distance':round(score,3),'reference_temperature':reference['temperature'],'generated_temperature':generated['temperature'],
             'reference_saturation':reference['saturation_value'],'generated_saturation':generated['saturation_value'],'generated_profile':generated,'quality_claim':'COLOR_ONLY_NOT_ARTISTIC_QUALITY'}
 
 def description(palette):
@@ -111,7 +117,7 @@ def comparison(root,state,items,baseline,output):
     """Only approved public texts' artwork and CC0 museum images; no private drafts."""
     import base64,shutil
     from html import escape
-    output=Path(output);output.mkdir(parents=True,exist_ok=True);rows=[];objects=state.get('art44',{}).get('objects',{})
+    output=Path(output);output.mkdir(parents=True,exist_ok=True);rows=[];paired_old=[];paired_new=[];objects=state.get('art44',{}).get('objects',{})
     for item in items:
         slug=item['article_slug'];old=baseline['images'].get(slug)
         if not old or old.get('model')!='@cf/black-forest-labs/flux-1-schnell':continue
@@ -121,11 +127,16 @@ def comparison(root,state,items,baseline,output):
             raw=base64.b64decode(obj['webp'],validate=True)
             if hashlib.sha256(raw).hexdigest()!=obj['sha256']:raise ValueError('ART_COMPARISON_HASH_INVALID')
             new_name=prefix+'after.webp';(output/new_name).write_bytes(raw)
+            paired_old.append(profile((Path(root)/old['path']).read_bytes()));paired_new.append(profile(raw))
         registry=state.get('_comparison_registry',{});work=registry.get('artworks',{}).get(item.get('selected_reference_id'),{})
         ref_name=None
         if work:
             ref_name=prefix+'reference.webp';shutil.copyfile(Path(root)/work['path'],output/ref_name)
         rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'model':obj.get('model') if obj else None,'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None})
+    def variety(values):
+        scores=[distance(a,b) for i,a in enumerate(values) for b in values[i+1:]]
+        return round(sum(scores)/len(scores),3) if scores else None
+    (output/'summary.json').write_text(json.dumps({'paired_images':len(paired_new),'targets':len(rows),'old_palette_diversity':variety(paired_old),'new_palette_diversity':variety(paired_new),'metric':'mean pairwise CIELAB color-mass transport; not an artistic quality score'},indent=2)+'\n')
     (output/'report.json').write_text(json.dumps(rows,ensure_ascii=False,indent=2)+'\n')
     body='<html><meta charset="utf-8"><title>№029 — сравнение иллюстраций</title><style>body{font:16px sans-serif;max-width:1400px;margin:auto}section{border-bottom:1px solid;padding:24px}figure{display:inline-block;width:42%;vertical-align:top}img{max-width:100%;height:auto}.ref{width:220px}</style><h1>№029: старые и новые иллюстрации</h1>'
     for r in rows:

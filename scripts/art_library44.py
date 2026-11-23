@@ -26,7 +26,7 @@ GENRES={
  'Геометрическая абстракция':('geometric-abstraction','Geometric abstraction'),
  'Супрематизм':('suprematism','Suprematism'), 'Коллаж':('collage','Collage'),
  'Индустриальная графика':('industrial','Industrial'), 'Масло':('oil','Oil on canvas')}
-HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org'}
+HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk'}
 
 def stamp():return datetime.now(timezone.utc).isoformat()
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -45,7 +45,11 @@ def issue_id(state):
     return value
 
 def genre_matches(genre,tokens):
-    text=tokens.casefold()
+    text=''.join(c for c in unicodedata.normalize('NFKD',tokens) if not unicodedata.combining(c)).casefold().replace('-',' ')
+    if genre=='Конструктивизм':return bool(re.search(r'\b(?:constructivis(?:m|t)|konstruktivis(?:m|t))',text))
+    if genre=='Романтизм':return bool(re.search(r'\b(?:romantic(?:ism)?|romantik)\b',text))
+    if genre=='Кубизм' and 'kubisme' in text:return True
+    if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',text):return False
     if genre=='Японская гравюра':return ('japan' in text or 'ukiyo' in text) and ('woodblock' in text or 'woodcut' in text)
     if genre=='Импрессионизм':return bool(re.search(r'\bimpressionis',text))
     if genre=='Акварель':return 'watercolor' in text or 'watercolour' in text
@@ -69,7 +73,8 @@ def file_valid(root,work):
         expected='assets/art/'+work['genre_id']+'/'+work['id']+'.webp'
         if work['path']!=expected or not re.fullmatch(r'[a-f0-9]{64}',work['id']):return False
         data=(Path(root)/expected).read_bytes()
-        if digest(data)!=work['sha256'] or work['license']!='CC0' or work['verified'] is not True:return False
+        if digest(data)!=work['sha256'] or work['license'] not in ('CC0','Public Domain Mark') or work['verified'] is not True:return False
+        if work['license']=='Public Domain Mark' and (work.get('public_domain') is not True or work.get('rights_evidence')!='https://creativecommons.org/publicdomain/mark/1.0/'):return False
         with Image.open(io.BytesIO(data)) as image:
             image.verify()
         return True
@@ -126,7 +131,7 @@ class Museum:
                 rows=json.loads(self.get(url+'&page='+str(page)))['data']
                 for row in rows:
                     if 'www.artic.edu' in self.blocked_hosts:break
-                    tokens=' '.join(row.get('style_titles') or [])+' '+row.get('medium_display','')+' '+str(row.get('place_of_origin',''))
+                    tokens=' '.join(str(x) for x in (row.get('style_titles') or []) if x)+' '+str(row.get('medium_display') or '')+' '+str(row.get('place_of_origin',''))
                     if not any(t in str(row.get('artwork_type_title','')).casefold() for t in ('painting','drawing','print')):continue
                     if row.get('is_public_domain') is not True or not row.get('image_id') or not genre_matches(genre,tokens):continue
                     if not row.get('artist_title') or not row.get('date_display') or not row.get('title'):continue
@@ -136,14 +141,15 @@ class Museum:
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
-            url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60})
+            query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial'}.get(genre,query)
+            url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
             for row in json.loads(self.get(url))['data']:
                 tokens=' '.join(str(row.get(k) or '') for k in ('title','technique','description','culture','type','period'))
                 image=(row.get('images') or {}).get('web',{}).get('url')
                 if image and urlparse(image).hostname in self.blocked_hosts:break
                 if row.get('type') not in ('Painting','Drawing','Print'):continue
                 if row.get('share_license_status')!='CC0' or not image or not genre_matches(genre,tokens):continue
-                authors=row.get('creators') or [];artist='; '.join(a.get('description','') for a in authors)
+                authors=row.get('creators') or [];artist='; '.join(str(a.get('description') or '') for a in authors if a.get('description'))
                 if not artist or not row.get('creation_date') or not row.get('title'):continue
                 yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],
                     'source_url':row['url'],'license':'CC0','license_url':'https://www.clevelandart.org/open-access','image_url':image,'genre_evidence':tokens[:1000],'genre_id':genre_id(genre),'verified':True}
@@ -168,6 +174,33 @@ class Museum:
             except Exception as exc:print('[art-museum] '+json.dumps({'museum':'met','code':safe_code(exc)}),flush=True)
 
 
+        # Independent official open collection. Only explicit public-domain rights
+        # and matching museum metadata are admitted; no API key or paid service.
+        try:
+            query={'Конструктивизм':'konstruktivisme','Кубизм':'kubisme','Романтизм':'romantik'}.get(genre,GENRES[genre][1])
+            url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
+            payload=json.loads(self.get(url));items=payload.get('items')
+            if not isinstance(items,list):raise ValueError('ART_SOURCE_SCHEMA_INVALID')
+            print('[art-museum-source] '+json.dumps({'museum':'smk','technical_access':'verified','records':len(items)}),flush=True)
+            for row in items:
+                rights=row.get('rights_url','');license={'https://creativecommons.org/publicdomain/zero/1.0/':'CC0','https://creativecommons.org/publicdomain/mark/1.0/':'Public Domain Mark'}.get(rights)
+                if row.get('public_domain') is not True or not license:continue
+                evidence=' '.join(str(row.get(k) or '') for k in ('titles','techniques','styles','artwork_type','description','object_names'))
+                if not genre_matches(genre,evidence):continue
+                image=row.get('image_thumbnail')
+                if not image or urlparse(image).hostname not in HOSTS:continue
+                titles=row.get('titles') or [];production=row.get('production') or [];dates=row.get('production_dates') or []
+                title=next((r.get('title') for r in titles if isinstance(r,dict) and r.get('title')),None)
+                artist=next((r.get('creator') for r in production if isinstance(r,dict) and isinstance(r.get('creator'),str)),None)
+                year=next((r.get('period') or r.get('start') for r in dates if isinstance(r,dict)),None)
+                identity=row.get('object_number')
+                if not all((identity,title,artist,year)):continue
+                yield {'museum':'SMK — National Gallery of Denmark','museum_id':'smk:'+identity,'title':title,'artist':artist,'year':year,
+                    'source_url':url,'license':license,'license_url':'https://www.smk.dk/en/article/smk-open/','rights_evidence':rights,'public_domain':True,'image_url':image,
+                    'genre_evidence':evidence[:1000],'genre_id':genre_id(genre),'verified':True}
+        except Exception as exc:print('[art-museum] '+json.dumps({'museum':'smk','code':safe_code(exc)}),flush=True)
+
+
 def safe_code(exc):
     value=str(exc)
     return value if re.fullmatch(r'[A-Z_0-9]+',value) else 'HTTP_'+str(exc.code) if isinstance(exc,HTTPError) else type(exc).__name__
@@ -176,7 +209,8 @@ def ingest(root,registry,work,raw,state,persist):
     for url in (work['source_url'],work['license_url']):
         if urlparse(url).scheme!='https' or urlparse(url).hostname not in HOSTS:raise ValueError('ART_METADATA_URL_INVALID')
     if work.get('genre_id') not in {g[0] for g in GENRES.values()}:raise ValueError('ART_GENRE_UNSUPPORTED')
-    if work.get('license')!='CC0' or work.get('verified') is not True:raise ValueError('ART_RIGHTS_UNVERIFIED')
+    if work.get('license') not in ('CC0','Public Domain Mark') or work.get('verified') is not True:raise ValueError('ART_RIGHTS_UNVERIFIED')
+    if work.get('license')=='Public Domain Mark' and (work.get('public_domain') is not True or work.get('rights_evidence')!='https://creativecommons.org/publicdomain/mark/1.0/'):raise ValueError('ART_RIGHTS_UNVERIFIED')
     if known(registry,work):return None
     original_hash=digest(raw)
     if any(w['original_sha256']==original_hash for w in registry['artworks'].values()):return None
@@ -208,7 +242,7 @@ def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None)
         if len(row['artwork_ids'])!=4 or len(set(row['artwork_ids']))!=4 or not all(file_valid(root,registry['artworks'][i]) for i in row['artwork_ids']):raise ValueError('ART_SET_INTEGRITY')
         return row
     used={i for row in registry['sets'].values() for i in row['artwork_ids']}
-    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w)]
+    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w) and not (genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',w.get('genre_evidence',''),re.I))]
     if len(available)<4:return None
     from scripts import art_reference44 as color
     profiles={w['id']:color.work_profile(root,w,{}) for w in available}
@@ -261,6 +295,8 @@ def attach(root,state,items,sets):
         item.update(reference_status='ONE_REFERENCE_READY',reference_set_id=row['id'],reference_artwork_ids=row['artwork_ids'],reference_sha256=row['sha256'],reference_images_sent=1)
         item['reference_images']=[{'path':work['path'],'sha256':work['sha256']}]
         item.update({k:color.direction(item['genre'])[k] for k in ('art_movement','medium')})
+        from scripts import cloudflare44
+        item['prompt']=cloudflare44.prompt(item)
         previous.append(choice['palette'])
     return items
 
@@ -293,10 +329,10 @@ def render(root,registry):
         content+='<h2>Вся коллекция</h2><div class="art-gallery">'
         for w in works:
             assigned=used.get(w['id']);status=('Назначено: '+assigned['issue_id']) if assigned else 'В запасе · ещё не назначено выпуску'
-            content+='<figure id="'+w['id']+'"><img loading="lazy" src="/'+w['path']+'" width="'+str(w['width'])+'" height="'+str(w['height'])+'" alt="'+escape(w['title'],quote=True)+'"><figcaption><strong>'+escape(w['title'])+'</strong> · '+escape(w['artist'])+' · '+escape(str(w['year']))+'<p>'+escape(w['museum'])+' · <a href="'+escape(w['source_url'],quote=True)+'">Музейный оригинал</a> · <a href="'+escape(w['license_url'],quote=True)+'">CC0</a></p><small>Добавлено '+escape(w['added_at'][:10])+' · '+escape(status)+'</small></figcaption></figure>'
+            content+='<figure id="'+w['id']+'"><img loading="lazy" src="/'+w['path']+'" width="'+str(w['width'])+'" height="'+str(w['height'])+'" alt="'+escape(w['title'],quote=True)+'"><figcaption><strong>'+escape(w['title'])+'</strong> · '+escape(w['artist'])+' · '+escape(str(w['year']))+'<p>'+escape(w['museum'])+' · <a href="'+escape(w['source_url'],quote=True)+'">Музейный оригинал</a> · <a href="'+escape(w['license_url'],quote=True)+'">'+escape(w['license'])+'</a></p><small>Добавлено '+escape(w['added_at'][:10])+' · '+escape(status)+'</small></figcaption></figure>'
         folder=target/gid;folder.mkdir(exist_ok=True);(folder/'index.html').write_text(page(groups[gid],'/art/'+gid+'/',content+'</div>'))
     body+='</ul>'
-    if registry['studies']:body+='<p><a href="/art/studies/">Пробы генерации по четырём референсам</a></p>'
+    if registry['studies']:body+='<p><a href="/art/studies/">Пробы генерации по музейным референсам</a></p>'
     (target/'index.html').write_text(page('Искусство','/art/',body))
     if registry['studies'] or any(s['issue_id'].startswith('art-study-') for s in registry['sets'].values()):
         body='<p>Технические художественные пробы на основе уже опубликованных статей. Это не новый выпуск газеты.</p><div class="art-gallery">'
