@@ -141,7 +141,7 @@ PARIS_SEEDS={
  'Ар-нуво':{i:('Mucha','Art Nouveau — Mucha/Fouquet-shop designs; Paris Musées Paris 1900 collection') for i in (320028394,320073266,320073209)},
  'Кубизм':{729:('Gris, Juan','Cubism — Juan Gris, Compotier; museum catalogue: Les chemins du cubisme')},
  'Романтизм':{160000895:('Delacroix','Romanticism — Eugène Delacroix, Salon de la Paix sketch; Petit Palais catalogue')},
- 'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956)}}
+ 'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956,160025973,160025974,160025969,160025947)}}
 MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,)}
 
 def met_seed_work(row,identifier,genre):
@@ -246,7 +246,7 @@ class Museum:
         # Public Linked Data / IIIF: no search-API key, paid plan or access bypass.
         # Fetch rights and metadata live before admitting any seed's actual file.
         if genre in ('Конструктивизм','Коллаж'):
-            for identifier in {'Конструктивизм':(1260,1247,11016,1207,11026,11269),'Коллаж':(10954,10956)}[genre]:
+            for identifier in {'Конструктивизм':(1260,1247,11016,1207,11026,11269),'Коллаж':(10954,10956,15441,15429)}[genre]:
                 mid='momus:'+str(identifier)
                 if mid in self.known_ids:continue
                 source='https://www.searchculture.gr/aggregator/edm/momus/000179-'+str(identifier)
@@ -646,6 +646,14 @@ def probe_source(output):
                     for index,child in enumerate(value[:3]):visit(child,path+'/'+str(index))
             visit(payload);report.update(public_root_keys=list(payload) if isinstance(payload,dict) else [],public_metadata_facts=facts)
         except Exception as exc:report['diagnostic_code']=safe_code(exc)
+    # Diagnose rejected curated records without relaxing any rights gate. Only
+    # public catalogue facts are retained; no originals, secrets or inference.
+    report['met_contracts']=[]
+    for identifier in (490060,498962,486744,497126):
+        try:
+            row=json.loads(client.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+str(identifier),accept='application/json'))
+            report['met_contracts'].append({k:row.get(k) for k in ('objectID','isPublicDomain','artistDisplayName','classification','medium','title')})
+        except Exception as exc:report['met_contracts'].append({'objectID':identifier,'code':safe_code(exc)})
     Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys')}),flush=True)
     return report
