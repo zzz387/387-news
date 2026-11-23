@@ -300,6 +300,7 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
         stage=mosaic44.CONFIG['repair_legacy_art']['stage']
         slugs=set(mosaic44.CONFIG['repair_legacy_art']['pilot_slugs']) if stage=='pilot' else set(legacy['images'])
         prepared=[i for i in items if i['article_slug'] in slugs and legacy['images'][i['article_slug']]['model']==mosaic44.CONFIG['model']]
+    if repair_legacy_images:sub['art44']['required_repair_keys']=[i['key'] for i in items if legacy['images'][i['article_slug']]['model']==mosaic44.CONFIG['model']]
     progress=mosaic44.prepare_items(sub,prepared,persist,allow_request)
     # Retain the complete plan for manifest assembly and idempotent future retries.
     sub['art44']['plan']=items

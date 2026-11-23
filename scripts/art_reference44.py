@@ -104,10 +104,11 @@ def direction(genre):return CONFIG['directions'].get(genre,CONFIG['directions'][
 def prompt(item):
     d=item['descriptor'];scene=(d.get('visual_subject_en') or d['title']+'. '+d.get('summary','')).strip()
     style=direction(item['genre']);palette=item.get('palette')
+    material=' Clearly render separated pigment strokes, broken optical edges and a visibly painted surface; avoid photographic fidelity or camera-like rendering.' if style['art_movement']=='impressionism' else ''
     color=description(palette) if isinstance(palette,dict) else 'Use the actual palette of the attached museum painting.'
-    composition={'constructivism':'Structure the subject with functional geometric planes and an asymmetric axis', 'art nouveau':'Frame the subject with flowing organic rhythms without copying museum figures', 'cubism':'Resolve the subject into interlocking planes and simultaneous viewpoints', 'impressionism':'Stage the subject in changing natural light with optical spatial depth'}.get(style['art_movement'],item.get('composition','Independent asymmetric composition serving the subject'))
+    composition={'constructivism':'Structure the subject with functional geometric planes and an asymmetric axis', 'art nouveau':'Weave flowing organic rhythms into the scene itself, without an enclosing frame or ornamental border and without copying museum figures', 'cubism':'Resolve the subject into interlocking planes and simultaneous viewpoints', 'impressionism':'Stage the subject in changing natural light with optical spatial depth'}.get(style['art_movement'],item.get('composition','Independent asymmetric composition serving the subject'))
     text=(f"Create an original, unsigned fine-art illustration. No text or artist signatures anywhere. Never reproduce reference inscriptions; leave all four corners blank and unmarked. ARTICLE SUBJECT: {scene}\nART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
-        f"ARTISTIC CHARACTERISTICS: {style['characteristics']}\n"
+        f"ARTISTIC CHARACTERISTICS: {style['characteristics']}{material}\n"
         'Use the single attached painting as the primary visual reference for artistic language, texture, light and tonal structure. '
         'Follow its actual color palette closely. Preserve dominant, secondary and accent proportions, temperature, saturation, contrast and light/dark distribution. '
         'Do not substitute a generic editorial color palette or dominant green unless present in the reference or necessary for the subject. '

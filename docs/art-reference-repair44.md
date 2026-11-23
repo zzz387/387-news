@@ -74,3 +74,16 @@ owner-authorized 029 repair's concise English visual subjects to each unchanged
 public text hash. These are illustrative metaphors derived from the final public
 articles, not new facts, edited news text or extra model requests for translation.
 The same selected reference is preserved while correcting that concrete error.
+
+The real SearchCulture recovery returned HTTP 406 without an Accept header.
+Its documented JSON-LD representation is requested explicitly using
+`Accept: application/ld+json`; no access restrictions are bypassed. Optional
+color retries now reserve first-pass capacity for all outstanding repair keys
+before using any of the unchanged daily free allowance on an aesthetic repeat.
+
+Visual review also found a conflicting Art-nouveau composition instruction:
+"Frame the subject" encouraged a decorative border despite the no-border clause.
+Prompt v4 integrates ornament into the scene without a frame and strengthens
+Impressionist pigment/edge instructions against photographic rendering. These
+three pilot outputs are reviewed before the all-image stage. Successful prior
+trial objects remain saved; optional color retries preserve first-pass capacity.

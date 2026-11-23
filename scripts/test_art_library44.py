@@ -349,4 +349,29 @@ class ArtLibraryTests(unittest.TestCase):
         bad=copy.deepcopy(payload);bad['sequences'][0]['canvases'][0]['metadata'][1]['value']='all rights reserved'
         self.assertIsNone(lib.paris_work(bad,320028394,'Ар-нуво'))
 
+    def test_color_retry_preserves_first_pass_free_budget_for_unfinished_repair(self):
+        from types import SimpleNamespace
+        state={'art44':{'objects':{},'required_repair_keys':[str(i) for i in range(11)]}}
+        budget=SimpleNamespace(ledger={'cloudflare_ai':{'reserved_neurons':4096,'observed_account_neurons':2244}})
+        with patch.object(art,'object_valid',side_effect=lambda obj:bool(obj.get('ready'))):
+            self.assertTrue(art.color_retry_available(state,[{'key':'0'}],budget))
+            budget.ledger['cloudflare_ai']['reserved_neurons']=4608
+            self.assertFalse(art.color_retry_available(state,[{'key':'0'}],budget))
+            state['art44']['objects']={str(i):{'ready':True} for i in range(10)}
+            self.assertTrue(art.color_retry_available(state,[{'key':'10'}],budget))
+            budget.ledger['cloudflare_ai']['observed_account_neurons']=None
+            self.assertFalse(art.color_retry_available(state,[{'key':'10'}],budget))
+
+    def test_official_linked_data_negotiates_documented_json_representation(self):
+        from contextlib import nullcontext
+        from types import SimpleNamespace
+        url='https://www.searchculture.gr/aggregator/edm/momus/000179-1260/json'
+        captured=[]
+        def reply(request,**kwargs):
+            captured.append(request.get_header('Accept'))
+            return nullcontext(SimpleNamespace(url=url,read=lambda size:b'{}'))
+        with patch.object(lib,'urlopen',side_effect=reply):
+            self.assertEqual(lib.Museum().get(url,robots=False,accept='application/ld+json, application/json;q=0.9'),b'{}')
+        self.assertEqual(captured,['application/ld+json, application/json;q=0.9'])
+
 if __name__=='__main__':unittest.main()

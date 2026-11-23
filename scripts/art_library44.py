@@ -150,7 +150,7 @@ def restore(root,state):
 class Museum:
     """A bounded official-API client. robots, bytes and deadline fail closed."""
     def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set();self.known_ids=set()
-    def get(self,url,limit=5000000,robots=True):
+    def get(self,url,limit=5000000,robots=True,accept=None):
         parsed=urlparse(url)
         if parsed.scheme!='https' or parsed.hostname not in HOSTS or parsed.username or parsed.password:raise ValueError('ART_SOURCE_HOST_INVALID')
         if parsed.hostname in self.blocked_hosts:raise ValueError('ART_SOURCE_UNAVAILABLE')
@@ -167,7 +167,7 @@ class Museum:
         if self.left<=0 or time.monotonic()>=self.deadline:raise ValueError('ART_DISCOVERY_BUDGET')
         self.left-=1
         try:
-            with urlopen(Request(url,headers={'User-Agent':AGENT}),timeout=min(12,max(1,self.deadline-time.monotonic()))) as response:
+            with urlopen(Request(url,headers={'User-Agent':AGENT,**({'Accept':accept} if accept else {})}),timeout=min(12,max(1,self.deadline-time.monotonic()))) as response:
                 if urlparse(response.url).scheme!='https' or urlparse(response.url).hostname not in HOSTS:raise ValueError('ART_REDIRECT_HOST_INVALID')
                 data=response.read(limit+1)
                 if len(data)>limit:raise ValueError('ART_RESPONSE_TOO_LARGE')
@@ -185,7 +185,7 @@ class Museum:
                 if mid in self.known_ids:continue
                 source='https://www.searchculture.gr/aggregator/edm/momus/000179-'+str(identifier)
                 try:
-                    work=searchculture_work(json.loads(self.get(source+'/json')),source,genre)
+                    work=searchculture_work(json.loads(self.get(source+'/json',accept='application/ld+json, application/json;q=0.9')),source,genre)
                     print('[art-museum-source] '+json.dumps({'museum':'momus-searchculture','item':identifier,'admissible':bool(work)}),flush=True)
                     if work:
                         self.known_ids.add(mid);yield work
