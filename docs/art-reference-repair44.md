@@ -25,3 +25,13 @@ The two original Klein files, article identities, Markdown and every text fragme
 remain checked. Replacement keys/URLs include the new prompt version. Museum
 references, selection and progress use the existing encrypted checkpoints and
 shared stock; there is no new credential, paid provider or storage service.
+
+Museum recovery accepts nullable official metadata without aborting the collection.
+New quartet candidates retain movement evidence checks, including accented terms;
+Neo-Plasticist/Vorticist descriptions are excluded from new Cubist quartets.
+Existing assigned quartets remain immutable. SMK's official public API is an
+independent bounded fallback: only explicit public_domain=true plus CC0 or Public
+Domain Mark rights URLs, complete attribution and matching movement metadata are
+accepted. Access/robots failures stay closed. License labels retain the actual
+CC0/PDM distinction. A real successful API response is logged separately from
+reference generation; an unavailable source never fabricates a candidate.
