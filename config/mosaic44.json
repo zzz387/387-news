@@ -58,7 +58,7 @@
   "reference_required": true,
   "repair_legacy_art": {
     "date": "2026-11-23",
-    "stage": "pilot",
+    "stage": "all",
     "pilot_slugs": [
       "feature-11",
       "feature-01",
