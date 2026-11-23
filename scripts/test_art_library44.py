@@ -324,6 +324,14 @@ class ArtLibraryTests(unittest.TestCase):
             {'@type':'ore:Aggregation','aggregatedCHO':source,'rights':'http://creativecommons.org/licenses/by-sa/4.0/',
              'object':'https://www.searchculture.gr/aggregator/thumbnails/edm-record/momus/000179-1260'}]}
         work=lib.searchculture_work(payload,source,'Конструктивизм');self.assertTrue(lib.rights_valid(work))
+        dc='http://purl.org/dc/elements/1.1/';edm='http://www.europeana.eu/schemas/edm/'
+        expanded={'@graph':[{'@id':source,'@type':[edm+'ProvidedCHO'],dc+'title':[{'@language':'en','@value':'Linearism'}],
+            dc+'creator':[{'@language':'en','@value':'Aleksandr Rodchenko'}],dc+'date':[{'@value':'1920'}],
+            dc+'type':[{'@language':'en','@value':'Painting'}],dc+'subject':[{'@language':'en','@value':'Constructivism'}]},
+            {'@type':['http://www.openarchives.org/ore/terms/Aggregation'],edm+'aggregatedCHO':[{'@id':source}],
+             edm+'rights':[{'@id':lib.CC_BY_SA}],edm+'object':[{'@id':payload['@graph'][1]['object']}]}]}
+        self.assertEqual(lib.searchculture_work(expanded,source,'Конструктивизм'),work)
+
         self.assertIn('Rodchenko',work['attribution']);self.assertEqual(work['license_scope'],'digital_file_and_thumbnail')
         for invalid in ('https://rightsstatements.org/vocab/InC/1.0/','https://creativecommons.org/licenses/by-nc/4.0/'):
             with self.subTest(rights=invalid):
@@ -348,6 +356,13 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertIsNone(lib.paris_work(payload,123,'Ар-нуво'));self.assertIsNone(lib.paris_work(payload,320028394,'Кубизм'))
         bad=copy.deepcopy(payload);bad['sequences'][0]['canvases'][0]['metadata'][1]['value']='all rights reserved'
         self.assertIsNone(lib.paris_work(bad,320028394,'Ар-нуво'))
+        met={'objectID':490060,'isPublicDomain':True,'artistDisplayName':'Juan Gris','classification':'Paintings','title':'Juan Legua','objectDate':'1911',
+             'objectURL':'https://www.metmuseum.org/art/collection/search/490060','primaryImageSmall':'https://images.metmuseum.org/fixture.jpg','medium':'Oil on canvas'}
+        self.assertEqual(lib.met_seed_work(met,490060,'Кубизм')['genre_id'],'cubism')
+        self.assertIsNone(lib.met_seed_work(dict(met,isPublicDomain=False),490060,'Кубизм'))
+        self.assertIsNone(lib.met_seed_work(dict(met,artistDisplayName='Another artist'),490060,'Кубизм'))
+        self.assertIsNone(lib.met_seed_work(met,490060,'Коллаж'))
+
 
     def test_color_retry_preserves_first_pass_free_budget_for_unfinished_repair(self):
         from types import SimpleNamespace
@@ -373,5 +388,23 @@ class ArtLibraryTests(unittest.TestCase):
         with patch.object(lib,'urlopen',side_effect=reply):
             self.assertEqual(lib.Museum().get(url,robots=False,accept='application/ld+json, application/json;q=0.9'),b'{}')
         self.assertEqual(captured,['application/ld+json, application/json;q=0.9'])
+
+    def test_provider_rejection_preserves_filter_and_continues_other_article_keys(self):
+        from scripts.test_policy44 import main_row
+        self.assertEqual(cf.output_rejection_code([{'code':3030,'message':'Your output has been flagged'}]),'CF_OUTPUT_REJECTED')
+        self.assertIsNone(cf.output_rejection_code([{'code':3030,'message':'Invalid request dimensions'}]))
+        with tempfile.TemporaryDirectory() as temp:
+            state=self.stock(temp,4);state['art44']={'objects':{},'history':[]}
+            items=art.article_plans(state,[main_row(i) for i in range(3)])
+            for item in items:item['genre']='Импрессионизм'
+            sets=lib.prepare_sets(temp,state,items,discover=False);lib.attach(temp,state,items,sets)
+            budget=type('Budget',(),{'ledger':{},'remaining_seconds':lambda self:1000})()
+            with patch.object(art.p,'ROOT',Path(temp)),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget):
+                with patch.object(art,'generate',side_effect=[RuntimeError('CF_OUTPUT_REJECTED'),picture(96),picture(97)]) as generate:
+                    report=art.prepare_items(state,items);self.assertEqual(report['ready'],2);self.assertEqual(report['provider_status'],'READY');self.assertEqual(generate.call_count,3)
+                before=copy.deepcopy(state['art44']['objects'])
+                with patch.object(art,'generate',side_effect=AssertionError('Do not retry rejected key or successful images')):
+                    self.assertEqual(art.prepare_items(state,items)['ready'],2)
+                self.assertEqual(state['art44']['objects'],before);self.assertEqual(state['art44']['rejected_keys'],{items[0]['key']:'CF_OUTPUT_REJECTED'})
 
 if __name__=='__main__':unittest.main()

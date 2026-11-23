@@ -76,6 +76,18 @@
       "c8a053aafee7e5f84eb2c6f3de0860546e4b9d30af51aafd9fe78e4a623ea0ac": "A sensitive metaphor for alcohol dependence within a marriage: a worried woman and her husband sit separated by a small table with one unlabelled bottle in a quiet home interior. A doorway suggests a difficult choice about safety and trust. No cheerful family scene, forest, drinking glamour or invented treatment claims.",
       "cd952cbb0c9ee1cdb5be6e7f25d04a4166302de19dca88d695efa4ca04302f38": "A speculative industrial drawing of the boundary between mind and technology: the outline of a human head connects through fine structural lines to an abstract lattice and memory-like light patterns. Show an unresolved philosophical question, not a proven brain-upload procedure or a real medical device.",
       "65283963673c1bacd9e84c4def1dcb693711d676a6dc548ece79b10bf5ae0370": "A supermarket still life as a cut-paper collage: blank food packages, simple ingredient shapes, a magnifying glass and small traffic-light markers evoke careful reading of nutrition labels. No readable text, fabricated nutritional numbers, brand names or exaggerated health claims."
+    },
+    "reviewed_images": {
+      "1cfc4479ba34a01f5e23f546e1580904b88952de40a205265ba5f9b2ffd6aa83": {
+        "prompt_version": "387-art-single-reference-3",
+        "sha256": "63178f5798a4bbfaa7625acced9820d3832d654bf4c26611ac9c5cb928c73050",
+        "review": "One reference, correct article subject and palette; advisory ornamental/texture limitations retained, not a claim of perfect artistic quality."
+      },
+      "c8a053aafee7e5f84eb2c6f3de0860546e4b9d30af51aafd9fe78e4a623ea0ac": {
+        "prompt_version": "387-art-single-reference-3",
+        "sha256": "d362a95bd2b82fc9b11d1198d381a69ff711e66e8b2c897a9e81ce8e1640978a",
+        "review": "One reference, correct article subject and palette; advisory ornamental/texture limitations retained, not a claim of perfect artistic quality."
+      }
     }
   }
 }

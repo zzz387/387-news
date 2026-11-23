@@ -87,3 +87,17 @@ Prompt v4 integrates ornament into the scene without a frame and strengthens
 Impressionist pigment/edge instructions against photographic rendering. These
 three pilot outputs are reviewed before the all-image stage. Successful prior
 trial objects remain saved; optional color retries preserve first-pass capacity.
+
+JSON-LD parsing accepts compact and expanded official predicates/types, still
+binding aggregation rights and its exact thumbnail to the same record URI.
+Public schema diagnostics contain only museum node IDs, types and field names.
+Known Met/Paris/MOMus collection seeds extend remaining movements, always behind
+live rights, artist, medium and image checks. No record is admitted from its name
+or existence alone.
+
+Cloudflare rejected one v4 trial output (3030). Respect that rejection: retain
+the rejected key without automatic retry and continue unrelated article keys;
+do not disable or evade the provider's filter. Two previously accepted, visually
+reviewed v3 results are bound to their actual text hash, prompt version and WebP
+SHA; they are not discarded or relabelled v4. Review records disclose remaining
+ornament/texture limitations. The all-eleven atomic publication gate remains.
