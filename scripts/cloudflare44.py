@@ -56,7 +56,9 @@ def multipart_payload(fields,images):
     boundary='387-art-'+hashlib.sha256(b''.join(images)).hexdigest()[:24]
     chunks=[]
     for key,value in fields.items():chunks.append(('--'+boundary+'\r\nContent-Disposition: form-data; name="'+key+'"\r\n\r\n'+str(value)+'\r\n').encode())
-    for i,data in enumerate(images):chunks.extend([('--'+boundary+'\r\nContent-Disposition: form-data; name="input_image_'+str(i)+'"; filename="reference-'+str(i)+'.webp"\r\nContent-Type: image/webp\r\n\r\n').encode(),data,b'\r\n'])
+    for i,data in enumerate(images):
+        if not data.startswith(b'\x89PNG\r\n\x1a\n'):raise RuntimeError('CF_REFERENCE_WIRE_FORMAT_INVALID')
+        chunks.extend([('--'+boundary+'\r\nContent-Disposition: form-data; name="input_image_'+str(i)+'"; filename="reference-'+str(i)+'.png"\r\nContent-Type: image/png\r\n\r\n').encode(),data,b'\r\n'])
     chunks.append(('--'+boundary+'--\r\n').encode())
     return b''.join(chunks),'multipart/form-data; boundary='+boundary
 
@@ -152,7 +154,12 @@ def generate(item,budget,config):
                 image.verify();w,h=image.size
                 if not 0<w<512 or not 0<h<512:raise RuntimeError('CF_REFERENCE_DIMENSIONS_INVALID')
                 input_tiles+=math.ceil(w/512)*math.ceil(h/512)
-            images.append(raw)
+            # Lossless transport encoding; canonical library WebP and its SHA
+            # remain immutable. Use the format shown in the official API example.
+            with Image.open(io.BytesIO(raw)) as image:
+                rgb=image.convert('RGB');wire=io.BytesIO();rgb.save(wire,format='PNG');encoded=wire.getvalue()
+                item['reference_transport']={'format':'PNG','library_sha256':ref['sha256'],'wire_sha256':hashlib.sha256(encoded).hexdigest(),'decoded_pixels_sha256':hashlib.sha256(rgb.tobytes()).hexdigest(),'width':w,'height':h}
+            images.append(encoded)
         model=REFERENCE_MODEL
     if config.get('reference_required') and item.get('protocol')==2 and item.get('date','')>=config.get('first_reference_issue','9999-12-31') and not images:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
     date=item.get('date')
@@ -167,7 +174,7 @@ def generate(item,budget,config):
     if current.get('day')!=day:
         ledger['cloudflare_ai']={'day':day,'account_hash':key,'reserved_neurons':0,'estimated_neurons':0,'requests':0,'observed_account_neurons':None,'cooldown_until':current.get('cooldown_until',0)}
     state=ledger['cloudflare_ai'];last_error=None
-    width,height={'3:2':(960,640),'4:5':(768,960),'1:1':(896,896),'3:4':(768,1024),'16:9':(1024,576)}.get(item.get('ratio'),(1024,768))
+    width,height={'3:2':(768,512),'4:5':(768,960),'1:1':(896,896),'3:4':(768,1024),'16:9':(1024,576)}.get(item.get('ratio'),(1024,768))
     for attempt in range(config.get('max_retries_per_article',2)):
         if state.get('cooldown_until',0)>time.time():raise GenerationPaused('CF_COOLDOWN')
         used=free_usage();state['observed_account_neurons']=used

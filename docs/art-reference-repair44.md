@@ -148,3 +148,13 @@ keeps all measured color groups and the complete brief, with a conservative
 2,200-character guard that fails before inference instead of silently cutting
 critical information. No exact hosted tokenizer count is claimed. Upstream:
 https://huggingface.co/docs/diffusers/main/en/api/pipelines/flux2
+
+The compact real v5 trial improved flatness but still missed the selected tan
+reference palette (COLOR_MISMATCH 46.209). A single compatibility correction uses
+lossless PNG transport, as in Cloudflare's official multipart example; WebP
+incompatibility is a hypothesis, not a proven cause. Validate the canonical
+library WebP/SHA first, then send identical decoded RGB pixels as one PNG. Keep
+source-file and wire hashes distinct in reference_transport metadata. No library
+files, reference choices, filters or article text change. Three-to-two outputs
+use 768x512 (two output tiles), matching the reading-column web scale and exact
+aspect ratio; actual dimensions and conservative reservation stay audited.
