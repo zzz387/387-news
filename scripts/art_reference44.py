@@ -78,6 +78,11 @@ def select(root,state,item,row,registry,previous):
         work=next((w for w in works if w['id']==cached['selected_reference_id']),None)
         if work is None or cached['sha256']!=work['sha256']:raise ValueError('ART_REFERENCE_SELECTION_CHANGED')
         return work,cached
+    preferred=item.get('preferred_reference_id')
+    if preferred:
+        selected=[w for w in works if w['id']==preferred]
+        if not selected:raise ValueError('ART_REFERENCE_SELECTION_CHANGED')
+        works=selected
     subject=' '.join(str(v) for v in item['descriptor'].values());words=tokens(subject);weights=CONFIG['selection_weights'];rated=[]
     for work in works:
         palette=work_profile(root,work,state);metadata=' '.join(str(work.get(k,'')) for k in ('title','genre_evidence','artist'))
@@ -91,7 +96,7 @@ def select(root,state,item,row,registry,previous):
         rated.append((score,work['id'],work,palette,fit,variety))
     score,_,work,palette,fit,variety=min(rated,key=lambda r:(-r[0],r[1]))
     choice={'selected_reference_id':work['id'],'sha256':work['sha256'],'palette':palette,'reference_selection_version':VERSION,
-            'reference_selection_score':round(score,5),'reference_selection_reason':{'metadata_and_tonal_proxy':round(fit,5),'palette_diversity':round(variety,5),'weights':weights,'mood_inference':'TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD'}}
+            'reference_selection_score':round(score,5),'reference_selection_reason':{'metadata_and_tonal_proxy':round(fit,5),'palette_diversity':round(variety,5),'weights':weights,'mood_inference':'TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD','preserved_for_prompt_correction':bool(preferred)}}
     saved[key]=choice;return work,choice
 
 def direction(genre):return CONFIG['directions'].get(genre,CONFIG['directions']['Графика тушью'])
@@ -101,7 +106,7 @@ def prompt(item):
     style=direction(item['genre']);palette=item.get('palette')
     color=description(palette) if isinstance(palette,dict) else 'Use the actual palette of the attached museum painting.'
     composition={'constructivism':'Structure the subject with functional geometric planes and an asymmetric axis', 'art nouveau':'Frame the subject with flowing organic rhythms without copying museum figures', 'cubism':'Resolve the subject into interlocking planes and simultaneous viewpoints', 'impressionism':'Stage the subject in changing natural light with optical spatial depth'}.get(style['art_movement'],item.get('composition','Independent asymmetric composition serving the subject'))
-    text=(f"Create an original fine-art illustration. ARTICLE SUBJECT: {scene}\nART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
+    text=(f"Create an original, unsigned fine-art illustration. No text or artist signatures anywhere. Never reproduce reference inscriptions; leave all four corners blank and unmarked. ARTICLE SUBJECT: {scene}\nART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
         f"ARTISTIC CHARACTERISTICS: {style['characteristics']}\n"
         'Use the single attached painting as the primary visual reference for artistic language, texture, light and tonal structure. '
         'Follow its actual color palette closely. Preserve dominant, secondary and accent proportions, temperature, saturation, contrast and light/dark distribution. '

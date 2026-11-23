@@ -93,7 +93,7 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertTrue(lib.genre_matches('Японская гравюра','Japan Color woodblock print'))
         self.assertFalse(lib.genre_matches('Японская гравюра','European oil painting'))
         self.assertTrue(lib.genre_matches('Конструктивизм','Constructivist design'))
-        self.assertTrue(lib.genre_matches('Ар-деко','Art Déco'))
+        self.assertTrue(lib.genre_matches('Ар-деко','Art Déco'));self.assertTrue(lib.genre_matches('Ар-нуво','Jugendstil'))
         self.assertFalse(lib.genre_matches('Кубизм','Neo-Plasticism evolved from Cubism'))
         museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','artwork_type_title':'Painting','style_titles':['Impressionism'],'is_public_domain':True}]}
         with patch.object(museum,'get',return_value=json.dumps(data).encode()):
@@ -117,11 +117,12 @@ class ArtLibraryTests(unittest.TestCase):
             lib.attach(temp,state,items,sets);selected=[i['selected_reference_id'] for i in items]
             lib.attach(temp,state,items,sets);self.assertEqual(selected,[i['selected_reference_id'] for i in items])
             self.assertEqual(len(sets['Импрессионизм']['artwork_ids']),4)
+            corrected=dict(items[0],key='corrected-prompt',preferred_reference_id=selected[0]);lib.attach(temp,state,[corrected],sets);self.assertEqual(corrected['selected_reference_id'],selected[0])
             self.assertTrue(all(len(i['reference_images'])==1 and i['reference_images_sent']==1 for i in items))
             self.assertTrue(all(i['selected_reference_id'] in i['reference_artwork_ids'] for i in items))
             for genre in ('Импрессионизм','Конструктивизм','Ар-нуво'):
                 item=dict(items[0],genre=genre);prompt=cf.prompt(item)
-                self.assertIn('single attached',prompt);self.assertIn(color.direction(genre)['characteristics'],prompt)
+                self.assertIn('unsigned',prompt);self.assertLess(prompt.index('No text'),prompt.index('ARTICLE SUBJECT'));self.assertIn('corners blank',prompt);self.assertIn('single attached',prompt);self.assertIn(color.direction(genre)['characteristics'],prompt)
                 self.assertNotIn('muted ochre, cream, deep green',prompt)
                 self.assertNotIn('Use all four',prompt)
             self.assertNotIn('Visible brushwork',cf.prompt(dict(items[0],genre='Конструктивизм')))

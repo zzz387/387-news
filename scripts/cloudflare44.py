@@ -175,7 +175,8 @@ def generate(item,budget,config):
         state['reserved_neurons']+=reserve;state['requests']+=1;budget.persist();_LAST=time.monotonic()
         try:
             if images:
-                result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'width':1024,'height':768},images=images)
+                width,height={'3:2':(960,640),'4:5':(768,960),'1:1':(896,896),'3:4':(768,1024),'16:9':(1024,576)}.get(item.get('ratio'),(1024,768))
+                result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'width':width,'height':height},images=images)
             else:result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'steps':config['steps']})
             data=base64.b64decode(result['result']['image'],validate=True)
             if not data:raise ValueError()

@@ -52,6 +52,7 @@ def genre_matches(genre,tokens):
     if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',text):return False
     if genre=='Японская гравюра':return ('japan' in text or 'ukiyo' in text) and ('woodblock' in text or 'woodcut' in text)
     if genre=='Импрессионизм':return bool(re.search(r'\bimpressionis',text))
+    if genre=='Ар-нуво' and re.search(r'\b(jugendstil|skønvirke|skonvirke)\b',text):return True
     if genre=='Акварель':return 'watercolor' in text or 'watercolour' in text
     if genre=='Масло':return bool(re.search(r'\boil\b',text))
     return GENRES[genre][1].casefold() in text
@@ -183,7 +184,7 @@ class Museum:
         # Independent official open collection. Only explicit public-domain rights
         # and matching museum metadata are admitted; no API key or paid service.
         try:
-            queries=list(dict.fromkeys((GENRES[genre][1],{'Конструктивизм':'konstruktivisme','Кубизм':'kubisme','Романтизм':'romantik'}.get(genre,GENRES[genre][1]))))
+            queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('kubisme',),'Романтизм':('romantik',)}.get(genre,()))))
             for query in queries:
                 url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
                 payload=json.loads(self.get(url));items=payload.get('items')
