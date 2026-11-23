@@ -234,7 +234,7 @@ def without_art44(page):
     return page.replace('<link rel="stylesheet" href="/assets/mosaic.css">','')
 
 
-def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
+def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,repair_legacy_images=False):
     """Owner-authorized artwork-only transaction on one verified public issue."""
     from scripts import mosaic44
     root=Path(root)
@@ -242,15 +242,32 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
     if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',date) or not allowed:raise p.Blocked('ART_BACKFILL_DATE_NOT_AUTHORIZED')
     data,rows=mosaic44.published_records(root,date,allow_missing_art=True)
     sub=parent.setdefault('art44_backfills',{}).setdefault(date,{'date':date,'art44':{'objects':{},'history':[]}})
+    legacy=None
+    if repair_legacy_images:
+        config=mosaic44.CONFIG['repair_legacy_art']
+        if date!=config['date'] or data['number']!=29:raise p.Blocked('ART_REPAIR_SCOPE_INVALID')
+        legacy=sub.setdefault('legacy_repair',{'images':{r['article_slug']:copy.deepcopy(r) for r in data['illustrations']},
+            'markdown':{slug:digest_bytes((root/'issues'/date/'articles'/slug/'article.md').read_bytes()) for slug in data['pages']}})
+        for slug,checksum in legacy['markdown'].items():
+            if digest_bytes((root/'issues'/date/'articles'/slug/'article.md').read_bytes())!=checksum:raise p.Blocked('ART_REPAIR_TEXT_CHANGED')
+        for slug,old in legacy['images'].items():
+            if old['model']!=mosaic44.CONFIG['model']:
+                current=next(r for r in data['illustrations'] if r['article_slug']==slug)
+                if current['sha256']!=old['sha256'] or current['path']!=old['path']:raise p.Blocked('ART_REPAIR_PRESERVED_IMAGE_CHANGED')
+        persist()
     items=mosaic44.article_plans(sub,rows)
     bindings={r['article_slug']:r for r in data.get('art44',{}).get('bindings',data.get('illustrations',[]))}
     for item,row in zip(items,rows):
+        item['article_slug']=row['article']['slug']
         prior=bindings.get(row['article']['slug'])
         if prior:
             basis={k:prior[k] for k in ('date','article_id','text_hash','prompt_version')}
             if basis['date']!=date or p.digest(basis)!=prior['key']:raise p.Blocked('ART_PUBLIC_BINDING_INVALID')
             repair=mosaic44.CONFIG.get('visual_brief_repairs',{}).get(prior['text_hash'],{})
-            if prior.get('prompt_version')==repair.get('replace_prompt_version'):
+            if repair_legacy_images and next((r for r in data['illustrations'] if r['article_slug']==item['article_slug']),{}).get('model')==mosaic44.CONFIG['model']:
+                basis['prompt_version']=mosaic44.CONFIG['prompt_version'];item.update(basis,key=p.digest(basis),genre=prior['genre'])
+                item['prompt']=mosaic44.prompt(item)
+            elif prior.get('prompt_version')==repair.get('replace_prompt_version'):
                 # Public reconstruction lacks the private record's mode/category metadata.
                 # Bind the one-time visual correction to the validated original text identity.
                 basis['prompt_version']=mosaic44.CONFIG['prompt_version']
@@ -267,8 +284,28 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True):
         reference_state={'date':date,'issue_id':data.get('issue_id',date),'art_library44':parent.setdefault('art_library44',{})}
         budget=news.runtime.ACTIVE_BUDGET
         sets=art_library44.prepare_sets(root,reference_state,items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180),number=data.get('number'))
-        art_library44.attach(root,reference_state,items,sets)
-    progress=mosaic44.prepare_items(sub,items,persist,allow_request)
+        art_library44.attach(root,reference_state,items,sets);persist()
+    prepared=items
+    if repair_legacy_images:
+        stage=mosaic44.CONFIG['repair_legacy_art']['stage']
+        slugs=set(mosaic44.CONFIG['repair_legacy_art']['pilot_slugs']) if stage=='pilot' else set(legacy['images'])
+        prepared=[i for i in items if i['article_slug'] in slugs and legacy['images'][i['article_slug']]['model']==mosaic44.CONFIG['model']]
+    progress=mosaic44.prepare_items(sub,prepared,persist,allow_request)
+    # Retain the complete plan for manifest assembly and idempotent future retries.
+    sub['art44']['plan']=items
+    if repair_legacy_images:
+        from scripts import art_reference44,art_library44
+        sub['_comparison_registry']=art_library44.load(root,reference_state)
+        import os
+        output=os.getenv('NEWS_ART_COMPARISON_DIR')
+        if output:art_reference44.comparison(root,sub,items,legacy,output)
+        sub.pop('_comparison_registry',None)
+        targets=[i for i in items if legacy['images'][i['article_slug']]['model']==mosaic44.CONFIG['model']]
+        completed=[i for i in targets if mosaic44.object_valid(sub['art44']['objects'].get(i['key'],{})) and sub['art44']['objects'][i['key']].get('reference_images_sent')==1]
+        sub['legacy_repair_report']={'targets':len(targets),'ready':len(completed),'stage':stage,'pilot_ready':all(any(i['article_slug']==slug for i in completed) for slug in mosaic44.CONFIG['repair_legacy_art']['pilot_slugs'])}
+        print('[art-legacy-repair] '+json.dumps(sub['legacy_repair_report']),flush=True);persist()
+        if stage=='pilot' or len(completed)!=len(targets):
+            parent['art44_backfill_status']={'date':date,**progress,**sub['legacy_repair_report']};persist();return False
     parent['art44_backfill_status']={'date':date,**progress};persist()
     articles=[r['article'] for r in rows]
     before={slug:(root/'issues'/date/'articles'/slug/'index.html').read_text() for slug in data['pages']}

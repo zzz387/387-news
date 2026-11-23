@@ -648,7 +648,7 @@ def main():
             pipeline.status(state,'PUBLISHING','commit_and_deploy')
         elif args.phase=='backfill_issue_art':
             from scripts import publication43
-            changed=publication43.backfill_issue_art(ROOT,date,state,persist)
+            changed=publication43.backfill_issue_art(ROOT,date,state,persist,repair_legacy_images=os.getenv('NEWS_REPAIR_LEGACY_IMAGES')=='true')
             ready=changed or publication43.metadata(ROOT,date).get('art44',{}).get('ready',0)>0
             pipeline.status(state,'PUBLISHING' if ready else 'PUBLISHED','commit_and_deploy' if ready else 'resume_missing_art')
         elif state.get('version')==43:

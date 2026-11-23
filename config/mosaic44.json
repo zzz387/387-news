@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "maximum_tiles": 12,
-  "prompt_version": "387-art-cloudflare-5",
+  "prompt_version": "387-art-single-reference-1",
   "provider": "cloudflare_workers_ai",
   "model": "@cf/black-forest-labs/flux-1-schnell",
   "free_tier_verified": false,
@@ -54,5 +54,15 @@
   },
   "references_enabled": true,
   "reference_model": "@cf/black-forest-labs/flux-2-klein-4b",
-  "first_reference_issue": "2026-11-23"
+  "first_reference_issue": "2026-11-23",
+  "reference_required": true,
+  "repair_legacy_art": {
+    "date": "2026-11-23",
+    "stage": "pilot",
+    "pilot_slugs": [
+      "feature-11",
+      "feature-01",
+      "feature-02"
+    ]
+  }
 }

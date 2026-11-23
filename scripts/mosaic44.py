@@ -34,7 +34,7 @@ THEMES={
  'technology':r'технолог|инженер|производ|имплантат|дрон|robot|technolog|engineer',
  'culture':r'музе|искусств|культур|худож|авангард|галере|коллекционер|museum|culture|art',
  'science':r'наук|исследован|уч[её]н|математ|science|research'}
-PALETTES=['приглушённые охра, кремовый и зелёный','монохромная графика и тёплая бумага','индиго, серебристый и мягкий коралловый','пыльная роза, оливковый и слоновая кость','терракота, угольный и бледно-голубой']
+PALETTES=['reference-derived']
 COMPOSITIONS=['асимметричная композиция с отрицательным пространством','широкий план с небольшим центральным акцентом','крупный фрагмент и выразительная фактура','ритм диагоналей и несколько масштабов','многослойная спокойная композиция']
 RATIOS=['3:2','4:5','1:1','3:4','16:9']
 
@@ -155,7 +155,7 @@ def art_report(state):
     ready=sum(object_valid(objects.get(item['key'],{})) for item in items)
     return {'phase':state.get('assembly_status44','NOT_APPROVED'),'articles':len(items),'ready':ready,'missing':len(items)-ready,
         'complete':bool(items) and ready==len(items),
-        'reference_guided':sum(object_valid(objects.get(i['key'],{})) and objects[i['key']].get('reference_status')=='FOUR_REFERENCES_READY' for i in items),'provider_status':saved.get('provider_status',provider_status()),'image_requests':saved.get('requests',0)}
+        'reference_guided':sum(object_valid(objects.get(i['key'],{})) and objects[i['key']].get('reference_status') in ('FOUR_REFERENCES_READY','ONE_REFERENCE_READY') for i in items),'provider_status':saved.get('provider_status',provider_status()),'image_requests':saved.get('requests',0)}
 
 def prepare(state,persist=lambda:None,allow_request=True):
     saved=state.setdefault('art44',{'objects':{},'history':[]})
@@ -199,6 +199,8 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             persist()
         if not allow_request or saved['provider_status']!='READY' or not budget or (budget.remaining_seconds()<90 if CONFIG.get('provider')=='cloudflare_workers_ai' else not budget.can_request()):break
         if sum(h.get('key')==item['key'] for h in saved['history'])>=CONFIG.get('max_retries_per_article',2):continue
+        if CONFIG.get('reference_required') and state['date']>=CONFIG.get('first_reference_issue','9999-12-31') and item.get('reference_status')!='ONE_REFERENCE_READY':
+            saved['code']='REFERENCE_SET_UNAVAILABLE';continue
         saved['current_key']=item['key'];persist()
         try:
             before=budget.ledger.get('cloudflare_ai',{}).get('requests',0) if CONFIG.get('provider')=='cloudflare_workers_ai' else budget.used
@@ -207,12 +209,26 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
                 after=budget.ledger.get('cloudflare_ai',{}).get('requests',0) if CONFIG.get('provider')=='cloudflare_workers_ai' else budget.used
                 saved['requests']=saved.get('requests',0)+max(0,after-before)
             data,width,height=encode_image(raw);digest=hashlib.sha256(data).hexdigest()
+            if item.get('selected_reference_id'):
+                from scripts import art_reference44
+                item['color_match']=art_reference44.compare(item['palette'],art_reference44.profile(data))
             if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
             saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
                 'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['reference_model'] if item.get('reference_images') else CONFIG['model'],'status':'READY',
-                **{k:item[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256') if k in item},
+                **{k:item[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match') if k in item},
                 'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
                 'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
+            persist()  # Keep the first usable result even if its one color retry fails.
+            if item.get('color_match',{}).get('status')=='COLOR_MISMATCH' and not saved.setdefault('color_retries',{}).get(item['key']) and budget.remaining_seconds()>120:
+                saved['color_retries'][item['key']]=True;persist()
+                retry=dict(item,color_retry=True)
+                before_retry=budget.ledger.get('cloudflare_ai',{}).get('requests',0)
+                try:retry_raw=generate(retry,budget)
+                finally:saved['requests']=saved.get('requests',0)+max(0,budget.ledger.get('cloudflare_ai',{}).get('requests',0)-before_retry)
+                second,w,h=encode_image(retry_raw);match=art_reference44.compare(item['palette'],art_reference44.profile(second));checksum=hashlib.sha256(second).hexdigest()
+                if match['lab_distance']<item['color_match']['lab_distance'] and not any(k!=item['key'] and v.get('sha256')==checksum for k,v in saved['objects'].items()):
+                    saved['objects'][item['key']].update(webp=base64.b64encode(second).decode(),sha256=checksum,width=w,height=h,size=len(second),color_match=match)
+                saved['objects'][item['key']]['color_retry_attempted']=True
         except Exception as exc:
             if isinstance(exc,news.runtime.GenerationPaused):
                 saved['code']='IMAGE_QUOTA_OR_COOLDOWN';persist();break
@@ -351,7 +367,7 @@ def materialize(state,articles,root,items=None):
             continue
         images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version','date','text_hash','protocol','article_slug')},
             **{k:row[k] for k in ('sha256','width','height','provider','model')},
-            **{k:row[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256') if k in row},'path':file.relative_to(root).as_posix()}
+            **{k:row[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match') if k in row},'path':file.relative_to(root).as_posix()}
     (folder/'manifest.json').write_text(json.dumps({'date':date,'images':images,'provider_status':provider_status()},ensure_ascii=False,indent=2)+'\n')
     return images
 

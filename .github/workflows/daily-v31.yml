@@ -35,6 +35,12 @@ on:
         type: string
         required: false
 
+      repair_legacy_images:
+        description: 'Owner-authorized targeted replacement of Schnell illustrations in issue 029 only'
+        type: boolean
+        default: false
+        required: false
+
       trial_approved_sha:
         description: 'Trial only: exact reviewed 40-character commit SHA'
         type: string
@@ -428,6 +434,7 @@ jobs:
     timeout-minutes: 30
     env:
       NEWS_POLICY_VERSION: "4.4"
+      NEWS_REPAIR_LEGACY_IMAGES: ${{ (inputs.repair_legacy_images || (github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]'))) && 'true' || 'false' }}
       NEWS_ART_LIBRARY_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-library]') }}
       NEWS_CATALOG_REFRESH: "true"
       NEWS_LIGHT_NEWS_ENABLED: "true"
@@ -480,6 +487,7 @@ jobs:
             phase=run
             preview=false
           fi
+          if [[ "$NEWS_REPAIR_LEGACY_IMAGES" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-23; fi
           if [[ "$CF_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-21; fi
           if [[ "$NOV22_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-22; fi
           if [[ "$ART_LIBRARY_ROLLOUT" == 'true' ]]; then
@@ -490,6 +498,7 @@ jobs:
       - name: Find previously saved encrypted checkpoint
         id: checkpoint
         env:
+          NEWS_ART_COMPARISON_DIR: ${{ runner.temp }}/art-repair-comparison
           PHASE: ${{ steps.context.outputs.phase }}
           PREVIEW: ${{ steps.context.outputs.preview }}
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
@@ -562,6 +571,7 @@ jobs:
         id: stage
         timeout-minutes: 20
         env:
+          NEWS_ART_COMPARISON_DIR: ${{ runner.temp }}/art-repair-comparison
           PHASE: ${{ steps.context.outputs.phase }}
           PREVIEW: ${{ steps.context.outputs.preview }}
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
@@ -580,6 +590,13 @@ jobs:
           if [[ "$PREVIEW" == 'true' ]]; then arguments+=(--preview); fi
           if [[ -n "$TARGET_DATE" ]]; then arguments+=(--target-date "$TARGET_DATE"); fi
           python -m scripts.staged_news "${arguments[@]}"
+      - name: Save artwork-only comparison gallery (approved public articles only)
+        if: ${{ always() && env.NEWS_REPAIR_LEGACY_IMAGES == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: art-repair-comparison-${{ github.run_id }}
+          path: ${{ runner.temp }}/art-repair-comparison
+          if-no-files-found: ignore
       - name: Save encrypted checkpoint only (never plain draft)
         if: ${{ always() && steps.stage.outputs.checkpoint == 'true' }}
         uses: actions/upload-artifact@v4

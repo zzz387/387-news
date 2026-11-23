@@ -118,13 +118,8 @@ STYLE_EN=dict(zip(
     ('watercolor','impressionism','pastel painting','symbolism','metaphysical painting','surrealism','Japanese woodblock print','minimalist painting','ink drawing','futurism','expressionism','painted poster art','etching','historical painting','art nouveau','constructivism','cubism','art deco','naturalist painting','linocut','botanical painting','romanticism','tempera','abstract painting','geometric abstraction','suprematism','paper collage','industrial graphic art','oil painting')))
 
 def prompt(item):
-    d=item['descriptor'];scene=d.get('visual_subject_en','').strip()
-    style=STYLE_EN.get(item['genre'],'editorial painting')
-    lead='Original fine-art illustration. '+style+'. Visible brushwork or hand-printed texture, expressive visual metaphor, not a photograph. '
-    # Put the actual subject first; long Russian source prose previously drowned it out.
-    if not scene:scene=d['title']+'. '+d.get('summary','')
-    if item.get('reference_images'):lead+='Use all four attached museum paintings as references for painting technique, texture, light, composition and artistic language. Create an independent composition for the new subject, never copy a reference scene. Avoid plastic textures, artificial glow, hyper-detail, excessive symmetry and random decoration. '
-    return (lead+'Subject: '+scene[:1400]+'. Balanced editorial composition, muted ochre, cream, deep green and indigo. Entirely pictorial, blank unmarked surfaces, unsigned. No text, writing, letters, signatures, logos, watermarks, labels or borders.')[:2048]
+    from scripts import art_reference44
+    return art_reference44.prompt(item)
 
 def generate(item,budget,config):
     global _LAST
@@ -133,7 +128,7 @@ def generate(item,budget,config):
     references=item.get('reference_images')
     images=[];input_tiles=0;model=MODEL
     if references is not None:
-        if len(references)!=4 or len({ref['sha256'] for ref in references})!=4:raise RuntimeError('CF_FOUR_REFERENCES_REQUIRED')
+        if len(references)!=1:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
         if config.get('reference_model')!=REFERENCE_MODEL:raise RuntimeError('CF_REFERENCE_MODEL_NOT_AUTHORIZED')
         from scripts import policy41
         from PIL import Image
@@ -141,7 +136,14 @@ def generate(item,budget,config):
         for ref in references:
             path=__import__('pathlib').Path(ref['path'])
             if path.is_absolute() or '..' in path.parts or path.parts[:2]!=('assets','art'):raise RuntimeError('CF_REFERENCE_PATH_INVALID')
-            raw=(policy41.ROOT/path).read_bytes()
+            target=(policy41.ROOT/path).resolve()
+            if not target.is_relative_to(policy41.ROOT.resolve()):raise RuntimeError('CF_REFERENCE_PATH_INVALID')
+            from scripts import art_library44
+            registry=art_library44.load(policy41.ROOT)
+            chosen=registry['artworks'].get(item.get('selected_reference_id'),{})
+            group=registry['sets'].get(item.get('reference_set_id'),{})
+            if chosen.get('path')!=ref['path'] or chosen.get('sha256')!=ref['sha256'] or group.get('artwork_ids')!=item.get('reference_artwork_ids') or item.get('selected_reference_id') not in group.get('artwork_ids',[]):raise RuntimeError('CF_REFERENCE_LIBRARY_INVALID')
+            raw=target.read_bytes()
             if hashlib.sha256(raw).hexdigest()!=ref['sha256']:raise RuntimeError('CF_REFERENCE_HASH_INVALID')
             with Image.open(io.BytesIO(raw)) as image:
                 image.verify();w,h=image.size
@@ -149,6 +151,7 @@ def generate(item,budget,config):
                 input_tiles+=math.ceil(w/512)*math.ceil(h/512)
             images.append(raw)
         model=REFERENCE_MODEL
+    if config.get('reference_required') and item.get('protocol')==2 and item.get('date','')>=config.get('first_reference_issue','9999-12-31') and not images:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
     date=item.get('date')
     if not date and os.getenv('CF_FREE_SMOKE')!='true':raise RuntimeError('CF_FINAL_APPROVAL_DATE_REQUIRED')
     if date and date<config['first_automatic_issue'] and date not in ('2026-11-20','2026-11-21'):raise RuntimeError('CF_DATE_NOT_AUTHORIZED')
