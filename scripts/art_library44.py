@@ -26,7 +26,7 @@ GENRES={
  'Геометрическая абстракция':('geometric-abstraction','Geometric abstraction'),
  'Супрематизм':('suprematism','Suprematism'), 'Коллаж':('collage','Collage'),
  'Индустриальная графика':('industrial','Industrial'), 'Масло':('oil','Oil on canvas')}
-HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk','www.searchculture.gr','www.momus.gr','dam.momus.gr','apicollections.parismusees.paris.fr','www.parismuseescollections.paris.fr','creativecommons.org','www.nga.gov','api.nga.gov'}
+HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk','www.searchculture.gr','www.momus.gr','dam.momus.gr','apicollections.parismusees.paris.fr','www.parismuseescollections.paris.fr','creativecommons.org'}
 
 def stamp():return datetime.now(timezone.utc).isoformat()
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -48,8 +48,8 @@ def genre_matches(genre,tokens):
     text=''.join(c for c in unicodedata.normalize('NFKD',tokens) if not unicodedata.combining(c)).casefold().replace('-',' ')
     if genre=='Конструктивизм':return bool(re.search(r'\b(?:constructivis(?:m|t)|konstruktivis(?:m|t))',text))
     if genre=='Романтизм':return bool(re.search(r'\b(?:romantic(?:ism)?|romantik)\b',text))
-    if genre=='Кубизм' and 'kubisme' in text:return True
     if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',text):return False
+    if genre=='Кубизм':return bool(re.search(r'\b(?:cubism|cubist|kubisme)\b',text))
     if genre=='Японская гравюра':return ('japan' in text or 'ukiyo' in text) and ('woodblock' in text or 'woodcut' in text)
     if genre=='Импрессионизм':return bool(re.search(r'\bimpressionis',text))
     if genre=='Ар-нуво' and re.search(r'\b(jugendstil|skønvirke|skonvirke)\b',text):return True
@@ -142,37 +142,6 @@ PARIS_SEEDS={
  'Кубизм':{729:('Gris, Juan','Cubism — Juan Gris, Compotier; museum catalogue: Les chemins du cubisme')},
  'Романтизм':{160000895:('Delacroix','Romanticism — Eugène Delacroix, Salon de la Paix sketch; Petit Palais catalogue')},
  'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956,160025973,160025974,160025969,160025947)}}
-NGA_SEEDS={
- '56101-fantomas':('Fantômas','1915','oil on canvas'),
- '166491-glass-and-checkerboard':('Glass and Checkerboard','1917','oil on wood'),
- '163527-ace-clubs-and-four-diamonds':('Ace of Clubs and Four of Diamonds','1915','oil on board')}
-
-def nga_work(raw,slug):
-    """Three catalogue-confirmed Cubist paintings; per-object image rights required."""
-    if slug not in NGA_SEEDS:return None
-    from html.parser import HTMLParser
-    class Page(HTMLParser):
-        def __init__(self):super().__init__();self.text=[];self.head=[];self.current=[];self.in_head=False;self.downloads=set()
-        def handle_starttag(self,tag,attrs):
-            attrs=dict(attrs)
-            if tag=='h1':self.in_head=True;self.current=[]
-            href=attrs.get('href','')
-            if tag=='a' and href.startswith('https://api.nga.gov/iiif/') and 'attachment_filename=' in href:self.downloads.add(href)
-        def handle_endtag(self,tag):
-            if tag=='h1':self.head.append(' '.join(self.current).strip());self.in_head=False
-        def handle_data(self,value):
-            self.text.append(value)
-            if self.in_head:self.current.append(value)
-    page=Page();page.feed(raw.decode('utf-8') if isinstance(raw,bytes) else raw)
-    title,year,medium=NGA_SEEDS[slug];text=' '.join(' '.join(page.text).split())
-    if title not in page.head or not all(value in text for value in ('Juan Gris',year,medium)):return None
-    if not re.search(r"This object[’']s media is free and in the public domain\.",text) or len(page.downloads)!=1:return None
-    image=next(iter(page.downloads)).replace('/full/full/','/full/480,/')
-    if not re.fullmatch(r'https://api\.nga\.gov/iiif/[a-f0-9-]+/full/480,/0/default\.jpg\?attachment_filename=[^/]+',image):return None
-    return {'museum':'National Gallery of Art, Washington','museum_id':'nga:'+slug.split('-')[0],'title':title,'artist':'Juan Gris','year':year,
-        'source_url':'https://www.nga.gov/artworks/'+slug,'license':'CC0','license_url':'https://www.nga.gov/terms-and-notices',
-        'rights_evidence':'OBJECT_MEDIA_PUBLIC_DOMAIN_AND_NGA_CC0_OPEN_ACCESS','image_url':image,'genre_evidence':'Cubism — catalogue-confirmed Juan Gris painting; '+medium,'genre_id':'cubism','verified':True}
-
 MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,)}
 
 def met_seed_work(row,identifier,genre):
@@ -296,14 +265,6 @@ class Museum:
                     if work:
                         self.known_ids.add(work['museum_id']);yield work
                 except Exception as exc:print('[art-museum] '+json.dumps({'museum':'paris-musees','code':safe_code(exc)}),flush=True)
-        if genre=='Кубизм':
-            for slug in NGA_SEEDS:
-                if 'nga:'+slug.split('-')[0] in self.known_ids:continue
-                try:
-                    work=nga_work(self.get('https://www.nga.gov/artworks/'+slug,accept='text/html'),slug)
-                    print('[art-museum-source] '+json.dumps({'museum':'nga','item':slug,'admissible':bool(work)}),flush=True)
-                    if work:self.known_ids.add(work['museum_id']);yield work
-                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'nga','code':safe_code(exc)}),flush=True)
         if genre in MET_SEEDS:
             for identifier in MET_SEEDS[genre]:
                 if 'met:'+str(identifier) in self.known_ids:continue
@@ -332,7 +293,7 @@ class Museum:
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
-            query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial'}.get(genre,query)
+            query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial','Кубизм':'Cubist'}.get(genre,query)
             for page in range(start_page,start_page+2):
                 url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,'skip':(page-1)*60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
                 for row in json.loads(self.get(url))['data']:
@@ -374,7 +335,7 @@ class Museum:
         # Independent official open collection. Only explicit public-domain rights
         # and matching museum metadata are admitted; no API key or paid service.
         try:
-            queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('kubisme',),'Романтизм':('romantik',)}.get(genre,()))))
+            queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('Juan Gris','kubisme'),'Романтизм':('romantik',)}.get(genre,()))))
             for query in queries:
                 url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
                 payload=json.loads(self.get(url));items=payload.get('items')
@@ -693,14 +654,17 @@ def probe_source(output):
             row=json.loads(client.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+str(identifier),accept='application/json'))
             report['met_contracts'].append({k:row.get(k) for k in ('objectID','isPublicDomain','artistDisplayName','classification','medium','title')})
         except Exception as exc:report['met_contracts'].append({'objectID':identifier,'code':safe_code(exc)})
-    report['nga_contracts']=[]
-    for slug in NGA_SEEDS:
+    report['cubist_search_contracts']=[]
+    for museum,url,key in (
+        ('cleveland','https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':'Cubist','cc0':1,'has_image':1,'limit':20}),'data'),
+        ('smk','https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':'Juan Gris','filters':'[public_domain:true],[has_image:true]','offset':0,'rows':20}),'items')):
         try:
-            raw=client.get('https://www.nga.gov/artworks/'+slug,accept='text/html');work=nga_work(raw,slug)
-            report['nga_contracts'].append({'slug':slug,'admitted':bool(work),'work':work,'html_bytes':len(raw)})
-        except Exception as exc:report['nga_contracts'].append({'slug':slug,'code':safe_code(exc)})
+            payload=json.loads(client.get(url));rows=payload.get(key,[])
+            facts=[{k:row.get(k) for k in ('id','object_number','title','titles','production','production_date','rights','public_domain','share_license_status','type','description','techniques','styles','content_description')} for row in rows]
+            report['cubist_search_contracts'].append({'museum':museum,'records':len(rows),'facts':facts})
+        except Exception as exc:report['cubist_search_contracts'].append({'museum':museum,'code':safe_code(exc)})
     Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
-    print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys')}),flush=True)
+    print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys','met_contracts','cubist_search_contracts')}),flush=True)
     return report
 
 

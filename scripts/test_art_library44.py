@@ -14,12 +14,6 @@ def picture(i):
     buffer=io.BytesIO();image.save(buffer,format='PNG');return buffer.getvalue()
 
 class ArtLibraryTests(unittest.TestCase):
-    def test_nga_cubist_seed_requires_own_image_rights_identity_and_download(self):
-        slug='166491-glass-and-checkerboard'
-        html='<h1>Global Search</h1><h1>Glass and Checkerboard</h1><p>Juan Gris c. 1917 oil on wood</p><p>This object’s media is free and in the public domain.</p><a href="https://api.nga.gov/iiif/d4ca2b12-bdf1-4360-a3de-4fb2b1927481/full/full/0/default.jpg?attachment_filename=glass.jpg">Download</a>'
-        self.assertEqual(lib.nga_work(html,slug)['license'],'CC0')
-        for changed in (html.replace('free and in the public domain.','restricted.'),html.replace('Juan Gris','Another artist'),html.replace('api.nga.gov','untrusted.example')):
-            with self.subTest(html=changed):self.assertIsNone(lib.nga_work(changed,slug))
 
     def stock(self,root,n=12,genre='Импрессионизм'):
         state={'date':'2026-11-23'};registry=lib.load(root,state)
@@ -102,6 +96,8 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertTrue(lib.genre_matches('Конструктивизм','Constructivist design'))
         self.assertTrue(lib.genre_matches('Ар-деко','Art Déco'));self.assertTrue(lib.genre_matches('Ар-нуво','Jugendstil'))
         self.assertFalse(lib.genre_matches('Кубизм','Neo-Plasticism evolved from Cubism'))
+        self.assertTrue(lib.genre_matches('Кубизм','A Cubist composition'))
+        self.assertFalse(lib.genre_matches('Кубизм','Cubo-Futurism is a distinct movement'))
         museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','artwork_type_title':'Painting','style_titles':['Impressionism'],'is_public_domain':True}]}
         with patch.object(museum,'get',return_value=json.dumps(data).encode()):
             work=next(museum.candidates('Импрессионизм'));self.assertEqual(work['license'],'CC0');self.assertEqual(work['genre_id'],'impressionism')
