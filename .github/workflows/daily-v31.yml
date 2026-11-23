@@ -435,7 +435,6 @@ jobs:
     env:
       NEWS_POLICY_VERSION: "4.4"
       NEWS_REPAIR_LEGACY_IMAGES: ${{ (inputs.repair_legacy_images || (github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]'))) && 'true' || 'false' }}
-      NEWS_ART_COMPARISON_DIR: ${{ runner.temp }}/art-repair-comparison
       NEWS_ART_LIBRARY_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-library]') }}
       NEWS_CATALOG_REFRESH: "true"
       NEWS_LIGHT_NEWS_ENABLED: "true"
@@ -499,6 +498,7 @@ jobs:
       - name: Find previously saved encrypted checkpoint
         id: checkpoint
         env:
+          NEWS_ART_COMPARISON_DIR: ${{ runner.temp }}/art-repair-comparison
           PHASE: ${{ steps.context.outputs.phase }}
           PREVIEW: ${{ steps.context.outputs.preview }}
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
@@ -571,6 +571,7 @@ jobs:
         id: stage
         timeout-minutes: 20
         env:
+          NEWS_ART_COMPARISON_DIR: ${{ runner.temp }}/art-repair-comparison
           PHASE: ${{ steps.context.outputs.phase }}
           PREVIEW: ${{ steps.context.outputs.preview }}
           TARGET_DATE: ${{ steps.context.outputs.target_date }}
