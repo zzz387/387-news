@@ -55,8 +55,8 @@ def compare(reference,generated):
             'reference_saturation':reference['saturation_value'],'generated_saturation':generated['saturation_value'],'generated_profile':generated,'quality_claim':'COLOR_ONLY_NOT_ARTISTIC_QUALITY'}
 
 def description(palette):
-    shares=', '.join(f"{g['color']} {round(g['share']*100)}%" for g in palette['groups'])
-    return f"Measured reference: {shares}; {palette['temperature']}, {palette['saturation']} saturation, {palette['contrast']} contrast; lightness {palette['lightness']}/100, dark area {round(palette['dark_share']*100)}%, light area {round(palette['light_share']*100)}%."
+    shares=' '.join(f"{g['color']}:{round(g['share']*100)}%" for g in palette['groups'])
+    return f"{shares}; {palette['temperature']}, {palette['saturation']} saturation, {palette['contrast']} contrast; L={palette['lightness']}/100, dark={round(palette['dark_share']*100)}%, light={round(palette['light_share']*100)}%."
 
 def work_profile(root,work,state):
     cache=state.setdefault('art_library44',{}).setdefault('color_profiles',{});key=work['sha256']
@@ -104,26 +104,28 @@ def direction(genre):return CONFIG['directions'].get(genre,CONFIG['directions'][
 def prompt(item):
     d=item['descriptor'];scene=(d.get('visual_subject_en') or d['title']+'. '+d.get('summary','')).strip()
     style=direction(item['genre']);palette=item.get('palette')
-    material=' Clearly render separated pigment strokes, broken optical edges and a visibly painted surface; avoid photographic fidelity or camera-like rendering.' if style['art_movement']=='impressionism' else ''
-    color=description(palette) if isinstance(palette,dict) else 'Use the actual palette of the attached museum painting.'
+    color=description(palette) if isinstance(palette,dict) else 'Use the actual colors of the attached painting.'
     green_share=sum(g['share'] for g in palette['groups'] if g['lab'][1]<-8) if isinstance(palette,dict) else None
     if green_share is not None and green_share<.05:
-        color+=' The reference has no dominant green field. Translate vegetation and other naturally colored objects into its measured color families; do not add a dominant green background.'
+        color+=' The reference has no dominant green field; use its actual color families for vegetation too.'
     conventions='; '.join(style[k] for k in ('space','line','light','texture','abstraction'))
     if style['art_movement']=='constructivism':
-        conventions+='; flat Constructivist artwork, not an architectural visualization: radical asymmetry, diagonal structural axes, overlapping angular planes and schematic botanical shapes; no realistic foliage, 3D building render or depth-of-field'
-
-    composition={'constructivism':'Structure the subject with functional geometric planes and an asymmetric axis', 'art nouveau':'Weave flowing organic rhythms into the scene itself, without an enclosing frame or ornamental border and without copying museum figures', 'cubism':'Resolve the subject into interlocking planes and simultaneous viewpoints', 'impressionism':'Stage the subject in changing natural light with optical spatial depth'}.get(style['art_movement'],item.get('composition','Independent asymmetric composition serving the subject'))
-    text=(f"Using the artistic language and actual colors of image 0, create an original, unsigned, visibly non-photographic {style['art_movement']} fine-art illustration. No text or artist signatures anywhere. Never reproduce reference inscriptions; leave all four corners blank and unmarked. ARTICLE SUBJECT: {scene}\nART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
-        f"ARTISTIC CHARACTERISTICS: {style['characteristics']}{material} {conventions}.\n"
-        'Use the single attached painting, image 0 (input_image_0), as the primary style reference. Render the new article subject in the artistic language, surface texture, light and tonal structure of image 0. '
-        'Follow its actual color palette closely. Preserve dominant, secondary and accent proportions, temperature, saturation, contrast and light/dark distribution. '
-        'Do not substitute a generic editorial color palette or dominant green unless present in the reference or necessary for the subject. '
-        f"{color}\nCOMPOSITION: {composition}. "
-        'Do not copy the museum scene, figures or distinctive arrangement. Avoid plastic surfaces, artificial glow, excessive symmetry, decorative particles and inappropriate hyper-detail. '
-        'Respect the movement and the article facts. No text, letters, signatures, logos, labels, borders or watermarks.')
-    if item.get('color_retry'):text+=' COLOR CORRECTION: retain the reference’s measured area ratios exactly as guidance, especially its dominant hue groups; reduce hues absent from it.'
-    if len(text)>4000:raise ValueError('ART_PROMPT_TOO_LONG')
+        conventions+='; flat intersecting planes on paper, not an architectural visualization: schematic building/foliage, diagonal axes, radical asymmetry, no realistic 3D rendering'
+    if style['art_movement']=='impressionism':conventions+='; clearly separated pigment strokes and dissolved edges, not photographic fidelity'
+    composition={'constructivism':'Build an independent geometric spatial construction from intersecting planes',
+        'art nouveau':'Integrate organic rhythms into the scene, without an enclosing frame',
+        'cubism':'Interlock planes and simultaneous viewpoints',
+        'impressionism':'An asymmetric observed grouping in changing light'}.get(style['art_movement'],item.get('composition','Independent asymmetric composition serving the subject'))
+    text=(f"Use the single attached painting, image 0 (input_image_0), only for style and actual colors. Create an original unsigned {style['art_movement']}, {style['medium']}. No text or signatures; keep all corners blank. "
+        f"COLOR: {color} Preserve dominant/secondary/accent proportions and light/dark balance.\n"
+        f"ARTICLE SUBJECT: {scene}\n"
+        f"ARTISTIC CHARACTERISTICS: {style['characteristics']} {conventions}.\n"
+        f"COMPOSITION: {composition}. "
+        'Do not copy reference figures, scene or distinctive arrangement. Respect article facts. No letters, logos, labels, borders, watermarks, plastic surfaces, artificial glow or gratuitous detail.')
+    if item.get('color_retry'):text+=' Keep the measured hue-area proportions especially close to image 0.'
+    # Upstream Klein uses a 512-token sequence by default. Keep essential subject,
+    # movement and measured reference colors compact and early; never slice them.
+    if len(text)>2200:raise ValueError('ART_PROMPT_TOO_LONG')
     return text
 
 def comparison(root,state,items,baseline,output):

@@ -140,3 +140,11 @@ Pricing source, checked 2026-11-23:
 https://developers.cloudflare.com/workers-ai/platform/pricing/
 Multipart/indexed-image format checked against the official Klein launch schema:
 https://developers.cloudflare.com/changelog/post/2026-01-15-flux-2-klein-4b-workers-ai/
+
+The upstream Klein pipeline defaults to a 512-token text sequence; Cloudflare
+does not document its hosted text limit. V5 therefore uses compact, prioritized
+reference/color/subject/style prose rather than long repeated boilerplate. It
+keeps all measured color groups and the complete brief, with a conservative
+2,200-character guard that fails before inference instead of silently cutting
+critical information. No exact hosted tokenizer count is claimed. Upstream:
+https://huggingface.co/docs/diffusers/main/en/api/pipelines/flux2
