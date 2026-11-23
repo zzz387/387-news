@@ -254,6 +254,8 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
             if old['model']!=mosaic44.CONFIG['model']:
                 current=next(r for r in data['illustrations'] if r['article_slug']==slug)
                 if current['sha256']!=old['sha256'] or current['path']!=old['path']:raise p.Blocked('ART_REPAIR_PRESERVED_IMAGE_CHANGED')
+        stage=mosaic44.CONFIG['repair_legacy_art']['stage']
+        attempts=legacy.setdefault('attempts',{});attempts[stage]=attempts.get(stage,0)+1
         persist()
     items=mosaic44.article_plans(sub,rows)
     bindings={r['article_slug']:r for r in data.get('art44',{}).get('bindings',data.get('illustrations',[]))}
@@ -283,7 +285,8 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
         from scripts import art_library44,news
         reference_state={'date':date,'issue_id':data.get('issue_id',date),'art_library44':parent.setdefault('art_library44',{})}
         budget=news.runtime.ACTIVE_BUDGET
-        sets=art_library44.prepare_sets(root,reference_state,items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180),number=data.get('number'))
+        reference_items=[i for i in items if i['article_slug'] in mosaic44.CONFIG['repair_legacy_art']['pilot_slugs']] if repair_legacy_images and stage=='pilot' else items
+        sets=art_library44.prepare_sets(root,reference_state,reference_items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180),number=data.get('number'))
         art_library44.attach(root,reference_state,items,sets);persist()
     prepared=items
     if repair_legacy_images:
@@ -302,7 +305,7 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
         sub.pop('_comparison_registry',None)
         targets=[i for i in items if legacy['images'][i['article_slug']]['model']==mosaic44.CONFIG['model']]
         completed=[i for i in targets if mosaic44.object_valid(sub['art44']['objects'].get(i['key'],{})) and sub['art44']['objects'][i['key']].get('reference_images_sent')==1]
-        sub['legacy_repair_report']={'targets':len(targets),'ready':len(completed),'stage':stage,'pilot_ready':all(any(i['article_slug']==slug for i in completed) for slug in mosaic44.CONFIG['repair_legacy_art']['pilot_slugs'])}
+        sub['legacy_repair_report']={'targets':len(targets),'ready':len(completed),'stage':stage,'repair_attempts':attempts[stage],'pilot_ready':all(any(i['article_slug']==slug for i in completed) for slug in mosaic44.CONFIG['repair_legacy_art']['pilot_slugs'])}
         print('[art-legacy-repair] '+json.dumps(sub['legacy_repair_report']),flush=True);persist()
         if stage=='pilot' or len(completed)!=len(targets):
             parent['art44_backfill_status']={'date':date,**progress,**sub['legacy_repair_report']};persist();return False

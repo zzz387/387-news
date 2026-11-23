@@ -161,11 +161,20 @@ class ArtLibraryTests(unittest.TestCase):
                 self.assertFalse(pub.backfill_issue_art(target,s['date'],later,repair_legacy_images=True));self.assertEqual(calls.call_count,11)
             self.assertTrue(all(p.read_bytes()==content for p,content in texts.items()))
 
+    def test_dhash_does_not_reject_distinct_verified_flat_color_works(self):
+        with tempfile.TemporaryDirectory() as temp:
+            state={};registry=lib.empty()
+            for i,rgb in enumerate(((200,30,20),(20,50,200))):
+                row={'genre_id':'constructivism','museum':'Synthetic museum','museum_id':'flat:'+str(i),'artist':'Fixture artist','title':'Distinct verified composition '+str(i),'year':'1920','source_url':'https://www.artic.edu/artworks/'+str(i),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images','verified':True,'genre_evidence':'Constructivism'}
+                raw=io.BytesIO();Image.new('RGB',(80,80),rgb).save(raw,format='PNG')
+                self.assertIsNotNone(lib.ingest(temp,registry,row,raw.getvalue(),state,lambda:None))
+            self.assertEqual(len(registry['artworks']),2)
+
     def test_smk_requires_explicit_open_rights_and_matching_metadata(self):
         museum=lib.Museum()
-        record={'object_number':'fixture-1','public_domain':True,'rights_url':'https://creativecommons.org/publicdomain/mark/1.0/',
+        record={'object_number':'fixture-1','public_domain':True,'rights':'https://creativecommons.org/publicdomain/mark/1.0/',
                 'titles':[{'title':'Constructivist study'}],'techniques':['Constructivism, painting'],
-                'production':[{'creator':'Fixture painter'}],'production_dates':[{'period':'1920'}],
+                'production':[{'creator':'Fixture painter'}],'production_date':[{'period':'1920'}],
                 'image_thumbnail':'https://iip-thumb.smk.dk/fixture.jpg'}
         def get(url,*args,**kwargs):
             if url.startswith('https://api.smk.dk/'):return json.dumps({'items':[dict(record,object_number='private',public_domain=False),record]}).encode()
@@ -177,6 +186,9 @@ class ArtLibraryTests(unittest.TestCase):
             state={};registry=lib.empty();key=lib.ingest(temp,registry,works[0],picture(93),state,lambda:None)
             self.assertTrue(lib.file_valid(temp,registry['artworks'][key]));self.assertFalse(lib.file_valid(temp,dict(registry['artworks'][key],public_domain=False)))
             with self.assertRaisesRegex(ValueError,'RIGHTS'):lib.ingest(temp,registry,dict(works[0],public_domain=False),picture(94),state,lambda:None)
+        record['rights']='https://creativecommons.org/share-your-work/public-domain/cc0/';record['techniques']=[{'technique':'Constructivism, olie på lærred'}];record['object_names']=[{'name':'maleri'}]
+        museum=lib.Museum()
+        with patch.object(museum,'get',side_effect=get):self.assertEqual(list(museum.candidates('Конструктивизм'))[0]['license'],'CC0')
 
     def test_real_multipart_sends_one_selected_binary_image_part(self):
         images=[picture(0)]
