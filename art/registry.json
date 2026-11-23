@@ -1174,6 +1174,54 @@
       "width": 300,
       "height": 171,
       "added_at": "2026-11-23T18:40:13.658716+00:00"
+    },
+    "fe0c90b8c62f68233510beab976642babf55e1306f0350de0b7b3c41d6247add": {
+      "museum": "SMK — National Gallery of Denmark",
+      "museum_id": "smk:KMSr61",
+      "title": "Guitarspillersken",
+      "artist": "Gris, Juan",
+      "year": "1926",
+      "source_url": "https://api.smk.dk/api/v1/art/search/?keys=Juan+Gris&filters=%5Bpublic_domain%3Atrue%5D%2C%5Bhas_image%3Atrue%5D&offset=0&rows=40",
+      "license": "Public Domain Mark",
+      "license_url": "https://www.smk.dk/en/article/smk-open/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "public_domain": true,
+      "genre_evidence": "Cubism — curated Juan Gris painting KMSr61; [{'title': 'Guitarspillersken', 'type': 'museumstitel', 'language': 'dansk'}, {'title': 'La joueuse de guitare', 'type': 'museumstitel', 'language': 'fransk'}] ['Olie på lærred']     [{'name': 'Maleri'}]",
+      "genre_id": "cubism",
+      "verified": true,
+      "id": "fe0c90b8c62f68233510beab976642babf55e1306f0350de0b7b3c41d6247add",
+      "path": "assets/art/cubism/fe0c90b8c62f68233510beab976642babf55e1306f0350de0b7b3c41d6247add.webp",
+      "sha256": "0add059e1623914b88ef06df08fa52379ba357c6f728ce3740439045662c703b",
+      "original_sha256": "af0fee8cdd000ad64e8e9bdd9720254548ac1798f0bac86c69bc7dbbc0d987a1",
+      "visual_hash": "3469029514026081496",
+      "perceptual_neighbours": [],
+      "width": 299,
+      "height": 480,
+      "added_at": "2026-11-23T22:30:13.461743+00:00"
+    },
+    "07e2a1744cfc9ec275fad7da5fab9af999848c63c44068f51d30bd65ee510385": {
+      "museum": "SMK — National Gallery of Denmark",
+      "museum_id": "smk:KMSr162",
+      "title": "Opstilling",
+      "artist": "Gris, Juan",
+      "year": "1916",
+      "source_url": "https://api.smk.dk/api/v1/art/search/?keys=Juan+Gris&filters=%5Bpublic_domain%3Atrue%5D%2C%5Bhas_image%3Atrue%5D&offset=0&rows=40",
+      "license": "Public Domain Mark",
+      "license_url": "https://www.smk.dk/en/article/smk-open/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "public_domain": true,
+      "genre_evidence": "Cubism — curated Juan Gris painting KMSr162; [{'title': 'Opstilling', 'type': 'museumstitel', 'language': 'dansk'}, {'title': 'Nature morte', 'type': 'museumstitel', 'language': 'fransk'}] ['Olie på pap']     [{'name': 'Maleri'}]",
+      "genre_id": "cubism",
+      "verified": true,
+      "id": "07e2a1744cfc9ec275fad7da5fab9af999848c63c44068f51d30bd65ee510385",
+      "path": "assets/art/cubism/07e2a1744cfc9ec275fad7da5fab9af999848c63c44068f51d30bd65ee510385.webp",
+      "sha256": "7d204e3bc98bde22cc1bab56613d886245bbcf2c4f6cee0b316b212ad925b657",
+      "original_sha256": "fc197c97051b08edc4e738938ba52025be2c224eee82777d399f592f26eb6fc6",
+      "visual_hash": "8711898889843275378",
+      "perceptual_neighbours": [],
+      "width": 358,
+      "height": 480,
+      "added_at": "2026-11-23T22:30:19.293973+00:00"
     }
   },
   "sets": {
@@ -1439,6 +1487,30 @@
         "8cb5657d3a8ca02664af01466799f0876fceb05eeee21add2e8e385fd4d5142e",
         "734687e23f63b67311ce48cb1b5623a59ee288dde6b545a69af5cd41f7eb4842",
         "d51428cfab80b5b4854209ec02b21b7358c12f3276e2e5316dc2f4110bf3d789"
+      ]
+    },
+    "2026-11-23/cubism": {
+      "id": "2026-11-23/cubism",
+      "issue_id": "2026-11-23",
+      "issue_date": "2026-11-23",
+      "issue_number": 29,
+      "genre_id": "cubism",
+      "genre": "Кубизм",
+      "artwork_ids": [
+        "61312254c28ed845fc6ca27056f468162b812cbe9985ac704a1df3574880844d",
+        "fe0c90b8c62f68233510beab976642babf55e1306f0350de0b7b3c41d6247add",
+        "311ffa24a3c50ec72e75fc5149725a606adfe22b2b2a2a324920bd3b36218fde",
+        "07e2a1744cfc9ec275fad7da5fab9af999848c63c44068f51d30bd65ee510385"
+      ],
+      "selected_at": "2026-11-23T22:30:22.582958+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "7e84cf4a1e013fea03cee2fb377679fecc9a4bb282610d785a7be613f4191025",
+        "0add059e1623914b88ef06df08fa52379ba357c6f728ce3740439045662c703b",
+        "798e7067424987ff79a34af1196a5f161f214eb72b47e3302e05cc3c02cf3f9e",
+        "7d204e3bc98bde22cc1bab56613d886245bbcf2c4f6cee0b316b212ad925b657"
       ]
     }
   },
