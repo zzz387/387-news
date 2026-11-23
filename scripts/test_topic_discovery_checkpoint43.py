@@ -8,6 +8,27 @@ from scripts import test_daily43 as fixtures,test_editorial_visual43 as visual
 from scripts.test_editorial_topic_coverage43 import candidate
 
 class TopicDiscoveryTests(unittest.TestCase):
+    def test_missing_44_streams_retry_with_bounded_cooldown_and_fresh_empty_reports(self):
+        from scripts import policy44
+        from scripts.test_policy44 import issue,main_row
+        config=self.core_registry();config['refresh_hours']=8
+        config['publishers'].append(dict(config['publishers'][0],id='health',priority_ids=[12]))
+        for elapsed,blocked,expected in [(5,False,set()),(31,False,{'C','health'}),(31,True,{'C'})]:
+            with self.subTest(minutes=elapsed,health_blocked=blocked):
+                s=issue();s['candidates']=[main_row(i) for i in [0,1,4]+list(range(6,16))]
+                saved={'checked_at':(fixtures.NOW-timedelta(minutes=elapsed)).isoformat(),'classifier44_revision':policy44.REVISION,'status':'full_sources_verified'}
+                s['discovery43']={'publishers':{r['id']:dict(saved) for r in config['publishers']},'last_run':{'at':'old','attempted_groups':['stale']}}
+                if blocked:s['discovery43']['publishers']['health']['status']='unavailable'
+                seen=[]
+                def inspect(row,*args,**kwargs):
+                    seen.append(row['id']);return {'status':'no_sources','article_checks':0},[]
+                with patch.object(cat,'registry',return_value=config),patch.object(cat,'inspect_publisher',side_effect=inspect):cat.refresh(s,fixtures.NOW,shortage=True)
+                report=s['discovery43']['last_run']
+                self.assertEqual(set(seen),expected);self.assertEqual(report['at'],fixtures.NOW.isoformat())
+                self.assertEqual(report['candidate_targets'],{'family':0,'health':2,'sport':1})
+                self.assertEqual(set(report['missing_candidate_groups']),{'health','sport'})
+                if not seen:self.assertEqual(report['code'],'NO_PUBLISHERS_DUE');self.assertEqual(report['attempted_groups'],[])
+
     def eos(self):
         a=candidate('Живые строительные материалы меняют подход к проектированию городской среды',5,source_title='There Are No Small Parts, Only Small Organisms')
         b=candidate('Самовосстанавливающийся бетон и мицелий меняют облик городской архитектуры',6,source_title='Building the Cities of Tomorrow with Living Materials')

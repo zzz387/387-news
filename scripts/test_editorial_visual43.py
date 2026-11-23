@@ -189,7 +189,7 @@ class LightAndLayoutTests(unittest.TestCase):
     def test_compact_current_home_is_derived_from_immutable_overview_and_still_hash_checked(self):
         with tempfile.TemporaryDirectory() as temp:
             target=Path(temp)
-            for folder in ('assets','issues','archive'):shutil.copytree(p.ROOT/folder,target/folder)
+            for folder in ('assets','issues','archive','art'):shutil.copytree(p.ROOT/folder,target/folder)
             shutil.copyfile(p.ROOT/'index.html',target/'index.html')
             before={str(f.relative_to(target)):f.read_bytes() for f in (target/'issues').rglob('*') if f.is_file()}
             previous=(target/'index.html').read_text()

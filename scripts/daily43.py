@@ -120,7 +120,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         def prepare_light():
             if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or (not active44 and clock()>=release-timedelta(minutes=10)) or not budget:return
             standard=policy44.standard(state) if active44 else None
-            if standard and not standard['compliant'] and standard['light_deficit']==0:return
+            if standard and standard['light_deficit']==0:return
             keep=max(4,2*max(0,minimum-len(selection43.composition(state))))
             if budget.remaining_requests()>=(2 if active44 else keep+2):
                 light43.prepare(state,persist)
@@ -141,7 +141,15 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 try:catalog43.refresh(state,clock(),shortage=True)
                 except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
                 priorities43.apply_rules(state,clock());persist();continue
-            if active44 and needed and not coverage_pending and len(selection43.composition(state))>=e.CONFIG['article_target']:break
+            if active44 and needed and not coverage_pending:
+                report=policy44.standard(state)
+                # The target is not a cap. Once bounded targeted searches are
+                # exhausted, pause for fresh sources rather than writing unrelated
+                # stock. After release, ordinary candidates can still reach the
+                # eleven-article admission when the real topic deficit permits it.
+                if report['main_articles']>=minimum and (clock()<release or report['total_topic_deficit']>3):
+                    state['topic_search44']={'code':'TARGETED_SUPPLY_EXHAUSTED','missing_groups':sorted(needed),'searches':extra_searches}
+                    persist();break
             coverage_needed=bool(coverage_pending) if active44 else banking and bool(coverage_pending)
             plan_state=state
             if coverage_needed:

@@ -240,8 +240,9 @@ def check_v43(base,home,expected_date=None):
             from scripts import policy44
             actual_articles.append(policy44.from_html(page))
     for image in data.get('illustrations',[]):check_public_image(base,image)
-    if data['policy_version']=='4.4':policy44.require({'policy_version':'4.4','brief_policy_revision':data.get('brief_policy_revision',1)},actual_articles,light)
-    return {'https':'verified','issue_date':date,'articles':count,'kind':data['kind'],'policy_version':data['policy_version'],'expected_date':expected_date,'status':'ok'}
+    editorial={}
+    if data['policy_version']=='4.4':editorial=policy44.require({'policy_version':'4.4','brief_policy_revision':data.get('brief_policy_revision',1)},actual_articles,light)
+    return dict(https='verified',issue_date=date,articles=count,kind=data['kind'],policy_version=data['policy_version'],expected_date=expected_date,status='ok',**({'editorial_standard':editorial} if editorial else {}))
 
 
 def check_archived(base,date):

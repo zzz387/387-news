@@ -88,9 +88,13 @@ def evaluate(root,status,now=None,check_public=None):
     today=now.date().isoformat()
     if now.hour<6:
         return {'date':today,'code':'NOT_PREPARED','verified':False,'alert':False,'not_due':True,'publication_status':'WAITING_FOR_RELEASE'}
+    editorial=status.get('editorial_standard',{}) if status.get('date')==today else {}
+    admission={'editorial_status':editorial['admission_status'],'editorial_standard':editorial} if editorial.get('admission_status') in ('STRICT_EDITORIAL_APPROVED','RELAXED_EDITORIAL_APPROVED','EDITORIAL_DEFICIT') else {}
     try:
-        check_public(expected_date=today)
-        return {'date':today,'code':'VERIFIED','verified':True,'alert':False,'publication_status':'PUBLISHED_VERIFIED'}
+        public=check_public(expected_date=today)
+        if isinstance(public,dict) and public.get('editorial_standard'):
+            editorial=public['editorial_standard'];admission={'editorial_status':editorial['admission_status'],'editorial_standard':editorial}
+        return dict(date=today,code='VERIFIED',verified=True,alert=False,publication_status='PUBLISHED_VERIFIED',delivery_status='PUBLICATION_VERIFIED',**admission)
     except (HTTPError,URLError,TimeoutError,OSError):
         external=True
     except Exception:
@@ -99,7 +103,7 @@ def evaluate(root,status,now=None,check_public=None):
     code='EXTERNAL_SERVICE' if external else 'SITE_NOT_CURRENT' if exists else 'NOT_PREPARED'
     if status.get('date')==today:
         block=status.get('block_code')
-        if block=='EDITORIAL_STANDARD_NOT_MET':code='EDITORIAL_DEFICIT'
+        if block=='EDITORIAL_STANDARD_NOT_MET':code='READY_NOT_PUBLISHED' if editorial.get('compliant') else 'EDITORIAL_DEFICIT'
         elif block=='DAILY_QUOTA': code='QUOTA_EXHAUSTED'
         elif block in ('API_COOLDOWN','AUDIT_EXTERNAL_ERROR','INFRASTRUCTURE_ERROR'): code='EXTERNAL_SERVICE'
         elif block=='RELEASE_DISABLED': code='SETTINGS_BLOCKED'
@@ -108,7 +112,7 @@ def evaluate(root,status,now=None,check_public=None):
         elif status.get('audit_passed') and not exists: code='READY_NOT_PUBLISHED'
     # One-hour grace prevents a transient initial deploy from creating an incident.
     alert=now.hour>=7 or code in ('EDITORIAL_HOLD','EDITORIAL_DEFICIT','DELIVERY_RETRY_LIMIT')
-    return {'date':today,'code':code,'verified':False,'alert':alert,'publication_status':'PUBLICATION_FAILED'}
+    return dict(date=today,code=code,verified=False,alert=alert,publication_status='PUBLICATION_FAILED',delivery_status='PUBLICATION_FAILED',**admission)
 
 
 def artwork_status(root,date,verified,status=None):
