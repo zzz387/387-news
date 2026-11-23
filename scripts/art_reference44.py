@@ -9,7 +9,7 @@ from PIL import Image,ImageStat
 VERSION='387-reference-selection-1'
 PROFILE_VERSION='387-color-lab-1'
 CONFIG=json.loads((Path(__file__).resolve().parents[1]/'config/art-directions44.json').read_text())
-FIELDS=('art_movement','medium','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation')
+FIELDS=('art_movement','medium','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport')
 
 def lab(rgb):
     v=[x/255 for x in rgb];r,g,b=[x/12.92 if x<=.04045 else ((x+.055)/1.055)**2.4 for x in v]
@@ -147,7 +147,7 @@ def comparison(root,state,items,baseline,output):
         ref_name=None
         if work:
             ref_name=prefix+'reference.webp';shutil.copyfile(Path(root)/work['path'],output/ref_name)
-        rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'license':work.get('license'),'license_url':work.get('license_url'),'attribution':work.get('attribution'),'reference_change':'Resized WebP','model':obj.get('model') if obj else None,'prompt_version':item.get('prompt_version'),'old_sha256':old['sha256'],'new_sha256':obj.get('sha256') if obj else None,'reference_set_id':item.get('reference_set_id'),'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None})
+        rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'license':work.get('license'),'license_url':work.get('license_url'),'attribution':work.get('attribution'),'reference_change':'Resized WebP','model':obj.get('model') if obj else None,'prompt_version':item.get('prompt_version'),'old_sha256':old['sha256'],'new_sha256':obj.get('sha256') if obj else None,'reference_set_id':item.get('reference_set_id'),'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None,'reference_transport':obj.get('reference_transport') if obj else None})
     def variety(values):
         scores=[distance(a,b) for i,a in enumerate(values) for b in values[i+1:]]
         return round(sum(scores)/len(scores),3) if scores else None

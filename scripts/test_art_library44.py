@@ -205,6 +205,7 @@ class ArtLibraryTests(unittest.TestCase):
         parts=list(message.iter_parts());files=[p for p in parts if p.get_filename()]
         self.assertEqual([p.get_param('name',header='content-disposition') for p in files],['input_image_0'])
         self.assertEqual([p.get_payload(decode=True) for p in files],images)
+        self.assertEqual(files[0].get_content_type(),'image/png');self.assertTrue(files[0].get_filename().endswith('.png'))
     def test_reference_inference_keeps_shared_free_ledger_and_uses_klein(self):
         with tempfile.TemporaryDirectory() as temp:
             state=self.stock(temp,4);items=self.items(1);sets=lib.prepare_sets(temp,state,items,discover=False);lib.attach(temp,state,items,sets)
@@ -214,12 +215,20 @@ class ArtLibraryTests(unittest.TestCase):
             with patch.dict(os.environ,env),patch.object(art.p,'ROOT',Path(temp)),patch.object(cf,'free_usage',return_value=200),patch.object(cf,'api',return_value={'result':{'image':base64.b64encode(picture(99)).decode()}}) as api,patch.object(cf,'_LAST',0):
                 cf.generate(item,budget,dict(art.CONFIG,request_gap_seconds=0))
                 args,kwargs=api.call_args;self.assertTrue(args[0].endswith(cf.REFERENCE_MODEL));self.assertNotIn('steps',args[1]);self.assertEqual(len(kwargs['images']),1)
+                self.assertTrue(kwargs['images'][0].startswith(b'\x89PNG'));self.assertEqual(item['reference_transport']['library_sha256'],item['reference_images'][0]['sha256'])
+                self.assertEqual(item['reference_transport']['wire_sha256'],lib.digest(kwargs['images'][0]))
+                with Image.open(io.BytesIO(kwargs['images'][0])) as wire,Image.open(Path(temp)/item['reference_images'][0]['path']) as canonical:
+                    self.assertEqual(wire.convert('RGB').tobytes(),canonical.convert('RGB').tobytes())
                 self.assertEqual(ledger['requests'],47);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
                 self.assertGreaterEqual(ledger['cloudflare_ai']['reserved_neurons'],2*(5.37+26.05*4))
                 self.assertLessEqual(ledger['cloudflare_ai']['reserved_neurons'],art.CONFIG['reserve_neurons_per_request'])
+                before=ledger['cloudflare_ai']['reserved_neurons'];item['ratio']='3:2'
+                cf.generate(item,budget,dict(art.CONFIG,request_gap_seconds=0));self.assertEqual(api.call_args.args[1]['width'],768);self.assertEqual(api.call_args.args[1]['height'],512)
+                self.assertGreaterEqual(ledger['cloudflare_ai']['reserved_neurons']-before,2*(5.37+26.05*2))
+                self.assertLessEqual(ledger['cloudflare_ai']['reserved_neurons']-before,art.CONFIG['reserve_neurons_per_request'])
                 item['reference_images']=item['reference_images']*3
                 with self.assertRaisesRegex(RuntimeError,'ONE_REFERENCE'):cf.generate(item,budget,art.CONFIG)
-                self.assertEqual(api.call_count,1)
+                self.assertEqual(api.call_count,2)
     def test_partial_illustration_resume_reuses_three_objects_and_one_quartet(self):
         from scripts.test_policy44 import main_row
         with tempfile.TemporaryDirectory() as temp:
