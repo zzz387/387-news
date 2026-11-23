@@ -116,3 +116,27 @@ small artifact contains only work facts, rights/file URLs and schema paths;
 descriptions and private newspaper data are excluded. No Secrets, checkpoints,
 Gemini or image inference are used. This advisory probe makes real schema changes
 reviewable before production, without adding a workflow or publication gate.
+
+The real Constructivist pilot delivered the correct subject but remained a
+realistic architectural rendering, with COLOR_MISMATCH after its one bounded
+color retry. It is not approved as a successful stylistic pilot. Prompt v5
+actually transmits the configured space/line/light/texture/abstraction fields,
+explicitly identifies image 0 as style-only, and makes flat Constructivist
+geometric treatment take precedence over architectural CGI. A green-background
+constraint is derived only when the measured reference lacks green, including
+for vegetation subjects; a green reference remains free to use its real colors.
+The same museum quartet and selected work remain fixed. Reviewed v3 results
+are retained; no additional color retry is allowed without first-pass capacity.
+
+For a verified one-input Klein request, the reservation is the published
+requested-tile estimate multiplied by two, capped at the unchanged fixed
+per-request ceiling (256). Four output tiles plus one input reserve 220 rather
+than 256 Neurons; historical reservations are never refunded or reset. Larger
+decoded outputs top the reservation up conservatively. The configured 7,500
+image budget, 10,000 account allowance, live whole-account checks, 1,500 headroom
+and Free-only/no-billing guards are unchanged. This is calculated reservation,
+not a claim of exact per-request telemetry (the API does not expose that).
+Pricing source, checked 2026-11-23:
+https://developers.cloudflare.com/workers-ai/platform/pricing/
+Multipart/indexed-image format checked against the official Klein launch schema:
+https://developers.cloudflare.com/changelog/post/2026-01-15-flux-2-klein-4b-workers-ai/

@@ -55,7 +55,7 @@ def compare(reference,generated):
             'reference_saturation':reference['saturation_value'],'generated_saturation':generated['saturation_value'],'generated_profile':generated,'quality_claim':'COLOR_ONLY_NOT_ARTISTIC_QUALITY'}
 
 def description(palette):
-    shares=', '.join(f"{g['color']} {round(g['share']*100)}%" for g in palette['groups'][:7])
+    shares=', '.join(f"{g['color']} {round(g['share']*100)}%" for g in palette['groups'])
     return f"Measured reference: {shares}; {palette['temperature']}, {palette['saturation']} saturation, {palette['contrast']} contrast; lightness {palette['lightness']}/100, dark area {round(palette['dark_share']*100)}%, light area {round(palette['light_share']*100)}%."
 
 def work_profile(root,work,state):
@@ -106,10 +106,17 @@ def prompt(item):
     style=direction(item['genre']);palette=item.get('palette')
     material=' Clearly render separated pigment strokes, broken optical edges and a visibly painted surface; avoid photographic fidelity or camera-like rendering.' if style['art_movement']=='impressionism' else ''
     color=description(palette) if isinstance(palette,dict) else 'Use the actual palette of the attached museum painting.'
+    green_share=sum(g['share'] for g in palette['groups'] if g['lab'][1]<-8) if isinstance(palette,dict) else None
+    if green_share is not None and green_share<.05:
+        color+=' The reference has no dominant green field. Translate vegetation and other naturally colored objects into its measured color families; do not add a dominant green background.'
+    conventions='; '.join(style[k] for k in ('space','line','light','texture','abstraction'))
+    if style['art_movement']=='constructivism':
+        conventions+='; flat Constructivist artwork, not an architectural visualization: radical asymmetry, diagonal structural axes, overlapping angular planes and schematic botanical shapes; no realistic foliage, 3D building render or depth-of-field'
+
     composition={'constructivism':'Structure the subject with functional geometric planes and an asymmetric axis', 'art nouveau':'Weave flowing organic rhythms into the scene itself, without an enclosing frame or ornamental border and without copying museum figures', 'cubism':'Resolve the subject into interlocking planes and simultaneous viewpoints', 'impressionism':'Stage the subject in changing natural light with optical spatial depth'}.get(style['art_movement'],item.get('composition','Independent asymmetric composition serving the subject'))
-    text=(f"Create an original, unsigned fine-art illustration. No text or artist signatures anywhere. Never reproduce reference inscriptions; leave all four corners blank and unmarked. ARTICLE SUBJECT: {scene}\nART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
-        f"ARTISTIC CHARACTERISTICS: {style['characteristics']}{material}\n"
-        'Use the single attached painting as the primary visual reference for artistic language, texture, light and tonal structure. '
+    text=(f"Create an original, unsigned, visibly non-photographic fine-art illustration. No text or artist signatures anywhere. Never reproduce reference inscriptions; leave all four corners blank and unmarked. ARTICLE SUBJECT: {scene}\nART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
+        f"ARTISTIC CHARACTERISTICS: {style['characteristics']}{material} {conventions}.\n"
+        'Use the single attached painting, image 0 (input_image_0), as the primary style reference. Render the new article subject in the artistic language, surface texture, light and tonal structure of image 0. '
         'Follow its actual color palette closely. Preserve dominant, secondary and accent proportions, temperature, saturation, contrast and light/dark distribution. '
         'Do not substitute a generic editorial color palette or dominant green unless present in the reference or necessary for the subject. '
         f"{color}\nCOMPOSITION: {composition}. "
