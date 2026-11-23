@@ -172,7 +172,7 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertEqual(len(works),1);self.assertEqual(works[0]['license'],'Public Domain Mark')
         with tempfile.TemporaryDirectory() as temp:
             state={};registry=lib.empty();key=lib.ingest(temp,registry,works[0],picture(93),state,lambda:None)
-            self.assertTrue(lib.file_valid(temp,registry['artworks'][key]))
+            self.assertTrue(lib.file_valid(temp,registry['artworks'][key]));self.assertFalse(lib.file_valid(temp,dict(registry['artworks'][key],public_domain=False)))
             with self.assertRaisesRegex(ValueError,'RIGHTS'):lib.ingest(temp,registry,dict(works[0],public_domain=False),picture(94),state,lambda:None)
 
     def test_real_multipart_sends_one_selected_binary_image_part(self):

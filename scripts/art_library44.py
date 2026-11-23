@@ -74,6 +74,7 @@ def file_valid(root,work):
         if work['path']!=expected or not re.fullmatch(r'[a-f0-9]{64}',work['id']):return False
         data=(Path(root)/expected).read_bytes()
         if digest(data)!=work['sha256'] or work['license'] not in ('CC0','Public Domain Mark') or work['verified'] is not True:return False
+        if work['license']=='Public Domain Mark' and (work.get('public_domain') is not True or work.get('rights_evidence')!='https://creativecommons.org/publicdomain/mark/1.0/'):return False
         with Image.open(io.BytesIO(data)) as image:
             image.verify()
         return True
