@@ -16,7 +16,7 @@ def picture(i):
 class ArtLibraryTests(unittest.TestCase):
     def test_nga_cubist_seed_requires_own_image_rights_identity_and_download(self):
         slug='166491-glass-and-checkerboard'
-        html='<h1>Glass and Checkerboard</h1><p>Juan Gris c. 1917 oil on wood</p><p>This object’s media is free and in the public domain.</p><a href="https://api.nga.gov/iiif/d4ca2b12-bdf1-4360-a3de-4fb2b1927481/full/full/0/default.jpg?attachment_filename=glass.jpg">Download</a>'
+        html='<h1>Global Search</h1><h1>Glass and Checkerboard</h1><p>Juan Gris c. 1917 oil on wood</p><p>This object’s media is free and in the public domain.</p><a href="https://api.nga.gov/iiif/d4ca2b12-bdf1-4360-a3de-4fb2b1927481/full/full/0/default.jpg?attachment_filename=glass.jpg">Download</a>'
         self.assertEqual(lib.nga_work(html,slug)['license'],'CC0')
         for changed in (html.replace('free and in the public domain.','restricted.'),html.replace('Juan Gris','Another artist'),html.replace('api.nga.gov','untrusted.example')):
             with self.subTest(html=changed):self.assertIsNone(lib.nga_work(changed,slug))

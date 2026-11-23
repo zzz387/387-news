@@ -152,21 +152,21 @@ def nga_work(raw,slug):
     if slug not in NGA_SEEDS:return None
     from html.parser import HTMLParser
     class Page(HTMLParser):
-        def __init__(self):super().__init__();self.text=[];self.head=[];self.in_head=False;self.downloads=set()
+        def __init__(self):super().__init__();self.text=[];self.head=[];self.current=[];self.in_head=False;self.downloads=set()
         def handle_starttag(self,tag,attrs):
             attrs=dict(attrs)
-            if tag=='h1':self.in_head=True
+            if tag=='h1':self.in_head=True;self.current=[]
             href=attrs.get('href','')
             if tag=='a' and href.startswith('https://api.nga.gov/iiif/') and 'attachment_filename=' in href:self.downloads.add(href)
         def handle_endtag(self,tag):
-            if tag=='h1':self.in_head=False
+            if tag=='h1':self.head.append(' '.join(self.current).strip());self.in_head=False
         def handle_data(self,value):
             self.text.append(value)
-            if self.in_head:self.head.append(value)
+            if self.in_head:self.current.append(value)
     page=Page();page.feed(raw.decode('utf-8') if isinstance(raw,bytes) else raw)
     title,year,medium=NGA_SEEDS[slug];text=' '.join(' '.join(page.text).split())
-    if ' '.join(page.head).strip()!=title or not all(value in text for value in ('Juan Gris',year,medium)):return None
-    if 'This object’s media is free and in the public domain.' not in text or len(page.downloads)!=1:return None
+    if title not in page.head or not all(value in text for value in ('Juan Gris',year,medium)):return None
+    if not re.search(r"This object[’']s media is free and in the public domain\.",text) or len(page.downloads)!=1:return None
     image=next(iter(page.downloads)).replace('/full/full/','/full/480,/')
     if not re.fullmatch(r'https://api\.nga\.gov/iiif/[a-f0-9-]+/full/480,/0/default\.jpg\?attachment_filename=[^/]+',image):return None
     return {'museum':'National Gallery of Art, Washington','museum_id':'nga:'+slug.split('-')[0],'title':title,'artist':'Juan Gris','year':year,
