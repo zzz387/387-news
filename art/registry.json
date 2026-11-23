@@ -1150,6 +1150,30 @@
       "width": 380,
       "height": 283,
       "added_at": "2026-11-23T18:34:51.515092+00:00"
+    },
+    "14f0e709d68510f9db410ac81eee61ffbd1ba2d9712f82e09c5939be0e292fff": {
+      "museum": "Paris Musées — Petit Palais, musée des Beaux-arts de la Ville de Paris",
+      "museum_id": "paris:160025953",
+      "title": "Barrette",
+      "artist": "Anonyme",
+      "year": "Vers 1920",
+      "source_url": "https://www.parismuseescollections.paris.fr/fr/petit-palais/oeuvres/barrette",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "genre_evidence": "Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927",
+      "genre_evidence_url": "https://www.parismuseescollections.paris.fr/fr/petit-palais/oeuvres/barrette",
+      "genre_id": "art-deco",
+      "verified": true,
+      "id": "14f0e709d68510f9db410ac81eee61ffbd1ba2d9712f82e09c5939be0e292fff",
+      "path": "assets/art/art-deco/14f0e709d68510f9db410ac81eee61ffbd1ba2d9712f82e09c5939be0e292fff.webp",
+      "sha256": "8cb5657d3a8ca02664af01466799f0876fceb05eeee21add2e8e385fd4d5142e",
+      "original_sha256": "4554800eddaf6f175cd1fc9586f03c6227765651a28d783a9a7fca7224cf168b",
+      "visual_hash": "1685864734430550395",
+      "perceptual_neighbours": [],
+      "width": 300,
+      "height": 171,
+      "added_at": "2026-11-23T18:40:13.658716+00:00"
     }
   },
   "sets": {
@@ -1391,6 +1415,30 @@
         "60904308e60bd4a406d2f54a8d0790a10c56fb8a342df31b2022ac280ef44672",
         "5be1d50d9c7de05e7551b9e4441dc7f5b73ee27e1aa8cf4ae534a6bfc0fd7857",
         "c5789b04f403f1bfd43b10daeaf801dcace9a926bd9e7e58f7106c1fd667f0f5"
+      ]
+    },
+    "2026-11-23/art-deco": {
+      "id": "2026-11-23/art-deco",
+      "issue_id": "2026-11-23",
+      "issue_date": "2026-11-23",
+      "issue_number": 29,
+      "genre_id": "art-deco",
+      "genre": "Ар-деко",
+      "artwork_ids": [
+        "617f039ed6c844667c8badbdaff4705842f6b38f11bca57a496e9efbae47752a",
+        "14f0e709d68510f9db410ac81eee61ffbd1ba2d9712f82e09c5939be0e292fff",
+        "3d6567f65c8ac8b09dc163da0773f89cb938b3b8803494208ac8e21458ca9ad9",
+        "b55781ca4ef11bab97d86255df3c63904e07a64a976cb712bcb98157ada7b8bf"
+      ],
+      "selected_at": "2026-11-23T18:40:19.265835+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "2b10b4a52787fcc58c9dcdf82010b52515ebe21cab331ef09c4ef2dc76dc0865",
+        "8cb5657d3a8ca02664af01466799f0876fceb05eeee21add2e8e385fd4d5142e",
+        "734687e23f63b67311ce48cb1b5623a59ee288dde6b545a69af5cd41f7eb4842",
+        "d51428cfab80b5b4854209ec02b21b7358c12f3276e2e5316dc2f4110bf3d789"
       ]
     }
   },
