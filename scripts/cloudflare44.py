@@ -167,10 +167,16 @@ def generate(item,budget,config):
     if current.get('day')!=day:
         ledger['cloudflare_ai']={'day':day,'account_hash':key,'reserved_neurons':0,'estimated_neurons':0,'requests':0,'observed_account_neurons':None,'cooldown_until':current.get('cooldown_until',0)}
     state=ledger['cloudflare_ai'];last_error=None
+    width,height={'3:2':(960,640),'4:5':(768,960),'1:1':(896,896),'3:4':(768,1024),'16:9':(1024,576)}.get(item.get('ratio'),(1024,768))
     for attempt in range(config.get('max_retries_per_article',2)):
         if state.get('cooldown_until',0)>time.time():raise GenerationPaused('CF_COOLDOWN')
         used=free_usage();state['observed_account_neurons']=used
         reserve=config.get('reserve_neurons_per_request',256)
+        if images:
+            # Current published Klein tile pricing, doubled, within the same
+            # configured per-request ceiling; never rewrite historical reserves.
+            forecast=5.37*input_tiles+26.05*math.ceil(width/512)*math.ceil(height/512)
+            reserve=min(reserve,math.ceil(2*forecast))
         if state['reserved_neurons']+reserve>config['image_neuron_budget'] or used+reserve>10000-config.get('account_headroom',1500):
             state['cooldown_until']=(datetime.now(timezone.utc).replace(hour=0,minute=0,second=0,microsecond=0)+timedelta(days=1,minutes=5)).timestamp();budget.persist();raise GenerationPaused('CF_FREE_QUOTA_EXHAUSTED')
         if budget.remaining_seconds()<90:raise GenerationPaused('CF_STAGE_TIME_LIMIT')
@@ -178,7 +184,6 @@ def generate(item,budget,config):
         state['reserved_neurons']+=reserve;state['requests']+=1;budget.persist();_LAST=time.monotonic()
         try:
             if images:
-                width,height={'3:2':(960,640),'4:5':(768,960),'1:1':(896,896),'3:4':(768,1024),'16:9':(1024,576)}.get(item.get('ratio'),(1024,768))
                 result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'width':width,'height':height},images=images)
             else:result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'steps':config['steps']})
             data=base64.b64decode(result['result']['image'],validate=True)
@@ -190,11 +195,11 @@ def generate(item,budget,config):
                 if not 0<w<=2048 or not 0<h<=2048:raise ValueError()
             estimate=5.37*input_tiles+26.05*math.ceil(w/512)*math.ceil(h/512) if images else 4.8*math.ceil(w/512)*math.ceil(h/512)+9.6*config['steps']
             state['estimated_neurons']+=estimate
-            state['reserved_neurons']+=max(0,estimate-reserve)
+            state['reserved_neurons']+=max(0,(math.ceil(2*estimate) if images else estimate)-reserve)
             try:state['observed_account_neurons']=free_usage()
             except Exception:state['usage_after_pending']=True
             budget.persist()
-            print('[cloudflare-art] '+json.dumps({'free_plan_verified':True,'model':model,'reference_images':len(images),'image_bytes':len(data),'estimated_neurons':estimate,'reserved_today':state['reserved_neurons'],'account_usage_observed':state['observed_account_neurons'],'actual_per_request_neurons':'NOT_EXPOSED_BY_IMAGE_RESPONSE'}),flush=True)
+            print('[cloudflare-art] '+json.dumps({'free_plan_verified':True,'model':model,'reference_images':len(images),'image_bytes':len(data),'estimated_neurons':estimate,'request_reservation':reserve,'reservation_basis':'PUBLISHED_REQUEST_TILES_X2_WITH_UNCHANGED_CEILING' if images else 'FIXED','reserved_today':state['reserved_neurons'],'account_usage_observed':state['observed_account_neurons'],'actual_per_request_neurons':'NOT_EXPOSED_BY_IMAGE_RESPONSE'}),flush=True)
             return data
         except GenerationPaused as exc:
             last_error=exc

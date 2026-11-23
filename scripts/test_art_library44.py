@@ -126,6 +126,13 @@ class ArtLibraryTests(unittest.TestCase):
                 self.assertNotIn('muted ochre, cream, deep green',prompt)
                 self.assertNotIn('Use all four',prompt)
             self.assertNotIn('Visible brushwork',cf.prompt(dict(items[0],genre='Конструктивизм')))
+            construct=cf.prompt(dict(items[0],genre='Конструктивизм'));self.assertIn('not an architectural visualization',construct);self.assertIn('image 0 (input_image_0)',construct)
+            self.assertIn(color.direction('Конструктивизм')['texture'],construct)
+            green=io.BytesIO();Image.new('RGB',(80,80),(30,140,40)).save(green,format='PNG')
+            green_prompt=cf.prompt(dict(items[0],palette=color.profile(green.getvalue())))
+            self.assertNotIn('reference has no dominant green field',green_prompt)
+            red_prompt=cf.prompt(dict(items[0],palette=a));self.assertIn('reference has no dominant green field',red_prompt)
+
 
     def test_targeted_repair_has_new_keys_but_preserves_two_images_and_all_text(self):
         from scripts.test_policy44 import issue,synthetic_art
@@ -208,7 +215,8 @@ class ArtLibraryTests(unittest.TestCase):
                 cf.generate(item,budget,dict(art.CONFIG,request_gap_seconds=0))
                 args,kwargs=api.call_args;self.assertTrue(args[0].endswith(cf.REFERENCE_MODEL));self.assertNotIn('steps',args[1]);self.assertEqual(len(kwargs['images']),1)
                 self.assertEqual(ledger['requests'],47);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
-                self.assertEqual(ledger['cloudflare_ai']['reserved_neurons'],256)
+                self.assertGreaterEqual(ledger['cloudflare_ai']['reserved_neurons'],2*(5.37+26.05*4))
+                self.assertLessEqual(ledger['cloudflare_ai']['reserved_neurons'],art.CONFIG['reserve_neurons_per_request'])
                 item['reference_images']=item['reference_images']*3
                 with self.assertRaisesRegex(RuntimeError,'ONE_REFERENCE'):cf.generate(item,budget,art.CONFIG)
                 self.assertEqual(api.call_count,1)

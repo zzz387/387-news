@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "maximum_tiles": 12,
-  "prompt_version": "387-art-single-reference-4",
+  "prompt_version": "387-art-single-reference-5",
   "provider": "cloudflare_workers_ai",
   "model": "@cf/black-forest-labs/flux-1-schnell",
   "free_tier_verified": false,
