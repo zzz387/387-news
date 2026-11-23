@@ -279,6 +279,10 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
                 item['prompt']=mosaic44.prompt(item)
             else:
                 for k in ('key','date','article_id','text_hash','prompt_version','description_hash','genre','ratio','protocol'):item[k]=prior[k]
+    if repair_legacy_images:
+        for item in items:
+            previous=next((obj for obj in sub['art44']['objects'].values() if obj.get('article_id')==item['article_id'] and obj.get('reference_images_sent')==1),None)
+            if previous:item['preferred_reference_id']=previous['selected_reference_id']
     sub['assembly_status44']='EDITORIAL_APPROVED'
     sub['art44']['approval']={'date':date,'manifest_hash':p.digest(data),'signature':p.digest([{'id':r['id'],'article':mosaic44.final_text(r['article'])} for r in rows])}
     if mosaic44.CONFIG.get('references_enabled') and date>=mosaic44.CONFIG.get('first_reference_issue','9999-12-31'):

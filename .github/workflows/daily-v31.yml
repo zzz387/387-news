@@ -777,7 +777,20 @@ jobs:
         if: ${{ steps.verify.outputs.verified == 'true' && (inputs.repair_legacy_images || (github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]'))) && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.targets > 0 && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.provider_status == 'READY' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').cloudflare_art.cooldown_until == 0 && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.repair_attempts < 4 && ((fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.stage == 'pilot' && !fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.pilot_ready) || (fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.stage == 'all' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.ready < fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.targets)) }}
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=backfill_issue_art -f preview=false -f target_date=2026-11-23 -f repair_legacy_images=true
+        run: |
+          # GitHub keeps one pending run per concurrency group. Never evict a
+          # queued daily production run to enqueue an artwork continuation.
+          pending=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?per_page=100" --jq '[.workflow_runs[] | select(.id != (env.GITHUB_RUN_ID | tonumber) and .path == ".github/workflows/daily-v31.yml" and .head_branch == "main" and .event != "pull_request" and (.status == "queued" or .status == "pending" or .status == "in_progress" or .status == "waiting"))] | length')
+          if [[ "$pending" != '0' ]]; then echo 'ART_REPAIR_YIELD_TO_PRODUCTION'; exit 0; fi
+          gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=backfill_issue_art -f preview=false -f target_date=2026-11-23 -f repair_legacy_images=true
+      - name: Hand completed artwork-only repair back to normal daily preparation
+        if: ${{ steps.verify.outputs.verified == 'true' && (inputs.repair_legacy_images || (github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]'))) && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.stage == 'all' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.targets > 0 && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.ready == fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.targets }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pending=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?per_page=100" --jq '[.workflow_runs[] | select(.id != (env.GITHUB_RUN_ID | tonumber) and .path == ".github/workflows/daily-v31.yml" and .head_branch == "main" and .event != "pull_request" and (.status == "queued" or .status == "pending" or .status == "in_progress" or .status == "waiting"))] | length')
+          if [[ "$pending" != '0' ]]; then echo 'DAILY_PREPARATION_ALREADY_QUEUED'; exit 0; fi
+          gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=run -f preview=false
       - name: Continue the next unpublished issue once after final-art rollout
         if: ${{ steps.verify.outputs.verified == 'true' && github.event_name == 'push' && (contains(github.event.head_commit.message, '[art-finalization]') || contains(github.event.head_commit.message, '[cf-art]')) }}
         env:
@@ -815,7 +828,7 @@ jobs:
   special-003-r:
     needs: [prepare, deploy, monitor]
     # Daily owns the shared mutex first; this call never holds or delays daily preparation.
-    if: ${{ always() && github.ref == 'refs/heads/main' && needs.prepare.result == 'success' && needs.monitor.outputs.verified == 'true' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' && !startsWith(inputs.phase, 'trial') && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.preview == false && (inputs.phase == 'run' || inputs.phase == 'resume'))) }}
+    if: ${{ always() && github.ref == 'refs/heads/main' && needs.prepare.result == 'success' && needs.monitor.outputs.verified == 'true' && vars.NEWS_AUTOMATION_V31_ENABLED == 'true' && vars.NEWS_RELEASE_APPROVED == 'true' && !inputs.repair_legacy_images && !(github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]')) && !startsWith(inputs.phase, 'trial') && (github.event_name == 'push' || github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.preview == false && (inputs.phase == 'run' || inputs.phase == 'resume'))) }}
     uses: ./.github/workflows/special-003-r.yml
     with:
       daily_run_used: ${{ fromJSON(needs.prepare.outputs.pipeline_status || '{"run_used":24}').run_used }}

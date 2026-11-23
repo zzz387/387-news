@@ -46,3 +46,12 @@ duplicates, while coarse dHash neighbours alone cannot discard distinct colors.
 Met fallback object seeds are verified Monet collection records (437133, 437112,
 437124, 437127, 437115, 437136); every API record must independently confirm artist,
 classification, public-domain rights, metadata and image bytes before admission.
+
+The first real one-image pilot revealed a signature-like corner mark. Prompt v2
+moves the unsigned/blank-corner requirement ahead of the subject; rejected trial
+objects remain in checkpoint history. A corrected prompt retains the previous
+selected reference for that article. Output dimensions now follow the planned
+aspect ratio using supported multiples of 16. Artwork-only pushes skip unrelated
+special-issue preparation. Before resuming, the workflow checks the main production
+queue so an art continuation cannot evict a queued daily run. A completed all-image
+repair hands control back to the ordinary daily preparation workflow.
