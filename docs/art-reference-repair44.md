@@ -101,3 +101,11 @@ do not disable or evade the provider's filter. Two previously accepted, visually
 reviewed v3 results are bound to their actual text hash, prompt version and WebP
 SHA; they are not discarded or relabelled v4. Review records disclose remaining
 ornament/texture limitations. The all-eleven atomic publication gate remains.
+
+A real runner response confirmed that `/json` returns a legacy Europeana Record
+DTO rather than the documented JSON-LD graph. Request the canonical item URI with
+`Accept: application/ld+json`; only an unsupported/technical representation may
+fall back to the documented `/xml` RDF representation. XML facts go through the
+same record-bound rights/media/thumbnail admission. HTTP 403, robots and other
+access failures never trigger this fallback. Gallery proof records actual old/new
+SHA values and prompt versions, and movement evidence points to its own catalogue.

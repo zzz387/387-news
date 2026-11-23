@@ -407,4 +407,19 @@ class ArtLibraryTests(unittest.TestCase):
                     self.assertEqual(art.prepare_items(state,items)['ready'],2)
                 self.assertEqual(state['art44']['objects'],before);self.assertEqual(state['art44']['rejected_keys'],{items[0]['key']:'CF_OUTPUT_REJECTED'})
 
+    def test_museum_canonical_negotiation_and_documented_rdf_fallback(self):
+        source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260'
+        rdf=('<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:edm="http://www.europeana.eu/schemas/edm/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:ore="http://www.openarchives.org/ore/terms/">\n<edm:ProvidedCHO rdf:about="SOURCE"><dc:title xml:lang="en">Linearism</dc:title><dc:creator xml:lang="en">Aleksandr Rodchenko</dc:creator><dc:date>1920</dc:date><dc:type xml:lang="en">Painting</dc:type><dc:subject xml:lang="en">Constructivism</dc:subject></edm:ProvidedCHO>\n<ore:Aggregation rdf:about="SOURCE/aggregation"><edm:aggregatedCHO rdf:resource="SOURCE"/><edm:rights rdf:resource="https://creativecommons.org/licenses/by-sa/4.0/"/><edm:object rdf:resource="https://www.searchculture.gr/aggregator/thumbnails/edm-record/momus/000179-1260"/></ore:Aggregation></rdf:RDF>').replace('SOURCE',source).encode()
+        work=lib.searchculture_xml(rdf,source,'Конструктивизм');self.assertTrue(lib.rights_valid(work));self.assertEqual(work['year'],'1920')
+        bad=rdf.replace(b'by-sa/4.0',b'by-nc/4.0');self.assertIsNone(lib.searchculture_xml(bad,source,'Конструктивизм'))
+        client=lib.Museum()
+        with patch.object(client,'get',side_effect=[b'{"about":"public-record","proxies":[]}',rdf]) as fetch:
+            self.assertEqual(client.linked_work(source,'Конструктивизм'),work)
+            self.assertEqual(fetch.call_args_list[0].args,(source,));self.assertEqual(fetch.call_args_list[0].kwargs['accept'],'application/ld+json')
+            self.assertEqual(fetch.call_args_list[1].args,(source+'/xml',));self.assertEqual(fetch.call_args_list[1].kwargs['accept'],'application/rdf+xml')
+        from urllib.error import HTTPError
+        with patch.object(client,'get',side_effect=HTTPError(source,403,'Forbidden',{},None)) as fetch:
+            with self.assertRaises(HTTPError):client.linked_work(source,'Конструктивизм')
+            self.assertEqual(fetch.call_count,1)
+
 if __name__=='__main__':unittest.main()
