@@ -142,6 +142,12 @@ PARIS_SEEDS={
  'Кубизм':{729:('Gris, Juan','Cubism — Juan Gris, Compotier; museum catalogue: Les chemins du cubisme')},
  'Романтизм':{160000895:('Delacroix','Romanticism — Eugène Delacroix, Salon de la Paix sketch; Petit Palais catalogue')},
  'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956,160025973,160025974,160025969,160025947)}}
+SMK_CUBIST_WORKS={'KMSr61':('Guitarspillersken','1926'),'KMSr162':('Opstilling','1916')}
+
+def curated_smk_cubist(identity,artist,title,year):
+    # Exact two documented paintings; never classify every work by an artist.
+    return artist=='Gris, Juan' and SMK_CUBIST_WORKS.get(identity)==(title,str(year))
+
 MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,)}
 
 def met_seed_work(row,identifier,genre):
@@ -347,7 +353,6 @@ class Museum:
                     license={'https://creativecommons.org/publicdomain/zero/1.0/':'CC0','https://creativecommons.org/publicdomain/mark/1.0/':'Public Domain Mark'}.get(rights)
                     if row.get('public_domain') is not True or not license:continue
                     evidence=' '.join(str(row.get(k) or '') for k in ('titles','techniques','styles','artwork_type','description','content_description','object_names'))
-                    if not genre_matches(genre,evidence):continue
                     media=str(row.get('techniques') or '')+' '+str(row.get('object_names') or '')+' '+str(row.get('artwork_type') or '')
                     if not re.search(r'(?i)\b(painting|drawing|print|collage|maleri|tegning|grafik|litografi|olie|akvarel|watercolor|oil|etching|radering|linocut|traesnit|træsnit|gouache)\b',media):continue
                     image=row.get('image_thumbnail')
@@ -358,6 +363,9 @@ class Museum:
                     year=next((r.get('period') or r.get('start') for r in dates if isinstance(r,dict)),None)
                     identity=row.get('object_number')
                     if not all((identity,title,artist,year)):continue
+                    if genre=='Кубизм' and curated_smk_cubist(identity,artist,title,year):
+                        evidence='Cubism — curated Juan Gris painting '+identity+'; '+evidence
+                    if not genre_matches(genre,evidence):continue
                     mid='smk:'+identity
                     if mid in self.known_ids:continue
                     self.known_ids.add(mid)

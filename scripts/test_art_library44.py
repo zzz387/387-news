@@ -98,6 +98,9 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertFalse(lib.genre_matches('Кубизм','Neo-Plasticism evolved from Cubism'))
         self.assertFalse(lib.genre_matches('Кубизм','Mondrian progressed from Cubism to an increasingly abstract style'))
         self.assertTrue(lib.genre_matches('Кубизм','A Cubist composition'))
+        self.assertTrue(lib.curated_smk_cubist('KMSr61','Gris, Juan','Guitarspillersken','1926'))
+        self.assertFalse(lib.curated_smk_cubist('KMSr61','Another artist','Guitarspillersken','1926'))
+        self.assertFalse(lib.curated_smk_cubist('KMSr162','Gris, Juan','Another work','1916'))
         self.assertFalse(lib.genre_matches('Кубизм','Cubo-Futurism is a distinct movement'))
         museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','artwork_type_title':'Painting','style_titles':['Impressionism'],'is_public_domain':True}]}
         with patch.object(museum,'get',return_value=json.dumps(data).encode()):
