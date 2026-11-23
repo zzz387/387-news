@@ -142,17 +142,21 @@ class Museum:
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
             query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial'}.get(genre,query)
-            url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
-            for row in json.loads(self.get(url))['data']:
-                tokens=' '.join(str(row.get(k) or '') for k in ('title','technique','description','culture','type','period'))
-                image=(row.get('images') or {}).get('web',{}).get('url')
-                if image and urlparse(image).hostname in self.blocked_hosts:break
-                if row.get('type') not in ('Painting','Drawing','Print'):continue
-                if row.get('share_license_status')!='CC0' or not image or not genre_matches(genre,tokens):continue
-                authors=row.get('creators') or [];artist='; '.join(str(a.get('description') or '') for a in authors if a.get('description'))
-                if not artist or not row.get('creation_date') or not row.get('title'):continue
-                yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],
-                    'source_url':row['url'],'license':'CC0','license_url':'https://www.clevelandart.org/open-access','image_url':image,'genre_evidence':tokens[:1000],'genre_id':genre_id(genre),'verified':True}
+            for page in range(start_page,start_page+2):
+                url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,'skip':(page-1)*60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
+                for row in json.loads(self.get(url))['data']:
+                    tokens=' '.join(str(row.get(k) or '') for k in ('title','technique','description','culture','type','period'))
+                    image=(row.get('images') or {}).get('web',{}).get('url')
+                    if image and urlparse(image).hostname in self.blocked_hosts:break
+                    if row.get('type') not in ('Painting','Drawing','Print'):continue
+                    if row.get('share_license_status')!='CC0' or not image or not genre_matches(genre,tokens):continue
+                    authors=row.get('creators') or [];artist='; '.join(str(a.get('description') or '') for a in authors if a.get('description'))
+                    if not artist or not row.get('creation_date') or not row.get('title'):continue
+                    mid='cma:'+str(row['id'])
+                    if mid in self.known_ids:continue
+                    self.known_ids.add(mid)
+                    yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],
+                        'source_url':row['url'],'license':'CC0','license_url':'https://www.clevelandart.org/open-access','image_url':image,'search_page':page,'genre_evidence':tokens[:1000],'genre_id':genre_id(genre),'verified':True}
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'cleveland','code':safe_code(exc)}),flush=True)
         # A third independent open collection, with a deliberately narrow curatorial
         # fallback: documented Monet paintings, not arbitrary search matches.
@@ -160,7 +164,9 @@ class Museum:
             try:
                 base='https://collectionapi.metmuseum.org/public/collection/v1/'
                 search=base.replace('/v1/','/v1.1/')+'search?'+urlencode({'q':'Claude Monet','artistOrCulture':'true','hasImages':'true','medium':'Paintings','offset':0,'limit':60})
-                ids=json.loads(self.get(search)).get('objectIDs') or []
+                found=json.loads(self.get(search));ids=found.get('objectIDs') or []
+                print('[art-museum-source] '+json.dumps({'museum':'met','response_keys':sorted(found),'records':len(ids)}),flush=True)
+                ids=list(dict.fromkeys(ids or [437133,437112,437124,437127,437115,437136]))
                 for identity in ids:
                     if 'met:'+str(identity) in self.known_ids:continue
                     if 'images.metmuseum.org' in self.blocked_hosts:break
@@ -177,27 +183,35 @@ class Museum:
         # Independent official open collection. Only explicit public-domain rights
         # and matching museum metadata are admitted; no API key or paid service.
         try:
-            query={'Конструктивизм':'konstruktivisme','Кубизм':'kubisme','Романтизм':'romantik'}.get(genre,GENRES[genre][1])
-            url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
-            payload=json.loads(self.get(url));items=payload.get('items')
-            if not isinstance(items,list):raise ValueError('ART_SOURCE_SCHEMA_INVALID')
-            print('[art-museum-source] '+json.dumps({'museum':'smk','technical_access':'verified','records':len(items)}),flush=True)
-            for row in items:
-                rights=row.get('rights_url','');license={'https://creativecommons.org/publicdomain/zero/1.0/':'CC0','https://creativecommons.org/publicdomain/mark/1.0/':'Public Domain Mark'}.get(rights)
-                if row.get('public_domain') is not True or not license:continue
-                evidence=' '.join(str(row.get(k) or '') for k in ('titles','techniques','styles','artwork_type','description','object_names'))
-                if not genre_matches(genre,evidence):continue
-                image=row.get('image_thumbnail')
-                if not image or urlparse(image).hostname not in HOSTS:continue
-                titles=row.get('titles') or [];production=row.get('production') or [];dates=row.get('production_dates') or []
-                title=next((r.get('title') for r in titles if isinstance(r,dict) and r.get('title')),None)
-                artist=next((r.get('creator') for r in production if isinstance(r,dict) and isinstance(r.get('creator'),str)),None)
-                year=next((r.get('period') or r.get('start') for r in dates if isinstance(r,dict)),None)
-                identity=row.get('object_number')
-                if not all((identity,title,artist,year)):continue
-                yield {'museum':'SMK — National Gallery of Denmark','museum_id':'smk:'+identity,'title':title,'artist':artist,'year':year,
-                    'source_url':url,'license':license,'license_url':'https://www.smk.dk/en/article/smk-open/','rights_evidence':rights,'public_domain':True,'image_url':image,
-                    'genre_evidence':evidence[:1000],'genre_id':genre_id(genre),'verified':True}
+            queries=list(dict.fromkeys((GENRES[genre][1],{'Конструктивизм':'konstruktivisme','Кубизм':'kubisme','Романтизм':'romantik'}.get(genre,GENRES[genre][1]))))
+            for query in queries:
+                url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
+                payload=json.loads(self.get(url));items=payload.get('items')
+                if not isinstance(items,list):raise ValueError('ART_SOURCE_SCHEMA_INVALID')
+                print('[art-museum-source] '+json.dumps({'museum':'smk','technical_access':'verified','records':len(items)}),flush=True)
+                for row in items:
+                    rights=row.get('rights_url') or row.get('rights') or '';rights=rights.replace('http://creativecommons.org/','https://creativecommons.org/') if isinstance(rights,str) else ''
+                    if rights=='https://creativecommons.org/share-your-work/public-domain/cc0/':rights='https://creativecommons.org/publicdomain/zero/1.0/'
+                    license={'https://creativecommons.org/publicdomain/zero/1.0/':'CC0','https://creativecommons.org/publicdomain/mark/1.0/':'Public Domain Mark'}.get(rights)
+                    if row.get('public_domain') is not True or not license:continue
+                    evidence=' '.join(str(row.get(k) or '') for k in ('titles','techniques','styles','artwork_type','description','content_description','object_names'))
+                    if not genre_matches(genre,evidence):continue
+                    media=str(row.get('techniques') or '')+' '+str(row.get('object_names') or '')+' '+str(row.get('artwork_type') or '')
+                    if not re.search(r'(?i)\b(painting|drawing|print|collage|maleri|tegning|grafik|litografi|olie|akvarel|watercolor|oil|etching|radering|linocut|traesnit|træsnit|gouache)\b',media):continue
+                    image=row.get('image_thumbnail')
+                    if not image or urlparse(image).hostname not in HOSTS:continue
+                    titles=row.get('titles') or [];production=row.get('production') or [];dates=row.get('production_dates') or row.get('production_date') or []
+                    title=next((r.get('title') for r in titles if isinstance(r,dict) and r.get('title')),None)
+                    artist=next((r.get('creator') for r in production if isinstance(r,dict) and isinstance(r.get('creator'),str)),None)
+                    year=next((r.get('period') or r.get('start') for r in dates if isinstance(r,dict)),None)
+                    identity=row.get('object_number')
+                    if not all((identity,title,artist,year)):continue
+                    mid='smk:'+identity
+                    if mid in self.known_ids:continue
+                    self.known_ids.add(mid)
+                    yield {'museum':'SMK — National Gallery of Denmark','museum_id':'smk:'+identity,'title':title,'artist':artist,'year':year,
+                        'source_url':url,'license':license,'license_url':'https://www.smk.dk/en/article/smk-open/','rights_evidence':rights,'public_domain':True,'image_url':image,
+                        'genre_evidence':evidence[:1000],'genre_id':genre_id(genre),'verified':True}
         except Exception as exc:print('[art-museum] '+json.dumps({'museum':'smk','code':safe_code(exc)}),flush=True)
 
 
@@ -224,10 +238,12 @@ def ingest(root,registry,work,raw,state,persist):
     with Image.open(io.BytesIO(data)) as check:
         gray=check.convert('L').resize((9,8));pixels=list(gray.getdata())
         visual_hash=sum((pixels[y*9+x]>pixels[y*9+x+1])<<(y*8+x) for y in range(8) for x in range(8))
-    if any(w.get('visual_hash') is not None and (int(w['visual_hash'])^visual_hash).bit_count()<=2 for w in registry['artworks'].values()):return None
+    # dHash alone conflates distinct flat-color/abstract works. Exact original/
+    # WebP hashes and normalized museum identity remain the blocking checks.
+    neighbours=[w['id'] for w in registry['artworks'].values() if w.get('visual_hash') is not None and (int(w['visual_hash'])^visual_hash).bit_count()<=2]
     if any(w['sha256']==checksum for w in registry['artworks'].values()):return None
     key=digest(identity(work).encode());path='assets/art/'+work['genre_id']+'/'+key+'.webp'
-    row=dict(work,id=key,path=path,sha256=checksum,original_sha256=original_hash,visual_hash=str(visual_hash),width=width,height=height,added_at=stamp())
+    row=dict(work,id=key,path=path,sha256=checksum,original_sha256=original_hash,visual_hash=str(visual_hash),perceptual_neighbours=neighbours,width=width,height=height,added_at=stamp())
     row.pop('image_url',None)
     registry['artworks'][key]=row
     state.setdefault('art_library44',{}).setdefault('objects',{})[key]=base64.b64encode(data).decode()
@@ -274,8 +290,10 @@ def prepare_sets(root,state,items,persist=lambda:None,discover=True,identity_ove
                     try:ingest(root,registry,work,client.get(work.pop('image_url')),state,persist)
                     except Exception as exc:
                         print('[art-reference] '+json.dumps({'genre':genre,'code':safe_code(exc)}),flush=True)
-                    row=assign(root,registry,issue,state['date'],genre,number,persist)
-                    if row:break
+                    used={i for group in registry['sets'].values() for i in group['artwork_ids']}
+                    pool=[w for w in registry['artworks'].values() if w['genre_id']==genre_id(genre) and w['id'] not in used]
+                    if len(pool)>=6:break
+                row=assign(root,registry,issue,state['date'],genre,number,persist)
             if row:result[genre]=row
         except Exception as exc:print('[art-reference] '+json.dumps({'genre':genre,'code':safe_code(exc)}),flush=True)
     state['art_library44']['deficits']=[g for g in genres if g not in result]

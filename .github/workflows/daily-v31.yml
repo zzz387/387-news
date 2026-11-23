@@ -773,6 +773,11 @@ jobs:
           path: ${{ runner.temp }}/editorial-composition43.json
           retention-days: 30
           if-no-files-found: warn
+      - name: Continue the explicitly authorized artwork repair (at most four runs per stage)
+        if: ${{ steps.verify.outputs.verified == 'true' && (inputs.repair_legacy_images || (github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]'))) && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.targets > 0 && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.provider_status == 'READY' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').cloudflare_art.cooldown_until == 0 && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.repair_attempts < 4 && ((fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.stage == 'pilot' && !fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.pilot_ready) || (fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.stage == 'all' && fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.ready < fromJSON(needs.prepare.outputs.pipeline_status || '{}').artwork_backfill.targets)) }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run daily-v31.yml --repo "$GITHUB_REPOSITORY" --ref main -f phase=backfill_issue_art -f preview=false -f target_date=2026-11-23 -f repair_legacy_images=true
       - name: Continue the next unpublished issue once after final-art rollout
         if: ${{ steps.verify.outputs.verified == 'true' && github.event_name == 'push' && (contains(github.event.head_commit.message, '[art-finalization]') || contains(github.event.head_commit.message, '[cf-art]')) }}
         env:

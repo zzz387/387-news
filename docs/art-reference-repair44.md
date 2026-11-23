@@ -35,3 +35,14 @@ Domain Mark rights URLs, complete attribution and matching movement metadata are
 accepted. Access/robots failures stay closed. License labels retain the actual
 CC0/PDM distinction. A real successful API response is logged separately from
 reference generation; an unavailable source never fabricates a candidate.
+
+Repair pilot discovery now requests only its three movements, retaining the other
+sets. Explicitly authorized repair runs can resume the same workflow at most four
+times per stage; completed pilot results stop for review, quota/provider pauses
+stop dispatch, and all completed images are reused. Actual SMK rights/date fields
+and two-dimensional media are checked. A bounded six-work pool permits meaningful
+color-diverse quartet selection; exact file hashes and museum identities block
+duplicates, while coarse dHash neighbours alone cannot discard distinct colors.
+Met fallback object seeds are verified Monet collection records (437133, 437112,
+437124, 437127, 437115, 437136); every API record must independently confirm artist,
+classification, public-domain rights, metadata and image bytes before admission.
