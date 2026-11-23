@@ -219,7 +219,7 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
                 'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
                 'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
             persist()  # Keep the first usable result even if its one color retry fails.
-            if item.get('color_match',{}).get('status')=='COLOR_MISMATCH' and not saved.setdefault('color_retries',{}).get(item['key']) and budget.remaining_seconds()>120:
+            if item.get('color_match',{}).get('status')=='COLOR_MISMATCH' and not saved.setdefault('color_retries',{}).get(item['key']) and budget.remaining_seconds()>120 and color_retry_available(state,items,budget):
                 saved['color_retries'][item['key']]=True;persist()
                 retry=dict(item,color_retry=True)
                 before_retry=budget.ledger.get('cloudflare_ai',{}).get('requests',0)
@@ -387,3 +387,14 @@ def art_caption(art):
         if art['artwork_license']!='https://creativecommons.org/licenses/by-sa/4.0/' or not art.get('reference_attribution') or not str(art.get('reference_source_url','')).startswith('https://www.searchculture.gr/aggregator/edm/momus/'):raise ValueError('ART_ATTRIBUTION_INVALID')
         text+=' · Музейный референс: <a href="'+escape(art['reference_source_url'],quote=True)+'">'+escape(art['reference_attribution'])+'</a>. Самостоятельная ИИ-композиция по референсу; <a rel="license" href="'+art['artwork_license']+'">CC BY-SA 4.0</a>.'
     return text
+
+
+def color_retry_available(state,items,budget):
+    """Keep enough of the unchanged free allowance for first-pass missing art."""
+    if CONFIG.get('provider')!='cloudflare_workers_ai':return budget.can_request()
+    saved=state['art44'];keys=saved.get('required_repair_keys') or [i['key'] for i in items]
+    missing=sum(not object_valid(saved['objects'].get(key,{})) for key in keys)
+    ledger=budget.ledger.get('cloudflare_ai',{});reserve=CONFIG.get('reserve_neurons_per_request',256)
+    observed=ledger.get('observed_account_neurons')
+    if not isinstance(observed,(int,float)):return False
+    return ledger.get('reserved_neurons',0)+(missing+1)*reserve<=CONFIG['image_neuron_budget'] and observed+(missing+1)*reserve<=10000-CONFIG.get('account_headroom',1500)
