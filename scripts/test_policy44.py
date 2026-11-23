@@ -37,6 +37,39 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_relaxed_topic_admission_boundaries_preserve_actual_deficits(self):
+        cases=[(13,(2,0,1),12,True,False),(11,(1,1,1),8,True,False),(12,(2,0,0),12,False,False),(10,(2,1,2),12,False,False),(8,(2,2,2),8,True,True),(15,(2,1,1),7,False,False),(13,(2,0,1),13,False,False)]
+        for n,groups,lights,allowed,strict in cases:
+            with self.subTest(main=n,groups=groups,lights=lights):
+                indexes=[i for base,count in zip((0,2,4),groups) for i in range(base,base+count)]
+                indexes+=list(range(6,6+n-len(indexes)))
+                rows=[main_row(i) for i in indexes];s=issue();s['brief_policy_revision']=2
+                report=v.standard(s,rows,[light_ready(i) for i in range(lights)])
+                self.assertEqual(report['topics'],dict(zip(v.GROUPS,groups)))
+                self.assertEqual(report['total_topic_deficit'],sum(max(0,2-count) for count in groups))
+                self.assertEqual(report['compliant'],allowed);self.assertEqual(report['strict_compliant'],strict)
+                if allowed and not strict:self.assertEqual(report['admission_reason'],'RELAXED_TOPIC_DEFICIT')
+                if not allowed:
+                    with self.assertRaisesRegex(Exception,'EDITORIAL_STANDARD_NOT_MET'):v.require(s,rows,[light_ready(i) for i in range(lights)])
+
+    def test_due_relaxed_issue_enters_delivery_without_stock_search_or_model_work(self):
+        from scripts import daily43 as daily,mosaic44,catalog43
+        rows=[main_row(i) for i in [0,1,4]+list(range(6,16))]
+        s=issue();s['brief_policy_revision']=2;s['candidates']=rows
+        with tempfile.TemporaryDirectory() as temp,patch.object(sel,'composition',return_value=rows),patch.object(catalog43,'refresh',side_effect=AssertionError('Do not search after due admission')),patch.object(stock43,'draw',side_effect=AssertionError('Do not add more accepted articles')),patch.object(news,'gemini',side_effect=AssertionError('Do not rewrite')),patch.object(mosaic44,'finalize',return_value=True) as final:
+            self.assertTrue(daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW))
+            final.assert_called_once();self.assertEqual(s['editorial_standard44']['admission_reason'],'RELAXED_TOPIC_DEFICIT')
+            self.assertEqual(s['editorial_standard44']['topics'],{'family':2,'health':0,'sport':1})
+            self.assertEqual(len(s['articles']),13)
+
+    def test_before_release_relaxed_issue_still_attempts_strict_search(self):
+        from scripts import daily43 as daily,catalog43,priorities43,mosaic44
+        rows=[main_row(i) for i in [0,1,4]+list(range(6,16))]
+        s=issue();s['brief_policy_revision']=2;s['candidates']=rows
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='true'),patch.object(sel,'composition',return_value=rows),patch.object(stock43,'restore_backlog'),patch.object(stock43,'balance'),patch.object(stock43,'draw'),patch.object(stock43,'draw_light'),patch.object(daily,'discover'),patch.object(priorities43,'apply_rules'),patch.object(catalog43,'refresh',side_effect=RuntimeError('bounded fixture search')) as search,patch.object(mosaic44,'finalize',return_value=False):
+            daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5))
+            search.assert_called_once()
+
     def test_flux_prompt_uses_english_subject_before_long_russian_prose(self):
         from scripts import cloudflare44 as cf,mosaic44 as art
         row=main_row(0);before=art.final_text(row['article'])

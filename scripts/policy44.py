@@ -60,9 +60,15 @@ def standard(state,rows=None,notes=None):
     modern=state.get('brief_policy_revision',2)>=2
     from scripts import brief_selection44
     invalid=modern and (len(notes)>12 or any(brief_selection44.excluded(r) for r in notes))
+    total=sum(deficits.values());light_ok=len(notes)>=8 and not invalid
+    strict=len(rows)>=8 and total==0 and light_ok
+    relaxed=len(rows)>=11 and total<=3 and light_ok
+    reason='STRICT_EDITORIAL_STANDARD' if strict else 'RELAXED_TOPIC_DEFICIT' if relaxed else 'EDITORIAL_DEFICIT'
     return {'policy_version':'4.4','main_articles':len(rows),'topics':groups,'main_deficit':max(0,8-len(rows)),
-        'topic_deficits':deficits,'light_notes':len(notes),'light_deficit':max(0,8-len(notes)),
-        'compliant':len(rows)>=8 and not any(deficits.values()) and len(notes)>=8 and not invalid}
+        'topic_deficits':deficits,'total_topic_deficit':total,'light_notes':len(notes),'light_deficit':max(0,8-len(notes)),
+        'light_compliant':light_ok,'strict_compliant':strict,'relaxed_compliant':relaxed,
+        'admission_reason':reason,'admission_status':'STRICT_EDITORIAL_APPROVED' if strict else 'RELAXED_EDITORIAL_APPROVED' if relaxed else 'EDITORIAL_DEFICIT',
+        'compliant':strict or relaxed}
 
 def require(state,rows=None,notes=None):
     result=standard(state,rows,notes)

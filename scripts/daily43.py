@@ -76,7 +76,13 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     release=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
     if policy44.active(state):
         from scripts import mosaic44
-        if mosaic44.approval_valid(state) and policy44.standard(state)['compliant']:
+        selected=selection43.composition(state);admission=policy44.standard(state,selected)
+        if admission['compliant'] and (current>=release or (mosaic44.approval_valid(state) and admission['strict_compliant'])):
+            # Due delivery uses accepted texts immediately, before stock/search/model work.
+            state['selected_ids']=[r['id'] for r in selected];state['articles']={r['id']:r['article'] for r in selected}
+            state['editorial_standard44']=admission
+            print('[editorial-standard44] '+json.dumps(admission),flush=True)
+            mosaic44.approve(state)
             return mosaic44.finalize(state,root,persist,clock,release,preview,allow_request=not delivery_only,allow_wait=now is None)
     budget=news.runtime.ACTIVE_BUDGET
     minimum=e.CONFIG['minimum_articles']
@@ -87,7 +93,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
     stock43.draw_light(state,root)
     due=current>=release-timedelta(minutes=10)
     active44=policy44.active(state)
-    short=not policy44.standard(state)['compliant'] if active44 else len(selection43.composition(state))<minimum
+    short=not policy44.standard(state)['strict_compliant' if current<release else 'compliant'] if active44 else len(selection43.composition(state))<minimum
     if short:
         state['audit_passed']=False
         pipeline.status(state,'PREPARING','continue_until_minimum','MINIMUM_ARTICLES_NOT_MET')
@@ -123,7 +129,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         attempted_ids=set();extra_searches=0
         while True:
             stock43.balance(state,root,clock())
-            if due and len(selection43.composition(state))>=minimum and (not active44 or policy44.standard(state)['compliant']):break
+            if due and len(selection43.composition(state))>=minimum and (not active44 or policy44.standard(state)['strict_compliant' if clock()<release else 'compliant']):break
             banking=len(selection43.composition(state))>=e.CONFIG['article_target'] and (not active44 or all(n>=2 for n in policy44.counts(selection43.composition(state)).values()))
             main_groups={g:sum(priorities43.classify(r)['group']==g for r in selection43.composition(state)) for g in ('A','C')}
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
@@ -159,7 +165,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             attempted_ids.add(record['id'])
             count=len(selection43.composition(state))
             banking=count>=e.CONFIG['article_target'] and (all(n>=2 for n in policy44.counts(selection43.composition(state)).values()) if active44 else main_groups.get(priorities43.classify(record)['group'],2)>=2)
-            if due and count>=minimum and (not active44 or policy44.standard(state)['compliant']):break
+            if due and count>=minimum and (not active44 or policy44.standard(state)['strict_compliant' if clock()<release else 'compliant']):break
             if banking and len(stock43.available(state,date))>=e.CONFIG.get('article_stock_target',20):
                 stock_needed={g for g,n in policy44.counts(stock43.available(state,date)).items() if n<2}
                 if not (active44 and policy44.subject(record) in stock_needed):break
