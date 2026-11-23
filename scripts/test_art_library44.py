@@ -96,12 +96,69 @@ class ArtLibraryTests(unittest.TestCase):
         with patch.object(museum,'get',return_value=json.dumps(data).encode()):
             work=next(museum.candidates('Импрессионизм'));self.assertEqual(work['license'],'CC0');self.assertEqual(work['genre_id'],'impressionism')
         with self.assertRaisesRegex(ValueError,'HOST'):museum.get('https://attacker.invalid/image.webp')
-    def test_real_multipart_has_four_separate_binary_image_parts(self):
-        images=[picture(i) for i in range(4)]
+    def test_color_profiles_selection_and_style_instructions_are_deterministic(self):
+        from scripts import art_reference44 as color
+        red=io.BytesIO();Image.new('RGB',(80,80),(200,35,20)).save(red,format='PNG')
+        blue=io.BytesIO();Image.new('RGB',(80,80),(15,60,210)).save(blue,format='PNG')
+        a=color.profile(red.getvalue());b=color.profile(blue.getvalue())
+        self.assertEqual(color.compare(a,a)['status'],'COLOR_MATCH_OK')
+        self.assertEqual(color.compare(a,b)['status'],'COLOR_MISMATCH')
+        self.assertGreater(color.distance(a,b),50);self.assertEqual(a['dominant'],['#c82314'])
+        with tempfile.TemporaryDirectory() as temp:
+            state=self.stock(temp,4);items=self.items(5);sets=lib.prepare_sets(temp,state,items,discover=False)
+            lib.attach(temp,state,items,sets);selected=[i['selected_reference_id'] for i in items]
+            lib.attach(temp,state,items,sets);self.assertEqual(selected,[i['selected_reference_id'] for i in items])
+            self.assertEqual(len(sets['Импрессионизм']['artwork_ids']),4)
+            self.assertTrue(all(len(i['reference_images'])==1 and i['reference_images_sent']==1 for i in items))
+            self.assertTrue(all(i['selected_reference_id'] in i['reference_artwork_ids'] for i in items))
+            for genre in ('Импрессионизм','Конструктивизм','Ар-нуво'):
+                item=dict(items[0],genre=genre);prompt=cf.prompt(item)
+                self.assertIn('single attached',prompt);self.assertIn(color.direction(genre)['characteristics'],prompt)
+                self.assertNotIn('muted ochre, cream, deep green',prompt)
+                self.assertNotIn('Use all four',prompt)
+            self.assertNotIn('Visible brushwork',cf.prompt(dict(items[0],genre='Конструктивизм')))
+
+    def test_targeted_repair_has_new_keys_but_preserves_two_images_and_all_text(self):
+        from scripts.test_policy44 import issue,synthetic_art
+        from scripts.test_daily43 import root as site_root
+        from scripts import publication43 as pub,art_reference44 as color
+        from scripts import generation_runtime as runtime
+        with tempfile.TemporaryDirectory() as temp:
+            target=site_root(temp);s=issue(13,12);s['date']='2026-11-23';s['brief_policy_revision']=2
+            s['art_library44']=self.stock(target,4)['art_library44'];styles={key:['Импрессионизм'] for key in art.STYLES}
+            old_config=dict(art.CONFIG,prompt_version='387-art-cloudflare-5',references_enabled=False)
+            with patch.object(art,'STYLES',styles),patch.object(art,'CONFIG',old_config),patch.object(pub.news,'get_next_number',return_value=29):
+                synthetic_art(s)
+                for index,obj in enumerate(s['art44']['objects'].values()):obj['model']=cf.REFERENCE_MODEL if index in (2,5) else cf.MODEL
+                pub.build(s,target)
+            before=pub.metadata(target,s['date']);originals={r['article_slug']:r for r in before['illustrations']}
+            texts={p:p.read_bytes() for p in (target/'issues'/s['date']).rglob('*.md')}
+            config=dict(art.CONFIG,repair_legacy_art=dict(art.CONFIG['repair_legacy_art'],stage='pilot'))
+            budget=type('Budget',(),{'ledger':{},'remaining_seconds':lambda self:1000})()
+            n=[500]
+            def generate(item,budget):n[0]+=1;return picture(n[0])
+            later={'date':s['date'],'art_library44':s['art_library44']}
+            with patch.object(art.p,'ROOT',target),patch.object(art,'CONFIG',config),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget),patch.object(lib.Museum,'get',side_effect=AssertionError('Use the same museum set')),patch.object(art,'generate',side_effect=generate) as calls,patch.object(color,'compare',return_value={'status':'COLOR_MATCH_OK','lab_distance':0}):
+                self.assertFalse(pub.backfill_issue_art(target,s['date'],later,repair_legacy_images=True));self.assertEqual(calls.call_count,3)
+                self.assertEqual(pub.metadata(target,s['date']),before)
+                config['repair_legacy_art']['stage']='all'
+                self.assertTrue(pub.backfill_issue_art(target,s['date'],later,repair_legacy_images=True));self.assertEqual(calls.call_count,11)
+                after=pub.metadata(target,s['date'])
+                for image in after['illustrations']:
+                    old=originals[image['article_slug']]
+                    if old['model']==cf.REFERENCE_MODEL:self.assertEqual(image,old)
+                    else:
+                        self.assertNotEqual(image['path'],old['path']);self.assertEqual(image['text_hash'],old['text_hash']);self.assertEqual(image['article_id'],old['article_id'])
+                        self.assertEqual(image['reference_images_sent'],1);self.assertEqual(image['model'],cf.REFERENCE_MODEL)
+                self.assertFalse(pub.backfill_issue_art(target,s['date'],later,repair_legacy_images=True));self.assertEqual(calls.call_count,11)
+            self.assertTrue(all(p.read_bytes()==content for p,content in texts.items()))
+
+    def test_real_multipart_sends_one_selected_binary_image_part(self):
+        images=[picture(0)]
         raw,content=cf.multipart_payload({'prompt':'Different subject','width':1024,'height':768},images)
         message=BytesParser(policy=default).parsebytes(('Content-Type: '+content+'\r\n\r\n').encode()+raw)
         parts=list(message.iter_parts());files=[p for p in parts if p.get_filename()]
-        self.assertEqual([p.get_param('name',header='content-disposition') for p in files],['input_image_'+str(i) for i in range(4)])
+        self.assertEqual([p.get_param('name',header='content-disposition') for p in files],['input_image_0'])
         self.assertEqual([p.get_payload(decode=True) for p in files],images)
     def test_reference_inference_keeps_shared_free_ledger_and_uses_klein(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -111,11 +168,11 @@ class ArtLibraryTests(unittest.TestCase):
             env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
             with patch.dict(os.environ,env),patch.object(art.p,'ROOT',Path(temp)),patch.object(cf,'free_usage',return_value=200),patch.object(cf,'api',return_value={'result':{'image':base64.b64encode(picture(99)).decode()}}) as api,patch.object(cf,'_LAST',0):
                 cf.generate(item,budget,dict(art.CONFIG,request_gap_seconds=0))
-                args,kwargs=api.call_args;self.assertTrue(args[0].endswith(cf.REFERENCE_MODEL));self.assertNotIn('steps',args[1]);self.assertEqual(len(kwargs['images']),4)
+                args,kwargs=api.call_args;self.assertTrue(args[0].endswith(cf.REFERENCE_MODEL));self.assertNotIn('steps',args[1]);self.assertEqual(len(kwargs['images']),1)
                 self.assertEqual(ledger['requests'],47);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
                 self.assertEqual(ledger['cloudflare_ai']['reserved_neurons'],256)
-                item['reference_images']=item['reference_images'][:3]
-                with self.assertRaisesRegex(RuntimeError,'FOUR_REFERENCES'):cf.generate(item,budget,art.CONFIG)
+                item['reference_images']=item['reference_images']*3
+                with self.assertRaisesRegex(RuntimeError,'ONE_REFERENCE'):cf.generate(item,budget,art.CONFIG)
                 self.assertEqual(api.call_count,1)
     def test_partial_illustration_resume_reuses_three_objects_and_one_quartet(self):
         from scripts.test_policy44 import main_row
@@ -208,7 +265,7 @@ class ArtLibraryTests(unittest.TestCase):
             with patch.object(art.p,'ROOT',target),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget),patch.object(lib.Museum,'get',side_effect=AssertionError('Do not search another quartet')),patch.object(art,'generate',return_value=picture(888)) as generate:
                 self.assertTrue(pub.backfill_issue_art(target,s['date'],later))
                 generate.assert_called_once();item=generate.call_args.args[0]
-                self.assertEqual(item['reference_set_id'],'2026-11-23/impressionism');self.assertEqual(len(item['reference_images']),4)
+                self.assertEqual(item['reference_set_id'],'2026-11-23/impressionism');self.assertEqual(len(item['reference_images']),1)
                 self.assertEqual(pub.validate(target,s['date'])['art44']['ready'],8)
 
     def test_pages_keep_original_proportions_sources_and_issue_grouping(self):

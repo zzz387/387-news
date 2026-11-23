@@ -210,7 +210,13 @@ def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None)
     used={i for row in registry['sets'].values() for i in row['artwork_ids']}
     available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w)]
     if len(available)<4:return None
-    selected=available[:4]
+    from scripts import art_reference44 as color
+    profiles={w['id']:color.work_profile(root,w,{}) for w in available}
+    selected=[available[0]]
+    while len(selected)<4:
+        remaining=[w for w in available if w not in selected]
+        chosen=min(remaining,key=lambda w:(-min(color.distance(profiles[w['id']],profiles[q['id']]) for q in selected),w['id']))
+        selected.append(chosen)
     row={'id':key,'issue_id':issue,'issue_date':issue_date,'issue_number':number,'genre_id':gid,'genre':genre,'artwork_ids':[w['id'] for w in selected],
         'selected_at':stamp(),'verification_status':'VERIFIED','assignment_status':'ASSIGNED','status':'READY','sha256':[w['sha256'] for w in selected]}
     registry['sets'][key]=row;persist();return row
@@ -219,10 +225,14 @@ def prepare_sets(root,state,items,persist=lambda:None,discover=True,identity_ove
     registry=restore(root,state);issue=identity_override or issue_id(state);result={};client=Museum()
     client.known_ids={w['museum_id'] for w in registry['artworks'].values()}
     genres=list(dict.fromkeys(item['genre'] for item in items))
+    attempts=state['art_library44'].setdefault('discovery_attempts',{})
+    genres.sort(key=lambda g:attempts.get(issue+'/'+genre_id(g),''))
     for genre in genres:
         try:
             row=assign(root,registry,issue,state['date'],genre,number,persist)
             if row is None and discover:
+                if client.left<=0 or time.monotonic()>=client.deadline:continue
+                attempts[issue+'/'+genre_id(genre)]=stamp()
                 start_page=max((w.get('search_page',1) for w in registry['artworks'].values() if w['genre_id']==genre_id(genre)),default=1)
                 for work in client.candidates(genre,start_page=start_page):
                     if client.left<=0 or time.monotonic()>=client.deadline:break
@@ -240,13 +250,18 @@ def prepare_sets(root,state,items,persist=lambda:None,discover=True,identity_ove
     return result
 
 def attach(root,state,items,sets):
-    registry=load(root,state)
+    from scripts import art_reference44 as color
+    registry=load(root,state);previous=[]
     for item in items:
         row=sets.get(item['genre'])
-        item['reference_status']='FOUR_REFERENCES_READY' if row else 'REFERENCE_SET_UNAVAILABLE'
+        item['reference_status']='REFERENCE_SET_UNAVAILABLE'
         if not row:continue
-        item['reference_set_id']=row['id'];item['reference_artwork_ids']=row['artwork_ids'];item['reference_sha256']=row['sha256']
-        item['reference_images']=[{'path':registry['artworks'][i]['path'],'sha256':registry['artworks'][i]['sha256']} for i in row['artwork_ids']]
+        work,choice=color.select(root,state,item,row,registry,previous)
+        item.update({k:v for k,v in choice.items() if k!='sha256'})
+        item.update(reference_status='ONE_REFERENCE_READY',reference_set_id=row['id'],reference_artwork_ids=row['artwork_ids'],reference_sha256=row['sha256'],reference_images_sent=1)
+        item['reference_images']=[{'path':work['path'],'sha256':work['sha256']}]
+        item.update({k:color.direction(item['genre'])[k] for k in ('art_movement','medium')})
+        previous.append(choice['palette'])
     return items
 
 def render(root,registry):
@@ -285,7 +300,7 @@ def render(root,registry):
     (target/'index.html').write_text(page('Искусство','/art/',body))
     if registry['studies'] or any(s['issue_id'].startswith('art-study-') for s in registry['sets'].values()):
         body='<p>Технические художественные пробы на основе уже опубликованных статей. Это не новый выпуск газеты.</p><div class="art-gallery">'
-        for row in registry['studies'].values():body+='<figure><img src="/'+row['path']+'" width="'+str(row['width'])+'" height="'+str(row['height'])+'" alt="'+escape(row['title'],quote=True)+'"><figcaption>'+escape(row['title'])+'<p>Четыре музейных референса · '+escape(row['reference_set_id'])+' · <a href="'+row['article_url']+'">Статья</a></p></figcaption></figure>'
+        for row in registry['studies'].values():body+='<figure><img src="/'+row['path']+'" width="'+str(row['width'])+'" height="'+str(row['height'])+'" alt="'+escape(row['title'],quote=True)+'"><figcaption>'+escape(row['title'])+'<p>'+('Один выбранный музейный референс' if row.get('reference_images_sent')==1 else 'Четыре музейных референса')+' · '+escape(row['reference_set_id'])+' · <a href="'+row['article_url']+'">Статья</a></p></figcaption></figure>'
         folder=target/'studies';folder.mkdir(exist_ok=True);(folder/'index.html').write_text(page('Художественная мастерская','/art/studies/',body+'</div>'))
 
 def rollout(root,date,state,persist):
@@ -309,7 +324,7 @@ def rollout(root,date,state,persist):
         raw=a.generate(item,news.runtime.ACTIVE_BUDGET);encoded,w,h=a.encode_image(raw)
         key=item['key'];path='assets/illustrations/'+study+'/'+key+'.webp'
         row={'key':key,'path':path,'width':w,'height':h,'sha256':digest(encoded),'title':item['descriptor']['title'],'article_url':'/issues/'+date+'/articles/'+item['article_id'].split('/')[-1]+'/',
-            'reference_set_id':item['reference_set_id'],'reference_artwork_ids':item['reference_artwork_ids'],'reference_sha256':item['reference_sha256'],'model':a.CONFIG['reference_model'],'created_at':stamp()}
+            'reference_images_sent':1,'selected_reference_id':item['selected_reference_id'],'reference_set_id':item['reference_set_id'],'reference_artwork_ids':item['reference_artwork_ids'],'reference_sha256':item['reference_sha256'],'model':a.CONFIG['reference_model'],'created_at':stamp()}
         if any(study['sha256']==row['sha256'] for study in registry['studies'].values()):raise ValueError('ART_STUDY_NOT_UNIQUE')
         registry['studies'][key]=row
         state['art_library44'].setdefault('study_objects',{})[key]=base64.b64encode(encoded).decode();persist()
@@ -322,7 +337,7 @@ def rollout(root,date,state,persist):
     render(root,registry)
     from scripts import layout43
     (Path(root)/'index.html').write_text(layout43.homepage((Path(root)/'issues'/date/'index.html').read_text(),date))
-    print('[art-library-rollout] '+json.dumps({'artworks':len(registry['artworks']),'sets':len(registry['sets']),'real_studies':len(registry['studies']),'references_per_request':4 if registry['studies'] else 0,'archives_unchanged':True}),flush=True)
+    print('[art-library-rollout] '+json.dumps({'artworks':len(registry['artworks']),'sets':len(registry['sets']),'real_studies':len(registry['studies']),'references_per_request':1 if registry['studies'] else 0,'archives_unchanged':True}),flush=True)
     return True
 
 def check_browser(root,output):
@@ -367,7 +382,7 @@ def merge_checkpoint(state,incoming):
         for key,row in incoming.get('registry',{}).get(section,{}).items():
             if key in registry[section] and registry[section][key]!=row:raise ValueError('ART_REGISTRY_CONFLICT')
             registry[section][key]=json.loads(json.dumps(row))
-    for section in ('objects','study_objects'):
+    for section in ('objects','study_objects','reference_choices','color_profiles'):
         for key,data in incoming.get(section,{}).items():
             previous=target.setdefault(section,{}).get(key)
             if previous is not None and previous!=data:raise ValueError('ART_CACHE_CONFLICT')
@@ -388,6 +403,7 @@ def checkpoint(state,root):
     value=state.get('art_library44',{})
     if not value:return {}
     saved={'registry':json.loads(json.dumps(value.get('registry',empty()))),'objects':{},'study_objects':{}}
+    for section in ('reference_choices','color_profiles'):saved[section]=json.loads(json.dumps(value.get(section,{})))
     tracked=checkpoint.tracked(str(Path(root).resolve()))
     for key,data in value.get('objects',{}).items():
         work=saved['registry']['artworks'].get(key)

@@ -1,0 +1,593 @@
+{
+  "selection_version": "387-reference-selection-1",
+  "selection_weights": {
+    "meaning": 0.7,
+    "diversity": 0.3
+  },
+  "color_thresholds": {
+    "ok": 16,
+    "warning": 30
+  },
+  "directions": {
+    "Импрессионизм": {
+      "art_movement": "impressionism",
+      "medium": "oil painting",
+      "characteristics": "Visible broken brushstrokes; natural changing light, optical color mixing and spatial atmosphere.",
+      "composition": "Asymmetric observed grouping",
+      "space": "Atmospheric depth",
+      "line": "Broken optical edges",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Observed daylight",
+      "texture": "Visible separated pigment marks",
+      "abstraction": "Optical rather than schematic",
+      "techniques": [
+        "oil painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Футуризм": {
+      "art_movement": "futurism",
+      "medium": "painting",
+      "characteristics": "Intersecting dynamic forms, rhythmic repetition, simultaneous viewpoints and directional movement.",
+      "composition": "Directional rhythmic movement",
+      "space": "Intersecting simultaneous space",
+      "line": "Dynamic repeated contours",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Rhythmic luminous planes",
+      "texture": "Energetic directional marks",
+      "abstraction": "Motion-based transformation",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Кубизм": {
+      "art_movement": "cubism",
+      "medium": "painting",
+      "characteristics": "Geometric decomposition, multiple viewpoints and interlocking shallow planes; no glossy 3D rendering.",
+      "composition": "Interlocking fractured planes",
+      "space": "Simultaneous shallow viewpoints",
+      "line": "Angular structural boundaries",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Plane-based tonal shifts",
+      "texture": "Faceted material planes",
+      "abstraction": "Analytical geometric transformation",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Конструктивизм": {
+      "art_movement": "constructivism",
+      "medium": "graphic composition",
+      "characteristics": "Functional geometry, structural axes, sharply organized planes and economical flat forms; no impasto brushwork.",
+      "composition": "Structural diagonal axes",
+      "space": "Flat organized planes",
+      "line": "Precise geometric edges",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Graphic tonal organization",
+      "texture": "Flat printed or matte surfaces",
+      "abstraction": "High formal abstraction",
+      "techniques": [
+        "graphic composition"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Ар-нуво": {
+      "art_movement": "art nouveau",
+      "medium": "decorative painting",
+      "characteristics": "Flowing contours, organic ornament, botanical rhythms and integrated flat decorative space.",
+      "composition": "Organic integrated ornament",
+      "space": "Decorative shallow space",
+      "line": "Flowing botanical contours",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Unified decorative light",
+      "texture": "Decorative painted or printed surface",
+      "abstraction": "Stylized organic forms",
+      "techniques": [
+        "decorative painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Символизм": {
+      "art_movement": "symbolism",
+      "medium": "painting",
+      "characteristics": "Layered visual metaphors, meaningful forms, nonliteral space and contemplative atmosphere.",
+      "composition": "Meaningful metaphorical grouping",
+      "space": "Nonliteral contemplative space",
+      "line": "Expressive image-bearing contours",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Atmosphere supports metaphor",
+      "texture": "Follow reference surface",
+      "abstraction": "Purposeful symbolic stylization",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Романтизм": {
+      "art_movement": "romanticism",
+      "medium": "oil painting",
+      "characteristics": "Emotional scale, atmospheric depth and dramatic light serving the subject.",
+      "composition": "Emotional scale and grouping",
+      "space": "Atmospheric distance",
+      "line": "Expressive rather than mechanical edges",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Dramatic coherent illumination",
+      "texture": "Follow reference paint handling",
+      "abstraction": "Expressive observed forms",
+      "techniques": [
+        "oil painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Японская гравюра": {
+      "art_movement": "ukiyo-e",
+      "medium": "woodblock print",
+      "characteristics": "Flat color planes, confident contours, asymmetry and deliberate negative space; no oil impasto.",
+      "composition": "Asymmetry and negative space",
+      "space": "Deliberately flattened space",
+      "line": "Confident printed outlines",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Graphic distribution of light",
+      "texture": "Woodblock surface and flat planes",
+      "abstraction": "Stylized planar forms",
+      "techniques": [
+        "woodblock print"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Ар-деко": {
+      "art_movement": "art deco",
+      "medium": "graphic painting",
+      "characteristics": "Streamlined geometry, stepped forms, elegant angular rhythm and clean organized shapes.",
+      "composition": "Stepped streamlined organization",
+      "space": "Elegant organized planes",
+      "line": "Clean angular contours",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Sculptural graphic tonal structure",
+      "texture": "Controlled graphic finish",
+      "abstraction": "Streamlined stylization",
+      "techniques": [
+        "graphic painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Коллаж": {
+      "art_movement": "collage",
+      "medium": "cut-paper collage",
+      "characteristics": "Layered cut edges, visible paper surfaces, discontinuous scale and deliberate juxtaposition; no plastic 3D effects.",
+      "composition": "Meaningful juxtaposition",
+      "space": "Layered discontinuous space",
+      "line": "Visible cut paper edges",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Coherent tonal grouping",
+      "texture": "Actual paper layering",
+      "abstraction": "Deliberate changes of scale",
+      "techniques": [
+        "cut-paper collage"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Индустриальная графика": {
+      "art_movement": "industrial graphic art",
+      "medium": "ink and print",
+      "characteristics": "Precise structural lines, machine rhythms, material cross-sections and strong graphic negative space.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "ink and print"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Акварель": {
+      "art_movement": "reference-defined movement",
+      "medium": "watercolor",
+      "characteristics": "Transparent washes, paper luminosity, fluid edges and layered pigment; no thick oil impasto.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "watercolor"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Масло": {
+      "art_movement": "reference-defined movement",
+      "medium": "oil painting",
+      "characteristics": "Use the selected painting’s spatial language and paint handling; material alone is not a movement.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "oil painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Темпера": {
+      "art_movement": "reference-defined movement",
+      "medium": "tempera",
+      "characteristics": "Matte opaque layers and controlled line; follow reference conventions.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "tempera"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Офорт": {
+      "art_movement": "reference-defined movement",
+      "medium": "etching",
+      "characteristics": "Incised fine line, cross-hatching, plate tone and paper space; no generic painted brushwork.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "etching"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Графика тушью": {
+      "art_movement": "reference-defined movement",
+      "medium": "ink drawing",
+      "characteristics": "Expressive contour, economical tonal marks and purposeful negative space.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "ink drawing"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Пастель": {
+      "art_movement": "reference-defined movement",
+      "medium": "pastel",
+      "characteristics": "Soft dry-pigment edges, layered strokes and paper grain.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "pastel"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Натурализм": {
+      "art_movement": "naturalism",
+      "medium": "painting",
+      "characteristics": "Observed organic forms, plausible scale, natural illumination and coherent spatial depth.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Сюрреализм": {
+      "art_movement": "surrealism",
+      "medium": "painting",
+      "characteristics": "Unexpected meaningful juxtapositions and coherent dreamlike space; avoid arbitrary decorative objects.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Метафизическая живопись": {
+      "art_movement": "metaphysical painting",
+      "medium": "painting",
+      "characteristics": "Quiet architectural space, deliberate perspective and contemplative symbolic relationships.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Экспрессионизм": {
+      "art_movement": "expressionism",
+      "medium": "painting",
+      "characteristics": "Expressive distortion, emphatic rhythm and emotionally purposeful marks.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Минималистичная живопись": {
+      "art_movement": "minimalism",
+      "medium": "painting",
+      "characteristics": "Economical shapes, restrained visual information and active negative space.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Плакатная графика": {
+      "art_movement": "poster art",
+      "medium": "print",
+      "characteristics": "Clear silhouettes, emphatic hierarchy and flat printable forms without typography.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "print"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Историческая живопись": {
+      "art_movement": "reference-defined movement",
+      "medium": "history painting",
+      "characteristics": "Narrative grouping and historically plausible objects; avoid invented documentary claims.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "history painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Линогравюра": {
+      "art_movement": "reference-defined movement",
+      "medium": "linocut",
+      "characteristics": "Carved edges, graphic rhythm and bold negative shapes.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "linocut"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Ботаническая живопись": {
+      "art_movement": "botanical art",
+      "medium": "painting",
+      "characteristics": "Observed plant structure and precise organic form with careful spatial arrangement.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Абстракционизм": {
+      "art_movement": "abstract art",
+      "medium": "painting",
+      "characteristics": "Purposeful nonliteral relationships of form and space based on the museum reference.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Геометрическая абстракция": {
+      "art_movement": "geometric abstraction",
+      "medium": "painting",
+      "characteristics": "Precisely related geometric planes, intervals and structural balance.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    },
+    "Супрематизм": {
+      "art_movement": "suprematism",
+      "medium": "painting",
+      "characteristics": "Autonomous elementary geometric forms in open pictorial space; no figurative gloss.",
+      "composition": "Subject-specific composition following reference conventions",
+      "space": "Follow the reference spatial language",
+      "line": "Follow the reference handling of line",
+      "color": "Preserve the measured museum color relationships without a preset palette",
+      "light": "Follow the reference light and dark relationships",
+      "texture": "Follow the actual medium in the reference",
+      "abstraction": "Follow the degree of stylization in the reference",
+      "techniques": [
+        "painting"
+      ],
+      "avoid": [
+        "Generic plastic 3D appearance",
+        "Inappropriate brushwork for the stated medium",
+        "Copying the museum scene"
+      ]
+    }
+  }
+}

@@ -77,7 +77,7 @@ class Policy44Tests(unittest.TestCase):
         row['article']['teaser']='Проверенный русский текст. '*300
         expected=art.final_text(row['article'])
         item=art.article_plans({'date':'2026-11-23'},[row])[0]
-        self.assertIn('Subject: Children build a cardboard castle',item['prompt'])
+        self.assertIn('ARTICLE SUBJECT: Children build a cardboard castle',item['prompt'])
         self.assertIn('watercolor',item['prompt']);self.assertNotIn('Проверенный',item['prompt'])
         self.assertLessEqual(len(item['prompt']),2048)
         self.assertEqual(expected,art.final_text(row['article']))
