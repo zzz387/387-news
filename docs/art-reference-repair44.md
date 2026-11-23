@@ -67,3 +67,10 @@ and a source/adaptation notice in their illustration caption and manifest.
 The Actions comparison artifact includes the same credits. No news body changes.
 Paris seeds are narrowly documented Mucha/Fouquet-shop designs, admitted only
 when their actual IIIF canvas declares CC0. Robots and request bounds still apply.
+
+The unsigned real pilot retained its reference palette but drifted into a forest
+scene unrelated to the marriage/alcohol article. Prompt v3 therefore binds the
+owner-authorized 029 repair's concise English visual subjects to each unchanged
+public text hash. These are illustrative metaphors derived from the final public
+articles, not new facts, edited news text or extra model requests for translation.
+The same selected reference is preserved while correcting that concrete error.

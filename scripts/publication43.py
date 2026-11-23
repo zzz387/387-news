@@ -268,6 +268,9 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
             repair=mosaic44.CONFIG.get('visual_brief_repairs',{}).get(prior['text_hash'],{})
             if repair_legacy_images and next((r for r in data['illustrations'] if r['article_slug']==item['article_slug']),{}).get('model')==mosaic44.CONFIG['model']:
                 basis['prompt_version']=mosaic44.CONFIG['prompt_version'];item.update(basis,key=p.digest(basis),genre=prior['genre'])
+                scene=mosaic44.CONFIG['repair_legacy_art'].get('visual_subjects',{}).get(prior['text_hash'])
+                if scene:
+                    item['descriptor']['visual_subject_en']=scene;item['description_hash']=p.digest(item['descriptor'])
                 item['prompt']=mosaic44.prompt(item)
             elif prior.get('prompt_version')==repair.get('replace_prompt_version'):
                 # Public reconstruction lacks the private record's mode/category metadata.
