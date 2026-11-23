@@ -113,7 +113,7 @@ def render_article(date,no,article,root,*,moment=None,policy_version="4.1"):
         art=article['artwork44']
         if not mosaic44.valid_image(root,date,art['key'],art):raise policy.Blocked('PUBLIC_ILLUSTRATION_CHANGED')
         out[0]=out[0].replace('</head>','<link rel="stylesheet" href="/assets/mosaic.css"></head>',1)
-        out.append('<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+article['title'],quote=True)+'" decoding="async"><figcaption>Художественная иллюстрация, созданная ИИ · '+escape(art['genre'])+'</figcaption></figure>')
+        out.append('<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+article['title'],quote=True)+'" decoding="async"><figcaption>'+mosaic44.art_caption(art)+'</figcaption></figure>')
     out.append('<div class="article-body">')
     out.append(render_blocks(article))
     if article['activities']:

@@ -1,7 +1,7 @@
 {
   "enabled": true,
   "maximum_tiles": 12,
-  "prompt_version": "387-art-single-reference-2",
+  "prompt_version": "387-art-single-reference-3",
   "provider": "cloudflare_workers_ai",
   "model": "@cf/black-forest-labs/flux-1-schnell",
   "free_tier_verified": false,
@@ -63,6 +63,19 @@
       "feature-11",
       "feature-01",
       "feature-02"
-    ]
+    ],
+    "visual_subjects": {
+      "cc64317410c339d257222dad17ef92c9ffeb0722e83e24e2f1de22e32e4c4781": "A conceptual architectural view of an elevated tropical house on a steel frame among the treetops of Costa Rica, with an open living space, deep roof overhangs and cross-ventilation. Express the dialogue between structural geometry and jungle canopy, not a documentary reconstruction of the actual building.",
+      "1cfc4479ba34a01f5e23f546e1580904b88952de40a205265ba5f9b2ffd6aa83": "A visual metaphor for changing car-buying choices: a buyer considers three unbranded cars of different sizes in an elegant showroom, with flowing branching paths suggesting a shifting budget and hybrid technology. No prices, charts, lettering, brand badges or numerical claims.",
+      "d4ebf54b24f9f48ada7f1448550af9389dc277688edd75473f92f0072d9065c6": "A paper-collage metaphor for a changing automobile market: cut-out unbranded car silhouettes, layered blank purchase papers and intersecting routes suggest consumer choices and new technology. Keep the composition distinct from a showroom scene. No text, invented statistics or logos.",
+      "801172b1e9617f50b8d25aadbe6519497ecc444fe04df0bdc6e3917e65773f40": "An architectural interior where tall translucent, textured and mirrored glass doors divide connected rooms; overlapping light, shadows and pivoting or sliding planes reveal spatial depth. Treat this as an original design metaphor, not a reproduction or advertisement for a named product.",
+      "0e4912af87b38e634627aa813939b742afe6371b52468b994063f8e70e190261": "An original conceptual view of a modest hillside family house inspired by a renovated mid-century ranch: dark charred-wood exterior, mature trees, restrained natural materials and quiet light through the interior. No invented portrait, exact architectural reconstruction or signage.",
+      "8c3c4f74d9c7d8e4815cea217cc2af9a95fabf85dca33a088d217442a3220805": "A painted visual metaphor for consumerism inside a fictional video-game world: a game controller in the foreground, a stylized coastal city reflected in a shopping window, blank shopping bags and virtual tokens. Question the cycle of real and virtual spending; no game screenshots, logos, text or currency amounts.",
+      "9db97cd64a34f2413c4dff221f1bfb4f520f3ffc063a00c05ef2db410d441d72": "A film director's drawing table: an open sketchbook with original unlettered character studies, pencils and a ribbon of film leading into a distant imagined cinema scene. Evoke the passage from drawing to cinema and the creative work of Georgiy Daneliya, without copying his drawings or inventing his portrait.",
+      "ea1b421bb34d9c3ecda13d468036d87f9bf5d7695979894940a2c86fcef257c0": "A quiet space for reflective reading and yoga: an open book without legible print and a pencil beside a folded yoga mat, with organic lines linking the printed page to a contemplative human silhouette. No claims of medical benefits, mystical facts, logos or religious advertising.",
+      "c8a053aafee7e5f84eb2c6f3de0860546e4b9d30af51aafd9fe78e4a623ea0ac": "A sensitive metaphor for alcohol dependence within a marriage: a worried woman and her husband sit separated by a small table with one unlabelled bottle in a quiet home interior. A doorway suggests a difficult choice about safety and trust. No cheerful family scene, forest, drinking glamour or invented treatment claims.",
+      "cd952cbb0c9ee1cdb5be6e7f25d04a4166302de19dca88d695efa4ca04302f38": "A speculative industrial drawing of the boundary between mind and technology: the outline of a human head connects through fine structural lines to an abstract lattice and memory-like light patterns. Show an unresolved philosophical question, not a proven brain-upload procedure or a real medical device.",
+      "65283963673c1bacd9e84c4def1dcb693711d676a6dc548ece79b10bf5ae0370": "A supermarket still life as a cut-paper collage: blank food packages, simple ingredient shapes, a magnifying glass and small traffic-light markers evoke careful reading of nutrition labels. No readable text, fabricated nutritional numbers, brand names or exaggerated health claims."
+    }
   }
 }

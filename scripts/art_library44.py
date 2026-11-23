@@ -1,7 +1,7 @@
 """Append-only public museum library; one immutable quartet per issue and genre."""
 import base64,hashlib,io,json,re,time,unicodedata
 from datetime import datetime,timezone
-from html import escape
+from html import escape,unescape
 from pathlib import Path
 from urllib.parse import urlencode,urlparse
 from urllib.request import Request,urlopen
@@ -26,7 +26,7 @@ GENRES={
  'Геометрическая абстракция':('geometric-abstraction','Geometric abstraction'),
  'Супрематизм':('suprematism','Suprematism'), 'Коллаж':('collage','Collage'),
  'Индустриальная графика':('industrial','Industrial'), 'Масло':('oil','Oil on canvas')}
-HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk'}
+HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk','www.searchculture.gr','www.momus.gr','dam.momus.gr','apicollections.parismusees.paris.fr','www.parismuseescollections.paris.fr','creativecommons.org'}
 
 def stamp():return datetime.now(timezone.utc).isoformat()
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -69,12 +69,66 @@ def load(root,state=None):
     if state is not None:state.setdefault('art_library44',{})['registry']=public
     return public
 
+CC_BY_SA='https://creativecommons.org/licenses/by-sa/4.0/'
+
+def rights_valid(work):
+    if work.get('verified') is not True:return False
+    license=work.get('license')
+    if license=='CC0':return True
+    if license=='Public Domain Mark':return work.get('public_domain') is True and work.get('rights_evidence')=='https://creativecommons.org/publicdomain/mark/1.0/'
+    # ShareAlike applies to the file/thumbnail, not just the catalogue metadata.
+    return license=='CC BY-SA 4.0' and work.get('rights_evidence')==CC_BY_SA and work.get('license_url')==CC_BY_SA and work.get('license_scope')=='digital_file_and_thumbnail' and bool(work.get('attribution')) and str(work.get('source_url','')).startswith('https://www.searchculture.gr/aggregator/edm/momus/')
+
+def english(value):
+    values=value if isinstance(value,list) else [value]
+    return next((v.get('@value') for v in values if isinstance(v,dict) and v.get('@language')=='en'),next((v for v in values if isinstance(v,str)),''))
+
+def searchculture_work(payload,source,genre):
+    graph=payload.get('@graph',[])
+    item=next((r for r in graph if r.get('@id')==source and r.get('@type')=='edm:ProvidedCHO'),{})
+    aggregation=next((r for r in graph if r.get('@type')=='ore:Aggregation' and r.get('aggregatedCHO')==source),{})
+    rights=str(aggregation.get('rights','')).replace('http://creativecommons.org/','https://creativecommons.org/')
+    if rights!=CC_BY_SA or not item:return None
+    subjects=[]
+    for field in ('dc:subject','subject'):
+        value=item.get(field) or [];subjects.extend(value if isinstance(value,list) else [value])
+    evidence=' '.join(v.get('@value','') if isinstance(v,dict) else str(v) for v in subjects)
+    if not genre_matches(genre,evidence):return None
+    media=english(item.get('dc:type'))
+    if media not in ('Painting','Drawing','Print','Sketch'):return None
+    title=english(item.get('title'));artist=english(item.get('creator'));year=english(item.get('date'));image=aggregation.get('object')
+    if not all((title,artist,year,image)) or urlparse(image).hostname!='www.searchculture.gr':return None
+    # Linked Data thumbnail is explicitly covered by this aggregation's edm:rights.
+    return {'museum':'MOMus — Museum of Modern Art, Costakis Collection','museum_id':'momus:'+source.rsplit('-',1)[-1],
+        'title':title,'artist':artist,'year':year,'source_url':source,'license':'CC BY-SA 4.0','license_url':CC_BY_SA,'rights_evidence':CC_BY_SA,
+        'license_scope':'digital_file_and_thumbnail','attribution':artist+' — '+title+'; MOMus / SearchCulture.gr; CC BY-SA 4.0',
+        'image_url':image,'genre_evidence':evidence,'genre_id':genre_id(genre),'verified':True}
+
+def paris_work(payload,identifier,genre):
+    if genre!='Ар-нуво' or identifier not in (320028394,320073266,320073209):return None
+    metadata={r['label']:r.get('value') for r in payload.get('metadata',[])}
+    def plain(value):return unescape(re.sub('<[^>]*>',' ', ' '.join(str(v) for v in value) if isinstance(value,list) else str(value or ''))).strip()
+    artist=plain(metadata.get('Auteur'));media=plain(metadata.get("Type d'objet"))+' '+plain(metadata.get('Dénomination'))
+    if 'Mucha' not in artist or not re.search(r'Peinture|Dessin|Tableau|Estampe',media,re.I):return None
+    canvas=payload.get('sequences',[{}])[0].get('canvases',[{}])[0]
+    rights={r['label']:r.get('value') for r in canvas.get('metadata',[])}
+    if rights.get('Copyright')!='https://creativecommons.org/publicdomain/zero/1.0/' or not str(rights.get('Droits','')).startswith('CC0 Paris Musées'):return None
+    image=(payload.get('thumbnail') or {}).get('@id');title=plain(payload.get('label'));year=plain(metadata.get('Date de production'))
+    source=metadata.get('Catalogue des œuvres de Paris Musées')
+    if not all((image,title,year,source)):return None
+    # Narrow curatorial seeds: Fouquet-shop designs, documented by Paris Musées
+    # in its Paris-1900 / Art-nouveau collection, not every work by this artist.
+    return {'museum':'Paris Musées — Musée Carnavalet','museum_id':'paris:'+str(identifier),'title':title,'artist':artist,'year':' '.join(year.split()),
+        'source_url':source,'license':'CC0','license_url':'https://creativecommons.org/publicdomain/zero/1.0/','rights_evidence':rights['Copyright'],
+        'image_url':image,'genre_evidence':'Art Nouveau — curated Mucha/Fouquet-shop painting or drawing; Paris Musées Paris 1900 collection',
+        'genre_evidence_url':'https://www.parismuseescollections.paris.fr/de/node/67084','genre_id':genre_id(genre),'verified':True}
+
 def file_valid(root,work):
     try:
         expected='assets/art/'+work['genre_id']+'/'+work['id']+'.webp'
         if work['path']!=expected or not re.fullmatch(r'[a-f0-9]{64}',work['id']):return False
         data=(Path(root)/expected).read_bytes()
-        if digest(data)!=work['sha256'] or work['license'] not in ('CC0','Public Domain Mark') or work['verified'] is not True:return False
+        if digest(data)!=work['sha256'] or not rights_valid(work):return False
         if work['license']=='Public Domain Mark' and (work.get('public_domain') is not True or work.get('rights_evidence')!='https://creativecommons.org/publicdomain/mark/1.0/'):return False
         with Image.open(io.BytesIO(data)) as image:
             image.verify()
@@ -123,6 +177,28 @@ class Museum:
             print('[art-museum-access] '+json.dumps({'host':parsed.hostname,'stage':'robots' if parsed.path=='/robots.txt' else 'fetch','http_status':exc.code}),flush=True)
             raise
     def candidates(self,genre,start_page=1):
+        # Public Linked Data / IIIF: no search-API key, paid plan or access bypass.
+        # Fetch rights and metadata live before admitting any seed's actual file.
+        if genre=='Конструктивизм':
+            for identifier in (1260,1247,11016,1207,11026,11269):
+                mid='momus:'+str(identifier)
+                if mid in self.known_ids:continue
+                source='https://www.searchculture.gr/aggregator/edm/momus/000179-'+str(identifier)
+                try:
+                    work=searchculture_work(json.loads(self.get(source+'/json')),source,genre)
+                    print('[art-museum-source] '+json.dumps({'museum':'momus-searchculture','item':identifier,'admissible':bool(work)}),flush=True)
+                    if work:
+                        self.known_ids.add(mid);yield work
+                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'momus-searchculture','code':safe_code(exc)}),flush=True)
+        if genre=='Ар-нуво':
+            for identifier in (320028394,320073266,320073209):
+                if 'paris:'+str(identifier) in self.known_ids:continue
+                try:
+                    work=paris_work(json.loads(self.get('https://apicollections.parismusees.paris.fr/iiif/'+str(identifier)+'/manifest')),identifier,genre)
+                    print('[art-museum-source] '+json.dumps({'museum':'paris-musees','item':identifier,'admissible':bool(work)}),flush=True)
+                    if work:
+                        self.known_ids.add(work['museum_id']);yield work
+                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'paris-musees','code':safe_code(exc)}),flush=True)
         query=GENRES[genre][1]
         fields='id,title,artist_title,date_display,date_start,image_id,is_public_domain,style_titles,medium_display,artwork_type_title,place_of_origin'
         url='https://api.artic.edu/api/v1/artworks/search?'+urlencode({'q':query,'limit':60,'fields':fields})
@@ -224,7 +300,7 @@ def ingest(root,registry,work,raw,state,persist):
     for url in (work['source_url'],work['license_url']):
         if urlparse(url).scheme!='https' or urlparse(url).hostname not in HOSTS:raise ValueError('ART_METADATA_URL_INVALID')
     if work.get('genre_id') not in {g[0] for g in GENRES.values()}:raise ValueError('ART_GENRE_UNSUPPORTED')
-    if work.get('license') not in ('CC0','Public Domain Mark') or work.get('verified') is not True:raise ValueError('ART_RIGHTS_UNVERIFIED')
+    if not rights_valid(work):raise ValueError('ART_RIGHTS_UNVERIFIED')
     if work.get('license')=='Public Domain Mark' and (work.get('public_domain') is not True or work.get('rights_evidence')!='https://creativecommons.org/publicdomain/mark/1.0/'):raise ValueError('ART_RIGHTS_UNVERIFIED')
     if known(registry,work):return None
     original_hash=digest(raw)
@@ -313,6 +389,8 @@ def attach(root,state,items,sets):
         item.update({k:v for k,v in choice.items() if k!='sha256'})
         item.update(reference_status='ONE_REFERENCE_READY',reference_set_id=row['id'],reference_artwork_ids=row['artwork_ids'],reference_sha256=row['sha256'],reference_images_sent=1)
         item['reference_images']=[{'path':work['path'],'sha256':work['sha256']}]
+        if work.get('license')=='CC BY-SA 4.0':
+            item.update(artwork_license=CC_BY_SA,reference_attribution=work['attribution'],reference_source_url=work['source_url'],reference_adaptation='Original AI composition after a museum reference; resized WebP reference')
         item.update({k:color.direction(item['genre'])[k] for k in ('art_movement','medium')})
         from scripts import cloudflare44
         item['prompt']=cloudflare44.prompt(item)
@@ -348,7 +426,7 @@ def render(root,registry):
         content+='<h2>Вся коллекция</h2><div class="art-gallery">'
         for w in works:
             assigned=used.get(w['id']);status=('Назначено: '+assigned['issue_id']) if assigned else 'В запасе · ещё не назначено выпуску'
-            content+='<figure id="'+w['id']+'"><img loading="lazy" src="/'+w['path']+'" width="'+str(w['width'])+'" height="'+str(w['height'])+'" alt="'+escape(w['title'],quote=True)+'"><figcaption><strong>'+escape(w['title'])+'</strong> · '+escape(w['artist'])+' · '+escape(str(w['year']))+'<p>'+escape(w['museum'])+' · <a href="'+escape(w['source_url'],quote=True)+'">Музейный оригинал</a> · <a href="'+escape(w['license_url'],quote=True)+'">'+escape(w['license'])+'</a></p><small>Добавлено '+escape(w['added_at'][:10])+' · '+escape(status)+'</small></figcaption></figure>'
+            content+='<figure id="'+w['id']+'"><img loading="lazy" src="/'+w['path']+'" width="'+str(w['width'])+'" height="'+str(w['height'])+'" alt="'+escape(w['title'],quote=True)+'"><figcaption><strong>'+escape(w['title'])+'</strong> · '+escape(w['artist'])+' · '+escape(str(w['year']))+'<p>'+escape(w['museum'])+' · <a href="'+escape(w['source_url'],quote=True)+'">Музейный оригинал</a> · <a href="'+escape(w['license_url'],quote=True)+'">'+escape(w['license'])+'</a> · Уменьшено, преобразовано в WebP</p><small>Добавлено '+escape(w['added_at'][:10])+' · '+escape(status)+'</small></figcaption></figure>'
         folder=target/gid;folder.mkdir(exist_ok=True);(folder/'index.html').write_text(page(groups[gid],'/art/'+gid+'/',content+'</div>'))
     body+='</ul>'
     if registry['studies']:body+='<p><a href="/art/studies/">Пробы генерации по музейным референсам</a></p>'

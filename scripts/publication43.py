@@ -268,6 +268,9 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
             repair=mosaic44.CONFIG.get('visual_brief_repairs',{}).get(prior['text_hash'],{})
             if repair_legacy_images and next((r for r in data['illustrations'] if r['article_slug']==item['article_slug']),{}).get('model')==mosaic44.CONFIG['model']:
                 basis['prompt_version']=mosaic44.CONFIG['prompt_version'];item.update(basis,key=p.digest(basis),genre=prior['genre'])
+                scene=mosaic44.CONFIG['repair_legacy_art'].get('visual_subjects',{}).get(prior['text_hash'])
+                if scene:
+                    item['descriptor']['visual_subject_en']=scene;item['description_hash']=p.digest(item['descriptor'])
                 item['prompt']=mosaic44.prompt(item)
             elif prior.get('prompt_version')==repair.get('replace_prompt_version'):
                 # Public reconstruction lacks the private record's mode/category metadata.
@@ -336,7 +339,7 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
                 updated['pages'][slug]['html']=digest_bytes(changed.encode())
                 continue
             base=without_art44(page)
-            figure='<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+next(a['title'] for a in articles if a['slug']==slug),quote=True)+'" decoding="async"><figcaption>Художественная иллюстрация, созданная ИИ · '+escape(art['genre'])+'</figcaption></figure>'
+            figure='<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+next(a['title'] for a in articles if a['slug']==slug),quote=True)+'" decoding="async"><figcaption>'+mosaic44.art_caption(art)+'</figcaption></figure>'
             changed=base.replace('</head>','<link rel="stylesheet" href="/assets/mosaic.css"></head>',1).replace('<div class="article-body">',figure+'<div class="article-body">',1)
             if without_art44(changed)!=without_art44(page):raise p.Blocked('ART_BACKFILL_CONTENT_CHANGED')
             file=work/'issues'/date/'articles'/slug/'index.html';file.write_text(changed)

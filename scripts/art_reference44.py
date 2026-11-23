@@ -9,7 +9,7 @@ from PIL import Image,ImageStat
 VERSION='387-reference-selection-1'
 PROFILE_VERSION='387-color-lab-1'
 CONFIG=json.loads((Path(__file__).resolve().parents[1]/'config/art-directions44.json').read_text())
-FIELDS=('art_movement','medium','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','color_match')
+FIELDS=('art_movement','medium','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation')
 
 def lab(rgb):
     v=[x/255 for x in rgb];r,g,b=[x/12.92 if x<=.04045 else ((x+.055)/1.055)**2.4 for x in v]
@@ -119,7 +119,7 @@ def prompt(item):
     return text
 
 def comparison(root,state,items,baseline,output):
-    """Only approved public texts' artwork and CC0 museum images; no private drafts."""
+    """Only approved public texts' artwork and openly licensed museum images; no private drafts."""
     import base64,shutil
     from html import escape
     output=Path(output);output.mkdir(parents=True,exist_ok=True);rows=[];paired_old=[];paired_new=[];objects=state.get('art44',{}).get('objects',{})
@@ -137,7 +137,7 @@ def comparison(root,state,items,baseline,output):
         ref_name=None
         if work:
             ref_name=prefix+'reference.webp';shutil.copyfile(Path(root)/work['path'],output/ref_name)
-        rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'model':obj.get('model') if obj else None,'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None})
+        rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'license':work.get('license'),'license_url':work.get('license_url'),'attribution':work.get('attribution'),'reference_change':'Resized WebP','model':obj.get('model') if obj else None,'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None})
     def variety(values):
         scores=[distance(a,b) for i,a in enumerate(values) for b in values[i+1:]]
         return round(sum(scores)/len(scores),3) if scores else None
@@ -148,7 +148,7 @@ def comparison(root,state,items,baseline,output):
         body+='<section><h2>'+escape(r['slug']+' · '+r['genre'])+'</h2><figure><figcaption>FLUX.1 Schnell — до</figcaption><img src="'+r['before']+'"></figure><figure><figcaption>После · '+escape(r['model'] or 'ещё не готово')+'</figcaption>'
         if r['after']:body+='<img src="'+r['after']+'">'
         body+='</figure><p>'+escape(str(r['artist'] or '')+' · '+str(r['title'] or ''))+'</p>'
-        if r['reference']:body+='<img class="ref" src="'+r['reference']+'">'
+        if r['reference']:body+='<img class="ref" src="'+r['reference']+'"><p><a href="'+escape(r['source'],quote=True)+'">Музейный источник</a> · <a href="'+escape(r['license_url'],quote=True)+'">'+escape(r['license'])+'</a> · Уменьшено, преобразовано в WebP'+(' · Новая ИИ-композиция также CC BY-SA 4.0' if r['license']=='CC BY-SA 4.0' else '')+'</p>'
         body+='<pre>'+escape(json.dumps({'palette':r['palette'],'color_match':r['color_match']},ensure_ascii=False,indent=2))+'</pre></section>'
     (output/'index.html').write_text(body+'</html>')
     return rows
