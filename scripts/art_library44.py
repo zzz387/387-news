@@ -26,7 +26,7 @@ GENRES={
  'Геометрическая абстракция':('geometric-abstraction','Geometric abstraction'),
  'Супрематизм':('suprematism','Suprematism'), 'Коллаж':('collage','Collage'),
  'Индустриальная графика':('industrial','Industrial'), 'Масло':('oil','Oil on canvas')}
-HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk','www.searchculture.gr','www.momus.gr','dam.momus.gr','apicollections.parismusees.paris.fr','www.parismuseescollections.paris.fr','creativecommons.org'}
+HOSTS={'api.artic.edu','www.artic.edu','openaccess-api.clevelandart.org','www.clevelandart.org','images.clevelandart.org','clevelandart.org','openaccess-cdn.clevelandart.org','collectionapi.metmuseum.org','images.metmuseum.org','www.metmuseum.org','api.smk.dk','iip.smk.dk','iip-thumb.smk.dk','www.smk.dk','open.smk.dk','www.searchculture.gr','www.momus.gr','dam.momus.gr','apicollections.parismusees.paris.fr','www.parismuseescollections.paris.fr','creativecommons.org','www.nga.gov','api.nga.gov'}
 
 def stamp():return datetime.now(timezone.utc).isoformat()
 def digest(data):return hashlib.sha256(data).hexdigest()
@@ -142,6 +142,37 @@ PARIS_SEEDS={
  'Кубизм':{729:('Gris, Juan','Cubism — Juan Gris, Compotier; museum catalogue: Les chemins du cubisme')},
  'Романтизм':{160000895:('Delacroix','Romanticism — Eugène Delacroix, Salon de la Paix sketch; Petit Palais catalogue')},
  'Ар-деко':{i:('Anonyme','Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927') for i in (160025958,160025929,160025953,160025956,160025973,160025974,160025969,160025947)}}
+NGA_SEEDS={
+ '56101-fantomas':('Fantômas','1915','oil on canvas'),
+ '166491-glass-and-checkerboard':('Glass and Checkerboard','1917','oil on wood'),
+ '163527-ace-clubs-and-four-diamonds':('Ace of Clubs and Four of Diamonds','1915','oil on board')}
+
+def nga_work(raw,slug):
+    """Three catalogue-confirmed Cubist paintings; per-object image rights required."""
+    if slug not in NGA_SEEDS:return None
+    from html.parser import HTMLParser
+    class Page(HTMLParser):
+        def __init__(self):super().__init__();self.text=[];self.head=[];self.in_head=False;self.downloads=set()
+        def handle_starttag(self,tag,attrs):
+            attrs=dict(attrs)
+            if tag=='h1':self.in_head=True
+            href=attrs.get('href','')
+            if tag=='a' and href.startswith('https://api.nga.gov/iiif/') and 'attachment_filename=' in href:self.downloads.add(href)
+        def handle_endtag(self,tag):
+            if tag=='h1':self.in_head=False
+        def handle_data(self,value):
+            self.text.append(value)
+            if self.in_head:self.head.append(value)
+    page=Page();page.feed(raw.decode('utf-8') if isinstance(raw,bytes) else raw)
+    title,year,medium=NGA_SEEDS[slug];text=' '.join(' '.join(page.text).split())
+    if ' '.join(page.head).strip()!=title or not all(value in text for value in ('Juan Gris',year,medium)):return None
+    if 'This object’s media is free and in the public domain.' not in text or len(page.downloads)!=1:return None
+    image=next(iter(page.downloads)).replace('/full/full/','/full/480,/')
+    if not re.fullmatch(r'https://api\.nga\.gov/iiif/[a-f0-9-]+/full/480,/0/default\.jpg\?attachment_filename=[^/]+',image):return None
+    return {'museum':'National Gallery of Art, Washington','museum_id':'nga:'+slug.split('-')[0],'title':title,'artist':'Juan Gris','year':year,
+        'source_url':'https://www.nga.gov/artworks/'+slug,'license':'CC0','license_url':'https://www.nga.gov/terms-and-notices',
+        'rights_evidence':'OBJECT_MEDIA_PUBLIC_DOMAIN_AND_NGA_CC0_OPEN_ACCESS','image_url':image,'genre_evidence':'Cubism — catalogue-confirmed Juan Gris painting; '+medium,'genre_id':'cubism','verified':True}
+
 MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,)}
 
 def met_seed_work(row,identifier,genre):
@@ -265,6 +296,14 @@ class Museum:
                     if work:
                         self.known_ids.add(work['museum_id']);yield work
                 except Exception as exc:print('[art-museum] '+json.dumps({'museum':'paris-musees','code':safe_code(exc)}),flush=True)
+        if genre=='Кубизм':
+            for slug in NGA_SEEDS:
+                if 'nga:'+slug.split('-')[0] in self.known_ids:continue
+                try:
+                    work=nga_work(self.get('https://www.nga.gov/artworks/'+slug,accept='text/html'),slug)
+                    print('[art-museum-source] '+json.dumps({'museum':'nga','item':slug,'admissible':bool(work)}),flush=True)
+                    if work:self.known_ids.add(work['museum_id']);yield work
+                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'nga','code':safe_code(exc)}),flush=True)
         if genre in MET_SEEDS:
             for identifier in MET_SEEDS[genre]:
                 if 'met:'+str(identifier) in self.known_ids:continue
@@ -626,7 +665,7 @@ def checkpoint(state,root):
 
 def probe_source(output):
     """One public read-only contract probe; no checkpoint, credentials or model."""
-    source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260';client=Museum(seconds=55,requests=10)
+    source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260';client=Museum(seconds=55,requests=16)
     report={'source':source,'admitted':False,'model_requests':0}
     try:
         work=client.linked_work(source,'Конструктивизм');report.update(admitted=bool(work),work=work)
@@ -654,6 +693,12 @@ def probe_source(output):
             row=json.loads(client.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+str(identifier),accept='application/json'))
             report['met_contracts'].append({k:row.get(k) for k in ('objectID','isPublicDomain','artistDisplayName','classification','medium','title')})
         except Exception as exc:report['met_contracts'].append({'objectID':identifier,'code':safe_code(exc)})
+    report['nga_contracts']=[]
+    for slug in NGA_SEEDS:
+        try:
+            raw=client.get('https://www.nga.gov/artworks/'+slug,accept='text/html');work=nga_work(raw,slug)
+            report['nga_contracts'].append({'slug':slug,'admitted':bool(work),'work':work,'html_bytes':len(raw)})
+        except Exception as exc:report['nga_contracts'].append({'slug':slug,'code':safe_code(exc)})
     Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
     print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys')}),flush=True)
     return report
