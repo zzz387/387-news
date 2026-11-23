@@ -808,6 +808,54 @@
       "width": 386,
       "height": 480,
       "added_at": "2026-11-23T12:37:04.100992+00:00"
+    },
+    "eef64f218dacb6b84e5ab7edf2fb05276b415ab7d7471a5047347e276d994c74": {
+      "museum": "Paris Musées — Musée Carnavalet",
+      "museum_id": "paris:320028394",
+      "title": "\"Soleil\", composition décorative provenant de la boutique du joaillier Georges Fouquet, 6 rue Royale.",
+      "artist": "Mucha, Alphonse",
+      "year": "Entre 1900 et 1901",
+      "source_url": "https://www.parismuseescollections.paris.fr/fr/musee-carnavalet/oeuvres/soleil-composition-decorative-provenant-de-la-boutique-du-joaillier-georges",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "genre_evidence": "Art Nouveau — curated Mucha/Fouquet-shop painting or drawing; Paris Musées Paris 1900 collection",
+      "genre_evidence_url": "https://www.parismuseescollections.paris.fr/de/node/67084",
+      "genre_id": "art-nouveau",
+      "verified": true,
+      "id": "eef64f218dacb6b84e5ab7edf2fb05276b415ab7d7471a5047347e276d994c74",
+      "path": "assets/art/art-nouveau/eef64f218dacb6b84e5ab7edf2fb05276b415ab7d7471a5047347e276d994c74.webp",
+      "sha256": "fd39fde5e47836c7d4361306453827ad4cc35a71209764aacf15b4c23086d3a4",
+      "original_sha256": "06c3b401ff4fb44e5e47c3df380461354ddc7c6c84f5a4720d33ecae38eee5a9",
+      "visual_hash": "3977569903323931617",
+      "perceptual_neighbours": [],
+      "width": 300,
+      "height": 226,
+      "added_at": "2026-11-23T13:17:57.593042+00:00"
+    },
+    "069f4b2e5fee7bc6fccba0c53fe4982c2550fc940ccbba7c205caacd7c01c805": {
+      "museum": "Paris Musées — Musée Carnavalet",
+      "museum_id": "paris:320073266",
+      "title": "Plan général de la mosaïque pour la bijouterie Fouquet",
+      "artist": "Mucha, Alphonse",
+      "year": "20 – 12 – 1900",
+      "source_url": "https://www.parismuseescollections.paris.fr/fr/musee-carnavalet/oeuvres/plan-general-de-la-mosaique-pour-la-bijouterie-fouquet",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "genre_evidence": "Art Nouveau — curated Mucha/Fouquet-shop painting or drawing; Paris Musées Paris 1900 collection",
+      "genre_evidence_url": "https://www.parismuseescollections.paris.fr/de/node/67084",
+      "genre_id": "art-nouveau",
+      "verified": true,
+      "id": "069f4b2e5fee7bc6fccba0c53fe4982c2550fc940ccbba7c205caacd7c01c805",
+      "path": "assets/art/art-nouveau/069f4b2e5fee7bc6fccba0c53fe4982c2550fc940ccbba7c205caacd7c01c805.webp",
+      "sha256": "90ef410a54b784beb00cb4f7c54e0eb7fc00724090b650b6ccecad7937311851",
+      "original_sha256": "b7df29ae243222696afbf70c4d9e8fd32f4829251b95aaf8dbc51171149fdcc4",
+      "visual_hash": "17351503811794235616",
+      "perceptual_neighbours": [],
+      "width": 225,
+      "height": 300,
+      "added_at": "2026-11-23T13:18:02.848011+00:00"
     }
   },
   "sets": {
@@ -953,6 +1001,30 @@
         "f6825de94d13994dda480043dcbea7873ecbf06e733a20b94fb1b4b4bf42c4df",
         "0e1f68346a7dc2e0477f31d089dd6c240596ea05b34a8432dbd143715ef5c59e",
         "c79623b9c69a0a6fcfebd7733c48557eb84b61177ffc97ae3f6f6acafbba1414"
+      ]
+    },
+    "2026-11-23/art-nouveau": {
+      "id": "2026-11-23/art-nouveau",
+      "issue_id": "2026-11-23",
+      "issue_date": "2026-11-23",
+      "issue_number": 29,
+      "genre_id": "art-nouveau",
+      "genre": "Ар-нуво",
+      "artwork_ids": [
+        "1d780a95f1598ae6e25e67919b061dd4afc4d0e81ff642cf0d1a96ffe8a372ec",
+        "eef64f218dacb6b84e5ab7edf2fb05276b415ab7d7471a5047347e276d994c74",
+        "b666d2392594a4292cb12e2f08ada3df2e19fc470cf4e3c2c185262ac5aa0d6f",
+        "069f4b2e5fee7bc6fccba0c53fe4982c2550fc940ccbba7c205caacd7c01c805"
+      ],
+      "selected_at": "2026-11-23T13:18:08.118901+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "d000c51226df36e18af887028ba8dc7d3fa8bf4255cbdb5929a0c0f3164b4fbd",
+        "fd39fde5e47836c7d4361306453827ad4cc35a71209764aacf15b4c23086d3a4",
+        "d02ceb2a3e2b308ad5276c0f1d58e4a2e78a0434b7e8c733729cf9cfa4327d92",
+        "90ef410a54b784beb00cb4f7c54e0eb7fc00724090b650b6ccecad7937311851"
       ]
     }
   },
