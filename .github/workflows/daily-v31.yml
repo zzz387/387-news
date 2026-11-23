@@ -91,7 +91,7 @@ jobs:
           fi
       - name: Probe changed museum adapter using public metadata only (no Secrets or models)
         run: |
-          if git diff --name-only HEAD^ HEAD | rg -q '^scripts/art_library44.py$'; then
+          if ! git diff --quiet HEAD^ HEAD -- scripts/art_library44.py; then
             python -m scripts.art_library44 --probe-source --output '${{ runner.temp }}/museum-source44-report.json'
           fi
       - uses: actions/upload-artifact@v4
