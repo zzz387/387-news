@@ -109,6 +109,9 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertEqual(color.compare(a,a)['status'],'COLOR_MATCH_OK')
         self.assertEqual(color.compare(a,b)['status'],'COLOR_MISMATCH')
         self.assertGreater(color.distance(a,b),50);self.assertEqual(a['dominant'],['#c82314'])
+        mass_a={'groups':[{'share':.9,'lab':[50,60,0]},{'share':.1,'lab':[50,-60,0]}],'lightness':50,'saturation_value':.6}
+        mass_b=dict(mass_a,groups=[{'share':.1,'lab':[50,60,0]},{'share':.9,'lab':[50,-60,0]}])
+        self.assertGreater(color.distance(mass_a,mass_b),90)
         with tempfile.TemporaryDirectory() as temp:
             state=self.stock(temp,4);items=self.items(5);sets=lib.prepare_sets(temp,state,items,discover=False)
             lib.attach(temp,state,items,sets);selected=[i['selected_reference_id'] for i in items]
