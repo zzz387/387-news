@@ -622,3 +622,38 @@ def checkpoint(state,root):
         if work and work['path'] in tracked and (Path(root)/work['path']).is_file() and digest((Path(root)/work['path']).read_bytes())==work['sha256']:continue
         saved['study_objects'][key]=data
     return saved
+
+
+def probe_source(output):
+    """One public read-only contract probe; no checkpoint, credentials or model."""
+    source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260';client=Museum(seconds=55,requests=10)
+    report={'source':source,'admitted':False,'model_requests':0}
+    try:
+        work=client.linked_work(source,'Конструктивизм');report.update(admitted=bool(work),work=work)
+    except Exception as exc:report['code']=safe_code(exc)
+    if not report['admitted'] and 'www.searchculture.gr' not in client.blocked_hosts:
+        try:
+            payload=json.loads(client.get(source+'/json',accept='application/json'));facts=[]
+            allowed={'about','id','proxyfor','edmaggregatedcho','edmrights','edmobject','dctitle','dccreator','dcdate','dctype','dcsubject','dcformat','dctermsmedium'}
+            def visit(value,path=''):
+                if len(facts)>=80:return
+                if isinstance(value,dict):
+                    for key,child in value.items():
+                        route=path+'/'+key
+                        if re.sub('[^a-z]','',key.casefold()) in allowed:facts.append({'path':route,'value':json.dumps(child,ensure_ascii=False)[:1200]})
+                        else:visit(child,route)
+                elif isinstance(value,list):
+                    for index,child in enumerate(value[:3]):visit(child,path+'/'+str(index))
+            visit(payload);report.update(public_root_keys=list(payload) if isinstance(payload,dict) else [],public_metadata_facts=facts)
+        except Exception as exc:report['diagnostic_code']=safe_code(exc)
+    Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys')}),flush=True)
+    return report
+
+
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(description='Read-only public museum metadata contract probe; no image generation')
+    parser.add_argument('--probe-source',action='store_true',required=True)
+    parser.add_argument('--output',required=True)
+    args=parser.parse_args();probe_source(args.output)

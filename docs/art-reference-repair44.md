@@ -109,3 +109,10 @@ fall back to the documented `/xml` RDF representation. XML facts go through the
 same record-bound rights/media/thumbnail admission. HTTP 403, robots and other
 access failures never trigger this fallback. Gallery proof records actual old/new
 SHA values and prompt versions, and movement evidence points to its own catalogue.
+
+When the museum adapter changes, the existing CI browser job runs a single
+read-only public metadata contract probe before its normal browser checks. Its
+small artifact contains only work facts, rights/file URLs and schema paths;
+descriptions and private newspaper data are excluded. No Secrets, checkpoints,
+Gemini or image inference are used. This advisory probe makes real schema changes
+reviewable before production, without adding a workflow or publication gate.
