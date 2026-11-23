@@ -215,7 +215,7 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
             saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
                 'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['reference_model'] if item.get('reference_images') else CONFIG['model'],'status':'READY',
-                **{k:item[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match') if k in item},
+                **{k:item[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation') if k in item},
                 'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
                 'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
             persist()  # Keep the first usable result even if its one color retry fails.
@@ -367,7 +367,7 @@ def materialize(state,articles,root,items=None):
             continue
         images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version','date','text_hash','protocol','article_slug')},
             **{k:row[k] for k in ('sha256','width','height','provider','model')},
-            **{k:row[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match') if k in row},'path':file.relative_to(root).as_posix()}
+            **{k:row[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation') if k in row},'path':file.relative_to(root).as_posix()}
     (folder/'manifest.json').write_text(json.dumps({'date':date,'images':images,'provider_status':provider_status()},ensure_ascii=False,indent=2)+'\n')
     return images
 
@@ -379,3 +379,11 @@ if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--diagnose',action='store_true',required=True);parser.add_argument('--probe-models',action='store_true');args=parser.parse_args()
     diagnose(args.probe_models)
+
+
+def art_caption(art):
+    text='Художественная иллюстрация, созданная ИИ · '+escape(art['genre'])
+    if art.get('artwork_license'):
+        if art['artwork_license']!='https://creativecommons.org/licenses/by-sa/4.0/' or not art.get('reference_attribution') or not str(art.get('reference_source_url','')).startswith('https://www.searchculture.gr/aggregator/edm/momus/'):raise ValueError('ART_ATTRIBUTION_INVALID')
+        text+=' · Музейный референс: <a href="'+escape(art['reference_source_url'],quote=True)+'">'+escape(art['reference_attribution'])+'</a>. Самостоятельная ИИ-композиция по референсу; <a rel="license" href="'+art['artwork_license']+'">CC BY-SA 4.0</a>.'
+    return text

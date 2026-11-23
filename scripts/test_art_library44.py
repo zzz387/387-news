@@ -316,4 +316,37 @@ class ArtLibraryTests(unittest.TestCase):
                 self.assertIn(work['path'],page);self.assertIn(work['source_url'],page);self.assertEqual((work['width'],work['height']),(80,60))
             self.assertIn('ещё не назначено',page)
 
+    def test_momus_linked_rights_are_bound_to_actual_item_and_attributed(self):
+        source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260'
+        payload={'@graph':[{'@id':source,'@type':'edm:ProvidedCHO','title':[{'@language':'en','@value':'Linearism'}],
+            'creator':[{'@language':'en','@value':'Aleksandr Rodchenko'}],'date':'1920','dc:type':[{'@language':'en','@value':'Painting'}],
+            'dc:subject':[{'@language':'en','@value':'Constructivism'}]},
+            {'@type':'ore:Aggregation','aggregatedCHO':source,'rights':'http://creativecommons.org/licenses/by-sa/4.0/',
+             'object':'https://www.searchculture.gr/aggregator/thumbnails/edm-record/momus/000179-1260'}]}
+        work=lib.searchculture_work(payload,source,'Конструктивизм');self.assertTrue(lib.rights_valid(work))
+        self.assertIn('Rodchenko',work['attribution']);self.assertEqual(work['license_scope'],'digital_file_and_thumbnail')
+        for invalid in ('https://rightsstatements.org/vocab/InC/1.0/','https://creativecommons.org/licenses/by-nc/4.0/'):
+            with self.subTest(rights=invalid):
+                bad=copy.deepcopy(payload);bad['@graph'][1]['rights']=invalid;self.assertIsNone(lib.searchculture_work(bad,source,'Конструктивизм'))
+        bad=copy.deepcopy(payload);bad['@graph'][1]['aggregatedCHO']='https://example.org/another-item'
+        self.assertIsNone(lib.searchculture_work(bad,source,'Конструктивизм'))
+        with tempfile.TemporaryDirectory() as temp:
+            state={'date':'2026-11-23'};reg=lib.load(temp,state);key=lib.ingest(temp,reg,work,picture(15),state,lambda:None)
+            self.assertTrue(lib.file_valid(temp,reg['artworks'][key]));lib.render(temp,reg)
+            page=(Path(temp)/'art/constructivism/index.html').read_text()
+            for credit in ('Rodchenko','Linearism','CC BY-SA 4.0','WebP'):self.assertIn(credit,page)
+        caption=art.art_caption({'genre':'Конструктивизм','artwork_license':lib.CC_BY_SA,'reference_attribution':work['attribution'],'reference_source_url':source})
+        self.assertIn('rel="license"',caption);self.assertIn('ИИ-композиция',caption)
+        with self.assertRaises(ValueError):art.art_caption({'genre':'Конструктивизм','artwork_license':lib.CC_BY_SA})
+
+    def test_paris_iiif_canvas_license_and_narrow_curatorial_seed(self):
+        payload={'label':'Soleil','metadata':[{'label':'Auteur','value':['Mucha, Alphonse']},{'label':"Type d'objet",'value':'Peinture'},
+            {'label':'Date de production','value':'<span>1900</span>-1901'},{'label':'Catalogue des œuvres de Paris Musées','value':'https://www.parismuseescollections.paris.fr/fr/oeuvre/soleil'}],
+            'thumbnail':{'@id':'https://apicollections.parismusees.paris.fr/thumbnail.jpg'},'sequences':[{'canvases':[{'metadata':[
+                {'label':'Droits','value':'CC0 Paris Musées / Carnavalet'},{'label':'Copyright','value':'https://creativecommons.org/publicdomain/zero/1.0/'}]}]}]}
+        work=lib.paris_work(payload,320028394,'Ар-нуво');self.assertTrue(lib.rights_valid(work));self.assertEqual(work['artist'],'Mucha, Alphonse')
+        self.assertIsNone(lib.paris_work(payload,123,'Ар-нуво'));self.assertIsNone(lib.paris_work(payload,320028394,'Кубизм'))
+        bad=copy.deepcopy(payload);bad['sequences'][0]['canvases'][0]['metadata'][1]['value']='all rights reserved'
+        self.assertIsNone(lib.paris_work(bad,320028394,'Ар-нуво'))
+
 if __name__=='__main__':unittest.main()

@@ -336,7 +336,7 @@ def backfill_issue_art(root,date,parent,persist=lambda:None,allow_request=True,r
                 updated['pages'][slug]['html']=digest_bytes(changed.encode())
                 continue
             base=without_art44(page)
-            figure='<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+next(a['title'] for a in articles if a['slug']==slug),quote=True)+'" decoding="async"><figcaption>Художественная иллюстрация, созданная ИИ · '+escape(art['genre'])+'</figcaption></figure>'
+            figure='<figure class="article-art44"><img src="/'+escape(art['path'],quote=True)+'" width="'+str(art['width'])+'" height="'+str(art['height'])+'" alt="'+escape('Художественная иллюстрация: '+next(a['title'] for a in articles if a['slug']==slug),quote=True)+'" decoding="async"><figcaption>'+mosaic44.art_caption(art)+'</figcaption></figure>'
             changed=base.replace('</head>','<link rel="stylesheet" href="/assets/mosaic.css"></head>',1).replace('<div class="article-body">',figure+'<div class="article-body">',1)
             if without_art44(changed)!=without_art44(page):raise p.Blocked('ART_BACKFILL_CONTENT_CHANGED')
             file=work/'issues'/date/'articles'/slug/'index.html';file.write_text(changed)

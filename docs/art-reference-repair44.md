@@ -55,3 +55,15 @@ aspect ratio using supported multiples of 16. Artwork-only pushes skip unrelated
 special-issue preparation. Before resuming, the workflow checks the main production
 queue so an art continuation cannot evict a queued daily run. A completed all-image
 repair hands control back to the ordinary daily preparation workflow.
+
+Additional museum recovery uses the official SearchCulture EDM `/json` item URIs
+and Paris Musées IIIF manifests, without search API keys. Curatorial seeds are
+only hints: every live record must independently bind title, artist, date,
+two-dimensional medium, movement evidence, a real thumbnail and its rights.
+MOMus digital-file/thumbnail CC BY-SA 4.0 is kept distinct from CC0: library
+credits include artist/title/provider/source/license and WebP transformation;
+new AI compositions using such references conservatively carry the same license
+and a source/adaptation notice in their illustration caption and manifest.
+The Actions comparison artifact includes the same credits. No news body changes.
+Paris seeds are narrowly documented Mucha/Fouquet-shop designs, admitted only
+when their actual IIIF canvas declares CC0. Robots and request bounds still apply.
