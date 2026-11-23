@@ -89,6 +89,17 @@ jobs:
           else
             python -m playwright install --with-deps chromium
           fi
+      - name: Probe changed museum adapter using public metadata only (no Secrets or models)
+        run: |
+          if ! git diff --quiet HEAD^ HEAD -- scripts/art_library44.py; then
+            python -m scripts.art_library44 --probe-source --output '${{ runner.temp }}/museum-source44-report.json'
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: public-museum-source44-contract
+          path: ${{ runner.temp }}/museum-source44-report.json
+          retention-days: 7
+          if-no-files-found: ignore
       - id: scope
         run: python -m scripts.ci_scope
       - name: Check 12 synthetic pages at mobile and desktop widths (no Secrets or Gemini)

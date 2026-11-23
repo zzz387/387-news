@@ -138,7 +138,7 @@ def comparison(root,state,items,baseline,output):
         ref_name=None
         if work:
             ref_name=prefix+'reference.webp';shutil.copyfile(Path(root)/work['path'],output/ref_name)
-        rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'license':work.get('license'),'license_url':work.get('license_url'),'attribution':work.get('attribution'),'reference_change':'Resized WebP','model':obj.get('model') if obj else None,'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None})
+        rows.append({'slug':slug,'genre':item['genre'],'before':old_name,'after':new_name,'reference':ref_name,'artist':work.get('artist'),'title':work.get('title'),'source':work.get('source_url'),'license':work.get('license'),'license_url':work.get('license_url'),'attribution':work.get('attribution'),'reference_change':'Resized WebP','model':obj.get('model') if obj else None,'prompt_version':item.get('prompt_version'),'old_sha256':old['sha256'],'new_sha256':obj.get('sha256') if obj else None,'reference_set_id':item.get('reference_set_id'),'selected_reference_id':item.get('selected_reference_id'),'palette':item.get('palette'),'color_match':obj.get('color_match') if obj else None,'reference_images_sent':obj.get('reference_images_sent') if obj else None})
     def variety(values):
         scores=[distance(a,b) for i,a in enumerate(values) for b in values[i+1:]]
         return round(sum(scores)/len(scores),3) if scores else None

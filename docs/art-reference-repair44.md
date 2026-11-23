@@ -101,3 +101,18 @@ do not disable or evade the provider's filter. Two previously accepted, visually
 reviewed v3 results are bound to their actual text hash, prompt version and WebP
 SHA; they are not discarded or relabelled v4. Review records disclose remaining
 ornament/texture limitations. The all-eleven atomic publication gate remains.
+
+A real runner response confirmed that `/json` returns a legacy Europeana Record
+DTO rather than the documented JSON-LD graph. Request the canonical item URI with
+`Accept: application/ld+json`; only an unsupported/technical representation may
+fall back to the documented `/xml` RDF representation. XML facts go through the
+same record-bound rights/media/thumbnail admission. HTTP 403, robots and other
+access failures never trigger this fallback. Gallery proof records actual old/new
+SHA values and prompt versions, and movement evidence points to its own catalogue.
+
+When the museum adapter changes, the existing CI browser job runs a single
+read-only public metadata contract probe before its normal browser checks. Its
+small artifact contains only work facts, rights/file URLs and schema paths;
+descriptions and private newspaper data are excluded. No Secrets, checkpoints,
+Gemini or image inference are used. This advisory probe makes real schema changes
+reviewable before production, without adding a workflow or publication gate.

@@ -115,6 +115,26 @@ def searchculture_work(payload,source,genre):
         'image_url':image,'genre_evidence':evidence,'genre_id':genre_id(genre),'verified':True}
 
 
+def searchculture_xml(raw,source,genre):
+    """Documented RDF/XML is normalized into the same strict EDM admission."""
+    from xml.etree import ElementTree as ET
+    rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#';edm='http://www.europeana.eu/schemas/edm/';ore='http://www.openarchives.org/ore/terms/'
+    root=ET.fromstring(raw)
+    if root.tag!='{'+rdf+'}RDF':raise ValueError('ART_SOURCE_SCHEMA_INVALID')
+    graph=[]
+    for element in root:
+        kind={'{'+edm+'}ProvidedCHO':'edm:ProvidedCHO','{'+ore+'}Aggregation':'ore:Aggregation'}.get(element.tag)
+        if not kind:continue
+        node={'@id':element.get('{'+rdf+'}about'),'@type':kind}
+        for field in element:
+            if not field.tag.startswith('{'):continue
+            namespace,name=field.tag[1:].split('}',1);key=namespace+name
+            value={'@id':field.get('{'+rdf+'}resource')} if field.get('{'+rdf+'}resource') else {'@value':(field.text or '').strip()}
+            if field.get('{http://www.w3.org/XML/1998/namespace}lang'):value['@language']=field.get('{http://www.w3.org/XML/1998/namespace}lang')
+            node.setdefault(key,[]).append(value)
+        graph.append(node)
+    return searchculture_work({'@graph':graph},source,genre)
+
 # Verified catalogue identifiers are discovery hints, never substitutes for live
 # rights/artist/medium/file verification. Established sets never use this table.
 PARIS_SEEDS={
@@ -152,7 +172,7 @@ def paris_work(payload,identifier,genre):
     return {'museum':'Paris Musées — '+plain(metadata.get('Institution')),'museum_id':'paris:'+str(identifier),'title':title,'artist':artist,'year':' '.join(year.split()),
         'source_url':source,'license':'CC0','license_url':'https://creativecommons.org/publicdomain/zero/1.0/','rights_evidence':rights['Copyright'],
         'image_url':image,'genre_evidence':spec[1],
-        'genre_evidence_url':'https://www.parismuseescollections.paris.fr/de/node/67084','genre_id':genre_id(genre),'verified':True}
+        'genre_evidence_url':source,'genre_id':genre_id(genre),'verified':True}
 
 def file_valid(root,work):
     try:
@@ -207,6 +227,21 @@ class Museum:
             if exc.code in (401,403,429,500,502,503):self.blocked_hosts.add(parsed.hostname)
             print('[art-museum-access] '+json.dumps({'host':parsed.hostname,'stage':'robots' if parsed.path=='/robots.txt' else 'fetch','http_status':exc.code}),flush=True)
             raise
+    def linked_work(self,source,genre):
+        # The /json convenience route can return an older Europeana Record DTO.
+        # Use documented canonical-URI negotiation; a technical representation
+        # mismatch may use RDF/XML, never an auth/robots/access-error workaround.
+        payload=None
+        try:
+            raw=self.get(source,accept='application/ld+json')
+            try:payload=json.loads(raw)
+            except (ValueError,UnicodeDecodeError):pass
+        except HTTPError as exc:
+            if exc.code!=406:raise
+        if isinstance(payload,dict) and '@graph' in payload:return searchculture_work(payload,source,genre)
+        print('[art-museum-format] '+json.dumps({'museum':'momus-searchculture','canonical_uri':source,'json_keys':list(payload)[:30] if isinstance(payload,dict) else [],'next':'DOCUMENTED_RDF_XML'}),flush=True)
+        return searchculture_xml(self.get(source+'/xml',accept='application/rdf+xml'),source,genre)
+
     def candidates(self,genre,start_page=1):
         # Public Linked Data / IIIF: no search-API key, paid plan or access bypass.
         # Fetch rights and metadata live before admitting any seed's actual file.
@@ -216,10 +251,7 @@ class Museum:
                 if mid in self.known_ids:continue
                 source='https://www.searchculture.gr/aggregator/edm/momus/000179-'+str(identifier)
                 try:
-                    payload=json.loads(self.get(source+'/json',accept='application/ld+json, application/json;q=0.9'));work=searchculture_work(payload,source,genre)
-                    if not work:
-                        graph=payload.get('@graph',[]) if isinstance(payload,dict) else payload
-                        print('[art-museum-schema] '+json.dumps({'item':identifier,'root_keys':list(payload)[:12] if isinstance(payload,dict) else [],'nodes':[{'id':r.get('@id'),'type':r.get('@type'),'keys':list(r)[:20]} for r in graph if isinstance(r,dict) and any(t in str(r.get('@type')) for t in ('ProvidedCHO','Aggregation'))][:3]}),flush=True)
+                    work=self.linked_work(source,genre)
                     print('[art-museum-source] '+json.dumps({'museum':'momus-searchculture','item':identifier,'admissible':bool(work)}),flush=True)
                     if work:
                         self.known_ids.add(mid);yield work
@@ -590,3 +622,38 @@ def checkpoint(state,root):
         if work and work['path'] in tracked and (Path(root)/work['path']).is_file() and digest((Path(root)/work['path']).read_bytes())==work['sha256']:continue
         saved['study_objects'][key]=data
     return saved
+
+
+def probe_source(output):
+    """One public read-only contract probe; no checkpoint, credentials or model."""
+    source='https://www.searchculture.gr/aggregator/edm/momus/000179-1260';client=Museum(seconds=55,requests=10)
+    report={'source':source,'admitted':False,'model_requests':0}
+    try:
+        work=client.linked_work(source,'Конструктивизм');report.update(admitted=bool(work),work=work)
+    except Exception as exc:report['code']=safe_code(exc)
+    if not report['admitted'] and 'www.searchculture.gr' not in client.blocked_hosts:
+        try:
+            payload=json.loads(client.get(source+'/json',accept='application/json'));facts=[]
+            allowed={'about','id','proxyfor','edmaggregatedcho','edmrights','edmobject','dctitle','dccreator','dcdate','dctype','dcsubject','dcformat','dctermsmedium'}
+            def visit(value,path=''):
+                if len(facts)>=80:return
+                if isinstance(value,dict):
+                    for key,child in value.items():
+                        route=path+'/'+key
+                        if re.sub('[^a-z]','',key.casefold()) in allowed:facts.append({'path':route,'value':json.dumps(child,ensure_ascii=False)[:1200]})
+                        else:visit(child,route)
+                elif isinstance(value,list):
+                    for index,child in enumerate(value[:3]):visit(child,path+'/'+str(index))
+            visit(payload);report.update(public_root_keys=list(payload) if isinstance(payload,dict) else [],public_metadata_facts=facts)
+        except Exception as exc:report['diagnostic_code']=safe_code(exc)
+    Path(output).write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n')
+    print('[art-source-probe] '+json.dumps({k:v for k,v in report.items() if k not in ('work','public_metadata_facts','public_root_keys')}),flush=True)
+    return report
+
+
+if __name__=='__main__':
+    import argparse
+    parser=argparse.ArgumentParser(description='Read-only public museum metadata contract probe; no image generation')
+    parser.add_argument('--probe-source',action='store_true',required=True)
+    parser.add_argument('--output',required=True)
+    args=parser.parse_args();probe_source(args.output)
