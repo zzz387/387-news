@@ -9,23 +9,23 @@
   "preview": false,
   "pages": {
     "feature-01": {
-      "html": "a7177489d712a2a058418834e9bf7bfc6769d9761df24f31f9884f5487e89167",
+      "html": "8f1644329853cf9058a16394d239e4a8bb909978195c714885c4f81388d630f4",
       "markdown": "b47e51881a3914c13f9686b3692ca0b056235748fc5b8b0dabca88421c3d731b"
     },
     "feature-02": {
-      "html": "eb7555551e7dab339b557c9aca068345a48fdeb0559a4e865b118d220db1d8da",
+      "html": "c4ba51229c48132381fa18240138eb288e004bbab12a0291e481524f60554210",
       "markdown": "3dc979325e66375bef888351b27e71cd6ba1e92a6f076b47663e42982cd68828"
     },
     "feature-03": {
-      "html": "547d87be21ded072c2f2f0f3205dc55f66090aee57aebcbe4713429a2a0511fc",
+      "html": "764e6e0022e8c0891fe79838953feaafda7108186c74d6246459a78c5b9b3020",
       "markdown": "de8ba2adfd1c1a658b3f6dfa70d43e4f8c1896deca3cb69bdefb38d2929aa47d"
     },
     "feature-04": {
-      "html": "2cdf6df031916edd38b5b157ae6e875ccc621033f65d22b7e86ec94bba413a8c",
+      "html": "fa2835b24570a01f084938679e38af7c0a1e98b6157d82828010520292a94fcc",
       "markdown": "1fa263f4ff0b1ec2397569f82c4b5db8f660b219c60e82e6799aa3d9d2bde223"
     },
     "feature-05": {
-      "html": "ee0907393bacb1c41a210ec9b0c8245033fc6f09f40be112709c11ffdf36334f",
+      "html": "945589f5480e296144cb6ce2bb59abd09edd3be48aacbf7d536c1fcbeeaaf5da",
       "markdown": "81ba3f14c1c8498d0eb1d9258ae2b2bfc73052fdb23b6bc9b4d50559c273e4c3"
     },
     "feature-06": {
@@ -66,12 +66,121 @@
   "release_not_before": "2026-11-23T06:00:00+03:00",
   "brief_policy_revision": 2,
   "mosaic_revision": 2,
-  "illustrations": [],
+  "illustrations": [
+    {
+      "key": "91e60bfd308acd05c9b50e274dba371eb76192caac338d0be7af08528eb2aebe",
+      "article_id": "9056d49942ca34f29681d781b0d216ff7484a85caa44c71617c16f5e4e5463b2",
+      "description_hash": "0fc67f6adaf4b185da7c755949b02b42721fd7dbc83daeda743992c4394559d8",
+      "genre": "Конструктивизм",
+      "ratio": "3:2",
+      "prompt_version": "387-art-cloudflare-5",
+      "date": "2026-11-23",
+      "text_hash": "cc64317410c339d257222dad17ef92c9ffeb0722e83e24e2f1de22e32e4c4781",
+      "protocol": 2,
+      "article_slug": "feature-01",
+      "sha256": "fcff7c21c35c84cf62df5ba69eea7ef96fd9b4d4145eca9e7a6d36c0a48ac7f3",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "reference_status": "REFERENCE_SET_UNAVAILABLE",
+      "path": "assets/illustrations/2026-11-23/91e60bfd308acd05c9b50e274dba371eb76192caac338d0be7af08528eb2aebe.webp"
+    },
+    {
+      "key": "583015a25911c3282965c9cfb5c475815c7f3f6a117d633141a7a66824b98ed2",
+      "article_id": "aacd5bb3542046f0abb1b39fa662fae256c93745a685564fe9834038845bc3d4",
+      "description_hash": "3c9127439b4aa1c9f8a5842f0d9ce0238404cbd98137aa0948ce2fe3e01d7580",
+      "genre": "Ар-нуво",
+      "ratio": "4:5",
+      "prompt_version": "387-art-cloudflare-5",
+      "date": "2026-11-23",
+      "text_hash": "1cfc4479ba34a01f5e23f546e1580904b88952de40a205265ba5f9b2ffd6aa83",
+      "protocol": 2,
+      "article_slug": "feature-02",
+      "sha256": "54b477537402f3962738e20a66366e9816194612caa3ba5715ff6e34bdabe4ba",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "reference_status": "REFERENCE_SET_UNAVAILABLE",
+      "path": "assets/illustrations/2026-11-23/583015a25911c3282965c9cfb5c475815c7f3f6a117d633141a7a66824b98ed2.webp"
+    },
+    {
+      "key": "092df606fbf8f2698cd7b344b2d340042dd8e2f17059239634a253516747eb5f",
+      "article_id": "cf2a9ddcc5d25fb9a9efd8bd32d5f748bdbde1ab7abe79db8e62ff90599f7776",
+      "description_hash": "a87604a576ab61e484a9dc010f0b270c5d78e2baaaae6ea938f04b200cdf1f15",
+      "genre": "Символизм",
+      "ratio": "1:1",
+      "prompt_version": "387-art-cloudflare-5",
+      "date": "2026-11-23",
+      "text_hash": "e568941daea78e5614336632f190c27c0c21462bed2743eadc57002ed9e1857d",
+      "protocol": 2,
+      "article_slug": "feature-03",
+      "sha256": "3545fe0653a90a86aaa46260c294fe2e80866c602471462a3181d0ac970a4c7a",
+      "width": 1024,
+      "height": 768,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "FOUR_REFERENCES_READY",
+      "reference_set_id": "2026-11-23/symbolism",
+      "reference_artwork_ids": [
+        "080abad448e544ca3d67ba00b4835c2e88709f8e10e57d5723bcca21d516943b",
+        "bfb97340b75d66d8daf0843a58c9982c7dbdd849ea7cde2498b97cd26986d40f",
+        "4a88cb5cdb52402afdd241b1218cd88ddc69b0bd59020156dae4cfb661a95765",
+        "61bd8458495302e2a43deb1a1b72dcc2d53efd25ad0784fe5fce7259d13f050c"
+      ],
+      "reference_sha256": [
+        "3b7a2e34a6f135c5518565bd6b331a4e8282f8dd06a0d19736e45df78a2decfa",
+        "d8304a41a5246078838b127518a9cdc219edcad143e2a7d1ba208a2da3480bbb",
+        "dc9117df87e815055d214a0fe5be329405492844f1bd174af67bb752583ed0b9",
+        "5c5853e1d268c9411f4f089dbcbf7b3b4e109a35cfd39d37381c777e836ad143"
+      ],
+      "path": "assets/illustrations/2026-11-23/092df606fbf8f2698cd7b344b2d340042dd8e2f17059239634a253516747eb5f.webp"
+    },
+    {
+      "key": "114e735227286cdfa143fe762167614818a7386d045088bed25fa3037dbe84cd",
+      "article_id": "b2b13908e4f30289a02da3998324f7ddda04cb4a86fd02c907b606e7d30728ad",
+      "description_hash": "365b10931b75767be958a2fba46492527b36606309c1392977980a9bb51d03c3",
+      "genre": "Коллаж",
+      "ratio": "3:4",
+      "prompt_version": "387-art-cloudflare-5",
+      "date": "2026-11-23",
+      "text_hash": "d4ebf54b24f9f48ada7f1448550af9389dc277688edd75473f92f0072d9065c6",
+      "protocol": 2,
+      "article_slug": "feature-04",
+      "sha256": "257101c6ebb72e3c1ce3179ebe99d9086f93b4c9e7ccf3d4cda9d3a3b02746f2",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "reference_status": "REFERENCE_SET_UNAVAILABLE",
+      "path": "assets/illustrations/2026-11-23/114e735227286cdfa143fe762167614818a7386d045088bed25fa3037dbe84cd.webp"
+    },
+    {
+      "key": "7387e05fe8055b4c91e49fc7366c963b35d4f12b20f08c4f84cda49570819be6",
+      "article_id": "1f9058ee02b37d64917f24fb389f467263bb5731fb1cc5bf5407c5496b56db56",
+      "description_hash": "c2d8d1748797de6fe8f4910527499c275880952de725d4d341e9375a620ebe4e",
+      "genre": "Кубизм",
+      "ratio": "16:9",
+      "prompt_version": "387-art-cloudflare-5",
+      "date": "2026-11-23",
+      "text_hash": "801172b1e9617f50b8d25aadbe6519497ecc444fe04df0bdc6e3917e65773f40",
+      "protocol": 2,
+      "article_slug": "feature-05",
+      "sha256": "e98dff28942b9995c685abf5034021eb1e37cf4ee48d58a10e090b772b3f0507",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "reference_status": "REFERENCE_SET_UNAVAILABLE",
+      "path": "assets/illustrations/2026-11-23/7387e05fe8055b4c91e49fc7366c963b35d4f12b20f08c4f84cda49570819be6.webp"
+    }
+  ],
   "art44": {
     "status": "ARTWORK_INCOMPLETE",
     "required": 13,
-    "ready": 0,
-    "missing": 13,
+    "ready": 5,
+    "missing": 8,
     "emergency_text": true,
     "provider_status": "READY",
     "bindings": [
@@ -380,7 +489,7 @@
     }
   ],
   "light_count": 12,
-  "homepage_hash": "43d10b64e1084483723858a0eba9b2e6a7aa0a86b153d9fe9392fb0ced8fa682",
-  "overview_hash": "e7c801f91c605b652ad8ffd8b57ff172fdfc4ef58e5d808881503603749a7819",
+  "homepage_hash": "d313df32c50e8498b0aa720fa309b276052283b64c332846bfcfac9c06b98daa",
+  "overview_hash": "80c1cf13c5010935d8ef042c143bcb61c031973fd100f4438d37e324b3ac4301",
   "markdown_hash": "1c01c1f13e0b3dbba74fa02ca7839b8ca68eaa83defd18ca9ee23a4c1c431143"
 }
