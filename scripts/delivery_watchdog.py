@@ -35,7 +35,12 @@ def observed_attempts(rows,date):return len({r['id'] for r in recoveries(rows,da
 
 def current(date,check,diagnostic=None):
     try:
-        check(expected_date=date)
+        report=check(expected_date=date)
+        if diagnostic is not None and isinstance(report,dict):
+            editorial=report.get('editorial_standard',{})
+            if editorial.get('compliant'):
+                diagnostic['editorial_status']=editorial['admission_status']
+                diagnostic['editorial_standard']=editorial
         if diagnostic is not None:diagnostic.pop('public_check_code',None)
         return True
     except HTTPError as exc:code='HTTP_'+str(exc.code) if exc.code in (403,404,503) else 'HTTP_STATUS_OTHER'
@@ -64,7 +69,7 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
         now=queue.moscow(clock())
         if now.date().isoformat()!=date:code='WATCHDOG_DATE_ROLLED_OVER';break
         if now>=release and current(date,check,result):
-            result.update(verified=True,publication_status='PUBLISHED_VERIFIED',code='VERIFIED')
+            result.update(verified=True,publication_status='PUBLISHED_VERIFIED',delivery_status='PUBLICATION_VERIFIED',code='VERIFIED')
             try:result['incident']=monitor.incident(date,'VERIFIED',True,request)
             except Exception as exc:result['notification_error']=type(exc).__name__
             return result
@@ -93,7 +98,7 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
             break
         if now>=deadline:code='ACTIVE_PRODUCTION_TIMEOUT' if active else 'RECOVERY_NOT_VERIFIED';break
         sleep(min(30,max(0,(deadline-now).total_seconds())))
-    result.update(publication_status='PUBLICATION_FAILED',code=code,recovery_attempts=attempts)
+    result.update(publication_status='PUBLICATION_FAILED',delivery_status='PUBLICATION_FAILED',code=code,recovery_attempts=attempts)
     try:result['incident']=monitor.incident(date,code,False,request,recovery_attempts=min(attempts,MAX_RECOVERIES),public_check_code=result.get('public_check_code'))
     except Exception as exc:result['notification_error']=type(exc).__name__
     return result

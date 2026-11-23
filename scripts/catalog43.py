@@ -185,11 +185,22 @@ def refresh(state,now=None,session=None,shortage=False):
         config['article_checks_per_run']=min(24,config['article_checks_per_run']*3)
     cache=state.setdefault('discovery43',{'publishers':{}})
     from scripts import priorities43,policy44
+    targets=policy44.search_deficits(state) if policy44.active(state) else {g:1 for g in priorities43.CORE_GROUPS}
+    cache['last_run']={'at':now.isoformat(),'attempted_groups':[],'candidate_groups':{},'publishers_attempted':0,'article_checks':0,
+                     'candidate_targets':targets,'missing_candidate_groups':[g for g,n in targets.items() if n]}
+    run=cache['last_run']
     def due(row):
         saved=cache['publishers'].get(row['id'],{})
         if policy44.active(state) and saved.get('classifier44_revision')!=policy44.REVISION:return True
         last=saved.get('checked_at')
-        return not last or now-datetime.fromisoformat(last)>=timedelta(hours=config['refresh_hours'])
+        interval=timedelta(hours=config['refresh_hours'])
+        # Retry missing streams before the normal broad refresh, without hammering
+        # the same publisher on two searches in one run or bypassing access denials.
+        ids={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}
+        targeted=shortage and policy44.active(state) and any(n and ids[g]&set(row.get('priority_ids',[])) for g,n in targets.items())
+        if targeted and saved.get('status') not in ('blocked','unavailable') and not saved.get('code'):
+            interval=min(interval,timedelta(minutes=30))
+        return not last or now-datetime.fromisoformat(last)>=interval
     ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified' and due(r)],cache,state.get('_recent43',[]),state['date'])
     from scripts import policy44
     if policy44.active(state):ordered=policy44.publisher_order(ordered,state)
@@ -203,7 +214,8 @@ def refresh(state,now=None,session=None,shortage=False):
             light=min(picks,key=lambda r:(cache['publishers'].get(r['id'],{}).get('checked_at',''),-r.get('availability',{}).get('full_originals_verified',0),r['id']))
             other=[r for r in other if r['id']!=light['id']]
             ordered=core+[dict(light,search_light=True)]+other
-    if not ordered:return cache
+    if not ordered:
+        run['code']='NO_PUBLISHERS_DUE';return cache
     from scripts import editorial41
     published_urls={x.get('source_url') for x in editorial41.archive_entries(p.ROOT)}
     selected=[]
@@ -212,10 +224,6 @@ def refresh(state,now=None,session=None,shortage=False):
         selected.append(row)
         if len(selected)>=config['publishers_per_run']:break
     known={r['url'] for r in state['candidates']};session=session or public_sources41.Session(timeout=7);deadline=time.monotonic()+(120 if shortage else 75);checks=0
-    cache['last_run']={'at':now.isoformat(),'attempted_groups':[],'candidate_groups':{},'publishers_attempted':0,'article_checks':0}
-    run=cache['last_run']
-    targets=policy44.search_deficits(state) if policy44.active(state) else {g:1 for g in priorities43.CORE_GROUPS}
-    run['candidate_targets']=targets
     # Reserve an independent discovery attempt for each core group. Network work
     # overlaps only across public publishers; no model calls or state mutations.
     core=[row for row in selected if row.get('search_group')]

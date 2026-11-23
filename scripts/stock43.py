@@ -57,24 +57,27 @@ def reconcile(state,root):
             if reserved and (Path(root)/'issues'/reserved/'index.html').exists() and not row.get('stock_published'):row.pop('stock_reserved_for',None)
     return stock
 
-def reusable(row,date,used=()):
+def reuse_block(row,date,used=()):
     from scripts import brief_selection44
-    if row.get('light_kind') and brief_selection44.excluded(row):return False
-    if row.get('stock_published') or source_urls(row)&set(used):return False
+    if row.get('light_kind') and brief_selection44.excluded(row):return 'BRIEF_UNSUITABLE'
+    if row.get('stock_published') or source_urls(row)&set(used):return 'ALREADY_PUBLISHED'
     from scripts import light44
     brief=light44.eligible(row)
-    if not brief and (not e.eligible(row) or row.get('checks',{}).get('final43',{}).get('is_news') is not False):return False
-    if brief and row.get('light_kind')=='news':return False
+    if not brief and not e.eligible(row):return 'REVIEW_NOT_CURRENT'
+    if not brief and row.get('checks',{}).get('final43',{}).get('is_news') is not False:return 'DATED_NEWS'
+    if brief and row.get('light_kind')=='news':return 'DATED_NEWS'
     # Clinical/legal/childcare advice is not silently carried into another day.
     # Such work stays in its original checkpoint until fresh normal safety review.
-    if e.high_risk(row):return False
+    if e.high_risk(row):return 'FRESH_SAFETY_REVIEW_REQUIRED'
     try:
         checked=datetime.fromisoformat(row['ready_checked_at']);checked=checked.replace(tzinfo=p.TZ) if checked.tzinfo is None else checked
         at=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
-        if not -timedelta(days=1)<=at-checked<=timedelta(days=e.CONFIG['reserve_max_age_days']):return False
+        if not -timedelta(days=1)<=at-checked<=timedelta(days=e.CONFIG['reserve_max_age_days']):return 'REVIEW_EXPIRED'
         rights41.require(row['source'],row['article']['mode'],rights41.decision(row['source'],row['article']['mode']))
-    except (KeyError,ValueError,p.Blocked):return False
-    return True
+    except (KeyError,ValueError,p.Blocked):return 'RIGHTS_OR_DATE_UNVERIFIED'
+    return None
+
+def reusable(row,date,used=()):return reuse_block(row,date,used) is None
 
 def available(state,date,key='records',include_reserved=False):
     stock=ensure(state);used=set(stock['published_urls'])
@@ -210,7 +213,9 @@ def report(state):
     from scripts import priorities43
     stock_groups={g:sum(priorities43.classify(r)['group']==g for r in available(state,date)) for g in ('A','C')}
     required=__import__('scripts.policy44',fromlist=['counts']).counts(available(state,date))
-    return {'required_topics':required,'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
+    from collections import Counter
+    blocked=Counter(reuse_block(r,date,stock['published_urls']) or ('RESERVED' if r.get('stock_reserved_for') else 'REUSABLE') for r in stock['records'])
+    return {'required_topics':required,'article_reuse_status':dict(blocked),'required_topic_goal':2,'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
             'stored_articles':len(stock['records']),'stored_light':len(stock['light']),
             'backlog':len(stock['backlog']),'article_goal':e.CONFIG.get('article_stock_target',20),
             'light_goal':e.CONFIG.get('light_stock_target',15)}

@@ -8,6 +8,15 @@ from scripts import daily43 as d,editorial43 as e,publication43 as pub,stock43 a
 from scripts import test_daily43 as fixture,test_editorial_visual43 as visual
 
 class MinimumStockTests(unittest.TestCase):
+    def test_inventory_block_reasons_preserve_existing_reuse_guards(self):
+        s=self.make(bank=3);a,b,c=stock.ensure(s)['records']
+        a['stock_published']=True;b['ready_checked_at']='2020-01-01T06:00:00+03:00'
+        self.assertEqual(stock.reuse_block(a,s['date']),'ALREADY_PUBLISHED')
+        self.assertEqual(stock.reuse_block(b,s['date']),'REVIEW_EXPIRED')
+        self.assertIsNone(stock.reuse_block(c,s['date']))
+        self.assertEqual(stock.report(s)['article_reuse_status'],{'ALREADY_PUBLISHED':1,'REVIEW_EXPIRED':1,'REUSABLE':1})
+        self.assertEqual(stock.available(s,s['date']),[c])
+
     def make(self,mains=0,bank=0):
         s=fixture.state(mains);inventory=stock.ensure(s)
         inventory['records']=[fixture.ready(i+100) for i in range(bank)]

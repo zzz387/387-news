@@ -40,6 +40,24 @@ class API:
         raise AssertionError('Unexpected endpoint '+path)
 
 class WatchdogTests(unittest.TestCase):
+    def test_relaxed_issue_recovery_keeps_real_deficit_and_requires_verified_https(self):
+        from scripts import policy44
+        from scripts.test_policy44 import main_row,issue
+        from scripts.test_editorial_visual43 import light_ready
+        s=issue();s['brief_policy_revision']=2
+        report=policy44.standard(s,[main_row(i) for i in [0,1,4]+list(range(6,16))],[light_ready(i) for i in range(12)])
+        clock=Clock(at('07:00'));api=API(clock);base=api.check
+        def check(**kwargs):return dict(base(**kwargs),editorial_standard=report)
+        with patch.dict(os.environ,NEWS_POLICY_VERSION='4.4'),patch.object(q,'edition_exists',return_value=False):
+            result=w.run(Path('/unused'),clock=clock,sleep=clock.sleep,request=api,check=check)
+            self.assertEqual(len(api.posts),1);self.assertTrue(result['verified'])
+            self.assertEqual(result['editorial_status'],'RELAXED_EDITORIAL_APPROVED')
+            self.assertEqual(result['editorial_standard']['total_topic_deficit'],3)
+            self.assertEqual(result['delivery_status'],'PUBLICATION_VERIFIED')
+            pending=m.evaluate(Path('/unused'),{'date':DAY,'editorial_standard':report,'block_code':'EDITORIAL_STANDARD_NOT_MET'},at('07:00'),lambda **kw:(_ for _ in ()).throw(RuntimeError('Not delivered')))
+            self.assertEqual(pending['code'],'READY_NOT_PUBLISHED');self.assertFalse(pending['verified'])
+            self.assertEqual(pending['editorial_status'],'RELAXED_EDITORIAL_APPROVED')
+
     def test_artwork_count_is_separate_from_successful_text_publication(self):
         from scripts import publication43,mosaic44
         metadata={'article_count':8,'pages':{str(i):{} for i in range(8)},'illustrations':[],
