@@ -48,7 +48,7 @@ def genre_matches(genre,tokens):
     text=''.join(c for c in unicodedata.normalize('NFKD',tokens) if not unicodedata.combining(c)).casefold().replace('-',' ')
     if genre=='Конструктивизм':return bool(re.search(r'\b(?:constructivis(?:m|t)|konstruktivis(?:m|t))',text))
     if genre=='Романтизм':return bool(re.search(r'\b(?:romantic(?:ism)?|romantik)\b',text))
-    if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',text):return False
+    if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis|progressed from cubism',text):return False
     if genre=='Кубизм':return bool(re.search(r'\b(?:cubism|cubist|kubisme)\b',text))
     if genre=='Японская гравюра':return ('japan' in text or 'ukiyo' in text) and ('woodblock' in text or 'woodcut' in text)
     if genre=='Импрессионизм':return bool(re.search(r'\bimpressionis',text))
@@ -410,7 +410,7 @@ def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None)
         if len(row['artwork_ids'])!=4 or len(set(row['artwork_ids']))!=4 or not all(file_valid(root,registry['artworks'][i]) for i in row['artwork_ids']):raise ValueError('ART_SET_INTEGRITY')
         return row
     used={i for row in registry['sets'].values() for i in row['artwork_ids']}
-    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w) and not (genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis',w.get('genre_evidence',''),re.I))]
+    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w) and not (genre=='Кубизм' and not genre_matches(genre,w.get('genre_evidence','')))]
     if len(available)<4:return None
     from scripts import art_reference44 as color
     profiles={w['id']:color.work_profile(root,w,{}) for w in available}

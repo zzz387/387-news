@@ -96,6 +96,7 @@ class ArtLibraryTests(unittest.TestCase):
         self.assertTrue(lib.genre_matches('Конструктивизм','Constructivist design'))
         self.assertTrue(lib.genre_matches('Ар-деко','Art Déco'));self.assertTrue(lib.genre_matches('Ар-нуво','Jugendstil'))
         self.assertFalse(lib.genre_matches('Кубизм','Neo-Plasticism evolved from Cubism'))
+        self.assertFalse(lib.genre_matches('Кубизм','Mondrian progressed from Cubism to an increasingly abstract style'))
         self.assertTrue(lib.genre_matches('Кубизм','A Cubist composition'))
         self.assertFalse(lib.genre_matches('Кубизм','Cubo-Futurism is a distinct movement'))
         museum=lib.Museum();data={'data':[{'id':1,'title':'Fixture painting','artist_title':'Fixture painter','date_display':'1890','image_id':'fixture','artwork_type_title':'Painting','style_titles':['Impressionism'],'is_public_domain':True}]}
