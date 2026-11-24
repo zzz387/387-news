@@ -461,7 +461,7 @@ jobs:
       NEWS_MAX_REQUESTS_PER_DAY: "220"
       NEWS_REQUEST_GAP_SECONDS: "6"
       NEWS_STAGE_SECONDS: "720"
-      GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite
+      GEMINI_MODELS: gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-3.6-flash
     outputs:
       ready: ${{ steps.commit.outputs.ready }}
       issue_date: ${{ steps.commit.outputs.issue_date || steps.stage.outputs.issue_date }}
