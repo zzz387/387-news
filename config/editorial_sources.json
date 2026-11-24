@@ -1,5 +1,5 @@
 {
-  "version": "4.4-personal-health-recovery",
+  "version": "4.4-personal-topic-routes-2",
   "refresh_hours": 6,
   "publishers_per_run": 5,
   "article_checks_per_run": 8,
@@ -6453,7 +6453,13 @@
         "feeds": [],
         "html": true,
         "manual_search": true,
-        "feed_urls_are_hints": false
+        "feed_urls_are_hints": false,
+        "revision": 1,
+        "group_pages": {
+          "family": [
+            "https://www.unicef.org/parenting/child-development"
+          ]
+        }
       },
       "enabled": true,
       "access": {
@@ -7169,7 +7175,17 @@
         "feeds": [],
         "html": true,
         "manual_search": true,
-        "feed_urls_are_hints": false
+        "feed_urls_are_hints": false,
+        "revision": 1,
+        "group_pages": {
+          "health": [
+            "https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/",
+            "https://www.nhs.uk/live-well/healthy-teeth-and-gums/"
+          ],
+          "sport": [
+            "https://www.nhs.uk/live-well/exercise/"
+          ]
+        }
       },
       "enabled": true,
       "access": {

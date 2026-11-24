@@ -8,6 +8,31 @@ from scripts import test_daily43 as fixtures,test_editorial_visual43 as visual
 from scripts.test_editorial_topic_coverage43 import candidate
 
 class TopicDiscoveryTests(unittest.TestCase):
+    def test_topic_section_is_used_instead_of_homepage_or_global_rss(self):
+        for group,title,expected in [('family','Helping parents support children at home',1),('health','Eating a balanced diet',1),('health','How to get to sleep',1),('health','National Diet debates election reform',0),('sport','Physical activity and exercise guidelines',1)]:
+            with self.subTest(group=group):
+                fixture=visual.CatalogTests();row=fixture.registry_row();session=fixture.session();transport=session.transport
+                row['discovery']=dict(row['discovery'],group_pages={group:['https://example.org/'+group]})
+                def page(url):
+                    if url=='https://example.org/'+group:
+                        session.urls.append(url)
+                        return '<html><link rel="alternate" type="application/rss+xml" href="/global-feed.xml"><h2><a href="/story/9">'+title+'</a></h2></html>'
+                    return transport(url)
+                session.transport=page
+                report,_=cat.inspect_publisher(row,session,now=fixtures.NOW,preferred_group=group)
+                self.assertEqual(report['discovery_page'],'https://example.org/'+group)
+                self.assertEqual(report['matching_topic_metadata'],expected);self.assertEqual(session.full,['https://example.org/story/9'] if expected else [])
+                self.assertFalse(any('feed' in url for url in session.urls))
+
+    def test_updated_discovery_route_is_not_hidden_by_an_old_checkpoint_cooldown(self):
+        fixture=visual.CatalogTests();row=fixture.registry_row();row['discovery']=dict(row['discovery'],revision=2)
+        config=cat.registry();config['publishers']=[row];s=fixtures.state()
+        s['discovery43']={'publishers':{'fixture':{'checked_at':fixtures.NOW.isoformat(),'discovery_revision':1}}}
+        with patch.object(cat,'registry',return_value=config),patch.object(cat,'inspect_publisher',return_value=({'article_checks':0,'status':'discovery_verified'},[])) as inspect:
+            cat.refresh(s,fixtures.NOW+timedelta(minutes=1),fixture.session())
+            cat.refresh(s,fixtures.NOW+timedelta(minutes=2),fixture.session())
+        inspect.assert_called_once();self.assertEqual(s['discovery43']['publishers']['fixture']['discovery_revision'],2)
+
     def test_missing_44_streams_retry_with_bounded_cooldown_and_fresh_empty_reports(self):
         from scripts import policy44
         from scripts.test_policy44 import issue,main_row
