@@ -298,6 +298,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
         # on a later operation/run; never retry immediately inside a failed call.
         model_list.sort(key=lambda m:cooldowns.get(m,0))
     errors = []
+    capacity_paused = False
     response_failed = False
     for model in model_list:
         url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
@@ -339,6 +340,9 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                     if runtime.ACTIVE_BUDGET:
                         runtime.ACTIVE_BUDGET.defer(model, delay)
                         if e.code==429:runtime.ACTIVE_BUDGET.defer('__all_models__',delay)
+                    if e.code==503:
+                        capacity_paused=True
+                        break  # Try the next configured free model once; keep this model's cooldown.
                     raise runtime.GenerationPaused(f'Gemini HTTP {e.code}; deferred without model fallback') from None
                 if e.code in (400,401,402,403,404):
                     break
@@ -359,6 +363,7 @@ def gemini(prompt, output_tokens=4800, *, schema=None):
                 errors.append(f'{model}: network error {type(e).__name__}')
                 if attempt < 2:
                     time.sleep([15, 45][attempt]); continue
+    if capacity_paused:raise runtime.GenerationPaused('Allowed free models temporarily unavailable; cooldowns retained')
     error_type = GeminiResponseError if response_failed else RuntimeError
     raise error_type('All allowed free Gemini models failed: ' + '; '.join(errors[-6:]))
 
