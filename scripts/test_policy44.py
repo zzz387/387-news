@@ -37,6 +37,13 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_unready_next_issue_keeps_automatic_archive_art_out_of_its_preparation_budget(self):
+        for n,lights,allowed in [(3,11,False),(8,8,True),(11,7,False),(11,8,True)]:
+            with self.subTest(main=n,lights=lights):
+                s=issue(n,lights)
+                if n==11:s['candidates']=[main_row(i) for i in [0,1,4]+list(range(6,14))]
+                self.assertEqual(staged_news.optional_art_allowed(s),allowed)
+
     def test_relaxed_topic_admission_boundaries_preserve_actual_deficits(self):
         cases=[(13,(2,0,1),12,True,False),(11,(1,1,1),8,True,False),(12,(2,0,0),12,False,False),(10,(2,1,2),12,False,False),(8,(2,2,2),8,True,True),(15,(2,1,1),7,False,False),(13,(2,0,1),13,False,False)]
         for n,groups,lights,allowed,strict in cases:

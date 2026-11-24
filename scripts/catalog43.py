@@ -60,7 +60,7 @@ def permitted_get(url,session):
 
 
 class Links(HTMLParser):
-    def __init__(self,base):super().__init__();self.base=base;self.feeds=[];self.articles=[];self.anchor=None;self.text=[];self.heading=0
+    def __init__(self,base,minimum_title_length=20):super().__init__();self.base=base;self.feeds=[];self.articles=[];self.anchor=None;self.text=[];self.heading=0;self.minimum_title_length=minimum_title_length
     def handle_starttag(self,tag,attrs):
         a={key:(value or '') for key,value in attrs}
         if tag in ('h1','h2','h3','h4'):self.heading+=1
@@ -71,7 +71,7 @@ class Links(HTMLParser):
     def handle_endtag(self,tag):
         if tag=='a' and self.anchor:
             title=' '.join(' '.join(self.text).split());url=urljoin(self.base,self.anchor)
-            if len(title)>20:self.articles.append({'url':url,'title':title,'heading_link':self.anchor_heading})
+            if len(title)>self.minimum_title_length:self.articles.append({'url':url,'title':title,'heading_link':self.anchor_heading})
             self.anchor=None
         if tag in ('h1','h2','h3','h4'):self.heading=max(0,self.heading-1)
 
@@ -109,12 +109,15 @@ def feed_items(raw,base):
 def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferred_group=None):
     now=now or datetime.now(p.TZ)
     report={'publisher':row['id'],'name':row['name'],'homepage':row['homepage'],'status':'unavailable','discovered':0,'eligible':0,'article_checks':0};sources=[];items=[];feeds=list(row['discovery']['feeds'])
-    pages=[row['homepage']]+row['discovery'].get('pages',[])
-    if len(pages)>1:feeds=[]  # A section's RSS must not silently replace another section.
-    home=pages[int(now.timestamp()//21600)%len(pages)]
+    group_pages=row['discovery'].get('group_pages',{}).get(preferred_group,[])
+    pages=group_pages or [row['homepage']]+row['discovery'].get('pages',[])
+    if group_pages or len(pages)>1:feeds=[]  # A section's RSS must not silently replace another section.
+    home=pages[int(now.timestamp()//(1800 if group_pages else 21600))%len(pages)]
     try:
-        raw=permitted_get(home,session);links=Links(getattr(raw,'resolved_url',home));links.feed(raw)
-        feeds=list(dict.fromkeys(links.feeds+feeds))
+        if not owned(home,row):raise p.Blocked('DISCOVERY_PAGE_WRONG_PUBLISHER')
+        report['discovery_page']=home
+        raw=permitted_get(home,session);links=Links(getattr(raw,'resolved_url',home),minimum_title_length=8 if group_pages else 20);links.feed(raw)
+        feeds=list(dict.fromkeys(([] if group_pages else links.feeds)+feeds))
         for feed in feeds[:2]:
             try:
                 data=feed_items(permitted_get(feed,session),feed);items.extend(data)
@@ -122,10 +125,16 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
                 if data:break
             except Exception:continue
         items=[dict(item,url=secure_discovery_url(item['url'],row)) for item in (items or links.articles)]
-        seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not advertising_story(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/')!=row['homepage'].rstrip('/') and x['url'] not in exclude]
+        seen=set();items=[x for x in items if owned(x['url'],row) and article_link(x) and not advertising_story(x) and not(x['url'] in seen or seen.add(x['url'])) and x['url'].rstrip('/') not in {row['homepage'].rstrip('/'),home.rstrip('/')} and x['url'] not in exclude]
         from scripts import selection43
         from scripts import priorities43,policy44
-        def item_group(item):return policy44.subject(item) if preferred_group in policy44.GROUPS else priorities43.classify(item)['group']
+        def item_group(item):
+            if preferred_group not in policy44.GROUPS:return priorities43.classify(item)['group']
+            group=policy44.subject(item)
+            # Concrete nutrition metadata, not a publisher/category override.
+            # The full original and final article still receive normal classification.
+            if not group and re.search(r'(?i)\b(?:balanced|vegan|vegetarian|mediterranean) diet\b|\bsaturated fat\b',item.get('title','')+' '+item.get('summary','')):return 'health'
+            return group
         items.sort(key=lambda item:(int(bool(preferred_group) and item_group(item)!=preferred_group),int(selection43.profile(item)['space']),not item.get('heading_link',False)))
         report.update(status='discovery_verified',discovered=len(items))
         if preferred_group:
@@ -191,6 +200,7 @@ def refresh(state,now=None,session=None,shortage=False,targeted_only=False):
     run=cache['last_run']
     def due(row):
         saved=cache['publishers'].get(row['id'],{})
+        if row['discovery'].get('revision') is not None and saved.get('discovery_revision')!=row['discovery']['revision']:return True
         if policy44.active(state) and saved.get('classifier44_revision')!=policy44.REVISION:return True
         last=saved.get('checked_at')
         interval=timedelta(hours=config['refresh_hours'])
@@ -272,6 +282,7 @@ def refresh(state,now=None,session=None,shortage=False,targeted_only=False):
         if row.get('search_group'):run['attempted_groups'].append(row['search_group'])
         report['requested_group']=row.get('search_group')
         cache['publishers'][row['id']]=dict(report,checked_at=now.isoformat())
+        cache['publishers'][row['id']]['discovery_revision']=row['discovery'].get('revision')
         if policy44.active(state):cache['publishers'][row['id']]['classifier44_revision']=policy44.REVISION
         for item,src in found:
             if src['url'] in known:continue

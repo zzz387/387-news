@@ -529,6 +529,12 @@ def recover_special_quota(ledger, key):
     RUNTIME.merge_snapshot(ledger,backup.get('_quota_snapshot',{}))
 
 
+def optional_art_allowed(state):
+    """Automatic archive artwork yields until the active daily edition is ready."""
+    from scripts import policy44,selection43
+    return not policy44.active(state) or policy44.standard(state,selection43.composition(state))['compliant']
+
+
 def main():
     global PERSIST
     p = argparse.ArgumentParser()
@@ -633,7 +639,7 @@ def main():
                     data,w,h=mosaic44.encode_image(raw);state['cf_free_smoke']={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':w,'height':h,'free_plan_verified':True};persist()
                     print('[cf-free-smoke] verified=true real_image=true billing_allowed=false',flush=True)
                 except Exception as exc:print('[cf-free-smoke] '+json.dumps({'verified':False,'code':str(exc) if re.fullmatch('[A-Z_0-9]+',str(exc)) else type(exc).__name__}),flush=True)
-        if args.phase in ('run','resume'):
+        if args.phase in ('run','resume') and optional_art_allowed(state):
             from scripts import mosaic44,publication43
             today=datetime.now(TZ).date().isoformat()
             if today>=mosaic44.CONFIG['first_automatic_issue'] and (ROOT/'issues'/today/'release.json').is_file() and mosaic44.provider_status()=='READY':
@@ -669,7 +675,7 @@ def main():
             ready=render(state,args.preview)
             pipeline.status(state,'PUBLISHING' if ready else 'APPROVED','commit_and_deploy' if ready else 'preview_complete')
         publication_date=art_publication_date or date
-        if not ready and args.phase in ('run','resume'):
+        if not ready and args.phase in ('run','resume') and optional_art_allowed(state):
             from scripts import mosaic44,publication43
             candidates=sorted((d.name for d in (ROOT/'issues').iterdir() if (d/'release.json').is_file() and re.fullmatch(r'\d{4}-\d{2}-\d{2}',d.name)),reverse=True)
             if mosaic44.provider_status()=='READY' and RUNTIME.ACTIVE_BUDGET.remaining_seconds()>90:
