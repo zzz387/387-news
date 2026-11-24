@@ -528,14 +528,21 @@ jobs:
           merge-multiple: true  # v4: artifact-ids otherwise nests under its name
       - name: Download shared daily request ledger
         if: ${{ steps.checkpoint.outputs.quota_found == 'true' }}
-        uses: actions/download-artifact@v4
-        with:
-          artifact-ids: ${{ steps.checkpoint.outputs.quota_id }}
-          run-id: ${{ steps.checkpoint.outputs.quota_run_id }}
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          path: ${{ runner.temp }}/quota
-          merge-multiple: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          QUOTA_ARTIFACT_ID: ${{ steps.checkpoint.outputs.quota_id }}
+        shell: bash
+        run: |
+          [[ "$QUOTA_ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$QUOTA_ARTIFACT_ID/zip" > "$RUNNER_TEMP/quota-exact.zip"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.locate_checkpoint import extract_quota_archive
+          root=Path(os.environ['RUNNER_TEMP'])
+          extract_quota_archive(root/'quota-exact.zip',root/'quota'/'quota.json')
+          print('EXACT_QUOTA_ARTIFACT_RESTORED')
+          PY
       - name: Restore shared encrypted editorial inventory
         if: ${{ steps.checkpoint.outputs.stock_found == 'true' }}
         uses: actions/download-artifact@v4
