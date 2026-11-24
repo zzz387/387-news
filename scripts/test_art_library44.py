@@ -99,6 +99,12 @@ class ArtLibraryTests(unittest.TestCase):
                 self.assertEqual(sets,lib.prepare_sets(temp,state,items,discover=False))
 
     def test_museum_metadata_and_access_checks_fail_closed(self):
+        for genre,identifier in (('Футуризм',485555),('Метафизическая живопись',435683)):
+            artist,title,_=lib.MET_REFERENCE_WORKS[identifier]
+            row=dict(objectID=identifier,isPublicDomain=True,artistDisplayName=artist,title=title,classification='Paintings',objectDate='1914',objectURL='https://www.metmuseum.org/art/collection/search/'+str(identifier),primaryImageSmall='https://images.metmuseum.org/fixture.jpg')
+            self.assertTrue(lib.rights_valid(lib.met_seed_work(row,identifier,genre)))
+            for wrong in ({'isPublicDomain':False},{'artistDisplayName':'Other artist'},{'title':'Other painting'}):
+                self.assertIsNone(lib.met_seed_work(dict(row,**wrong),identifier,genre))
         self.assertTrue(lib.genre_matches('Японская гравюра','Japan Color woodblock print'))
         self.assertFalse(lib.genre_matches('Японская гравюра','European oil painting'))
         self.assertTrue(lib.genre_matches('Конструктивизм','Constructivist design'))
@@ -267,13 +273,14 @@ class ArtLibraryTests(unittest.TestCase):
     def test_https_gallery_verifies_registry_and_binary_hashes(self):
         from scripts import site_checks
         from scripts.test_daily43 import web
-        with tempfile.TemporaryDirectory() as temp:
-            state=self.stock(temp,4);lib.prepare_sets(temp,state,self.items(5),discover=False)
+        for n in (1,4):
+          with self.subTest(references=n),tempfile.TemporaryDirectory() as temp:
+            state=self.stock(temp,n);lib.prepare_sets(temp,state,self.items(5),discover=False)
             root=Path(temp);(root/'assets/art.css').write_bytes((art.p.ROOT/'assets/art.css').read_bytes())
             class Response(io.BytesIO):status=200
             def fetch_image(request,**kwargs):return Response((root/request.full_url.split('https://387.su/')[1]).read_bytes())
             with patch.object(site_checks,'fetch',side_effect=web(root)),patch.object(site_checks,'urlopen',side_effect=fetch_image):
-                self.assertEqual(site_checks.check_art_library(root)['images_checked'],4)
+                self.assertEqual(site_checks.check_art_library(root)['images_checked'],n)
                 with patch.object(site_checks,'urlopen',return_value=Response(b'corrupted image')):
                     with self.assertRaisesRegex(RuntimeError,'PUBLIC_ART_IMAGE_CHANGED'):site_checks.check_art_library(root)
 

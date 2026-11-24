@@ -148,16 +148,27 @@ def curated_smk_cubist(identity,artist,title,year):
     # Exact two documented paintings; never classify every work by an artist.
     return artist=='Gris, Juan' and SMK_CUBIST_WORKS.get(identity)==(title,str(year))
 
-MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,)}
+MET_SEEDS={'Кубизм':(490060,498962,486744),'Коллаж':(497126,),
+    'Футуризм':(485555,),'Метафизическая живопись':(435683,)}
+# Exact, publicly catalogued paintings. Böcklin is a documented precursor,
+# not relabelled as a member of the later Metaphysical movement.
+MET_REFERENCE_WORKS={
+    485555:('Umberto Boccioni','The Street Pavers','Futurism — curated Boccioni painting'),
+    435683:('Arnold Böcklin','Island of the Dead','Symbolism; curated precursor reference for Metaphysical painting; not a Metaphysical-period work')}
+
 
 def met_seed_work(row,identifier,genre):
     if identifier not in MET_SEEDS.get(genre,()) or row.get('objectID')!=identifier or row.get('isPublicDomain') is not True:return None
-    if row.get('artistDisplayName')!='Juan Gris' or row.get('classification')!='Paintings':return None
+    spec=MET_REFERENCE_WORKS.get(identifier)
+    artist=spec[0] if spec else 'Juan Gris'
+    if row.get('artistDisplayName')!=artist or row.get('classification')!='Paintings':return None
+    if spec and row.get('title')!=spec[1]:return None
     if genre=='Коллаж' and not re.search(r'(?i)cut.*paper|collage|papier.coll',row.get('medium','')):return None
     if not all(row.get(k) for k in ('title','objectDate','objectURL','primaryImageSmall')):return None
     return {'museum':'The Metropolitan Museum of Art','museum_id':'met:'+str(identifier),'title':row['title'],'artist':row['artistDisplayName'],'year':row['objectDate'],
         'source_url':row['objectURL'],'license':'CC0','license_url':'https://www.metmuseum.org/policies/image-resources','image_url':row['primaryImageSmall'],
-        'genre_evidence':GENRES[genre][1]+' — curated Juan Gris '+('cut-paper composition' if genre=='Коллаж' else 'Cubist painting')+'; '+row.get('medium',''),
+        'genre_evidence':(spec[2] if spec else GENRES[genre][1]+' — curated Juan Gris '+('cut-paper composition' if genre=='Коллаж' else 'Cubist painting'))+'; '+row.get('medium',''),
+        **({'reference_relation':'documented precursor, not movement membership','genre_evidence_url':'https://www.salvador-dali.org/media/upload/pdf/dossierenglish_160163606439.pdf'} if identifier==435683 else {}),
         'genre_id':genre_id(genre),'verified':True}
 
 def paris_work(payload,identifier,genre):

@@ -302,7 +302,7 @@ def check_art_library(root,base='https://387.su'):
         page=fetch(base+'/art/'+genre+'/')
         if 'Вся коллекция' not in page:raise RuntimeError('PUBLIC_ART_GALLERY_MISSING')
     for group in actual['sets'].values():
-        if len(group['artwork_ids'])!=4 or len(set(group['artwork_ids']))!=4:raise RuntimeError('PUBLIC_ART_SET_INVALID')
+        if not 1<=len(group['artwork_ids'])<=4 or len(set(group['artwork_ids']))!=len(group['artwork_ids']):raise RuntimeError('PUBLIC_ART_SET_INVALID')
         if [actual['artworks'][i]['sha256'] for i in group['artwork_ids']]!=group['sha256']:raise RuntimeError('PUBLIC_ART_SET_CHANGED')
     latest=max((g['issue_date'] for g in actual['sets'].values()),default='')
     current={i for g in actual['sets'].values() if g['issue_date']==latest for i in g['artwork_ids']}
