@@ -59,6 +59,18 @@ def preparation_order(state,limit=None,exclude_ids=()):
     return selection43.order(state,state.get('_recent43',[]),limit=limit,exclude_ids=exclude_ids)
 
 
+def verified_supply(state,exclude_ids=()):
+    """Do not spend discovery time while lawful full-text candidates remain."""
+    for row in state.get('candidates',[]):
+        if row.get('id') in exclude_ids or row.get('status') not in ('discovered','preparing','retryable_error') or row.get('for_light_only'):continue
+        source=row.get('source',{})
+        if not source.get('full_text_verified') or source.get('metadata_status')!='verified':continue
+        try:
+            if rights41.decision(source,'INDEPENDENT_ARTICLE')['status']=='allowed':return True
+        except (KeyError,TypeError,p.Blocked):continue
+    return False
+
+
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None,delivery_only=False):
     try:from scripts import selection43,catalog43,light43,priorities43
     except ImportError:import selection43,catalog43,light43,priorities43
@@ -105,11 +117,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         discover(state)
         # Fill the last ordinary place from already verified candidates before
         # spending a full discovery window. Exhaustion still triggers bounded search.
-        existing_supply=active44 and any(
-            r.get('status') in ('discovered','preparing','retryable_error') and not r.get('for_light_only')
-            and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified'
-            and rights41.decision(r['source'],'INDEPENDENT_ARTICLE')['status']=='allowed'
-            for r in state['candidates'])
+        existing_supply=active44 and verified_supply(state)
         if os.getenv('NEWS_CATALOG_REFRESH')=='true' and not existing_supply and (short or clock()<release-timedelta(minutes=25)):
             try:catalog43.refresh(state,clock(),shortage=short)
             except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
@@ -137,7 +145,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             if active44:
                 needed={g for g,n in policy44.counts(selection43.composition(state)).items() if n<2}
                 coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and policy44.subject(r) in needed and r['id'] not in attempted_ids and not r.get('for_light_only')]
-            if active44 and needed and not coverage_pending and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
+            if active44 and needed and not coverage_pending and not verified_supply(state,attempted_ids) and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                 extra_searches+=1
                 try:catalog43.refresh(state,clock(),shortage=True)
                 except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
