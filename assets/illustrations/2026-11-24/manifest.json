@@ -695,6 +695,2403 @@
         "height": 411
       },
       "path": "assets/illustrations/2026-11-24/c12b8f0bdebd96eda6278bdb38460b5cf454979e9fbe68f95c1572b782dbd1ca.webp"
+    },
+    "88b1c27ee20b03ea0829f2900f28fec8da98e4b4579e79f031e8da50c8a213d5": {
+      "key": "88b1c27ee20b03ea0829f2900f28fec8da98e4b4579e79f031e8da50c8a213d5",
+      "article_id": "7eb01cd915a914780828cbe855eb1ac3e2233a6134ecec42474ebb06f7e248f1",
+      "description_hash": "0b9ed195c80b6059623509ada6f5eff4a3ce8e01be7f6f5d106c43dd8a7ad45f",
+      "genre": "Символизм",
+      "ratio": "3:2",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "31b2241c953098d1caa6c431c809960b174e95411cd692d037150c2ba6e4993b",
+      "protocol": 2,
+      "article_slug": "feature-01",
+      "sha256": "f33e6f6fe9d143dcc73dfd7f6e4119412b22d34a8e62d95b4b4380f916125fb9",
+      "width": 768,
+      "height": 512,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/symbolism",
+      "reference_artwork_ids": [
+        "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e",
+        "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def"
+      ],
+      "reference_sha256": [
+        "071c4933b5ede828d85fb9c1b37a1f633537b9d20f510e3b7b9e4d605116367f",
+        "b52b9603abfa3f0e326e67c28ea86e2995cd3fc8313a8dc0a19e2a63cb60eae0"
+      ],
+      "selected_reference_id": "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.68739,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.55342,
+        "palette_diversity": 1,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "071c4933b5ede828d85fb9c1b37a1f633537b9d20f510e3b7b9e4d605116367f",
+        "groups": [
+          {
+            "color": "#8e8573",
+            "share": 0.127,
+            "lab": [
+              55.851,
+              0.229,
+              10.934
+            ]
+          },
+          {
+            "color": "#695d51",
+            "share": 0.114,
+            "lab": [
+              40.289,
+              2.687,
+              8.666
+            ]
+          },
+          {
+            "color": "#aca795",
+            "share": 0.0974,
+            "lab": [
+              68.445,
+              -1.366,
+              9.956
+            ]
+          },
+          {
+            "color": "#c5bdab",
+            "share": 0.0847,
+            "lab": [
+              76.804,
+              -0.265,
+              10.105
+            ]
+          },
+          {
+            "color": "#cac2b0",
+            "share": 0.0834,
+            "lab": [
+              78.622,
+              -0.27,
+              10.054
+            ]
+          },
+          {
+            "color": "#cec7b6",
+            "share": 0.0801,
+            "lab": [
+              80.374,
+              -0.474,
+              9.378
+            ]
+          },
+          {
+            "color": "#c7c1b0",
+            "share": 0.0785,
+            "lab": [
+              78.121,
+              -0.834,
+              9.307
+            ]
+          },
+          {
+            "color": "#e0d8c7",
+            "share": 0.0718,
+            "lab": [
+              86.545,
+              -0.129,
+              9.355
+            ]
+          },
+          {
+            "color": "#cfc3ae",
+            "share": 0.0699,
+            "lab": [
+              79.244,
+              0.716,
+              12.068
+            ]
+          },
+          {
+            "color": "#c0b6a2",
+            "share": 0.0667,
+            "lab": [
+              74.363,
+              0.165,
+              11.458
+            ]
+          },
+          {
+            "color": "#d9d0be",
+            "share": 0.0633,
+            "lab": [
+              83.748,
+              0.076,
+              10.046
+            ]
+          },
+          {
+            "color": "#d4cab6",
+            "share": 0.0631,
+            "lab": [
+              81.629,
+              0.127,
+              11.231
+            ]
+          }
+        ],
+        "dominant": [
+          "#8e8573"
+        ],
+        "secondary": [
+          "#8e8573",
+          "#695d51",
+          "#aca795",
+          "#c5bdab",
+          "#cac2b0",
+          "#cec7b6",
+          "#c7c1b0",
+          "#e0d8c7",
+          "#cfc3ae",
+          "#c0b6a2",
+          "#d9d0be",
+          "#d4cab6"
+        ],
+        "accent": [],
+        "temperature": "warm",
+        "saturation": "low",
+        "saturation_value": 0.15,
+        "lightness": 70.91,
+        "dark_share": 0.007,
+        "light_share": 0.605,
+        "contrast": "moderate",
+        "contrast_value": 46.58
+      },
+      "art_movement": "symbolism",
+      "medium": "painting",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 21.227,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.15,
+        "generated_saturation": 0.346,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "f33e6f6fe9d143dcc73dfd7f6e4119412b22d34a8e62d95b4b4380f916125fb9",
+          "groups": [
+            {
+              "color": "#d8caaf",
+              "share": 0.1483,
+              "lab": [
+                81.804,
+                0.516,
+                15.252
+              ]
+            },
+            {
+              "color": "#8b6b44",
+              "share": 0.109,
+              "lab": [
+                47.524,
+                7.621,
+                26.658
+              ]
+            },
+            {
+              "color": "#3f2f23",
+              "share": 0.1023,
+              "lab": [
+                20.871,
+                5.332,
+                10.52
+              ]
+            },
+            {
+              "color": "#c6ad8f",
+              "share": 0.0977,
+              "lab": [
+                72.147,
+                4.461,
+                18.762
+              ]
+            },
+            {
+              "color": "#ccbea9",
+              "share": 0.0869,
+              "lab": [
+                77.597,
+                1.472,
+                12.389
+              ]
+            },
+            {
+              "color": "#785538",
+              "share": 0.0804,
+              "lab": [
+                39.201,
+                10.849,
+                22.594
+              ]
+            },
+            {
+              "color": "#e2cead",
+              "share": 0.0802,
+              "lab": [
+                83.616,
+                1.859,
+                18.969
+              ]
+            },
+            {
+              "color": "#5d4a31",
+              "share": 0.0787,
+              "lab": [
+                32.803,
+                4.268,
+                17.955
+              ]
+            },
+            {
+              "color": "#9a7e5d",
+              "share": 0.0685,
+              "lab": [
+                54.64,
+                6.023,
+                22.031
+              ]
+            },
+            {
+              "color": "#b38d62",
+              "share": 0.0592,
+              "lab": [
+                61.235,
+                8.732,
+                28.392
+              ]
+            },
+            {
+              "color": "#e5d1b0",
+              "share": 0.0504,
+              "lab": [
+                84.687,
+                1.84,
+                18.916
+              ]
+            },
+            {
+              "color": "#d9c3a4",
+              "share": 0.0384,
+              "lab": [
+                79.877,
+                2.967,
+                18.429
+              ]
+            }
+          ],
+          "dominant": [
+            "#d8caaf"
+          ],
+          "secondary": [
+            "#d8caaf",
+            "#8b6b44",
+            "#3f2f23",
+            "#c6ad8f",
+            "#ccbea9",
+            "#785538",
+            "#e2cead",
+            "#5d4a31",
+            "#9a7e5d",
+            "#b38d62",
+            "#e5d1b0"
+          ],
+          "accent": [
+            "#d9c3a4"
+          ],
+          "temperature": "warm",
+          "saturation": "moderate",
+          "saturation_value": 0.346,
+          "lightness": 60.12,
+          "dark_share": 0.13,
+          "light_share": 0.402,
+          "contrast": "high",
+          "contrast_value": 64.52
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "071c4933b5ede828d85fb9c1b37a1f633537b9d20f510e3b7b9e4d605116367f",
+        "wire_sha256": "b84d81e3ccb5029c4e99dc34793bca22fb93df463ffdbde6bcaddea11313d39a",
+        "decoded_pixels_sha256": "4bb263377d9c25cc7ae4c6f4cebb0259ef7569f5b9b0f137949aaeaacad6eacb",
+        "width": 480,
+        "height": 345
+      },
+      "path": "assets/illustrations/2026-11-24/88b1c27ee20b03ea0829f2900f28fec8da98e4b4579e79f031e8da50c8a213d5.webp"
+    },
+    "c5c88831c4176d76127488f32f944482cc50a654b71aa3578f47d2c6591af31c": {
+      "key": "c5c88831c4176d76127488f32f944482cc50a654b71aa3578f47d2c6591af31c",
+      "article_id": "5856733ff2a748582c28b9d85b9010b1cf9c4bfb6991b163d38a40f6794bf083",
+      "description_hash": "f566da72ffc8bdfedc4f421bee05f1e58d779157b660885d2007144b57490207",
+      "genre": "Геометрическая абстракция",
+      "ratio": "4:5",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "d4dd37908cf4673f5070963a0406ba7014050867c3c67974b6d614c297b80abf",
+      "protocol": 2,
+      "article_slug": "feature-02",
+      "sha256": "4fa1ac90ea158a2338486827f3165cb73438e0311f23163a0de88f374474524e",
+      "width": 768,
+      "height": 960,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/geometric-abstraction",
+      "reference_artwork_ids": [
+        "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702"
+      ],
+      "reference_sha256": [
+        "6059b27d6ad64fafb3c28b7ebeb269803bfd154a093508352f93aefc172335d2"
+      ],
+      "selected_reference_id": "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.68998,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.57467,
+        "palette_diversity": 0.95903,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "6059b27d6ad64fafb3c28b7ebeb269803bfd154a093508352f93aefc172335d2",
+        "groups": [
+          {
+            "color": "#504435",
+            "share": 0.1221,
+            "lab": [
+              29.656,
+              2.494,
+              10.995
+            ]
+          },
+          {
+            "color": "#423e2e",
+            "share": 0.1116,
+            "lab": [
+              26.16,
+              -1.344,
+              10.485
+            ]
+          },
+          {
+            "color": "#5f594b",
+            "share": 0.095,
+            "lab": [
+              37.996,
+              -0.199,
+              8.988
+            ]
+          },
+          {
+            "color": "#564f40",
+            "share": 0.0936,
+            "lab": [
+              33.859,
+              0.111,
+              9.924
+            ]
+          },
+          {
+            "color": "#2e2b20",
+            "share": 0.0934,
+            "lab": [
+              17.52,
+              -0.89,
+              7.675
+            ]
+          },
+          {
+            "color": "#353326",
+            "share": 0.0835,
+            "lab": [
+              21.074,
+              -1.752,
+              8.591
+            ]
+          },
+          {
+            "color": "#3e3528",
+            "share": 0.0803,
+            "lab": [
+              22.736,
+              1.612,
+              9.686
+            ]
+          },
+          {
+            "color": "#635342",
+            "share": 0.0757,
+            "lab": [
+              36.429,
+              3.772,
+              12.432
+            ]
+          },
+          {
+            "color": "#695e4d",
+            "share": 0.0663,
+            "lab": [
+              40.483,
+              1.434,
+              11.376
+            ]
+          },
+          {
+            "color": "#6a5a48",
+            "share": 0.0614,
+            "lab": [
+              39.318,
+              3.512,
+              12.828
+            ]
+          },
+          {
+            "color": "#746754",
+            "share": 0.0587,
+            "lab": [
+              44.31,
+              1.901,
+              12.621
+            ]
+          },
+          {
+            "color": "#5d5143",
+            "share": 0.0584,
+            "lab": [
+              35.237,
+              2.481,
+              10.069
+            ]
+          }
+        ],
+        "dominant": [
+          "#504435"
+        ],
+        "secondary": [
+          "#504435",
+          "#423e2e",
+          "#5f594b",
+          "#564f40",
+          "#2e2b20",
+          "#353326",
+          "#3e3528",
+          "#635342",
+          "#695e4d",
+          "#6a5a48",
+          "#746754",
+          "#5d5143"
+        ],
+        "accent": [],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.299,
+        "lightness": 31.11,
+        "dark_share": 0.429,
+        "light_share": 0.0,
+        "contrast": "moderate",
+        "contrast_value": 25.33
+      },
+      "art_movement": "geometric abstraction",
+      "medium": "painting",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_OK",
+        "lab_distance": 15.379,
+        "reference_temperature": "warm",
+        "generated_temperature": "neutral",
+        "reference_saturation": 0.299,
+        "generated_saturation": 0.317,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "4fa1ac90ea158a2338486827f3165cb73438e0311f23163a0de88f374474524e",
+          "groups": [
+            {
+              "color": "#0c0f11",
+              "share": 0.119,
+              "lab": [
+                4.158,
+                -0.569,
+                -1.367
+              ]
+            },
+            {
+              "color": "#272c29",
+              "share": 0.1063,
+              "lab": [
+                17.427,
+                -2.947,
+                1.195
+              ]
+            },
+            {
+              "color": "#6e5e39",
+              "share": 0.1057,
+              "lab": [
+                40.6,
+                0.961,
+                23.547
+              ]
+            },
+            {
+              "color": "#493e2d",
+              "share": 0.101,
+              "lab": [
+                26.881,
+                1.815,
+                12.233
+              ]
+            },
+            {
+              "color": "#5f727f",
+              "share": 0.0928,
+              "lab": [
+                46.974,
+                -3.866,
+                -9.483
+              ]
+            },
+            {
+              "color": "#1b1e1e",
+              "share": 0.0813,
+              "lab": [
+                10.959,
+                -1.398,
+                -0.482
+              ]
+            },
+            {
+              "color": "#4d5149",
+              "share": 0.0754,
+              "lab": [
+                33.865,
+                -3.323,
+                4.152
+              ]
+            },
+            {
+              "color": "#6c7c86",
+              "share": 0.0748,
+              "lab": [
+                51.064,
+                -3.575,
+                -7.405
+              ]
+            },
+            {
+              "color": "#7a7149",
+              "share": 0.0676,
+              "lab": [
+                47.533,
+                -2.844,
+                23.476
+              ]
+            },
+            {
+              "color": "#403326",
+              "share": 0.0652,
+              "lab": [
+                22.294,
+                3.599,
+                10.454
+              ]
+            },
+            {
+              "color": "#111618",
+              "share": 0.0601,
+              "lab": [
+                6.855,
+                -1.574,
+                -2.119
+              ]
+            },
+            {
+              "color": "#989b93",
+              "share": 0.0508,
+              "lab": [
+                63.528,
+                -2.604,
+                3.813
+              ]
+            }
+          ],
+          "dominant": [
+            "#0c0f11"
+          ],
+          "secondary": [
+            "#0c0f11",
+            "#272c29",
+            "#6e5e39",
+            "#493e2d",
+            "#5f727f",
+            "#1b1e1e",
+            "#4d5149",
+            "#6c7c86",
+            "#7a7149",
+            "#403326",
+            "#111618",
+            "#989b93"
+          ],
+          "accent": [],
+          "temperature": "neutral",
+          "saturation": "moderate",
+          "saturation_value": 0.317,
+          "lightness": 29.66,
+          "dark_share": 0.515,
+          "light_share": 0.0,
+          "contrast": "moderate",
+          "contrast_value": 53.28
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "6059b27d6ad64fafb3c28b7ebeb269803bfd154a093508352f93aefc172335d2",
+        "wire_sha256": "5ab27c29abe121f946097301c0c74994bea345d1f4f8075b321ef63e50e29636",
+        "decoded_pixels_sha256": "256eebcc4c800b2887b9fb405fd8fd52bfe0f3f85349e20a8c398ec92fae3519",
+        "width": 480,
+        "height": 390
+      },
+      "path": "assets/illustrations/2026-11-24/c5c88831c4176d76127488f32f944482cc50a654b71aa3578f47d2c6591af31c.webp"
+    },
+    "d2b615ba21bfbb4e47e0bc6832539bafdeaa263450027f69d7181c4558bd6b25": {
+      "key": "d2b615ba21bfbb4e47e0bc6832539bafdeaa263450027f69d7181c4558bd6b25",
+      "article_id": "5c695bbfdd66c23f7c2a03a26b73d9c63d73732b3b6219a7cac6af6f35ab44a8",
+      "description_hash": "349261d9204a6f8889f9daa676405577d9a55ea2f03f1198bc5899f837961d76",
+      "genre": "Ар-нуво",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "d5dca8b0903ce060dd8dbf88457a482595867c989caa0041d3e621d02b836eea",
+      "protocol": 2,
+      "article_slug": "feature-03",
+      "sha256": "d6e0abc3dc99327e70d1a33798a9de84797b488d5c07a19317f1628f978e7e19",
+      "width": 896,
+      "height": 896,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/art-nouveau",
+      "reference_artwork_ids": [
+        "1d09faa7566085b920c0c3d41290657715e34d3d54155e45721469918ceec88a",
+        "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5"
+      ],
+      "reference_sha256": [
+        "a89e5b1cb90555303b53017b37439b514101a4f53bd472cb3e95f57835c9dbeb",
+        "7c4b6a10d01aca8b5aaa7504708e1b732a85800c1340caaa721c99c611faa8ad"
+      ],
+      "selected_reference_id": "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.53075,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.56084,
+        "palette_diversity": 0.46052,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "7c4b6a10d01aca8b5aaa7504708e1b732a85800c1340caaa721c99c611faa8ad",
+        "groups": [
+          {
+            "color": "#c9c1be",
+            "share": 0.1268,
+            "lab": [
+              78.622,
+              2.262,
+              2.503
+            ]
+          },
+          {
+            "color": "#d9d8d6",
+            "share": 0.1087,
+            "lab": [
+              86.365,
+              -0.018,
+              1.103
+            ]
+          },
+          {
+            "color": "#e3e2e0",
+            "share": 0.1039,
+            "lab": [
+              89.908,
+              -0.018,
+              1.094
+            ]
+          },
+          {
+            "color": "#98837d",
+            "share": 0.0955,
+            "lab": [
+              56.476,
+              6.965,
+              6.191
+            ]
+          },
+          {
+            "color": "#efeceb",
+            "share": 0.0811,
+            "lab": [
+              93.598,
+              0.828,
+              0.838
+            ]
+          },
+          {
+            "color": "#e6e6e5",
+            "share": 0.0793,
+            "lab": [
+              91.268,
+              -0.178,
+              0.486
+            ]
+          },
+          {
+            "color": "#f8f7f2",
+            "share": 0.0778,
+            "lab": [
+              97.183,
+              -0.537,
+              2.515
+            ]
+          },
+          {
+            "color": "#eae7e6",
+            "share": 0.0774,
+            "lab": [
+              91.845,
+              0.832,
+              0.842
+            ]
+          },
+          {
+            "color": "#e3e6e5",
+            "share": 0.0759,
+            "lab": [
+              91.045,
+              -1.184,
+              0.133
+            ]
+          },
+          {
+            "color": "#eaeceb",
+            "share": 0.0628,
+            "lab": [
+              93.225,
+              -0.845,
+              0.249
+            ]
+          },
+          {
+            "color": "#e2dddb",
+            "share": 0.0586,
+            "lab": [
+              88.446,
+              1.345,
+              1.581
+            ]
+          },
+          {
+            "color": "#f1f3f1",
+            "share": 0.0521,
+            "lab": [
+              95.644,
+              -1.017,
+              0.728
+            ]
+          }
+        ],
+        "dominant": [
+          "#c9c1be"
+        ],
+        "secondary": [
+          "#c9c1be",
+          "#d9d8d6",
+          "#e3e2e0",
+          "#98837d",
+          "#efeceb",
+          "#e6e6e5",
+          "#f8f7f2",
+          "#eae7e6",
+          "#e3e6e5",
+          "#eaeceb",
+          "#e2dddb",
+          "#f1f3f1"
+        ],
+        "accent": [],
+        "temperature": "neutral",
+        "saturation": "low",
+        "saturation_value": 0.048,
+        "lightness": 85.91,
+        "dark_share": 0.007,
+        "light_share": 0.857,
+        "contrast": "moderate",
+        "contrast_value": 39.16
+      },
+      "art_movement": "art nouveau",
+      "medium": "decorative painting",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 17.175,
+        "reference_temperature": "neutral",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.048,
+        "generated_saturation": 0.128,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "d6e0abc3dc99327e70d1a33798a9de84797b488d5c07a19317f1628f978e7e19",
+          "groups": [
+            {
+              "color": "#9d9281",
+              "share": 0.1406,
+              "lab": [
+                61.055,
+                1.134,
+                10.485
+              ]
+            },
+            {
+              "color": "#e9e6d9",
+              "share": 0.1076,
+              "lab": [
+                91.201,
+                -1.223,
+                6.686
+              ]
+            },
+            {
+              "color": "#857668",
+              "share": 0.1048,
+              "lab": [
+                50.621,
+                3.388,
+                9.836
+              ]
+            },
+            {
+              "color": "#a8a594",
+              "share": 0.1,
+              "lab": [
+                67.556,
+                -1.951,
+                9.201
+              ]
+            },
+            {
+              "color": "#beb3a1",
+              "share": 0.0916,
+              "lab": [
+                73.39,
+                0.864,
+                10.599
+              ]
+            },
+            {
+              "color": "#edebdf",
+              "share": 0.0827,
+              "lab": [
+                92.905,
+                -1.396,
+                6.054
+              ]
+            },
+            {
+              "color": "#f0eee3",
+              "share": 0.0674,
+              "lab": [
+                93.978,
+                -1.226,
+                5.554
+              ]
+            },
+            {
+              "color": "#baa691",
+              "share": 0.0651,
+              "lab": [
+                69.296,
+                3.88,
+                13.535
+              ]
+            },
+            {
+              "color": "#d7d3c5",
+              "share": 0.065,
+              "lab": [
+                84.518,
+                -1.051,
+                7.415
+              ]
+            },
+            {
+              "color": "#e2ded1",
+              "share": 0.063,
+              "lab": [
+                88.455,
+                -0.88,
+                6.852
+              ]
+            },
+            {
+              "color": "#cfc5b3",
+              "share": 0.0595,
+              "lab": [
+                79.871,
+                0.454,
+                10.278
+              ]
+            },
+            {
+              "color": "#c2beaf",
+              "share": 0.0527,
+              "lab": [
+                76.916,
+                -1.228,
+                8.07
+              ]
+            }
+          ],
+          "dominant": [
+            "#9d9281"
+          ],
+          "secondary": [
+            "#9d9281",
+            "#e9e6d9",
+            "#857668",
+            "#a8a594",
+            "#beb3a1",
+            "#edebdf",
+            "#f0eee3",
+            "#baa691",
+            "#d7d3c5",
+            "#e2ded1",
+            "#cfc5b3",
+            "#c2beaf"
+          ],
+          "accent": [],
+          "temperature": "warm",
+          "saturation": "low",
+          "saturation_value": 0.128,
+          "lightness": 75.3,
+          "dark_share": 0.0,
+          "light_share": 0.504,
+          "contrast": "moderate",
+          "contrast_value": 43.31
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "7c4b6a10d01aca8b5aaa7504708e1b732a85800c1340caaa721c99c611faa8ad",
+        "wire_sha256": "cbe757cba8944c66fb51979f4e2d561b889075372bb12940bebaf984ed573904",
+        "decoded_pixels_sha256": "5a8411972667a96a1fb81c427b8b1e0f4c7d5ff98b162e986f2537fa41fce5c6",
+        "width": 232,
+        "height": 300
+      },
+      "path": "assets/illustrations/2026-11-24/d2b615ba21bfbb4e47e0bc6832539bafdeaa263450027f69d7181c4558bd6b25.webp"
+    },
+    "770fdc7f23b968dfd01baaad15db5edbfa555a04a5f2c70586c0e7997dd93216": {
+      "key": "770fdc7f23b968dfd01baaad15db5edbfa555a04a5f2c70586c0e7997dd93216",
+      "article_id": "5ee0423831d3d9ebde6dc095d4b4463a727b62985ce1be1bf88b65c88aa50777",
+      "description_hash": "0177e74d22ed764e802220980dbaeaeff6f467673cfa5cdde1b47ad6742f09ff",
+      "genre": "Романтизм",
+      "ratio": "16:9",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "f7a578dc9537435f1e46e5e6820c17fbe8c740a83b8f432540f2685945be506c",
+      "protocol": 2,
+      "article_slug": "feature-05",
+      "sha256": "a9c13583dd81272bf71e0841cffbed44f9db31cfcdbcadeca9c1f7d8775010b7",
+      "width": 1024,
+      "height": 576,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/romanticism",
+      "reference_artwork_ids": [
+        "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c"
+      ],
+      "reference_sha256": [
+        "f45ae02bf19c29397d7dfb456b0773cd4e56c457aee66ded7d2404da3cfa03c3"
+      ],
+      "selected_reference_id": "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.49955,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.53446,
+        "palette_diversity": 0.41809,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "f45ae02bf19c29397d7dfb456b0773cd4e56c457aee66ded7d2404da3cfa03c3",
+        "groups": [
+          {
+            "color": "#2a1a12",
+            "share": 0.112,
+            "lab": [
+              11.098,
+              6.732,
+              8.511
+            ]
+          },
+          {
+            "color": "#617472",
+            "share": 0.1006,
+            "lab": [
+              47.296,
+              -7.448,
+              -1.247
+            ]
+          },
+          {
+            "color": "#949077",
+            "share": 0.0982,
+            "lab": [
+              59.503,
+              -2.895,
+              13.844
+            ]
+          },
+          {
+            "color": "#455a5d",
+            "share": 0.0888,
+            "lab": [
+              36.682,
+              -7.178,
+              -4.349
+            ]
+          },
+          {
+            "color": "#8b8163",
+            "share": 0.0882,
+            "lab": [
+              54.123,
+              -1.188,
+              17.671
+            ]
+          },
+          {
+            "color": "#6e6651",
+            "share": 0.0815,
+            "lab": [
+              43.378,
+              -0.542,
+              13.038
+            ]
+          },
+          {
+            "color": "#837655",
+            "share": 0.0812,
+            "lab": [
+              50.024,
+              -0.254,
+              20.039
+            ]
+          },
+          {
+            "color": "#66583f",
+            "share": 0.0753,
+            "lab": [
+              38.134,
+              1.651,
+              16.625
+            ]
+          },
+          {
+            "color": "#513e25",
+            "share": 0.0752,
+            "lab": [
+              27.651,
+              4.658,
+              18.481
+            ]
+          },
+          {
+            "color": "#a7a58e",
+            "share": 0.074,
+            "lab": [
+              67.336,
+              -3.323,
+              12.2
+            ]
+          },
+          {
+            "color": "#38392c",
+            "share": 0.0648,
+            "lab": [
+              23.502,
+              -3.153,
+              7.986
+            ]
+          },
+          {
+            "color": "#c6c9ba",
+            "share": 0.0602,
+            "lab": [
+              80.362,
+              -3.713,
+              7.135
+            ]
+          }
+        ],
+        "dominant": [
+          "#2a1a12"
+        ],
+        "secondary": [
+          "#2a1a12",
+          "#617472",
+          "#949077",
+          "#455a5d",
+          "#8b8163",
+          "#6e6651",
+          "#837655",
+          "#66583f",
+          "#513e25",
+          "#a7a58e",
+          "#38392c",
+          "#c6c9ba"
+        ],
+        "accent": [],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.339,
+        "lightness": 43.92,
+        "dark_share": 0.23,
+        "light_share": 0.054,
+        "contrast": "high",
+        "contrast_value": 65.54
+      },
+      "art_movement": "romanticism",
+      "medium": "oil painting",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 29.587,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.339,
+        "generated_saturation": 0.34,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "a9c13583dd81272bf71e0841cffbed44f9db31cfcdbcadeca9c1f7d8775010b7",
+          "groups": [
+            {
+              "color": "#1e1815",
+              "share": 0.1165,
+              "lab": [
+                8.853,
+                2.342,
+                3.154
+              ]
+            },
+            {
+              "color": "#0d0b0c",
+              "share": 0.1077,
+              "lab": [
+                3.175,
+                0.735,
+                -0.206
+              ]
+            },
+            {
+              "color": "#361b17",
+              "share": 0.0911,
+              "lab": [
+                13.413,
+                12.807,
+                8.604
+              ]
+            },
+            {
+              "color": "#3f3126",
+              "share": 0.0897,
+              "lab": [
+                21.556,
+                4.44,
+                9.432
+              ]
+            },
+            {
+              "color": "#82897e",
+              "share": 0.0894,
+              "lab": [
+                56.231,
+                -4.733,
+                5.012
+              ]
+            },
+            {
+              "color": "#6a5943",
+              "share": 0.0888,
+              "lab": [
+                38.924,
+                3.398,
+                15.333
+              ]
+            },
+            {
+              "color": "#281815",
+              "share": 0.0807,
+              "lab": [
+                10.249,
+                7.562,
+                5.333
+              ]
+            },
+            {
+              "color": "#2e2924",
+              "share": 0.0738,
+              "lab": [
+                16.961,
+                1.239,
+                4.115
+              ]
+            },
+            {
+              "color": "#533424",
+              "share": 0.0703,
+              "lab": [
+                25.023,
+                11.939,
+                15.821
+              ]
+            },
+            {
+              "color": "#101011",
+              "share": 0.0691,
+              "lab": [
+                4.708,
+                0.194,
+                -0.529
+              ]
+            },
+            {
+              "color": "#131619",
+              "share": 0.0688,
+              "lab": [
+                7.068,
+                -0.524,
+                -2.554
+              ]
+            },
+            {
+              "color": "#b2b5a3",
+              "share": 0.0539,
+              "lab": [
+                72.995,
+                -4.298,
+                8.813
+              ]
+            }
+          ],
+          "dominant": [
+            "#1e1815"
+          ],
+          "secondary": [
+            "#1e1815",
+            "#0d0b0c",
+            "#361b17",
+            "#3f3126",
+            "#82897e",
+            "#6a5943",
+            "#281815",
+            "#2e2924",
+            "#533424",
+            "#101011",
+            "#131619",
+            "#b2b5a3"
+          ],
+          "accent": [],
+          "temperature": "warm",
+          "saturation": "moderate",
+          "saturation_value": 0.34,
+          "lightness": 22.26,
+          "dark_share": 0.752,
+          "light_share": 0.025,
+          "contrast": "high",
+          "contrast_value": 62.38
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "f45ae02bf19c29397d7dfb456b0773cd4e56c457aee66ded7d2404da3cfa03c3",
+        "wire_sha256": "7b3aed514ef649e06dd4a1ed29a6a4ee28aa1412d0b04e96b77439c6c700b08b",
+        "decoded_pixels_sha256": "ad64949f319c122546991d35147f2831918ddebdefd31f46a2892a70c5b69eb1",
+        "width": 300,
+        "height": 298
+      },
+      "path": "assets/illustrations/2026-11-24/770fdc7f23b968dfd01baaad15db5edbfa555a04a5f2c70586c0e7997dd93216.webp"
+    },
+    "553fbb0895d5b32380e9d01cfb0fb91431aefb4effe463442a9ddf5c04c4a561": {
+      "key": "553fbb0895d5b32380e9d01cfb0fb91431aefb4effe463442a9ddf5c04c4a561",
+      "article_id": "720d87723e961090091a888198b9d07be856a1c5b4ae945f34eaab9623604e3b",
+      "description_hash": "33b268f42005d88c138a23d55142b3fd091d10b67b77cbd2a0c0354bc387a139",
+      "genre": "Коллаж",
+      "ratio": "3:4",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "892d578e879b77448c5f57aac220fed03d7b1fbab5be5c9e2376473895e32bba",
+      "protocol": 2,
+      "article_slug": "feature-09",
+      "sha256": "82df3f594920a16a498a4d53e0b361c39aef01490f3b3036b68a0d9aa0815bd1",
+      "width": 768,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/collage",
+      "reference_artwork_ids": [
+        "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce"
+      ],
+      "reference_sha256": [
+        "2c496672fc0f693b4a0cd46548eb8a6e685fa95d2da2d2b3b9d857e70083fc1d"
+      ],
+      "selected_reference_id": "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.45984,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.51921,
+        "palette_diversity": 0.32131,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "2c496672fc0f693b4a0cd46548eb8a6e685fa95d2da2d2b3b9d857e70083fc1d",
+        "groups": [
+          {
+            "color": "#f8fdfc",
+            "share": 0.279,
+            "lab": [
+              98.921,
+              -1.82,
+              -0.098
+            ]
+          },
+          {
+            "color": "#6c454c",
+            "share": 0.2363,
+            "lab": [
+              33.914,
+              17.846,
+              2.757
+            ]
+          },
+          {
+            "color": "#f9fefd",
+            "share": 0.2023,
+            "lab": [
+              99.266,
+              -1.818,
+              -0.098
+            ]
+          },
+          {
+            "color": "#f8fdfb",
+            "share": 0.1028,
+            "lab": [
+              98.896,
+              -1.997,
+              0.379
+            ]
+          },
+          {
+            "color": "#f6fffd",
+            "share": 0.0681,
+            "lab": [
+              99.301,
+              -3.301,
+              -0.072
+            ]
+          },
+          {
+            "color": "#fbfefd",
+            "share": 0.0315,
+            "lab": [
+              99.411,
+              -1.162,
+              0.131
+            ]
+          },
+          {
+            "color": "#c4c6cb",
+            "share": 0.0271,
+            "lab": [
+              79.861,
+              0.247,
+              -2.735
+            ]
+          },
+          {
+            "color": "#f9fdfc",
+            "share": 0.0163,
+            "lab": [
+              98.993,
+              -1.492,
+              0.016
+            ]
+          },
+          {
+            "color": "#f9fffb",
+            "share": 0.015,
+            "lab": [
+              99.466,
+              -2.675,
+              1.219
+            ]
+          },
+          {
+            "color": "#f8fefb",
+            "share": 0.0137,
+            "lab": [
+              99.145,
+              -2.5,
+              0.742
+            ]
+          },
+          {
+            "color": "#f9fffe",
+            "share": 0.0048,
+            "lab": [
+              99.54,
+              -2.144,
+              -0.211
+            ]
+          },
+          {
+            "color": "#f8fdfd",
+            "share": 0.0032,
+            "lab": [
+              98.946,
+              -1.642,
+              -0.575
+            ]
+          }
+        ],
+        "dominant": [
+          "#f8fdfc",
+          "#6c454c",
+          "#f9fefd"
+        ],
+        "secondary": [
+          "#f8fdfb",
+          "#f6fffd"
+        ],
+        "accent": [
+          "#fbfefd",
+          "#c4c6cb",
+          "#f9fdfc",
+          "#f9fffb",
+          "#f8fefb",
+          "#f9fffe",
+          "#f8fdfd"
+        ],
+        "temperature": "neutral",
+        "saturation": "low",
+        "saturation_value": 0.095,
+        "lightness": 83.71,
+        "dark_share": 0.057,
+        "light_share": 0.75,
+        "contrast": "high",
+        "contrast_value": 80.79
+      },
+      "art_movement": "collage",
+      "medium": "cut-paper collage",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_OK",
+        "lab_distance": 13.587,
+        "reference_temperature": "neutral",
+        "generated_temperature": "neutral",
+        "reference_saturation": 0.095,
+        "generated_saturation": 0.094,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "82df3f594920a16a498a4d53e0b361c39aef01490f3b3036b68a0d9aa0815bd1",
+          "groups": [
+            {
+              "color": "#4f2a27",
+              "share": 0.1195,
+              "lab": [
+                21.818,
+                16.781,
+                9.478
+              ]
+            },
+            {
+              "color": "#b0b1b0",
+              "share": 0.1184,
+              "lab": [
+                72.101,
+                -0.54,
+                0.386
+              ]
+            },
+            {
+              "color": "#967a79",
+              "share": 0.1086,
+              "lab": [
+                53.797,
+                10.674,
+                4.642
+              ]
+            },
+            {
+              "color": "#dee3de",
+              "share": 0.0999,
+              "lab": [
+                89.739,
+                -2.577,
+                1.85
+              ]
+            },
+            {
+              "color": "#e6e6e0",
+              "share": 0.0877,
+              "lab": [
+                91.143,
+                -1.057,
+                2.917
+              ]
+            },
+            {
+              "color": "#c9cfcc",
+              "share": 0.0801,
+              "lab": [
+                82.595,
+                -2.598,
+                0.774
+              ]
+            },
+            {
+              "color": "#eef0ec",
+              "share": 0.0678,
+              "lab": [
+                94.548,
+                -1.372,
+                1.695
+              ]
+            },
+            {
+              "color": "#f3f3ee",
+              "share": 0.0677,
+              "lab": [
+                95.718,
+                -0.874,
+                2.405
+              ]
+            },
+            {
+              "color": "#f6f7f2",
+              "share": 0.0668,
+              "lab": [
+                97.035,
+                -1.206,
+                2.281
+              ]
+            },
+            {
+              "color": "#ecede8",
+              "share": 0.0638,
+              "lab": [
+                93.549,
+                -1.215,
+                2.299
+              ]
+            },
+            {
+              "color": "#eaeae5",
+              "share": 0.0614,
+              "lab": [
+                92.573,
+                -0.88,
+                2.422
+              ]
+            },
+            {
+              "color": "#d9d8d2",
+              "share": 0.0583,
+              "lab": [
+                86.264,
+                -0.725,
+                3.072
+              ]
+            }
+          ],
+          "dominant": [
+            "#4f2a27"
+          ],
+          "secondary": [
+            "#4f2a27",
+            "#b0b1b0",
+            "#967a79",
+            "#dee3de",
+            "#e6e6e0",
+            "#c9cfcc",
+            "#eef0ec",
+            "#f3f3ee",
+            "#f6f7f2",
+            "#ecede8",
+            "#eaeae5",
+            "#d9d8d2"
+          ],
+          "accent": [],
+          "temperature": "neutral",
+          "saturation": "low",
+          "saturation_value": 0.094,
+          "lightness": 76.03,
+          "dark_share": 0.076,
+          "light_share": 0.67,
+          "contrast": "high",
+          "contrast_value": 78.48
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "artwork_license": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "reference_attribution": "Mylona, Alex (1920-2016) — Construction  II; MOMus / SearchCulture.gr; CC BY-SA 4.0",
+      "reference_source_url": "https://www.searchculture.gr/aggregator/edm/momus/000179-10956",
+      "reference_adaptation": "Original AI composition after a museum reference; resized WebP reference",
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "2c496672fc0f693b4a0cd46548eb8a6e685fa95d2da2d2b3b9d857e70083fc1d",
+        "wire_sha256": "fd317ff3ba868583f96d3531e52668bc7928fa47c8710b42a6c10b8833ee8b17",
+        "decoded_pixels_sha256": "08e004367d4be77516962f89a0df2b46725acf215605349a666b4c7da0f778d5",
+        "width": 380,
+        "height": 283
+      },
+      "path": "assets/illustrations/2026-11-24/553fbb0895d5b32380e9d01cfb0fb91431aefb4effe463442a9ddf5c04c4a561.webp"
+    },
+    "06455e41a298e7fab4c12fffa8ab3cfa098f49acb73e3e89d62602aec89266e6": {
+      "key": "06455e41a298e7fab4c12fffa8ab3cfa098f49acb73e3e89d62602aec89266e6",
+      "article_id": "7900ce225ccf93b217b9d64387001eb1808ca1d15ff6097099aef95e47fae1e1",
+      "description_hash": "696d1849cbd0648af48e1790e0683a874070024b42b55b4f920e7eb7452699c3",
+      "genre": "Конструктивизм",
+      "ratio": "16:9",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "30e0378ea559dce9e66cfc3848794fa21c447d83f9dff2207a0cc38bbb5643c5",
+      "protocol": 2,
+      "article_slug": "feature-10",
+      "sha256": "b9a19ec06245bd6730acbcabc8ec323652f44fad8e279ed2b76a808b8e40ee36",
+      "width": 1024,
+      "height": 576,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/constructivism",
+      "reference_artwork_ids": [
+        "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f"
+      ],
+      "reference_sha256": [
+        "407b9942f9ac2e13796486789ef3cbea0df39562203a0f49afed1976dc568b4e"
+      ],
+      "selected_reference_id": "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.48,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.55018,
+        "palette_diversity": 0.31625,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "407b9942f9ac2e13796486789ef3cbea0df39562203a0f49afed1976dc568b4e",
+        "groups": [
+          {
+            "color": "#65342d",
+            "share": 0.1169,
+            "lab": [
+              27.88,
+              21.131,
+              14.228
+            ]
+          },
+          {
+            "color": "#b59478",
+            "share": 0.1169,
+            "lab": [
+              63.64,
+              8.276,
+              19.47
+            ]
+          },
+          {
+            "color": "#9a775e",
+            "share": 0.1022,
+            "lab": [
+              52.81,
+              10.14,
+              19.007
+            ]
+          },
+          {
+            "color": "#c8a385",
+            "share": 0.0924,
+            "lab": [
+              69.59,
+              9.333,
+              20.732
+            ]
+          },
+          {
+            "color": "#d4b195",
+            "share": 0.088,
+            "lab": [
+              74.58,
+              8.565,
+              19.073
+            ]
+          },
+          {
+            "color": "#d9b89e",
+            "share": 0.0808,
+            "lab": [
+              76.983,
+              7.962,
+              17.618
+            ]
+          },
+          {
+            "color": "#d8b599",
+            "share": 0.0758,
+            "lab": [
+              76.038,
+              8.503,
+              18.986
+            ]
+          },
+          {
+            "color": "#cdab90",
+            "share": 0.0723,
+            "lab": [
+              72.309,
+              8.404,
+              18.544
+            ]
+          },
+          {
+            "color": "#d3ad8f",
+            "share": 0.0674,
+            "lab": [
+              73.364,
+              9.541,
+              20.631
+            ]
+          },
+          {
+            "color": "#dcbca4",
+            "share": 0.0669,
+            "lab": [
+              78.383,
+              7.805,
+              16.386
+            ]
+          },
+          {
+            "color": "#c39a7a",
+            "share": 0.066,
+            "lab": [
+              66.612,
+              10.879,
+              22.634
+            ]
+          },
+          {
+            "color": "#d3b49b",
+            "share": 0.0544,
+            "lab": [
+              75.364,
+              7.387,
+              16.9
+            ]
+          }
+        ],
+        "dominant": [
+          "#65342d"
+        ],
+        "secondary": [
+          "#65342d",
+          "#b59478",
+          "#9a775e",
+          "#c8a385",
+          "#d4b195",
+          "#d9b89e",
+          "#d8b599",
+          "#cdab90",
+          "#d3ad8f",
+          "#dcbca4",
+          "#c39a7a",
+          "#d3b49b"
+        ],
+        "accent": [],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.335,
+        "lightness": 64.71,
+        "dark_share": 0.062,
+        "light_share": 0.28,
+        "contrast": "moderate",
+        "contrast_value": 49.82
+      },
+      "art_movement": "constructivism",
+      "medium": "graphic composition",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 27.108,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.335,
+        "generated_saturation": 0.493,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "b9a19ec06245bd6730acbcabc8ec323652f44fad8e279ed2b76a808b8e40ee36",
+          "groups": [
+            {
+              "color": "#33432c",
+              "share": 0.1455,
+              "lab": [
+                26.448,
+                -11.592,
+                11.941
+              ]
+            },
+            {
+              "color": "#999163",
+              "share": 0.1192,
+              "lab": [
+                59.821,
+                -4.27,
+                25.521
+              ]
+            },
+            {
+              "color": "#7e3b23",
+              "share": 0.114,
+              "lab": [
+                33.321,
+                27.115,
+                28.025
+              ]
+            },
+            {
+              "color": "#e9d5af",
+              "share": 0.0902,
+              "lab": [
+                86.011,
+                1.122,
+                21.329
+              ]
+            },
+            {
+              "color": "#b56435",
+              "share": 0.0875,
+              "lab": [
+                50.918,
+                28.719,
+                40.143
+              ]
+            },
+            {
+              "color": "#c6a670",
+              "share": 0.0827,
+              "lab": [
+                69.789,
+                4.449,
+                32.295
+              ]
+            },
+            {
+              "color": "#756e40",
+              "share": 0.0826,
+              "lab": [
+                46.048,
+                -4.415,
+                26.576
+              ]
+            },
+            {
+              "color": "#ce8c40",
+              "share": 0.0806,
+              "lab": [
+                63.55,
+                18.069,
+                49.421
+              ]
+            },
+            {
+              "color": "#eedbb5",
+              "share": 0.06,
+              "lab": [
+                88.054,
+                0.716,
+                21.087
+              ]
+            },
+            {
+              "color": "#ba7936",
+              "share": 0.0516,
+              "lab": [
+                56.469,
+                19.353,
+                45.855
+              ]
+            },
+            {
+              "color": "#e3be79",
+              "share": 0.0451,
+              "lab": [
+                78.776,
+                4.432,
+                39.658
+              ]
+            },
+            {
+              "color": "#cdb57f",
+              "share": 0.0409,
+              "lab": [
+                74.547,
+                0.94,
+                30.688
+              ]
+            }
+          ],
+          "dominant": [
+            "#33432c"
+          ],
+          "secondary": [
+            "#33432c",
+            "#999163",
+            "#7e3b23",
+            "#e9d5af",
+            "#b56435",
+            "#c6a670",
+            "#756e40",
+            "#ce8c40",
+            "#eedbb5",
+            "#ba7936"
+          ],
+          "accent": [
+            "#e3be79",
+            "#cdb57f"
+          ],
+          "temperature": "warm",
+          "saturation": "moderate",
+          "saturation_value": 0.493,
+          "lightness": 56.71,
+          "dark_share": 0.114,
+          "light_share": 0.212,
+          "contrast": "high",
+          "contrast_value": 60.88
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "artwork_license": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "reference_attribution": "Rodchenko, Aleksandr (1891-1956) — Construction in White (Robot); MOMus / SearchCulture.gr; CC BY-SA 4.0",
+      "reference_source_url": "https://www.searchculture.gr/aggregator/edm/momus/000179-11016",
+      "reference_adaptation": "Original AI composition after a museum reference; resized WebP reference",
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "407b9942f9ac2e13796486789ef3cbea0df39562203a0f49afed1976dc568b4e",
+        "wire_sha256": "2666d5e099d4fc4cb8d5576bff8891e9ac1a704951dc98e79cd881c69d6ca912",
+        "decoded_pixels_sha256": "caa23065a85ab09817777ad3ba9608438116e6da0514a18abd2c078b29a03c29",
+        "width": 312,
+        "height": 480
+      },
+      "path": "assets/illustrations/2026-11-24/06455e41a298e7fab4c12fffa8ab3cfa098f49acb73e3e89d62602aec89266e6.webp"
+    },
+    "5500a28cf2784cf34ca2e86a5f4d30985bd45c06e988cc7f98483cbe23c2c30b": {
+      "key": "5500a28cf2784cf34ca2e86a5f4d30985bd45c06e988cc7f98483cbe23c2c30b",
+      "article_id": "c4ebf7418a0c2c279dd0ecd2eabe3d9dc2fa03931da1bc378ec561d5fb3e8850",
+      "description_hash": "b8d2f76f6c35c0a4ee24c0312e9f831f3346e81eea7a469564e2f1b93dd45605",
+      "genre": "Импрессионизм",
+      "ratio": "3:2",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "951a46f7dfff91abc8940dcf764e672c10d1a027d10a9eed4d78eb31b9a0531b",
+      "protocol": 2,
+      "article_slug": "feature-11",
+      "sha256": "f2c828e9b0e2f72346dee3e33bb9311769ac95866c5839940ea2d76619f37923",
+      "width": 768,
+      "height": 512,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/impressionism",
+      "reference_artwork_ids": [
+        "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e",
+        "a67f80cca3f2e4acd0500100dbbb56289e76721aa325fcf8cbcf9c740ee09ed7"
+      ],
+      "reference_sha256": [
+        "e4a0f9e0a644e5a2b0e8e4f46ca04796c72a28e1a81240e069ad8e5c950af0a0",
+        "4f37d9e45f32cbc38e08976c0781dc4f2972593354fbc106242d38e7e9882d41"
+      ],
+      "selected_reference_id": "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.49284,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.56399,
+        "palette_diversity": 0.32684,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "e4a0f9e0a644e5a2b0e8e4f46ca04796c72a28e1a81240e069ad8e5c950af0a0",
+        "groups": [
+          {
+            "color": "#211f1b",
+            "share": 0.105,
+            "lab": [
+              11.84,
+              0.031,
+              3.073
+            ]
+          },
+          {
+            "color": "#1b1917",
+            "share": 0.1014,
+            "lab": [
+              8.909,
+              0.498,
+              1.754
+            ]
+          },
+          {
+            "color": "#3e3b2f",
+            "share": 0.1013,
+            "lab": [
+              24.819,
+              -1.11,
+              7.923
+            ]
+          },
+          {
+            "color": "#433e32",
+            "share": 0.0938,
+            "lab": [
+              26.358,
+              -0.193,
+              8.17
+            ]
+          },
+          {
+            "color": "#484539",
+            "share": 0.0932,
+            "lab": [
+              29.234,
+              -1.121,
+              7.718
+            ]
+          },
+          {
+            "color": "#26211d",
+            "share": 0.0887,
+            "lab": [
+              13.16,
+              1.511,
+              3.574
+            ]
+          },
+          {
+            "color": "#434135",
+            "share": 0.0828,
+            "lab": [
+              27.383,
+              -1.571,
+              7.644
+            ]
+          },
+          {
+            "color": "#1e1c18",
+            "share": 0.0769,
+            "lab": [
+              10.353,
+              0.038,
+              3.117
+            ]
+          },
+          {
+            "color": "#464236",
+            "share": 0.0725,
+            "lab": [
+              28.02,
+              -0.665,
+              7.93
+            ]
+          },
+          {
+            "color": "#201c19",
+            "share": 0.0717,
+            "lab": [
+              10.615,
+              1.265,
+              2.781
+            ]
+          },
+          {
+            "color": "#886d51",
+            "share": 0.0644,
+            "lab": [
+              47.964,
+              6.598,
+              19.694
+            ]
+          },
+          {
+            "color": "#2d2922",
+            "share": 0.0483,
+            "lab": [
+              16.793,
+              0.36,
+              5.261
+            ]
+          }
+        ],
+        "dominant": [
+          "#211f1b"
+        ],
+        "secondary": [
+          "#211f1b",
+          "#1b1917",
+          "#3e3b2f",
+          "#433e32",
+          "#484539",
+          "#26211d",
+          "#434135",
+          "#1e1c18",
+          "#464236",
+          "#201c19",
+          "#886d51"
+        ],
+        "accent": [
+          "#2d2922"
+        ],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.228,
+        "lightness": 21.26,
+        "dark_share": 0.904,
+        "light_share": 0.0,
+        "contrast": "moderate",
+        "contrast_value": 36.01
+      },
+      "art_movement": "impressionism",
+      "medium": "oil painting",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MISMATCH",
+        "lab_distance": 36.032,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.228,
+        "generated_saturation": 0.371,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "f2c828e9b0e2f72346dee3e33bb9311769ac95866c5839940ea2d76619f37923",
+          "groups": [
+            {
+              "color": "#7d664a",
+              "share": 0.1392,
+              "lab": [
+                44.742,
+                5.011,
+                19.291
+              ]
+            },
+            {
+              "color": "#342a23",
+              "share": 0.1044,
+              "lab": [
+                17.952,
+                3.289,
+                6.305
+              ]
+            },
+            {
+              "color": "#201514",
+              "share": 0.0969,
+              "lab": [
+                8.075,
+                5.428,
+                2.736
+              ]
+            },
+            {
+              "color": "#70836e",
+              "share": 0.0931,
+              "lab": [
+                52.733,
+                -11.208,
+                9.073
+              ]
+            },
+            {
+              "color": "#65402a",
+              "share": 0.0915,
+              "lab": [
+                30.881,
+                13.508,
+                20.004
+              ]
+            },
+            {
+              "color": "#918564",
+              "share": 0.0778,
+              "lab": [
+                55.802,
+                -0.807,
+                19.472
+              ]
+            },
+            {
+              "color": "#8ea889",
+              "share": 0.0708,
+              "lab": [
+                66.184,
+                -15.051,
+                13.071
+              ]
+            },
+            {
+              "color": "#ad8861",
+              "share": 0.069,
+              "lab": [
+                59.304,
+                8.885,
+                26.306
+              ]
+            },
+            {
+              "color": "#3b4e48",
+              "share": 0.0688,
+              "lab": [
+                31.454,
+                -8.863,
+                1.126
+              ]
+            },
+            {
+              "color": "#baad89",
+              "share": 0.0644,
+              "lab": [
+                70.963,
+                -1.056,
+                20.225
+              ]
+            },
+            {
+              "color": "#dcdabf",
+              "share": 0.0625,
+              "lab": [
+                86.564,
+                -3.863,
+                13.551
+              ]
+            },
+            {
+              "color": "#b7c79b",
+              "share": 0.0617,
+              "lab": [
+                78.04,
+                -13.16,
+                20.259
+              ]
+            }
+          ],
+          "dominant": [
+            "#7d664a"
+          ],
+          "secondary": [
+            "#7d664a",
+            "#342a23",
+            "#201514",
+            "#70836e",
+            "#65402a",
+            "#918564",
+            "#8ea889",
+            "#ad8861",
+            "#3b4e48",
+            "#baad89",
+            "#dcdabf",
+            "#b7c79b"
+          ],
+          "accent": [],
+          "temperature": "warm",
+          "saturation": "moderate",
+          "saturation_value": 0.371,
+          "lightness": 46.82,
+          "dark_share": 0.265,
+          "light_share": 0.119,
+          "contrast": "high",
+          "contrast_value": 75.93
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "e4a0f9e0a644e5a2b0e8e4f46ca04796c72a28e1a81240e069ad8e5c950af0a0",
+        "wire_sha256": "5fb052d75c2cce790f52a79505bcb65dba7c50cb78b703a55212099ca6e307d8",
+        "decoded_pixels_sha256": "b354b3f7c997118489b4b9734751656527b33b73a7b91f9575ce0f0b83d6b847",
+        "width": 397,
+        "height": 480
+      },
+      "path": "assets/illustrations/2026-11-24/5500a28cf2784cf34ca2e86a5f4d30985bd45c06e988cc7f98483cbe23c2c30b.webp"
     }
   },
   "provider_status": "READY"

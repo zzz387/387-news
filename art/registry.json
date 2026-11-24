@@ -1953,6 +1953,138 @@
         "34b3ba9615013665c25d31419b9ef51a6aafb03350e0da247fd63f9502614a6f",
         "7eb952cd999fc8c22c285ae4e9a54e67e99fb6765b180191685b42f093662063"
       ]
+    },
+    "2026-11-24/symbolism": {
+      "id": "2026-11-24/symbolism",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "symbolism",
+      "genre": "Символизм",
+      "artwork_ids": [
+        "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e",
+        "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def"
+      ],
+      "selected_at": "2026-11-24T11:45:35.403790+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "071c4933b5ede828d85fb9c1b37a1f633537b9d20f510e3b7b9e4d605116367f",
+        "b52b9603abfa3f0e326e67c28ea86e2995cd3fc8313a8dc0a19e2a63cb60eae0"
+      ]
+    },
+    "2026-11-24/geometric-abstraction": {
+      "id": "2026-11-24/geometric-abstraction",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "geometric-abstraction",
+      "genre": "Геометрическая абстракция",
+      "artwork_ids": [
+        "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702"
+      ],
+      "selected_at": "2026-11-24T11:45:37.958928+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "6059b27d6ad64fafb3c28b7ebeb269803bfd154a093508352f93aefc172335d2"
+      ]
+    },
+    "2026-11-24/art-nouveau": {
+      "id": "2026-11-24/art-nouveau",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "art-nouveau",
+      "genre": "Ар-нуво",
+      "artwork_ids": [
+        "1d09faa7566085b920c0c3d41290657715e34d3d54155e45721469918ceec88a",
+        "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5"
+      ],
+      "selected_at": "2026-11-24T11:45:40.579876+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "a89e5b1cb90555303b53017b37439b514101a4f53bd472cb3e95f57835c9dbeb",
+        "7c4b6a10d01aca8b5aaa7504708e1b732a85800c1340caaa721c99c611faa8ad"
+      ]
+    },
+    "2026-11-24/romanticism": {
+      "id": "2026-11-24/romanticism",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "romanticism",
+      "genre": "Романтизм",
+      "artwork_ids": [
+        "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c"
+      ],
+      "selected_at": "2026-11-24T11:45:45.937601+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "f45ae02bf19c29397d7dfb456b0773cd4e56c457aee66ded7d2404da3cfa03c3"
+      ]
+    },
+    "2026-11-24/collage": {
+      "id": "2026-11-24/collage",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "collage",
+      "genre": "Коллаж",
+      "artwork_ids": [
+        "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce"
+      ],
+      "selected_at": "2026-11-24T11:45:51.220553+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "2c496672fc0f693b4a0cd46548eb8a6e685fa95d2da2d2b3b9d857e70083fc1d"
+      ]
+    },
+    "2026-11-24/constructivism": {
+      "id": "2026-11-24/constructivism",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "constructivism",
+      "genre": "Конструктивизм",
+      "artwork_ids": [
+        "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f"
+      ],
+      "selected_at": "2026-11-24T11:45:53.763976+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "407b9942f9ac2e13796486789ef3cbea0df39562203a0f49afed1976dc568b4e"
+      ]
+    },
+    "2026-11-24/impressionism": {
+      "id": "2026-11-24/impressionism",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "impressionism",
+      "genre": "Импрессионизм",
+      "artwork_ids": [
+        "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e",
+        "a67f80cca3f2e4acd0500100dbbb56289e76721aa325fcf8cbcf9c740ee09ed7"
+      ],
+      "selected_at": "2026-11-24T11:45:56.344757+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "e4a0f9e0a644e5a2b0e8e4f46ca04796c72a28e1a81240e069ad8e5c950af0a0",
+        "4f37d9e45f32cbc38e08976c0781dc4f2972593354fbc106242d38e7e9882d41"
+      ]
     }
   },
   "studies": {
