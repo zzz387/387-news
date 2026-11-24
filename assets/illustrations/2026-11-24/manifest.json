@@ -1,5 +1,354 @@
 {
   "date": "2026-11-24",
-  "images": {},
+  "images": {
+    "e0f7fb7c1b6aedf6f63dd0047f6eeb70313f93706cbf1fb925c9b21cf2f1eef0": {
+      "key": "e0f7fb7c1b6aedf6f63dd0047f6eeb70313f93706cbf1fb925c9b21cf2f1eef0",
+      "article_id": "32cbb2d821753a5452c322d8f90497a3ce187c6445c1d53598f9a62daeffe6f7",
+      "description_hash": "93759721c3fc2f86d6c11ce5401f7042e6e5013155c30d6e213d2a2d9485ffd3",
+      "genre": "Акварель",
+      "ratio": "3:2",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "b21b02dec4a028520c06f32ee1a6ff9cbbec0fc886f10cf3bdc279b8399ae830",
+      "protocol": 2,
+      "article_slug": "feature-06",
+      "sha256": "7691b4f245da778697ad10021e31cae923ea4644328ff1f3622aacb3d8534e9a",
+      "width": 768,
+      "height": 512,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/watercolor",
+      "reference_artwork_ids": [
+        "bea582d794561a11ce5178b7838fde2f6221824edd54f3552746b2c5e7290222",
+        "908831977ed6724a4e0be7cea90eca74844ad410125e1915791dc08261ad97c3",
+        "381bfd81138e9b240f1b38f2e03f29426cb2a2693c6d29cb94d97e49efdc2d1b",
+        "9c39be40db216d322d5cbe894cae015f2c348f1c0862049bda604eaed4d6574c"
+      ],
+      "reference_sha256": [
+        "52271fda7c2715289b61d1930e276875e46e9ad39c03f65e66815d59add74546",
+        "b761a50593e2d8857a275ef27005983d4c99e8a78a8373c308850a298fc76254",
+        "8c3daee7b3e11473bfd100c9afd2b5f0908bdc5ac805df16d5673de723faaf75",
+        "2d0327ffdd4acc2c88e58740c822549d404d50b89523ece90ed49a771b68bd4f"
+      ],
+      "selected_reference_id": "9c39be40db216d322d5cbe894cae015f2c348f1c0862049bda604eaed4d6574c",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.68969,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.5567,
+        "palette_diversity": 1,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "2d0327ffdd4acc2c88e58740c822549d404d50b89523ece90ed49a771b68bd4f",
+        "groups": [
+          {
+            "color": "#a69780",
+            "share": 0.1253,
+            "lab": [
+              63.177,
+              1.739,
+              14.143
+            ]
+          },
+          {
+            "color": "#c2b091",
+            "share": 0.1168,
+            "lab": [
+              72.605,
+              1.576,
+              18.254
+            ]
+          },
+          {
+            "color": "#8b6b4a",
+            "share": 0.1134,
+            "lab": [
+              47.623,
+              8.255,
+              23.359
+            ]
+          },
+          {
+            "color": "#efdcb1",
+            "share": 0.1085,
+            "lab": [
+              88.311,
+              0.031,
+              23.535
+            ]
+          },
+          {
+            "color": "#a1825b",
+            "share": 0.1043,
+            "lab": [
+              56.386,
+              6.503,
+              25.59
+            ]
+          },
+          {
+            "color": "#bd975e",
+            "share": 0.0927,
+            "lab": [
+              64.773,
+              7.035,
+              35.265
+            ]
+          },
+          {
+            "color": "#d9bd93",
+            "share": 0.085,
+            "lab": [
+              78.026,
+              3.866,
+              24.934
+            ]
+          },
+          {
+            "color": "#dbc9a9",
+            "share": 0.063,
+            "lab": [
+              81.674,
+              1.28,
+              18.295
+            ]
+          },
+          {
+            "color": "#d6b382",
+            "share": 0.0544,
+            "lab": [
+              74.92,
+              5.952,
+              29.747
+            ]
+          },
+          {
+            "color": "#bea376",
+            "share": 0.0475,
+            "lab": [
+              68.352,
+              3.471,
+              27.057
+            ]
+          },
+          {
+            "color": "#e8cfa3",
+            "share": 0.0465,
+            "lab": [
+              84.188,
+              2.26,
+              25.096
+            ]
+          },
+          {
+            "color": "#f6eacc",
+            "share": 0.0427,
+            "lab": [
+              92.927,
+              -0.739,
+              16.041
+            ]
+          }
+        ],
+        "dominant": [
+          "#a69780"
+        ],
+        "secondary": [
+          "#a69780",
+          "#c2b091",
+          "#8b6b4a",
+          "#efdcb1",
+          "#a1825b",
+          "#bd975e",
+          "#d9bd93",
+          "#dbc9a9",
+          "#d6b382"
+        ],
+        "accent": [
+          "#bea376",
+          "#e8cfa3",
+          "#f6eacc"
+        ],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.323,
+        "lightness": 70.17,
+        "dark_share": 0.0,
+        "light_share": 0.386,
+        "contrast": "moderate",
+        "contrast_value": 43.3
+      },
+      "art_movement": "reference-defined movement",
+      "medium": "watercolor",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 26.241,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.323,
+        "generated_saturation": 0.151,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "7691b4f245da778697ad10021e31cae923ea4644328ff1f3622aacb3d8534e9a",
+          "groups": [
+            {
+              "color": "#fdfdfb",
+              "share": 0.1436,
+              "lab": [
+                99.26,
+                -0.349,
+                0.954
+              ]
+            },
+            {
+              "color": "#a19484",
+              "share": 0.1229,
+              "lab": [
+                62.018,
+                2.065,
+                10.202
+              ]
+            },
+            {
+              "color": "#5e5d61",
+              "share": 0.1109,
+              "lab": [
+                39.701,
+                1.246,
+                -2.145
+              ]
+            },
+            {
+              "color": "#beb7af",
+              "share": 0.1099,
+              "lab": [
+                74.768,
+                1.054,
+                4.942
+              ]
+            },
+            {
+              "color": "#fcfdf9",
+              "share": 0.0951,
+              "lab": [
+                99.137,
+                -1.027,
+                1.793
+              ]
+            },
+            {
+              "color": "#e6d4b9",
+              "share": 0.0944,
+              "lab": [
+                85.713,
+                1.949,
+                15.622
+              ]
+            },
+            {
+              "color": "#f9f7eb",
+              "share": 0.0926,
+              "lab": [
+                97.089,
+                -1.386,
+                5.996
+              ]
+            },
+            {
+              "color": "#efe3cf",
+              "share": 0.0922,
+              "lab": [
+                90.686,
+                0.798,
+                11.229
+              ]
+            },
+            {
+              "color": "#e0bf95",
+              "share": 0.0663,
+              "lab": [
+                79.203,
+                5.786,
+                25.576
+              ]
+            },
+            {
+              "color": "#fdfdf5",
+              "share": 0.0464,
+              "lab": [
+                99.114,
+                -1.381,
+                3.821
+              ]
+            },
+            {
+              "color": "#fcfefb",
+              "share": 0.0248,
+              "lab": [
+                99.434,
+                -1.184,
+                1.199
+              ]
+            },
+            {
+              "color": "#fefcfb",
+              "share": 0.0008,
+              "lab": [
+                99.087,
+                0.487,
+                0.711
+              ]
+            }
+          ],
+          "dominant": [
+            "#fdfdfb"
+          ],
+          "secondary": [
+            "#fdfdfb",
+            "#a19484",
+            "#5e5d61",
+            "#beb7af",
+            "#fcfdf9",
+            "#e6d4b9",
+            "#f9f7eb",
+            "#efe3cf",
+            "#e0bf95"
+          ],
+          "accent": [
+            "#fdfdf5",
+            "#fcfefb",
+            "#fefcfb"
+          ],
+          "temperature": "warm",
+          "saturation": "low",
+          "saturation_value": 0.151,
+          "lightness": 81.18,
+          "dark_share": 0.023,
+          "light_share": 0.68,
+          "contrast": "high",
+          "contrast_value": 60.09
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "2d0327ffdd4acc2c88e58740c822549d404d50b89523ece90ed49a771b68bd4f",
+        "wire_sha256": "8436a23ce30f9374a078f2e7bf6a97349cedf73adb45d728b9b5cd77c167dc79",
+        "decoded_pixels_sha256": "c3fc796a6b4376f5db96b75cc1b8cd16a8d43fe23780295d26987d4b84035afa",
+        "width": 480,
+        "height": 293
+      },
+      "path": "assets/illustrations/2026-11-24/e0f7fb7c1b6aedf6f63dd0047f6eeb70313f93706cbf1fb925c9b21cf2f1eef0.webp"
+    }
+  },
   "provider_status": "READY"
 }
