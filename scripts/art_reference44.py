@@ -72,7 +72,7 @@ def select(root,state,item,row,registry,previous):
     from scripts import art_library44
     saved=state.setdefault('art_library44',{}).setdefault('reference_choices',{});key=row['id']+'/'+item['key']
     works=[registry['artworks'][i] for i in row['artwork_ids']]
-    if len(works)!=4 or not all(art_library44.file_valid(root,w) for w in works):raise ValueError('ART_SET_INTEGRITY')
+    if not 1<=len(works)<=4 or not all(art_library44.file_valid(root,w) for w in works):raise ValueError('ART_SET_INTEGRITY')
     cached=saved.get(key)
     if cached:
         work=next((w for w in works if w['id']==cached['selected_reference_id']),None)

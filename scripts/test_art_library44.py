@@ -82,14 +82,22 @@ class ArtLibraryTests(unittest.TestCase):
                 return picture(100+int(url.rsplit('/',1)[1]))
             with patch.object(lib.Museum,'candidates',return_value=iter(candidates)),patch.object(lib.Museum,'get',autospec=True,side_effect=get) as download:
                 sets=lib.prepare_sets(temp,{'date':'2026-11-24'},self.items(1))
-                self.assertEqual(len(sets),1);self.assertEqual(download.call_count,4)
+                self.assertEqual(len(sets),1);self.assertEqual(download.call_count,1)
 
-    def test_insufficient_stock_is_explicit_and_never_fabricates_a_set(self):
+    def test_single_reference_and_thirty_day_reuse_preserve_history(self):
         with tempfile.TemporaryDirectory() as temp:
-            state=self.stock(temp,3);items=self.items(5)
-            sets=lib.prepare_sets(temp,state,items,discover=False);lib.attach(temp,state,items,sets)
-            self.assertEqual(sets,{});self.assertEqual(state['art_library44']['deficits'],['Импрессионизм'])
-            self.assertTrue(all(i['reference_status']=='REFERENCE_SET_UNAVAILABLE' for i in items))
+            state=self.stock(temp,1);items=self.items(2)
+            with patch.object(lib.Museum,'get',side_effect=AssertionError('Use saved library')):
+                sets=lib.prepare_sets(temp,state,items);lib.attach(temp,state,items,sets)
+                self.assertEqual(len(sets['Импрессионизм']['artwork_ids']),1)
+                self.assertTrue(all(i['reference_images_sent']==1 for i in items))
+                self.assertEqual(items[0]['selected_reference_id'],items[1]['selected_reference_id'])
+                for day,allowed in (('2026-12-22',False),('2026-12-23',True),('2027-01-21',False),('2027-01-22',True)):
+                    result=lib.prepare_sets(temp,{'date':day},self.items(1),discover=False)
+                    self.assertEqual(bool(result),allowed,day)
+                self.assertEqual(len(lib.load(temp)['sets']),3)
+                self.assertEqual(sets,lib.prepare_sets(temp,state,items,discover=False))
+
     def test_museum_metadata_and_access_checks_fail_closed(self):
         self.assertTrue(lib.genre_matches('Японская гравюра','Japan Color woodblock print'))
         self.assertFalse(lib.genre_matches('Японская гравюра','European oil painting'))
