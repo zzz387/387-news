@@ -2167,6 +2167,26 @@
       "sha256": [
         "6a84dae9afd0d0c1ea0d9c301d85af16cf28af2a01b9ed88fa810a37b98e524e"
       ]
+    },
+    "2026-11-25/watercolor": {
+      "id": "2026-11-25/watercolor",
+      "issue_id": "2026-11-25",
+      "issue_date": "2026-11-25",
+      "issue_number": null,
+      "genre_id": "watercolor",
+      "genre": "Акварель",
+      "artwork_ids": [
+        "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+        "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb"
+      ],
+      "selected_at": "2026-11-24T20:11:32.460568+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727"
+      ]
     }
   },
   "studies": {

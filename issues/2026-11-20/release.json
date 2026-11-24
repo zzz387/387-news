@@ -1,0 +1,594 @@
+{
+  "date": "2026-11-20",
+  "number": 31,
+  "policy_version": "4.4",
+  "article_count": 14,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "6f4b5f09d2c45aaeb170c4fef7b0534c93816a73f7b226f3205a28b5f866289f",
+      "markdown": "194cae3a8996864dc8e9705bbc3821c954f10eb74fe51267c4e4d24d86d9aae2"
+    },
+    "feature-02": {
+      "html": "d1afa9d06ceb5d80eede78650a87aef663ac0ac2f6587d6292746ae0049b63fc",
+      "markdown": "67b1145653d161b7f4ec8fc1b82b978569d7da5b88bbe6621c3d43a0651ec77c"
+    },
+    "feature-03": {
+      "html": "a00f83f5baa6991f3914806484f25d3f1c88b89438a9c8c0eaaee144aa8ee561",
+      "markdown": "d5390cb6d64f83ca6001d1e136480ef5e849369e76a4c43535cc37f0c7416596"
+    },
+    "feature-04": {
+      "html": "6ee92518a6f780f4d476e7c78304419ff5a1778ba163e3260d9c70c447f8fad8",
+      "markdown": "c2e0bc6502b8a632be337a92b639345721c0b9db693fd2d81f32524f4ef8993e"
+    },
+    "feature-05": {
+      "html": "4071eb9ca1a5c2b68e09701b44e9cd1f4c13a61f3374909467dcee5ce132bae8",
+      "markdown": "ae929b8bf643a92411dff2f2afc4c55a4fd5f3b62a956e520b971d56ac112144"
+    },
+    "feature-06": {
+      "html": "5f84625c0701822ab64c63b39d9c9cab72c9ef3572a22b358436eb80a0accc21",
+      "markdown": "cdc7641f26add2a753af37c3eb9a944abed5d7c9ee8e230d28541caf70f03d88"
+    },
+    "feature-07": {
+      "html": "88ab95e8e7c144d1e5d17e44c6a9640d41196d6ddc01d31d95ef5b083bfd1c48",
+      "markdown": "dd99111aad2f67942c301f18ec27867b8b6ddb2eabc16b7fbf1d3e9336d1cea0"
+    },
+    "feature-08": {
+      "html": "d1a8f23ad0fd5490ad6fa7a7296602d3f5c372de50d727d0afd2e1ac82a9be5a",
+      "markdown": "542edc5f66092ba6df3f116ec126a47877c3eaf1d0cda3f7baa7ac1dae15adf3"
+    },
+    "feature-09": {
+      "html": "e6ee5debbaff821df0b9a8d1ee10dadeb6c7a9c27838585c194bbb898ab9b496",
+      "markdown": "c6cc285fd68b6734fa252dc573fc65895d59c562a1ce8afbcd8ad7b3d76bc9aa"
+    },
+    "feature-10": {
+      "html": "3aeb0fd9e9f28e2cf968b05a8741f6ab578c4cb2c6a57fdc77cb38855c78c43b",
+      "markdown": "2a20b4c35f2b5021545fa06288ca573e2ac9772d026fe0b2681b13ca360b5f2c"
+    },
+    "feature-11": {
+      "html": "20e06a09c4a7f971f975d4377da3881f62ab2009550aeb0840f41568e1687bf4",
+      "markdown": "8c67de23208df83f26a60cf0a67369acee5adee9dfbceb034bd05d5f6a0b3043"
+    },
+    "feature-12": {
+      "html": "7841ef54ebb4284513e391a3c3bad2bc3fd336594cd481dcdd13f0ac471120cb",
+      "markdown": "7ed89e128f0645b7d0ba0ab6d5bff4ac517c3b4815d0241ded37fb91df4073a2"
+    },
+    "feature-13": {
+      "html": "ec74ca54c74cba553be4f0e02e667d7e626444d79e7d2df4caef2c9a5692bbe0",
+      "markdown": "da7ad7243761df4b25f1792851db4280af1555ae4c050e59507ed217bf0f2a7d"
+    },
+    "feature-14": {
+      "html": "9f5c0cdaf1dc8c47a35fd0322345a1492d9a11a50564bf834d2ef84485af92f4",
+      "markdown": "97774b08bb21bfffee5c27777cc580025063858a46e710984242fa83dd5cd311"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-24T23:20:09.266220+03:00",
+  "release_not_before": "2026-11-20T06:00:00+03:00",
+  "brief_policy_revision": 2,
+  "recovered_at": "2026-11-24T23:20:09.266244+03:00",
+  "mosaic_revision": 2,
+  "illustrations": [
+    {
+      "key": "de142513024e3684af78d7ef98b45196cb95f59d7733a5bb48026d8f799c6522",
+      "article_id": "24b52e415a678e40a4baef6cc0ceaddc2e58e1bc4db14503923a8bb34277e692",
+      "description_hash": "57a35d8fb1cb63f89928abe2a94ae0af619f45c718cb310849cbd2c7aabc47e2",
+      "genre": "Романтизм",
+      "ratio": "3:2",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "08a08d8247dc214e3df44ef1cd4e354dab512691ccb0e1f2f1f7ce3f44abf4af",
+      "protocol": 2,
+      "article_slug": "feature-01",
+      "sha256": "fa7a189faa0937b7ee58ec2f413868a27cac08ecfc960809b3b9af3551027715",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/de142513024e3684af78d7ef98b45196cb95f59d7733a5bb48026d8f799c6522.webp"
+    },
+    {
+      "key": "482769b8b1fddd48eae0a549fd1d58be86e7ce8db2db0c01f9aefd9857c75e8a",
+      "article_id": "c204d8a80f237a0218e75b1cc1183f1dfb6b2ed1e516da9458bf051366e00cbf",
+      "description_hash": "3bb0e4707b23614d7ce844f10e2763063c9bdcea7b54799b81f3c124c34857c6",
+      "genre": "Футуризм",
+      "ratio": "4:5",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "8562aa06a73156f3b39502b259e5a3dad6bbd0c86b6898684ca50d4d691abe7c",
+      "protocol": 2,
+      "article_slug": "feature-02",
+      "sha256": "b21ebf58c119056a49c167659515424aa428679030087d7461476344d1c3b32b",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/482769b8b1fddd48eae0a549fd1d58be86e7ce8db2db0c01f9aefd9857c75e8a.webp"
+    },
+    {
+      "key": "367e913783eafe805567994435d54965cf820a7bd5041a929184285f1b5585bd",
+      "article_id": "fedad8c3cc6ef52fcd8e6d18600e0452e6ef6c27c95b11271d04a0139c2e8c8e",
+      "description_hash": "7ba5f12c7d70bb60ae4aeecb82814d724bea2f23f6b60b27190c9a5a34d0df4c",
+      "genre": "Ар-нуво",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "7c3dc639500f67bfc111e4ea0ce430de335da4373b488ba4abca0f6ab76f337b",
+      "protocol": 2,
+      "article_slug": "feature-03",
+      "sha256": "676ab12e257b2f6626900704856b44456a0a31d4ed6a0e21771d3fca841987a5",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/367e913783eafe805567994435d54965cf820a7bd5041a929184285f1b5585bd.webp"
+    },
+    {
+      "key": "9a4305f12e4cf9fe7e0595e0d55c83328160d5e5e247432275e304cf66fee37e",
+      "article_id": "03c266b736241b536637856ec371d10d35fcf288d6edb5978fd025c94cd35b54",
+      "description_hash": "5d6043227b6297e63af0579e20dbbc1f96ed6ab66cdb716bdceecc2a1f6223a4",
+      "genre": "Конструктивизм",
+      "ratio": "3:4",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "d2925ee292e40b0e1377d8edf6e4a2f9fb14de54c9f470beb06647805a5a0ad0",
+      "protocol": 2,
+      "article_slug": "feature-04",
+      "sha256": "bd80dc92f0779dd280a900fcb3b6035c2a713a208dcc6623ea7e577000c41d86",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/9a4305f12e4cf9fe7e0595e0d55c83328160d5e5e247432275e304cf66fee37e.webp"
+    },
+    {
+      "key": "fb9fbaadd8b7e17ef8e33d933620eb5ef20a28ed533406d8a58af3aa3317efb9",
+      "article_id": "9a3c44b9f146eedffbb5a897b29a449326e25e35294b0781d350577161caee24",
+      "description_hash": "2df45069347e04b66139d3c28b326f9e10d5d71ac0aad335015c40fba9f72233",
+      "genre": "Экспрессионизм",
+      "ratio": "16:9",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "170b2bd62d2cad2e7f9c34a5f99974e6c264440f585b112ba21402ebfe33dd54",
+      "protocol": 2,
+      "article_slug": "feature-05",
+      "sha256": "282a6c46362d4ee41f776f9ada19b7c9aacf332bdc829b213e74aa15f7eb745b",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/fb9fbaadd8b7e17ef8e33d933620eb5ef20a28ed533406d8a58af3aa3317efb9.webp"
+    },
+    {
+      "key": "7ce8084044bb0cc5436546f3d3c372014f15ab9680b8eb205b0d9f00b7f43515",
+      "article_id": "00df1ba36f67505ee3fe38f759a0f7879175159847279c8f479dce31d4998403",
+      "description_hash": "11058ed6a8d3c2cd91d7e82b9cc6e9a753fd2aecc7f0fe16908f5a8cffb60808",
+      "genre": "Натурализм",
+      "ratio": "3:2",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "c2b15671b17bef7069d81f052b50f890ca187a856bf7e43f9ef4d8d26ed37b8f",
+      "protocol": 2,
+      "article_slug": "feature-06",
+      "sha256": "f0ba822b815fe22b8668056772a2a5728b0ce7bbc55cf1a9f39a59419f67f948",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/7ce8084044bb0cc5436546f3d3c372014f15ab9680b8eb205b0d9f00b7f43515.webp"
+    },
+    {
+      "key": "139fc3dd77a66fec5e76d21d6a927b274c1870566a5190d391bac95997dccff1",
+      "article_id": "9a54918115849bf64e55a44e1e5338cc393a543da81a774171d47fe4348ad0ef",
+      "description_hash": "c3bf74a4364e63d12317135ecd9f1e4d17852a14b0dca7c6a577823fa2e2671d",
+      "genre": "Геометрическая абстракция",
+      "ratio": "4:5",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "a8236b0261c31ae1899c83c0e288153c4709549b8013e24c6db5a717f8417727",
+      "protocol": 2,
+      "article_slug": "feature-07",
+      "sha256": "e21ebe49d998594c16cef0e6d7c824b819dded6f9f2c5e147d23ef16e6ac168b",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/139fc3dd77a66fec5e76d21d6a927b274c1870566a5190d391bac95997dccff1.webp"
+    },
+    {
+      "key": "aa108804a071706d18a2613e19be1c33c176939648ee35c89da45904744d7c43",
+      "article_id": "93664c7e15119a56221ef735967d52f6577adaae09e9420441dca8572396e6f6",
+      "description_hash": "3d2f1176ddc276a7ef8906224fac98964c44ef434e55973ec06ab4c67d86bc3b",
+      "genre": "Линогравюра",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "6ffb9d036ea2c76f80a64cd69e6ce0712773716c35b7dba6cbf697e436314150",
+      "protocol": 2,
+      "article_slug": "feature-08",
+      "sha256": "84e08334f943f51c8ce6317001090b62ed2a783fbb6af8b1164e8d9f331101a5",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/aa108804a071706d18a2613e19be1c33c176939648ee35c89da45904744d7c43.webp"
+    },
+    {
+      "key": "56b1fa812efa20fefe46b1f8e760ada9f921f933b27834dc60663f38029d658f",
+      "article_id": "aedbe70137ccab5ed46662f2828e4c4651c8b212f17be7108ff0c8d3b9758edb",
+      "description_hash": "d582702203c1a3f816132a8d8550a2bf966a9a443bb51c548c557aab60dbc5bb",
+      "genre": "Индустриальная графика",
+      "ratio": "3:4",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "af5708489a7cad88c02cd8e6bb081ff75651b651431b9339ea181b3394a55ae1",
+      "protocol": 2,
+      "article_slug": "feature-09",
+      "sha256": "03a5078551ce7329a85f9949082d3a4d42381becc673063d0b25422391cb99f6",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/56b1fa812efa20fefe46b1f8e760ada9f921f933b27834dc60663f38029d658f.webp"
+    },
+    {
+      "key": "7a681f2e8a40d73dcfc6c0b6740f6d56ebccab252e28d7bfbc4a8f6d73090ed4",
+      "article_id": "0003ae6247292198dabc85b5d1784b465f87cc24202746161d240fda35f9b6e6",
+      "description_hash": "30bec5186a853c168c6bf1adf5b8fe2245167d58a755114643fe3f27d6792c3c",
+      "genre": "Символизм",
+      "ratio": "16:9",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "756625fb319d8882ea7cad81bd5c0148a8592e78ee59d5f18daf856c7728f593",
+      "protocol": 2,
+      "article_slug": "feature-10",
+      "sha256": "57edc87dbe9cacaee82d68188e8efd3a0be0fd8e2469afd53ed400b94f720449",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/7a681f2e8a40d73dcfc6c0b6740f6d56ebccab252e28d7bfbc4a8f6d73090ed4.webp"
+    }
+  ],
+  "art44": {
+    "status": "ARTWORK_INCOMPLETE",
+    "required": 14,
+    "ready": 10,
+    "missing": 4,
+    "emergency_text": true,
+    "provider_status": "READY",
+    "bindings": [
+      {
+        "key": "de142513024e3684af78d7ef98b45196cb95f59d7733a5bb48026d8f799c6522",
+        "date": "2026-11-20",
+        "article_id": "24b52e415a678e40a4baef6cc0ceaddc2e58e1bc4db14503923a8bb34277e692",
+        "text_hash": "08a08d8247dc214e3df44ef1cd4e354dab512691ccb0e1f2f1f7ce3f44abf4af",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "57a35d8fb1cb63f89928abe2a94ae0af619f45c718cb310849cbd2c7aabc47e2",
+        "genre": "Романтизм",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-01"
+      },
+      {
+        "key": "482769b8b1fddd48eae0a549fd1d58be86e7ce8db2db0c01f9aefd9857c75e8a",
+        "date": "2026-11-20",
+        "article_id": "c204d8a80f237a0218e75b1cc1183f1dfb6b2ed1e516da9458bf051366e00cbf",
+        "text_hash": "8562aa06a73156f3b39502b259e5a3dad6bbd0c86b6898684ca50d4d691abe7c",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "3bb0e4707b23614d7ce844f10e2763063c9bdcea7b54799b81f3c124c34857c6",
+        "genre": "Футуризм",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-02"
+      },
+      {
+        "key": "367e913783eafe805567994435d54965cf820a7bd5041a929184285f1b5585bd",
+        "date": "2026-11-20",
+        "article_id": "fedad8c3cc6ef52fcd8e6d18600e0452e6ef6c27c95b11271d04a0139c2e8c8e",
+        "text_hash": "7c3dc639500f67bfc111e4ea0ce430de335da4373b488ba4abca0f6ab76f337b",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "7ba5f12c7d70bb60ae4aeecb82814d724bea2f23f6b60b27190c9a5a34d0df4c",
+        "genre": "Ар-нуво",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-03"
+      },
+      {
+        "key": "9a4305f12e4cf9fe7e0595e0d55c83328160d5e5e247432275e304cf66fee37e",
+        "date": "2026-11-20",
+        "article_id": "03c266b736241b536637856ec371d10d35fcf288d6edb5978fd025c94cd35b54",
+        "text_hash": "d2925ee292e40b0e1377d8edf6e4a2f9fb14de54c9f470beb06647805a5a0ad0",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "5d6043227b6297e63af0579e20dbbc1f96ed6ab66cdb716bdceecc2a1f6223a4",
+        "genre": "Конструктивизм",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-04"
+      },
+      {
+        "key": "fb9fbaadd8b7e17ef8e33d933620eb5ef20a28ed533406d8a58af3aa3317efb9",
+        "date": "2026-11-20",
+        "article_id": "9a3c44b9f146eedffbb5a897b29a449326e25e35294b0781d350577161caee24",
+        "text_hash": "170b2bd62d2cad2e7f9c34a5f99974e6c264440f585b112ba21402ebfe33dd54",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "2df45069347e04b66139d3c28b326f9e10d5d71ac0aad335015c40fba9f72233",
+        "genre": "Экспрессионизм",
+        "ratio": "16:9",
+        "protocol": 2,
+        "article_slug": "feature-05"
+      },
+      {
+        "key": "7ce8084044bb0cc5436546f3d3c372014f15ab9680b8eb205b0d9f00b7f43515",
+        "date": "2026-11-20",
+        "article_id": "00df1ba36f67505ee3fe38f759a0f7879175159847279c8f479dce31d4998403",
+        "text_hash": "c2b15671b17bef7069d81f052b50f890ca187a856bf7e43f9ef4d8d26ed37b8f",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "11058ed6a8d3c2cd91d7e82b9cc6e9a753fd2aecc7f0fe16908f5a8cffb60808",
+        "genre": "Натурализм",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-06"
+      },
+      {
+        "key": "139fc3dd77a66fec5e76d21d6a927b274c1870566a5190d391bac95997dccff1",
+        "date": "2026-11-20",
+        "article_id": "9a54918115849bf64e55a44e1e5338cc393a543da81a774171d47fe4348ad0ef",
+        "text_hash": "a8236b0261c31ae1899c83c0e288153c4709549b8013e24c6db5a717f8417727",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "c3bf74a4364e63d12317135ecd9f1e4d17852a14b0dca7c6a577823fa2e2671d",
+        "genre": "Геометрическая абстракция",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-07"
+      },
+      {
+        "key": "aa108804a071706d18a2613e19be1c33c176939648ee35c89da45904744d7c43",
+        "date": "2026-11-20",
+        "article_id": "93664c7e15119a56221ef735967d52f6577adaae09e9420441dca8572396e6f6",
+        "text_hash": "6ffb9d036ea2c76f80a64cd69e6ce0712773716c35b7dba6cbf697e436314150",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "3d2f1176ddc276a7ef8906224fac98964c44ef434e55973ec06ab4c67d86bc3b",
+        "genre": "Линогравюра",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-08"
+      },
+      {
+        "key": "56b1fa812efa20fefe46b1f8e760ada9f921f933b27834dc60663f38029d658f",
+        "date": "2026-11-20",
+        "article_id": "aedbe70137ccab5ed46662f2828e4c4651c8b212f17be7108ff0c8d3b9758edb",
+        "text_hash": "af5708489a7cad88c02cd8e6bb081ff75651b651431b9339ea181b3394a55ae1",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "d582702203c1a3f816132a8d8550a2bf966a9a443bb51c548c557aab60dbc5bb",
+        "genre": "Индустриальная графика",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-09"
+      },
+      {
+        "key": "7a681f2e8a40d73dcfc6c0b6740f6d56ebccab252e28d7bfbc4a8f6d73090ed4",
+        "date": "2026-11-20",
+        "article_id": "0003ae6247292198dabc85b5d1784b465f87cc24202746161d240fda35f9b6e6",
+        "text_hash": "756625fb319d8882ea7cad81bd5c0148a8592e78ee59d5f18daf856c7728f593",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "30bec5186a853c168c6bf1adf5b8fe2245167d58a755114643fe3f27d6792c3c",
+        "genre": "Символизм",
+        "ratio": "16:9",
+        "protocol": 2,
+        "article_slug": "feature-10"
+      },
+      {
+        "key": "7b81b31cec1ddaee6c3addf20a9abf48f5dc9d2b74105eab2c09afa96fc34c18",
+        "date": "2026-11-20",
+        "article_id": "83600b50793a32716488daeff6c9830fbc729ad0268527f4bbc685934a299511",
+        "text_hash": "ba9f374a13c00b8675aabbcd69af2b3fb343aa4c86aba11e448d160ad9cd3c7f",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "1b342f7e394bcf5bbc95c273379205bdc348e9cd9c2a9289941a9cbdd73e8337",
+        "genre": "Акварель",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-11"
+      },
+      {
+        "key": "e8c2f7ba35123d41c7f48c7600398125ff301ada6661d99a1a0e80afbe7e976d",
+        "date": "2026-11-20",
+        "article_id": "9f0e054936778e4449d570d66f5d962e3775d7c71d2bfb954bf0f73c5293b3dc",
+        "text_hash": "19b2b4e2aafa2d6db1bb9933aabf1f90a4b15cd9567a102538c8f239a3899678",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "51d60ba5e946a074a65e336cc782b04ea7c4da69c2112dc63f6799303fddbf80",
+        "genre": "Импрессионизм",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-12"
+      },
+      {
+        "key": "dcdfd2487d25469d902ed7cb393d0c22e4e8c7f44df8d4d0f4bda4bde2a577c1",
+        "date": "2026-11-20",
+        "article_id": "b253ed4370953de91f59247a7116242534e181d016ef458054cc833513cad8f6",
+        "text_hash": "eab4d446789d37289cace436fbb7d936678fe60591e115a96a31edc77a0fd21a",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "9303f357166bc9b23ca13fa12fefa585c74e163bf8b5049b80478507d15e1fdc",
+        "genre": "Кубизм",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-13"
+      },
+      {
+        "key": "8213c100cec0c16d7ecbee09ad188217f1e12187bafbf744c32b645151f4b4c0",
+        "date": "2026-11-20",
+        "article_id": "5e4b7c6d7b17f6721e333a2c9d5b6280e99fe2620bd121306e4f6be7666df464",
+        "text_hash": "ec937a7c880b87daf04b6e7f5a4e0e1c4ad4e483995f9a59dab80885ff20657c",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "12db9a156511f225c32a5e7532a986681464d3f13542afd1bca4452634849ffb",
+        "genre": "Метафизическая живопись",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-14"
+      }
+    ]
+  },
+  "light_news": [
+    {
+      "kind": "historical_fact",
+      "title": "Искусственный интеллект и технологии",
+      "text": "Десять лет спустя после матча системы AlphaGo против чемпиона по го Ли Седоля современный искусственный интеллект все еще не использует те же механизмы, которые обеспечили ту победу.",
+      "source": {
+        "url": "https://www.technologyreview.com/2026/11/18/1148650/ai-hype-index-ai-is-everywhere/",
+        "title": "The AI Hype Index: AI is everywhere",
+        "publisher": "MIT Technology Review",
+        "language": "en",
+        "published": "2026-11-18T09:42:44-05:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Земледелие на Филиппинах",
+      "text": "По данным исследования 2021 года, кукуруза является главной сельскохозяйственной культурой муниципалитета Себу, занимая 53% его аграрной площади.",
+      "source": {
+        "url": "https://news.mongabay.com/2026/11/philippine-corn-farmers-investigate-links-between-chemical-farming-and-soil-erosion/",
+        "title": "Philippine corn farmers investigate links between chemical farming and soil erosion",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-20T18:27:41+00:00"
+      }
+    },
+    {
+      "kind": "news",
+      "title": "Дебют юной актрисы в кино",
+      "text": "Школьница Алиса Юнусова исполнила главную роль в новом драматическом фильме «Дива», для чего ей пришлось осваивать сложный вокал и учить итальянские арии.",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/eto-moj-gorod-aktrisa-alisa-yunusova/",
+        "title": "Это мой город: актриса Алиса Юнусова",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-18T03:49:03+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Миф о Лабиринте и Голодные игры",
+      "text": "Сюзанна Коллинз в интервью призналась, что идея цикла «Голодные игры» возникла у нее под впечатлением от греческого мифа о Тесее и Минотавре, который она прочла в восьмилетнем возрасте. Сценарий с ежегодной отправкой юношей и девушек в качестве дани, которых пожирает чудовище, стал литературной основой для сюжета о борьбе Китнисс Эвердин.",
+      "source": {
+        "url": "https://www.mentalfloss.com/culture/folklore-mythology/greek-myth-inspired-hunger-games?utm_source=RSS",
+        "title": "The Greek Myth That Inspired the Hunger Games",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-18T01:00:00Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Первые черепашата на Тихоокеанском побережье",
+      "text": "Детеныши оливковой морской черепахи, спасенные от приближающегося шторма в Калифорнии, были выпущены в дикую природу. Это первый в истории случай появления гнезд морских черепах на американском Западном побережье.",
+      "source": {
+        "url": "https://www.goodnewsnetwork.org/west-coasts-first-ever-sea-turtle-hatchlings-released-into-the-pacific-look/",
+        "title": "West Coast’s First Ever Sea Turtle Hatchlings Released into the Pacific (LOOK)",
+        "publisher": "Good News Network",
+        "language": "en",
+        "published": "2026-11-17T19:30:43+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Древние леса под водой",
+      "text": "Ученые обнаружили у побережья Мозамбика рифы, сформировавшиеся на месте древних торфяных болот и лесов. Радиоуглеродный анализ показал, что возраст этих затопленных структур составляет от 300 до 5000 лет.",
+      "source": {
+        "url": "https://eos.org/articles/scientists-have-discovered-a-thriving-reef-that-was-once-an-ancient-forest",
+        "title": "Scientists Have Discovered a Thriving Reef That Was Once an Ancient Forest - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-17T14:04:17+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Скончался эксперт по устойчивому развитию Джейсон Клэй",
+      "text": "Джейсон Клэй, известный своей работой по внедрению экологических стандартов в крупном бизнесе и сотрудничеством с WWF, ушел из жизни в возрасте 75 лет.",
+      "source": {
+        "url": "https://news.mongabay.com/2026/11/jason-clay-who-persuaded-big-business-to-help-save-nature-has-died-at-75/",
+        "title": "Jason Clay, who persuaded big business to help save nature, has died at 75",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-17T22:02:18+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Спрос на новостройки сместился к завершающей стадии",
+      "text": "В Москве и Подмосковье покупатели массового жилья стали значительно реже приобретать квартиры на нулевом этапе строительства. Основной спрос сместился в сторону объектов на финальной стадии готовности.",
+      "source": {
+        "url": "https://expert.ru/nedvizhimost/pokupateli-novostroek-ushli-ot-kotlovana",
+        "title": "Покупатели новостроек ушли «от котлована»",
+        "publisher": "expert.ru",
+        "language": "ru",
+        "published": "2026-11-18T10:00:00+03:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Новый рождественский фильм Тайлера Перри",
+      "text": "Известный режиссер Тайлер Перри представил свою новую праздничную картину под названием «Евангелие Рождества», которая рассказывает о музыканте, пытающемся возродить заброшенную церковь в Нью-Йорке. В ленте звучит много госпел-музыки в исполнении известных артистов.",
+      "source": {
+        "url": "https://www.christianitytoday.com/2026/11/tyler-perry-the-gospel-of-christmas-review/",
+        "title": "Tyler Perry’s Christmas Movie Is Everything You’d Think It Would Be - Christianity Today",
+        "publisher": "Christianity Today",
+        "language": "en",
+        "published": "2026-11-17T11:00:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Демократы Юга: исторический сдвиг",
+      "text": "В 1963 году в штате Миссисипи победа Льюиса Макаллистера в Палате представителей стала первым успехом республиканцев за 43 года. Долгое время политика штата была монополизирована одной партией.",
+      "source": {
+        "url": "https://theconversation.com/the-stunning-transformation-of-the-southern-democratic-party-in-one-lifetime-296566",
+        "title": "The stunning transformation of the Southern Democratic Party, in one lifetime",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-18T13:35:40Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Редкая встреча с изолированным племенем ава",
+      "text": "Группа примерно из 20 представителей изолированного народа ава вышла к деревне гуажажара в бразильском штате Мараньян. Этот редкий случай вызвал серьезную озабоченность экологов и активистов по поводу уязвимости коренных жителей.",
+      "source": {
+        "url": "https://news.mongabay.com/short-article/2026/11/rare-encounter-with-isolated-indigenous-awa-people-in-brazil-exposes-vulnerability/",
+        "title": "Rare encounter with isolated Indigenous Awá people in Brazil exposes vulnerability",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-17T23:20:01+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Исследования Арктики",
+      "text": "Международная мониторинговая программа «Распределенная биологическая обсерватория» с 2010 года ведет наблюдение за изменениями льда, температуры и химического состава воды в Тихоокеанской Арктике.",
+      "source": {
+        "url": "https://eos.org/articles/changing-arctic-waters-reshape-life-from-the-seafloor-to-the-coastlines",
+        "title": "Changing Arctic Waters Reshape Life from the Seafloor to the Coastlines - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-19T13:49:11+00:00"
+      }
+    }
+  ],
+  "light_count": 12,
+  "homepage_hash": "359175625e5a9c9236445bfe3fbd4749660c980f030ea4a82de723d1f2086209",
+  "overview_hash": "60a3f75a18f728fee84b920b4ea73e78c00e62fb097f582d18cd7821adcaab76",
+  "markdown_hash": "4436642cb8397c6a3b331426bb3fdf71329450b1e17217a0451e3ad74a4d2359"
+}
