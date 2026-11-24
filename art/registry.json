@@ -1615,6 +1615,52 @@
       "width": 395,
       "height": 480,
       "added_at": "2026-11-24T08:19:16.336643+00:00"
+    },
+    "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb": {
+      "museum": "The Metropolitan Museum of Art",
+      "museum_id": "met:485555",
+      "title": "The Street Pavers",
+      "artist": "Umberto Boccioni",
+      "year": "1914",
+      "source_url": "https://www.metmuseum.org/art/collection/search/485555",
+      "license": "CC0",
+      "license_url": "https://www.metmuseum.org/policies/image-resources",
+      "genre_evidence": "Futurism — curated Boccioni painting; Oil on canvas",
+      "genre_id": "futurism",
+      "verified": true,
+      "id": "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb",
+      "path": "assets/art/futurism/7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb.webp",
+      "sha256": "ecdce649014061d215541079059a684f04bc6e542606af8a0ffd9ab151ba5223",
+      "original_sha256": "9b8449881dca1b22abba5cbf56e5f48e874f2f4d59d0b45966fb247329fe4a92",
+      "visual_hash": "4340966703667203749",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 478,
+      "added_at": "2026-11-24T12:01:17.536378+00:00"
+    },
+    "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b": {
+      "museum": "The Metropolitan Museum of Art",
+      "museum_id": "met:435683",
+      "title": "Island of the Dead",
+      "artist": "Arnold Böcklin",
+      "year": "1880",
+      "source_url": "https://www.metmuseum.org/art/collection/search/435683",
+      "license": "CC0",
+      "license_url": "https://www.metmuseum.org/policies/image-resources",
+      "genre_evidence": "Symbolism; curated precursor reference for Metaphysical painting; not a Metaphysical-period work; Oil on wood",
+      "reference_relation": "documented precursor, not movement membership",
+      "genre_evidence_url": "https://www.salvador-dali.org/media/upload/pdf/dossierenglish_160163606439.pdf",
+      "genre_id": "metaphysical",
+      "verified": true,
+      "id": "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b",
+      "path": "assets/art/metaphysical/50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b.webp",
+      "sha256": "6a84dae9afd0d0c1ea0d9c301d85af16cf28af2a01b9ed88fa810a37b98e524e",
+      "original_sha256": "65e3bfeaff511bfca00a6694c3cef5a502a7ea778fe70a96119f0d2dc18013f5",
+      "visual_hash": "14477611296780766340",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 298,
+      "added_at": "2026-11-24T12:01:25.354924+00:00"
     }
   },
   "sets": {
@@ -2084,6 +2130,42 @@
       "sha256": [
         "e4a0f9e0a644e5a2b0e8e4f46ca04796c72a28e1a81240e069ad8e5c950af0a0",
         "4f37d9e45f32cbc38e08976c0781dc4f2972593354fbc106242d38e7e9882d41"
+      ]
+    },
+    "2026-11-24/futurism": {
+      "id": "2026-11-24/futurism",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "futurism",
+      "genre": "Футуризм",
+      "artwork_ids": [
+        "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb"
+      ],
+      "selected_at": "2026-11-24T12:01:21.330035+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "ecdce649014061d215541079059a684f04bc6e542606af8a0ffd9ab151ba5223"
+      ]
+    },
+    "2026-11-24/metaphysical": {
+      "id": "2026-11-24/metaphysical",
+      "issue_id": "2026-11-24",
+      "issue_date": "2026-11-24",
+      "issue_number": 30,
+      "genre_id": "metaphysical",
+      "genre": "Метафизическая живопись",
+      "artwork_ids": [
+        "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b"
+      ],
+      "selected_at": "2026-11-24T12:01:29.186567+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "6a84dae9afd0d0c1ea0d9c301d85af16cf28af2a01b9ed88fa810a37b98e524e"
       ]
     }
   },
