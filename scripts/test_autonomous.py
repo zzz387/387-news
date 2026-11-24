@@ -138,15 +138,16 @@ print(json.dumps({'prior':prior,'parts':len(d['_longform_progress']['parts']),'c
             with self.assertRaises(rt.GenerationPaused): news.gemini('test')
         self.assertEqual(api.call_count,1)
 
-    def test_429_503_defer_without_fallback_or_request_storm(self):
+    def test_429_holds_all_models_and_503_tries_each_configured_model_once(self):
         for status in (429,503):
             with self.subTest(status=status):
                 budget=rt.RequestBudget({},gap=0)
                 error=HTTPError('https://example.invalid',status,'error',{'Retry-After':'300'},io.BytesIO(b'{}'))
                 with patch.dict(os.environ,{'GEMINI_API_KEY':'fake'}),patch.object(rt,'ACTIVE_BUDGET',budget),patch.object(news,'urlopen',side_effect=error) as api:
                     with self.assertRaises(rt.GenerationPaused): news.gemini('test')
-                self.assertEqual(api.call_count,1)
-                self.assertEqual(budget.ledger['requests'],1)
+                expected=1 if status==429 else 2
+                self.assertEqual(api.call_count,expected)
+                self.assertEqual(budget.ledger['requests'],expected)
                 restored=rt.RequestBudget(json.loads(json.dumps(budget.ledger)),gap=0)
                 with self.assertRaises(rt.GenerationPaused): restored.reserve('gemini-3.5-flash-lite')
 

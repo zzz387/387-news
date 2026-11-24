@@ -105,7 +105,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         discover(state)
         # Fill the last ordinary place from already verified candidates before
         # spending a full discovery window. Exhaustion still triggers bounded search.
-        existing_supply=active44 and all(n>=2 for n in policy44.counts(selection43.composition(state)).values()) and any(
+        existing_supply=active44 and any(
             r.get('status') in ('discovered','preparing','retryable_error') and not r.get('for_light_only')
             and r.get('source',{}).get('full_text_verified') and r.get('source',{}).get('metadata_status')=='verified'
             and rights41.decision(r['source'],'INDEPENDENT_ARTICLE')['status']=='allowed'
@@ -120,6 +120,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         def prepare_light():
             if os.getenv('NEWS_LIGHT_NEWS_ENABLED')!='true' or (not active44 and clock()>=release-timedelta(minutes=10)) or not budget:return
             standard=policy44.standard(state) if active44 else None
+            if active44 and len(selection43.composition(state))<minimum:return
             if standard and standard['light_deficit']==0:return
             keep=max(4,2*max(0,minimum-len(selection43.composition(state))))
             if budget.remaining_requests()>=(2 if active44 else keep+2):
@@ -135,7 +136,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and main_groups.get(priorities43.classify(r)['group'],2)<2 and not r.get('for_light_only')]
             if active44:
                 needed={g for g,n in policy44.counts(selection43.composition(state)).items() if n<2}
-                coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and policy44.subject(r) in needed and not r.get('for_light_only')]
+                coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and policy44.subject(r) in needed and r['id'] not in attempted_ids and not r.get('for_light_only')]
             if active44 and needed and not coverage_pending and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                 extra_searches+=1
                 try:catalog43.refresh(state,clock(),shortage=True)

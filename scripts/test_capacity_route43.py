@@ -13,15 +13,14 @@ class CapacityRouteTests(unittest.TestCase):
             def __exit__(self,*args):return False
             def read(self):return json.dumps({'candidates':[{'finishReason':'STOP','content':{'parts':[{'text':'{"ok":true}'}]}}]}).encode()
         return Response()
-    def test_503_pauses_once_then_a_later_call_uses_the_existing_healthy_model(self):
+    def test_503_uses_the_existing_healthy_model_in_the_same_operation(self):
         ledger=self.ledger();budget=rt.RequestBudget(ledger,gap=0);urls=[]
         def get(request,**kwargs):
             urls.append(request.full_url)
             if len(urls)==1:raise HTTPError(request.full_url,503,'UNAVAILABLE',{},io.BytesIO(b'{"error":{"status":"UNAVAILABLE","message":"high demand"}}'))
             return self.response()
         with patch.dict(os.environ,GEMINI_API_KEY='synthetic',GEMINI_MODELS='gemini-3.5-flash-lite,gemini-3.1-flash-lite'),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(news,'urlopen',side_effect=get):
-            with self.assertRaises(rt.GenerationPaused):news.gemini('synthetic')
-            self.assertEqual(len(urls),1);self.assertTrue(news.gemini('synthetic')['ok'])
+            self.assertTrue(news.gemini('synthetic')['ok']);self.assertEqual(len(urls),2)
         self.assertIn('3.5-flash-lite',urls[0]);self.assertIn('3.1-flash-lite',urls[1]);self.assertEqual(ledger['requests'],2);self.assertEqual(budget.used,2)
     def test_429_holds_every_model_and_never_spends_another_request(self):
         ledger=self.ledger();budget=rt.RequestBudget(ledger,gap=0);error=HTTPError('synthetic',429,'QUOTA',{'Retry-After':'1200'},io.BytesIO(b'{"error":{"status":"RESOURCE_EXHAUSTED"}}'))
