@@ -166,6 +166,15 @@ def main():
     except Exception as exc:
         result['notification_error']=type(exc).__name__
     print('[delivery-status] '+json.dumps(result),flush=True)
+    if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4':
+        # A verified daily release hands the same controller tomorrow's work;
+        # its run name bounds continuations independently of delivery retries.
+        from scripts import delivery_watchdog
+        try:
+            next_date=(datetime.fromisoformat(result['date'])+timedelta(days=1)).date().isoformat()
+            wake=delivery_watchdog.prepare_date(next_date,datetime.now(news.TZ),request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')))
+        except Exception as exc:wake={'code':'PREPARATION_API_UNCERTAIN','error':type(exc).__name__}
+        print('[preparation-wakeup] '+json.dumps(wake),flush=True)
     art=None
     if result['date']>='2026-11-22' and release_queue.edition_exists(news.ROOT,result['date']):
         art=artwork_status(news.ROOT,result['date'],result['verified'],raw)

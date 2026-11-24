@@ -2,7 +2,7 @@
 import copy,json,os,tempfile,unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import patch,Mock
 from scripts import policy44 as v,editorial43 as e,selection43 as sel,publication43 as pub,light44 as brief,light43,stock43,news,site_checks,staged_news
 from scripts.test_daily43 import state,root,ready,web,NOW
 from scripts.test_editorial_visual43 import named,light_ready
@@ -69,6 +69,36 @@ class Policy44Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='true'),patch.object(sel,'composition',return_value=rows),patch.object(stock43,'restore_backlog'),patch.object(stock43,'balance'),patch.object(stock43,'draw'),patch.object(stock43,'draw_light'),patch.object(daily,'discover'),patch.object(priorities43,'apply_rules'),patch.object(catalog43,'refresh',side_effect=RuntimeError('bounded fixture search')) as search,patch.object(mosaic44,'finalize',return_value=False):
             daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5))
             search.assert_called_once()
+
+    def test_before_release_missing_topics_get_targeted_search_despite_general_supply(self):
+        from scripts import daily43 as daily,catalog43,priorities43,mosaic44
+        rows=[main_row(i) for i in [0,1,4,6,7,8,9,10]];s=issue();s['candidates']=rows
+        candidate=main_row(30);candidate.update(status='discovered');candidate.pop('article');candidate['title']='Архитектура музея';s['candidates'].append(candidate)
+        budget=SimpleNamespace(deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:24)
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='true'),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(stock43,'restore_backlog'),patch.object(stock43,'balance'),patch.object(stock43,'draw'),patch.object(stock43,'draw_light'),patch.object(daily,'discover'),patch.object(priorities43,'apply_rules'),patch.object(catalog43,'refresh') as search,patch.object(mosaic44,'finalize',return_value=False):
+            daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=5))
+        self.assertEqual(search.call_count,2)
+        self.assertTrue(all(call.kwargs.get('targeted_only') for call in search.call_args_list))
+
+    def test_early_approved_issue_still_prepares_supply_when_reserve_is_low(self):
+        from scripts import daily43 as daily,priorities43,mosaic44
+        s=issue();v.migrate(s);original=copy.deepcopy(s['candidates']);candidate=main_row(30);candidate['status']='discovered';s['candidates'].append(candidate)
+        budget=SimpleNamespace(deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:24)
+        editor=Mock();editor.finish.side_effect=lambda state,row:row.update(status='ready')
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='false'),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(daily,'discover'),patch.object(priorities43,'apply_rules'),patch.object(mosaic44,'approval_valid',return_value=True),patch.object(mosaic44,'finalize',return_value=False):
+            daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=4),editor=editor)
+        editor.finish.assert_called_once();self.assertEqual(s['candidates'][:8],original)
+
+    def test_before_release_exhausted_target_search_still_prepares_eleven_article_fallback(self):
+        from scripts import daily43 as daily,catalog43,priorities43,mosaic44
+        s=issue();s['candidates']=[main_row(i) for i in [0,1,4,6,7,8,9,10]]
+        for i in (30,31,32):s['candidates'].append(dict(main_row(i),status='discovered'))
+        budget=SimpleNamespace(deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:24)
+        editor=Mock();editor.finish.side_effect=lambda state,row:row.update(status='ready')
+        with tempfile.TemporaryDirectory() as temp,patch.dict(os.environ,NEWS_CATALOG_REFRESH='true'),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(daily,'discover'),patch.object(priorities43,'apply_rules'),patch.object(catalog43,'refresh') as search,patch.object(mosaic44,'finalize',return_value=False):
+            daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=4),editor=editor)
+        self.assertEqual(search.call_count,2);self.assertEqual(editor.finish.call_count,3)
+        self.assertEqual(v.standard(s)['main_articles'],11);self.assertTrue(v.standard(s)['relaxed_compliant'])
 
     def test_flux_prompt_uses_english_subject_before_long_russian_prose(self):
         from scripts import cloudflare44 as cf,mosaic44 as art
@@ -626,6 +656,18 @@ class Policy44Tests(unittest.TestCase):
         with patch.object(catalog,'registry',return_value=cfg),patch.object(catalog,'inspect_publisher',side_effect=inspect),patch.dict(os.environ,NEWS_LIGHT_NEWS_ENABLED='false'):
             report=catalog.refresh(s,NOW,shortage=True)['last_run']
         self.assertEqual(limits[:3],[2,2,2]);self.assertTrue(all(calls[g]>=3 for g in v.GROUPS));self.assertTrue(all(report['candidate_groups'][g]>=2 for g in v.GROUPS));self.assertLessEqual(report['article_checks'],24)
+
+    def test_targeted_search_uses_multiple_matching_publishers_without_general_light_slot(self):
+        from scripts import catalog43 as catalog
+        cfg=copy.deepcopy(catalog.registry());template=cfg['publishers'][0];pubs=[]
+        for name,ids in [('health1',[12]),('health2',[16]),('general',[18])]:
+            row=copy.deepcopy(template);row.update(id=name,priority_ids=ids,enabled=True,availability={'status':'verified'});pubs.append(row)
+        cfg['publishers']=pubs;calls=[]
+        def inspect(row,*args,**kwargs):
+            calls.append(row['id']);return {'article_checks':0,'status':'discovery_verified'},[]
+        with patch.object(catalog,'registry',return_value=cfg),patch.object(catalog,'inspect_publisher',side_effect=inspect),patch.dict(os.environ,NEWS_LIGHT_NEWS_ENABLED='true'):
+            report=catalog.refresh(issue(0,0),NOW,shortage=True,targeted_only=True)['last_run']
+        self.assertCountEqual(calls,['health1','health2']);self.assertTrue(report['targeted_only'])
 
 
     def test_official_nhs_identity_does_not_grant_republication_rights(self):

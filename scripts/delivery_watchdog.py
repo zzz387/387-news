@@ -12,6 +12,7 @@ POLL_SECONDS=600
 RECOVERY_GAP=timedelta(minutes=12)
 ARM_SECONDS=5*60*60
 DELIVERY_LEAD_SECONDS=6*60
+MAX_PREPARATIONS=4
 
 
 def productions(request):
@@ -31,6 +32,25 @@ def recoveries(rows,date):
 
 
 def observed_attempts(rows,date):return len({r['id'] for r in recoveries(rows,date)})
+
+
+def prepare_date(date,now,request=monitor.github,exclude_run_id=0):
+    """Bounded wake-up of the existing controller, using the SAME mutex/quota."""
+    datetime.strptime(date,'%Y-%m-%d')
+    result={'date':date,'dispatched':False}
+    rows=productions(request)
+    def busy(rows):return any(r['status'] in ACTIVE and r['id']!=exclude_run_id for r in rows)
+    if busy(rows):return dict(result,code='PREPARATION_ALREADY_ACTIVE')
+    prior=[r for r in rows if r.get('event')=='workflow_dispatch' and r.get('display_title')=='Preparation '+date]
+    # Day-ahead attempts must not consume the following night's wake-up budget.
+    today=[r for r in prior if queue.moscow(datetime.fromisoformat(r['created_at'].replace('Z','+00:00'))).date()==now.date()]
+    if len(today)>=MAX_PREPARATIONS:return dict(result,code='PREPARATION_WAKEUP_LIMIT')
+    retry_after=max((datetime.fromisoformat(r['created_at'].replace('Z','+00:00'))+RECOVERY_GAP for r in prior),default=now)
+    if now<retry_after:return dict(result,code='PREPARATION_BACKOFF')
+    if request('GET',f'actions/workflows/{WORKFLOW}').get('state')!='active':return dict(result,code='PRODUCTION_WORKFLOW_DISABLED')
+    if busy(productions(request)):return dict(result,code='PREPARATION_ALREADY_ACTIVE')
+    request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'resume','preview':'false','target_date':date}})
+    return dict(result,dispatched=True,code='PREPARATION_DISPATCHED',attempt=len(today)+1)
 
 
 def current(date,check,diagnostic=None):
@@ -55,14 +75,29 @@ def durable_attempts(date,request):
     return monitor.incident_attempts((issue or {}).get('body',''))
 
 
-def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=site_checks.check_site,poll_seconds=POLL_SECONDS):
+def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=site_checks.check_site,poll_seconds=POLL_SECONDS,prepare_early=False):
     now=queue.moscow(clock());date=now.date().isoformat();release=datetime.fromisoformat(date+'T06:00:00').replace(tzinfo=queue.news.TZ)
     result={'date':date,'verified':False,'recovery_dispatched':False,'publication_status':'WAITING_FOR_RELEASE','code':'NOT_DUE','gemini_requests':0}
     if now<release:
+        if prepare_early and os.getenv('NEWS_POLICY_VERSION')=='4.4':
+            try:result['preparation']=prepare_date(date,now,request)
+            except Exception as exc:result['preparation']={'code':'PREPARATION_API_UNCERTAIN','error':type(exc).__name__}
         if (release-now).total_seconds()>ARM_SECONDS:return result
         print('[delivery-watchdog] '+json.dumps(dict(result,code='ARMED_FOR_DELIVERY',release_at=release.isoformat(),delivery_start=(release-timedelta(seconds=DELIVERY_LEAD_SECONDS)).isoformat())),flush=True)
-        # Separate watcher lock: generation can continue while this appointment waits.
-        queue.wait_until_release(date,clock=clock,sleep=sleep,maximum_wait=ARM_SECONDS,lead_seconds=DELIVERY_LEAD_SECONDS)
+        # Waiting for delivery must not prevent bounded preparation retries when
+        # later cron wake-ups are missing. No model, draft or additional mutex.
+        last_prepare=now;local_dispatches=int(result.get('preparation',{}).get('dispatched',False))
+        def preparation_wait(seconds):
+            nonlocal last_prepare,local_dispatches
+            sleep(seconds);at=queue.moscow(clock())
+            if not prepare_early or os.getenv('NEWS_POLICY_VERSION')!='4.4' or local_dispatches>=MAX_PREPARATIONS or at-last_prepare<RECOVERY_GAP:return
+            last_prepare=at
+            try:
+                wake=prepare_date(date,at,request);result['preparation']=wake
+                local_dispatches+=int(wake['dispatched'])
+                if wake['code']=='PREPARATION_WAKEUP_LIMIT':local_dispatches=MAX_PREPARATIONS
+            except Exception as exc:result['preparation']={'code':'PREPARATION_API_UNCERTAIN','error':type(exc).__name__}
+        queue.wait_until_release(date,clock=clock,sleep=preparation_wait,maximum_wait=ARM_SECONDS,lead_seconds=DELIVERY_LEAD_SECONDS)
     deadline=max(queue.moscow(clock()),release)+timedelta(seconds=poll_seconds)
     attempts=0;code='RECOVERY_NOT_VERIFIED';active=False
     while True:
@@ -70,6 +105,9 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
         if now.date().isoformat()!=date:code='WATCHDOG_DATE_ROLLED_OVER';break
         if now>=release and current(date,check,result):
             result.update(verified=True,publication_status='PUBLISHED_VERIFIED',delivery_status='PUBLICATION_VERIFIED',code='VERIFIED')
+            if prepare_early and os.getenv('NEWS_POLICY_VERSION')=='4.4':
+                try:result['preparation']=prepare_date((now.date()+timedelta(days=1)).isoformat(),now,request)
+                except Exception as exc:result['preparation']={'code':'PREPARATION_API_UNCERTAIN','error':type(exc).__name__}
             try:result['incident']=monitor.incident(date,'VERIFIED',True,request)
             except Exception as exc:result['notification_error']=type(exc).__name__
             return result
@@ -112,7 +150,7 @@ def main():
         report=site_checks.check_site(**kwargs)
         site_checks.check_assets(queue.news.ROOT)
         return report
-    result=run(queue.news.ROOT,check=delivered)
+    result=run(queue.news.ROOT,check=delivered,prepare_early=True)
     print('[delivery-watchdog] '+json.dumps(result),flush=True)
     if os.getenv('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as stream:stream.write('### Independent public delivery\n\n```json\n'+json.dumps(result,indent=2)+'\n```\n')

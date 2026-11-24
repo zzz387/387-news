@@ -29,7 +29,8 @@ class API:
         if path=='actions/workflows/daily-v31.yml':return {'state':'active'}
         if path.endswith('/dispatches'):
             self.posts.append((self.clock(),copy.deepcopy(payload)))
-            self.rows.append({'id':100+len(self.posts),'head_branch':'main','event':'workflow_dispatch','display_title':'Delivery '+DAY,'status':'completed','created_at':self.clock().isoformat()})
+            title=('Preparation ' if payload['inputs']['phase']=='resume' else 'Delivery ')+payload['inputs']['target_date']
+            self.rows.append({'id':100+len(self.posts),'head_branch':'main','event':'workflow_dispatch','display_title':title,'status':'completed','created_at':self.clock().isoformat()})
             if self.dispatch_succeeds:self.healthy_at=self.clock()+timedelta(seconds=60)
             return None  # Actual dispatch REST response is204, not JSON.
         if method=='GET' and path.startswith('issues?'):return copy.deepcopy(self.issues)
@@ -40,6 +41,42 @@ class API:
         raise AssertionError('Unexpected endpoint '+path)
 
 class WatchdogTests(unittest.TestCase):
+    def test_preparation_wakeups_are_bounded_backed_off_and_use_existing_controller(self):
+        for mode,expected in [('idle','PREPARATION_DISPATCHED'),('active','PREPARATION_ALREADY_ACTIVE'),('limit','PREPARATION_WAKEUP_LIMIT'),('recent','PREPARATION_BACKOFF')]:
+            with self.subTest(mode=mode):
+                clock=Clock(at('00:30'));api=API(clock)
+                if mode=='active':api.active_until=at('01:00')
+                if mode in ('limit','recent'):
+                    api.rows=[{'id':i+2,'head_branch':'main','event':'workflow_dispatch','display_title':'Preparation '+DAY,'status':'completed','created_at':(clock()-timedelta(minutes=1 if mode=='recent' else 30)).isoformat()} for i in range(4 if mode=='limit' else 1)]
+                result=w.prepare_date(DAY,clock(),api)
+                self.assertEqual(result['code'],expected)
+                self.assertEqual(len(api.posts),int(mode=='idle'))
+                if api.posts:self.assertEqual(api.posts[0][1],{'ref':'main','inputs':{'phase':'resume','preview':'false','target_date':DAY}})
+
+    def test_early_watchdog_starts_preparation_before_delivery_appointment(self):
+        clock=Clock(at('00:30'));api=API(clock)
+        with patch.dict(os.environ,NEWS_POLICY_VERSION='4.4'):
+            result=w.run(Path('/unused'),clock=clock,sleep=clock.sleep,request=api,check=api.check,prepare_early=True)
+        self.assertTrue(result['preparation']['dispatched']);self.assertFalse(result['verified'])
+        self.assertEqual(api.posts[0][0],at('00:30'));self.assertEqual(clock.sleeps,[])
+
+    def test_historical_artwork_yields_to_unpublished_daily_without_changing_preview(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            self.assertEqual(q.context('backfill_issue_art',False,'2026-10-29','workflow_dispatch',root=root,now=at('05:00')),('run',False,DAY))
+            self.assertEqual(q.context('backfill_issue_art',True,'2026-10-29','workflow_dispatch',root=root,now=at('05:00')),('backfill_issue_art',True,'2026-10-29'))
+            with patch.object(q,'edition_exists',return_value=True):
+                self.assertEqual(q.context('backfill_issue_art',False,'2026-10-29','workflow_dispatch',root=root,now=at('05:00')),('backfill_issue_art',False,'2026-10-29'))
+
+    def test_armed_watcher_continues_bounded_preparation_without_later_cron(self):
+        clock=Clock(at('04:55'));api=API(clock)
+        with patch.dict(os.environ,NEWS_POLICY_VERSION='4.4'):
+            result=w.run(Path('/unused'),clock=clock,sleep=clock.sleep,request=api,check=api.check,prepare_early=True)
+        preparations=[(at_,p) for at_,p in api.posts if p['inputs']['phase']=='resume' and p['inputs']['target_date']==DAY]
+        self.assertEqual(len(preparations),w.MAX_PREPARATIONS)
+        self.assertTrue(all(at_<at('05:54') for at_,_ in preparations))
+        self.assertTrue(result['verified']);self.assertEqual(result['gemini_requests'],0)
+
     def test_relaxed_issue_recovery_keeps_real_deficit_and_requires_verified_https(self):
         from scripts import policy44
         from scripts.test_policy44 import main_row,issue

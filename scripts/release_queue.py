@@ -51,6 +51,9 @@ def context(phase, preview, date, event, root=None, now=None, check_public=None)
     if date:
         datetime.strptime(date,'%Y-%m-%d')
     if phase=='backfill_issue_art' and date:
+        if not preview and date<now.date().isoformat() and not edition_exists(root,now.date().isoformat()):
+            print('[release-context] ARTWORK_YIELD_TO_UNPUBLISHED_DAILY',flush=True)
+            return 'run',False,now.date().isoformat()
         return phase,preview,date
     if phase=='recover_missing_issue' and date=='2026-11-20':
         return 'run',preview,date
