@@ -8,6 +8,17 @@ from scripts import daily43 as d,editorial43 as e,publication43 as pub,stock43 a
 from scripts import test_daily43 as fixture,test_editorial_visual43 as visual
 
 class MinimumStockTests(unittest.TestCase):
+    def test_reviewed_stock_can_complete_an_unwritten_candidate_without_overwriting_a_draft(self):
+        for drafted in (False,True):
+            with self.subTest(drafted=drafted),tempfile.TemporaryDirectory() as temp:
+                s=self.make(bank=1);row=copy.deepcopy(stock.ensure(s)['records'][0]);row['status']='preparing'
+                if not drafted:row.pop('article')
+                row['checks']={};row['progress']={'preserved_attempt':1};s['candidates']=[row]
+                stock.draw(s,fixture.root(temp),fixture.NOW)
+                self.assertEqual(e.eligible(row),not drafted)
+                if not drafted:self.assertEqual(row['history'][-1]['previous_progress'],{'preserved_attempt':1})
+                else:self.assertEqual(row['progress'],{'preserved_attempt':1})
+
     def test_inventory_block_reasons_preserve_existing_reuse_guards(self):
         s=self.make(bank=3);a,b,c=stock.ensure(s)['records']
         a['stock_published']=True;b['ready_checked_at']='2020-01-01T06:00:00+03:00'

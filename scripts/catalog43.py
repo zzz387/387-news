@@ -174,7 +174,7 @@ def inspect_publisher(row,session,*,article_limit=2,exclude=(),now=None,preferre
     return report,sources
 
 
-def refresh(state,now=None,session=None,shortage=False):
+def refresh(state,now=None,session=None,shortage=False,targeted_only=False):
     rotate_candidates(state)
     now=now or datetime.now(p.TZ);config=registry()
     from scripts import editorial43,selection43
@@ -204,7 +204,16 @@ def refresh(state,now=None,session=None,shortage=False):
     ordered=priorities43.publisher_order([r for r in config['publishers'] if r.get('enabled') and r.get('availability',{}).get('status')=='verified' and due(r)],cache,state.get('_recent43',[]),state['date'])
     from scripts import policy44
     if policy44.active(state):ordered=policy44.publisher_order(ordered,state)
-    if os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true':
+    if targeted_only:
+        ids={'family':{1,2,3},'health':{12,16},'sport':{13,14,15}}
+        wanted={g for g,n in targets.items() if n}
+        targeted=[]
+        for row in ordered:
+            groups=[g for g in wanted if ids[g]&set(row.get('priority_ids',[]))]
+            if groups:targeted.append(dict(row,search_group=row.get('search_group') or min(groups,key=lambda g:(policy44.publisher_score(row,g),g))))
+        ordered=targeted
+    run['targeted_only']=targeted_only
+    if not targeted_only and os.getenv('NEWS_LIGHT_NEWS_ENABLED')=='true':
         # One public discovery slot for the independent light column; content,
         # complete originals and rights still decide eligibility, never the flag.
         core=[r for r in ordered if r.get('search_group')]
@@ -215,7 +224,9 @@ def refresh(state,now=None,session=None,shortage=False):
             other=[r for r in other if r['id']!=light['id']]
             ordered=core+[dict(light,search_light=True)]+other
     if not ordered:
-        run['code']='NO_PUBLISHERS_DUE';return cache
+        run['code']='NO_TARGET_PUBLISHERS_DUE' if targeted_only else 'NO_PUBLISHERS_DUE'
+        print('[discovery-coverage43] '+json.dumps(run),flush=True)
+        return cache
     from scripts import editorial41
     published_urls={x.get('source_url') for x in editorial41.archive_entries(p.ROOT)}
     selected=[]

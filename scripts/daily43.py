@@ -86,17 +86,20 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
         verify=check_public or (lambda **kwargs:pipeline.site_checks.check_delivery(root=root,**kwargs))
         ready=pipeline.published_delivery(state,date,ops,preview,current,verify);persist();return ready
     release=datetime.fromisoformat(date+'T06:00').replace(tzinfo=p.TZ)
+    budget=news.runtime.ACTIVE_BUDGET
     if policy44.active(state):
         from scripts import mosaic44
         selected=selection43.composition(state);admission=policy44.standard(state,selected)
-        if admission['compliant'] and (current>=release or (mosaic44.approval_valid(state) and admission['strict_compliant'])):
+        replenish=(current<release-timedelta(minutes=10) and admission['strict_compliant'] and budget and budget.can_request()
+                   and (os.getenv('GEMINI_API_KEY') or editor is not None)
+                   and len(stock43.available(state,date))<e.CONFIG.get('article_stock_target',20))
+        if not replenish and admission['compliant'] and (current>=release or (mosaic44.approval_valid(state) and admission['strict_compliant'])):
             # Due delivery uses accepted texts immediately, before stock/search/model work.
             state['selected_ids']=[r['id'] for r in selected];state['articles']={r['id']:r['article'] for r in selected}
             state['editorial_standard44']=admission
             print('[editorial-standard44] '+json.dumps(admission),flush=True)
             mosaic44.approve(state)
             return mosaic44.finalize(state,root,persist,clock,release,preview,allow_request=not delivery_only,allow_wait=now is None)
-    budget=news.runtime.ACTIVE_BUDGET
     minimum=e.CONFIG['minimum_articles']
     stock43.restore_backlog(state,root)
     stock43.balance(state,root,current)
@@ -145,18 +148,17 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
             if active44:
                 needed={g for g,n in policy44.counts(selection43.composition(state)).items() if n<2}
                 coverage_pending=[r for r in state['candidates'] if r.get('status') in ('discovered','preparing','retryable_error') and policy44.subject(r) in needed and r['id'] not in attempted_ids and not r.get('for_light_only')]
-            if active44 and needed and not coverage_pending and not verified_supply(state,attempted_ids) and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
+            if active44 and needed and not coverage_pending and (not verified_supply(state,attempted_ids) or (clock()<release and len(selection43.composition(state))>=minimum)) and extra_searches<2 and os.getenv('NEWS_CATALOG_REFRESH')=='true' and budget and budget.can_request():
                 extra_searches+=1
-                try:catalog43.refresh(state,clock(),shortage=True)
+                try:catalog43.refresh(state,clock(),shortage=True,targeted_only=True)
                 except Exception as exc:print('[catalog43] '+json.dumps({'code':type(exc).__name__,'optional':True}),flush=True)
                 priorities43.apply_rules(state,clock());persist();continue
             if active44 and needed and not coverage_pending:
                 report=policy44.standard(state)
-                # The target is not a cap. Once bounded targeted searches are
-                # exhausted, pause for fresh sources rather than writing unrelated
-                # stock. After release, ordinary candidates can still reach the
-                # eleven-article admission when the real topic deficit permits it.
-                if report['main_articles']>=minimum and (clock()<release or report['total_topic_deficit']>3):
+                # Exhaust targeted searches first, then prepare the lawful
+                # eleven-article fallback BEFORE release too. Stop unrelated
+                # filling once admitted, or when deficit>3 makes it useless.
+                if report['main_articles']>=minimum and (report['relaxed_compliant'] or report['total_topic_deficit']>3):
                     state['topic_search44']={'code':'TARGETED_SUPPLY_EXHAUSTED','missing_groups':sorted(needed),'searches':extra_searches}
                     persist();break
             coverage_needed=bool(coverage_pending) if active44 else banking and bool(coverage_pending)

@@ -121,22 +121,35 @@ def draw(state,root,now,target=None):
     reconcile(state,root);target=target or e.CONFIG['article_target'];known={r['url'] for r in state['candidates']}
     history=sel.recent(root,state['date']);selected=sel.composition(state)
     pending=list(available(state,state['date'],include_reserved=True))
+    draw_report={'available':len(pending),'taken':0,'existing_candidate':0,'duplicate_story':0,'unselected':0}
+    state['stock_draw43']=draw_report
     from scripts import policy44
     while pending and (policy44.active(state) or len(selected)<target):
         proxies=[dict(r,status='discovered') for r in pending]
         plan=sel.order(dict(state,candidates=selected+proxies),history,limit=1)
-        if not plan:break
+        if not plan:
+            draw_report['unselected']+=len(pending)
+            draw_report['duplicate_story']+=sum(any(sel.duplicate(r,old) for old in selected+history) for r in pending)
+            break
         row=next(r for r in pending if identity(r)==identity(plan[0]));pending.remove(row)
         if policy44.active(state) and row.get('stock_prepared_for')==state['date'] and len(selected)>=e.CONFIG['minimum_articles'] and all(n>=2 for n in policy44.counts(selected).values()):continue
         previous=next((r for r in state['candidates'] if r['url']==row['url']),None)
-        if previous is not None and previous.get('status')!='reserve_ready':continue
-        if any(sel.duplicate(row,r) for r in selected+history):continue
+        recover_unwritten=(previous is not None and previous.get('status') in ('discovered','preparing','retryable_error') and not previous.get('article'))
+        if previous is not None and previous.get('status')!='reserve_ready' and not recover_unwritten:
+            draw_report['existing_candidate']+=1;continue
+        if any(sel.duplicate(row,r) for r in selected+history):
+            draw_report['duplicate_story']+=1;continue
         row['stock_reserved_for']=state['date']
         if previous is not None:
+            if recover_unwritten:
+                old_progress=copy.deepcopy(previous.get('progress',{}));old_history=copy.deepcopy(previous.get('history',[]))
+                previous.clear();previous.update(copy.deepcopy(row))
+                previous['history']=old_history+previous.get('history',[])+[{'code':'REVIEWED_STOCK_RECOVERED','previous_progress':old_progress}]
             previous['status']='ready';previous['stock_origin']=identity(row);selected.append(previous)
         else:
             saved=copy.deepcopy(row);saved['stock_origin']=identity(row);saved['status']='ready'
             state['candidates'].append(saved);selected.append(saved);known.add(row['url'])
+        draw_report['taken']+=1
     if policy44.active(state):policy44.migrate(state)
     return len(selected)
 
@@ -215,7 +228,11 @@ def report(state):
     required=__import__('scripts.policy44',fromlist=['counts']).counts(available(state,date))
     from collections import Counter
     blocked=Counter(reuse_block(r,date,stock['published_urls']) or ('RESERVED' if r.get('stock_reserved_for') else 'REUSABLE') for r in stock['records'])
-    return {'required_topics':required,'article_reuse_status':dict(blocked),'required_topic_goal':2,'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
+    inventory_status={'published':blocked['ALREADY_PUBLISHED'],'ready_unreserved':len(available(state,date)),
+        'reserved':blocked['RESERVED'],'needs_recheck':sum(n for code,n in blocked.items() if code not in ('ALREADY_PUBLISHED','RESERVED','REUSABLE')),
+        'in_preparation':sum(r.get('status')=='preparing' for r in stock['backlog']),
+        'rejected_or_deferred':sum(r.get('status') in ('deferred','topic_duplicate','rejected') for r in stock['backlog'])}
+    return {'draw':state.get('stock_draw43',{}),'inventory_status':inventory_status,'required_topics':required,'article_reuse_status':dict(blocked),'required_topic_goal':2,'family_articles':stock_groups['A'],'health_sport_articles':stock_groups['C'],'prospective_candidates':len(prospects),'candidate_goal':e.CONFIG.get('candidate_stock_target',32),'ready_articles':len(available(state,date)),'ready_light':len(available(state,date,'light')),
             'stored_articles':len(stock['records']),'stored_light':len(stock['light']),
             'backlog':len(stock['backlog']),'article_goal':e.CONFIG.get('article_stock_target',20),
             'light_goal':e.CONFIG.get('light_stock_target',15)}
