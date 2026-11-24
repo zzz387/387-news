@@ -1,5 +1,5 @@
 """Small daily controller using existing encryption, quota, mutex and Pages delivery."""
-import copy,json,os,time
+import copy,json,os,time,math
 from datetime import datetime,timedelta
 from pathlib import Path
 try:
@@ -71,6 +71,18 @@ def verified_supply(state,exclude_ids=()):
     return False
 
 
+def capacity_retry_delay(budget):
+    """One capacity backoff can use spare stage time; never bypass a429 hold."""
+    try:
+        cooldowns=budget.ledger.get('cooldowns',{});at=time.time()
+        if cooldowns.get('__all_models__',0)>at or not budget.can_request():return 0
+        models=[m.strip() for m in os.getenv('GEMINI_MODELS','gemini-3.5-flash-lite,gemini-3.1-flash-lite').split(',') if m.strip()]
+        delay=math.ceil(min(cooldowns.get(m,0)-at for m in models))
+        if not 0<delay<=180 or budget.remaining_seconds()<=delay+180:return 0
+        return delay
+    except (AttributeError,ValueError,TypeError,OverflowError):return 0
+
+
 def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=None,editor=None,delivery_only=False):
     try:from scripts import selection43,catalog43,light43,priorities43
     except ImportError:import selection43,catalog43,light43,priorities43
@@ -138,7 +150,7 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 light43.prepare(state,persist)
                 stock43.bank_light(state,clock())
         prepare_light()
-        attempted_ids=set();extra_searches=0
+        attempted_ids=set();extra_searches=0;capacity_retries=0
         while True:
             stock43.balance(state,root,clock())
             if due and len(selection43.composition(state))>=minimum and (not active44 or policy44.standard(state)['strict_compliant' if clock()<release else 'compliant']):break
@@ -215,7 +227,13 @@ def advance(state,date,preview,ops,persist=lambda:None,now=None,check_public=Non
                 if peers and not any(h.get('code')=='STORY_DUPLICATE_AFTER_WRITING' for h in record['history']):
                     record['history'].append({'code':'STORY_DUPLICATE_AFTER_WRITING','peer_ids':[r['id'] for r in peers]})
             except news.runtime.GenerationPaused:
-                record['status']='preparing';persist();break
+                record['status']='preparing';persist()
+                delay=capacity_retry_delay(budget) if capacity_retries<1 and active44 and not policy44.standard(state)['compliant'] else 0
+                if delay:
+                    capacity_retries+=1
+                    print('[capacity-retry43] '+json.dumps({'code':'BOUNDED_CAPACITY_BACKOFF','seconds':delay,'attempt':capacity_retries}),flush=True)
+                    time.sleep(delay);attempted_ids.discard(record['id']);continue
+                break
             except Exception as exc:
                 failures=record['progress'].get('v43_external_failures',0)+1
                 record['progress']['v43_external_failures']=failures
