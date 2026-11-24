@@ -37,7 +37,7 @@
       "markdown": "aef1b8c99ae2ca06823016523322ea752209838617c07c7bc933871afd33a26d"
     },
     "feature-08": {
-      "html": "4142c1f73086954abeefefa86093e7bdb8ad32e854c8fb20131680783ced9d78",
+      "html": "da39efa816537e45e59d9b11c9f16adc955cefa904f34ef5ffdaf26eb85ad4d1",
       "markdown": "b31aa301d7b5156b47a15a828e76b670953b47a56ec383a83fb93973f8799586"
     },
     "feature-09": {
@@ -406,13 +406,360 @@
         "height": 293
       },
       "path": "assets/illustrations/2026-11-24/e0f7fb7c1b6aedf6f63dd0047f6eeb70313f93706cbf1fb925c9b21cf2f1eef0.webp"
+    },
+    {
+      "key": "c12b8f0bdebd96eda6278bdb38460b5cf454979e9fbe68f95c1572b782dbd1ca",
+      "article_id": "f59ee0f9e25c5a0f8c1a655bb038181ea974634e507d52bc6499ab179692bcfe",
+      "description_hash": "812c2a24bfde23eba07cb3d36f0cb75b87aea74370b37b4d204b2d264f723f61",
+      "genre": "Абстракционизм",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-24",
+      "text_hash": "7c58bd1a971dc09b55b805388c41a72aa06f052685b5d95200fe731a44a6a3d9",
+      "protocol": 2,
+      "article_slug": "feature-08",
+      "sha256": "93ca5c2ff351bd9542e7dc1012a5b70e57159cdb176ceac6873d965ed2a18416",
+      "width": 896,
+      "height": 896,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-24/abstract",
+      "reference_artwork_ids": [
+        "5d84cf7dece3911b208904ffcebe43f2beb6a606b51ce42ecc7622d86e9ace03",
+        "a6d5d9687b756cbef574a9fb3112f8a5c9e729f8bb612a7f73ab7f3fc5bea838",
+        "593f6c62909ea5140c7efaa118567f834864a154ecd095d6fb1b06f63bb90782",
+        "e6f4184fb1d50012c356c9d60fdcf5612c9e3366bbb18dbc9053dd39b6c0ba84"
+      ],
+      "reference_sha256": [
+        "931b07587194e3322775f2c98d2041ab2e84cc45776e515f9263d121882bffa6",
+        "d1ed8821461076778314c5c3ed6173c28ed26013dec7ca412149d71f7805b212",
+        "34b3ba9615013665c25d31419b9ef51a6aafb03350e0da247fd63f9502614a6f",
+        "7eb952cd999fc8c22c285ae4e9a54e67e99fb6765b180191685b42f093662063"
+      ],
+      "selected_reference_id": "a6d5d9687b756cbef574a9fb3112f8a5c9e729f8bb612a7f73ab7f3fc5bea838",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.68934,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.5562,
+        "palette_diversity": 1,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "d1ed8821461076778314c5c3ed6173c28ed26013dec7ca412149d71f7805b212",
+        "groups": [
+          {
+            "color": "#0c414f",
+            "share": 0.1219,
+            "lab": [
+              25.023,
+              -11.23,
+              -13.273
+            ]
+          },
+          {
+            "color": "#234256",
+            "share": 0.1134,
+            "lab": [
+              26.521,
+              -4.836,
+              -15.473
+            ]
+          },
+          {
+            "color": "#0a2e47",
+            "share": 0.1129,
+            "lab": [
+              17.797,
+              -2.343,
+              -19.164
+            ]
+          },
+          {
+            "color": "#171726",
+            "share": 0.1004,
+            "lab": [
+              8.437,
+              4.577,
+              -10.289
+            ]
+          },
+          {
+            "color": "#0e5e5b",
+            "share": 0.0864,
+            "lab": [
+              35.7,
+              -22.975,
+              -4.805
+            ]
+          },
+          {
+            "color": "#1a1e32",
+            "share": 0.0788,
+            "lab": [
+              11.813,
+              4.573,
+              -13.804
+            ]
+          },
+          {
+            "color": "#668594",
+            "share": 0.0759,
+            "lab": [
+              53.747,
+              -7.203,
+              -11.594
+            ]
+          },
+          {
+            "color": "#0e1b31",
+            "share": 0.075,
+            "lab": [
+              9.789,
+              2.862,
+              -16.328
+            ]
+          },
+          {
+            "color": "#172c45",
+            "share": 0.0719,
+            "lab": [
+              17.52,
+              0.718,
+              -18.196
+            ]
+          },
+          {
+            "color": "#252c4a",
+            "share": 0.0586,
+            "lab": [
+              18.752,
+              6.431,
+              -19.601
+            ]
+          },
+          {
+            "color": "#2d6275",
+            "share": 0.0561,
+            "lab": [
+              38.858,
+              -11.473,
+              -16.012
+            ]
+          },
+          {
+            "color": "#35787d",
+            "share": 0.0486,
+            "lab": [
+              46.538,
+              -19.531,
+              -9.172
+            ]
+          }
+        ],
+        "dominant": [
+          "#0c414f"
+        ],
+        "secondary": [
+          "#0c414f",
+          "#234256",
+          "#0a2e47",
+          "#171726",
+          "#0e5e5b",
+          "#1a1e32",
+          "#668594",
+          "#0e1b31",
+          "#172c45",
+          "#252c4a",
+          "#2d6275"
+        ],
+        "accent": [
+          "#35787d"
+        ],
+        "temperature": "cool",
+        "saturation": "high",
+        "saturation_value": 0.645,
+        "lightness": 24.77,
+        "dark_share": 0.716,
+        "light_share": 0.0,
+        "contrast": "moderate",
+        "contrast_value": 43.8
+      },
+      "art_movement": "abstract art",
+      "medium": "painting",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_OK",
+        "lab_distance": 15.912,
+        "reference_temperature": "cool",
+        "generated_temperature": "cool",
+        "reference_saturation": 0.645,
+        "generated_saturation": 0.359,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "93ca5c2ff351bd9542e7dc1012a5b70e57159cdb176ceac6873d965ed2a18416",
+          "groups": [
+            {
+              "color": "#18171c",
+              "share": 0.1138,
+              "lab": [
+                8.047,
+                1.842,
+                -3.334
+              ]
+            },
+            {
+              "color": "#335868",
+              "share": 0.1125,
+              "lab": [
+                35.365,
+                -8.355,
+                -13.296
+              ]
+            },
+            {
+              "color": "#1e3846",
+              "share": 0.1017,
+              "lab": [
+                22.111,
+                -5.303,
+                -11.715
+              ]
+            },
+            {
+              "color": "#1e1f28",
+              "share": 0.1015,
+              "lab": [
+                12.019,
+                2.038,
+                -6.206
+              ]
+            },
+            {
+              "color": "#33303d",
+              "share": 0.0823,
+              "lab": [
+                20.653,
+                4.539,
+                -7.706
+              ]
+            },
+            {
+              "color": "#1b1827",
+              "share": 0.0812,
+              "lab": [
+                9.261,
+                5.726,
+                -9.722
+              ]
+            },
+            {
+              "color": "#282335",
+              "share": 0.0801,
+              "lab": [
+                15.009,
+                7.056,
+                -10.874
+              ]
+            },
+            {
+              "color": "#387389",
+              "share": 0.0732,
+              "lab": [
+                45.507,
+                -12.38,
+                -17.862
+              ]
+            },
+            {
+              "color": "#131418",
+              "share": 0.0699,
+              "lab": [
+                6.366,
+                0.563,
+                -2.813
+              ]
+            },
+            {
+              "color": "#3e4353",
+              "share": 0.0677,
+              "lab": [
+                28.545,
+                2.028,
+                -10.262
+              ]
+            },
+            {
+              "color": "#191e29",
+              "share": 0.0596,
+              "lab": [
+                11.242,
+                1.077,
+                -8.162
+              ]
+            },
+            {
+              "color": "#84867b",
+              "share": 0.0566,
+              "lab": [
+                55.468,
+                -2.854,
+                5.665
+              ]
+            }
+          ],
+          "dominant": [
+            "#18171c"
+          ],
+          "secondary": [
+            "#18171c",
+            "#335868",
+            "#1e3846",
+            "#1e1f28",
+            "#33303d",
+            "#1b1827",
+            "#282335",
+            "#387389",
+            "#131418",
+            "#3e4353",
+            "#191e29",
+            "#84867b"
+          ],
+          "accent": [],
+          "temperature": "cool",
+          "saturation": "moderate",
+          "saturation_value": 0.359,
+          "lightness": 22.29,
+          "dark_share": 0.707,
+          "light_share": 0.001,
+          "contrast": "moderate",
+          "contrast_value": 45.07
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "d1ed8821461076778314c5c3ed6173c28ed26013dec7ca412149d71f7805b212",
+        "wire_sha256": "7cb870855eaac6e5c685c38101435c09203db2629c6131c21e313bcbd3ca3143",
+        "decoded_pixels_sha256": "6e691d07c3b60a45969fa0a853410134c2346fb69ac0a021e5f16af983e93302",
+        "width": 480,
+        "height": 411
+      },
+      "path": "assets/illustrations/2026-11-24/c12b8f0bdebd96eda6278bdb38460b5cf454979e9fbe68f95c1572b782dbd1ca.webp"
     }
   ],
   "art44": {
     "status": "ARTWORK_INCOMPLETE",
     "required": 11,
-    "ready": 1,
-    "missing": 10,
+    "ready": 2,
+    "missing": 9,
     "emergency_text": true,
     "provider_status": "READY",
     "bindings": [
@@ -685,7 +1032,7 @@
     }
   ],
   "light_count": 11,
-  "homepage_hash": "457325b005cffd846a4860f2cec78f3d7a9ab0232e2765c3f0e454682c175f07",
-  "overview_hash": "670b432ae637ee0d801509d78a37ab9c7cb3a49d36a75cb48bcddcfee091924e",
+  "homepage_hash": "d70c4886a0f10b306dbcd7ad2775276ada557fdfbf823f9e36b8a1be5cd974d2",
+  "overview_hash": "92c5d3dbe220784bde357d0e8db4c369470082ac40755674c3a7de770d294750",
   "markdown_hash": "aa16078995dab70bd2ccda14b6f33b648e4a2e1fc747cb7395080e8d653c77c4"
 }
