@@ -527,19 +527,7 @@ jobs:
           path: ${{ runner.temp }}/checkpoint
           merge-multiple: true  # v4: artifact-ids otherwise nests under its name
       - name: Download shared daily request ledger
-        id: quota_download
-        continue-on-error: true
         if: ${{ steps.checkpoint.outputs.quota_found == 'true' }}
-        uses: actions/download-artifact@v4
-        with:
-          artifact-ids: ${{ steps.checkpoint.outputs.quota_id }}
-          run-id: ${{ steps.checkpoint.outputs.quota_run_id }}
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          path: ${{ runner.temp }}/quota
-          merge-multiple: true
-      - name: Recover the exact quota artifact if GitHub's run listing is stale
-        if: ${{ steps.checkpoint.outputs.quota_found == 'true' && steps.quota_download.outcome == 'failure' }}
         env:
           GH_TOKEN: ${{ github.token }}
           QUOTA_ARTIFACT_ID: ${{ steps.checkpoint.outputs.quota_id }}
