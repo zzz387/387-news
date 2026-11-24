@@ -1,6 +1,6 @@
 """Append-only public museum library; one immutable quartet per issue and genre."""
 import base64,hashlib,io,json,re,time,unicodedata
-from datetime import datetime,timezone
+from datetime import datetime,timezone,date
 from html import escape,unescape
 from pathlib import Path
 from urllib.parse import urlencode,urlparse
@@ -411,19 +411,28 @@ def ingest(root,registry,work,raw,state,persist):
     file=Path(root)/path;file.parent.mkdir(parents=True,exist_ok=True);file.write_bytes(data)
     return key
 
+def available_works(root,registry,issue,issue_date,genre):
+    """Immutable issue assignments retain the full legacy and rolling use history."""
+    day=date.fromisoformat(issue_date);gid=genre_id(genre)
+    recent={i for group in registry['sets'].values()
+        if group['issue_id']!=issue and (day-date.fromisoformat(group['issue_date'])).days<30
+        for i in group['artwork_ids']}
+    return [w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in recent
+        and file_valid(root,w) and not (genre=='Кубизм' and not genre_matches(genre,w.get('genre_evidence','')))]
+
+
 def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None):
     gid=genre_id(genre);key=issue+'/'+gid
     if key in registry['sets']:
         row=registry['sets'][key]
-        if len(row['artwork_ids'])!=4 or len(set(row['artwork_ids']))!=4 or not all(file_valid(root,registry['artworks'][i]) for i in row['artwork_ids']):raise ValueError('ART_SET_INTEGRITY')
+        if not 1<=len(row['artwork_ids'])<=4 or len(set(row['artwork_ids']))!=len(row['artwork_ids']) or not all(file_valid(root,registry['artworks'][i]) for i in row['artwork_ids']):raise ValueError('ART_SET_INTEGRITY')
         return row
-    used={i for row in registry['sets'].values() for i in row['artwork_ids']}
-    available=[w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in used and file_valid(root,w) and not (genre=='Кубизм' and not genre_matches(genre,w.get('genre_evidence','')))]
-    if len(available)<4:return None
+    available=available_works(root,registry,issue,issue_date,genre)
+    if not available:return None
     from scripts import art_reference44 as color
     profiles={w['id']:color.work_profile(root,w,{}) for w in available}
     selected=[available[0]]
-    while len(selected)<4:
+    while len(selected)<min(4,len(available)):
         remaining=[w for w in available if w not in selected]
         chosen=min(remaining,key=lambda w:(-min(color.distance(profiles[w['id']],profiles[q['id']]) for q in selected),w['id']))
         selected.append(chosen)
@@ -450,9 +459,7 @@ def prepare_sets(root,state,items,persist=lambda:None,discover=True,identity_ove
                     try:ingest(root,registry,work,client.get(work.pop('image_url')),state,persist)
                     except Exception as exc:
                         print('[art-reference] '+json.dumps({'genre':genre,'code':safe_code(exc)}),flush=True)
-                    used={i for group in registry['sets'].values() for i in group['artwork_ids']}
-                    pool=[w for w in registry['artworks'].values() if w['genre_id']==genre_id(genre) and w['id'] not in used]
-                    if len(pool)>=6:break
+                    if available_works(root,registry,issue,state['date'],genre):break
                 row=assign(root,registry,issue,state['date'],genre,number,persist)
             if row:result[genre]=row
         except Exception as exc:print('[art-reference] '+json.dumps({'genre':genre,'code':safe_code(exc)}),flush=True)
