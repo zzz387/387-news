@@ -39,6 +39,17 @@ def extract_quota_archive(archive,target):
     temp=target.with_suffix('.tmp');temp.write_bytes(raw);temp.replace(target)
 
 
+def extract_stock_archive(archive,target):
+    """Preserve opaque ciphertext; authenticated decryption stays in the loader."""
+    with zipfile.ZipFile(archive) as bundle:
+        files=bundle.infolist()
+        if len(files)!=1 or files[0].filename!='editorial-stock.enc' or not 32<=files[0].file_size<=128*1024*1024:
+            raise RuntimeError('STOCK_ARCHIVE_INVALID')
+        raw=bundle.read(files[0])
+    target=Path(target);target.parent.mkdir(parents=True,exist_ok=True)
+    temp=target.with_suffix('.tmp');temp.write_bytes(raw);temp.replace(target)
+
+
 def main():
     phase = os.environ.get('PHASE','').strip()
     if phase not in ('auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art'):

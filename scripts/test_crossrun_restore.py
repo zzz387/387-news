@@ -13,6 +13,17 @@ except ImportError:
 LABEL = '387news31-test-2026-10-25'
 
 class CrossRunDownloadTests(unittest.TestCase):
+    def test_exact_inventory_archive_preserves_ciphertext_and_rejects_other_members(self):
+        from scripts import staged_news
+        encrypted=staged_news.cipher({'private_fixture':'synthetic only'},bytes(range(32)))
+        with tempfile.TemporaryDirectory() as temp:
+            archive=Path(temp)/'stock.zip';target=Path(temp)/'editorial-stock.enc'
+            with zipfile.ZipFile(archive,'w') as bundle:bundle.writestr('editorial-stock.enc',encrypted)
+            locator.extract_stock_archive(archive,target);self.assertEqual(target.read_bytes(),encrypted)
+            with zipfile.ZipFile(archive,'w') as bundle:bundle.writestr('../editorial-stock.enc',encrypted)
+            with self.assertRaisesRegex(RuntimeError,'STOCK_ARCHIVE_INVALID'):locator.extract_stock_archive(archive,target)
+            self.assertEqual(target.read_bytes(),encrypted)
+
     def test_exact_quota_archive_restore_preserves_counts_and_rejects_unsafe_members(self):
         ledger={'day':'2026-11-24','requests':57,'models':{'fixture':57},'cooldowns':{'fixture':9999999999}}
         for name,valid in [('quota.json',True),('../quota.json',False),('unexpected.json',False)]:
