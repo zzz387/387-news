@@ -1,0 +1,342 @@
+{
+  "date": "2026-11-24",
+  "number": 30,
+  "policy_version": "4.4",
+  "article_count": 11,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "88340f2b267c4666d444e616597e52e8094f0a28cd90fc8629aa3b63ed8050aa",
+      "markdown": "b8c887b529e14c79cc23731909c2328ee974d5eb500c4b20ef657ceddec6a7be"
+    },
+    "feature-02": {
+      "html": "72a19ce07f1ef9db2c81b85bb51fbcabe71bdf929ed1d007682a17557304f1b3",
+      "markdown": "29e231b9a41b04c6c7b11a07f1b541732ff5808904363dc8a59e8838a1cb432a"
+    },
+    "feature-03": {
+      "html": "a907f971679a53daeba04ddcf3ab67c78057dafc0559a897ce9f061cc3e980ec",
+      "markdown": "fc41ead8eec0d7999fca2d82dfdf04613e83a950a02b76496b25848ba6488538"
+    },
+    "feature-04": {
+      "html": "3cf3f12e8da8e8c0286a5408b99d50a09491775affedea457ba698bce150453d",
+      "markdown": "5c52ae9289aceef4d76989266865151a76041af357242c7ff343e67cdf4324b2"
+    },
+    "feature-05": {
+      "html": "2d6e789443a0b06567d2799e84f8ddda05a39d7fdce799911594c5cdb9e6ceff",
+      "markdown": "e42c6af9895834df1075ea6a0e52185dd528ece476a443fafda992886e1c035f"
+    },
+    "feature-06": {
+      "html": "0fd7b93ad042d96e450b8fbbe72799a2e3a5f890d1bc2e60f4161d336a28aaa6",
+      "markdown": "8b18a1a6ee13b3e2d2e61bd801667a57e8411b268ea0a58db06f309f385df437"
+    },
+    "feature-07": {
+      "html": "798ccd218c4cac8feb6ee8ef0fefc726e6de103e3d94c26143db6f39d3beabf5",
+      "markdown": "aef1b8c99ae2ca06823016523322ea752209838617c07c7bc933871afd33a26d"
+    },
+    "feature-08": {
+      "html": "4142c1f73086954abeefefa86093e7bdb8ad32e854c8fb20131680783ced9d78",
+      "markdown": "b31aa301d7b5156b47a15a828e76b670953b47a56ec383a83fb93973f8799586"
+    },
+    "feature-09": {
+      "html": "e6aa7d37e97aa33e1ee8d7fb2d2fb4abdc406b918cc19ed3035ce44be7759a22",
+      "markdown": "7af3b13d0aab2aa025b20ae762463b22839da028a4f945a3f95c29d4e3e39b68"
+    },
+    "feature-10": {
+      "html": "3dd4bb043ab90dff53d74341cec69f510a3415066b22aab5ac6b884d6ac785d1",
+      "markdown": "94001542516066b0b636ea4fb63fbdbc8987eaf4f7133d9cfdf1f7b50e166672"
+    },
+    "feature-11": {
+      "html": "bfe07e748762f2491a18a5e91355395aa3049910993463590dd266ab7b29e58f",
+      "markdown": "d520ed89ea4bacd271e9d52c157e22cffc0d0f9d8866398337bb63e903377423"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-24T09:59:09.554084+03:00",
+  "release_not_before": "2026-11-24T06:00:00+03:00",
+  "brief_policy_revision": 2,
+  "mosaic_revision": 2,
+  "illustrations": [],
+  "art44": {
+    "status": "ARTWORK_INCOMPLETE",
+    "required": 11,
+    "ready": 0,
+    "missing": 11,
+    "emergency_text": true,
+    "provider_status": "READY",
+    "bindings": [
+      {
+        "key": "88b1c27ee20b03ea0829f2900f28fec8da98e4b4579e79f031e8da50c8a213d5",
+        "date": "2026-11-24",
+        "article_id": "7eb01cd915a914780828cbe855eb1ac3e2233a6134ecec42474ebb06f7e248f1",
+        "text_hash": "31b2241c953098d1caa6c431c809960b174e95411cd692d037150c2ba6e4993b",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "0b9ed195c80b6059623509ada6f5eff4a3ce8e01be7f6f5d106c43dd8a7ad45f",
+        "genre": "Символизм",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-01"
+      },
+      {
+        "key": "c5c88831c4176d76127488f32f944482cc50a654b71aa3578f47d2c6591af31c",
+        "date": "2026-11-24",
+        "article_id": "5856733ff2a748582c28b9d85b9010b1cf9c4bfb6991b163d38a40f6794bf083",
+        "text_hash": "d4dd37908cf4673f5070963a0406ba7014050867c3c67974b6d614c297b80abf",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "f566da72ffc8bdfedc4f421bee05f1e58d779157b660885d2007144b57490207",
+        "genre": "Геометрическая абстракция",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-02"
+      },
+      {
+        "key": "d2b615ba21bfbb4e47e0bc6832539bafdeaa263450027f69d7181c4558bd6b25",
+        "date": "2026-11-24",
+        "article_id": "5c695bbfdd66c23f7c2a03a26b73d9c63d73732b3b6219a7cac6af6f35ab44a8",
+        "text_hash": "d5dca8b0903ce060dd8dbf88457a482595867c989caa0041d3e621d02b836eea",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "349261d9204a6f8889f9daa676405577d9a55ea2f03f1198bc5899f837961d76",
+        "genre": "Ар-нуво",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-03"
+      },
+      {
+        "key": "6735cb9e8bad8e4fc9b1ff66384b7e50814b54d9403749bd4e1c17c542542979",
+        "date": "2026-11-24",
+        "article_id": "858b33cfd633a9681a571f9b521410bc4d77dd32272fc3ae39246283770c0c8b",
+        "text_hash": "e19b6fff66dab411a2c2c9e4cac8fdb777003a5b1bc1108961639a2022eb3650",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "4e400859f9e225d6fb2ddf7f56e5c6824b19ad3acfba4435f40b33f7a532c191",
+        "genre": "Футуризм",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-04"
+      },
+      {
+        "key": "770fdc7f23b968dfd01baaad15db5edbfa555a04a5f2c70586c0e7997dd93216",
+        "date": "2026-11-24",
+        "article_id": "5ee0423831d3d9ebde6dc095d4b4463a727b62985ce1be1bf88b65c88aa50777",
+        "text_hash": "f7a578dc9537435f1e46e5e6820c17fbe8c740a83b8f432540f2685945be506c",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "0177e74d22ed764e802220980dbaeaeff6f467673cfa5cdde1b47ad6742f09ff",
+        "genre": "Романтизм",
+        "ratio": "16:9",
+        "protocol": 2,
+        "article_slug": "feature-05"
+      },
+      {
+        "key": "e0f7fb7c1b6aedf6f63dd0047f6eeb70313f93706cbf1fb925c9b21cf2f1eef0",
+        "date": "2026-11-24",
+        "article_id": "32cbb2d821753a5452c322d8f90497a3ce187c6445c1d53598f9a62daeffe6f7",
+        "text_hash": "b21b02dec4a028520c06f32ee1a6ff9cbbec0fc886f10cf3bdc279b8399ae830",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "93759721c3fc2f86d6c11ce5401f7042e6e5013155c30d6e213d2a2d9485ffd3",
+        "genre": "Акварель",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-06"
+      },
+      {
+        "key": "d823034f827756721842696e53bcda532b2560df71275729d474f14706e47621",
+        "date": "2026-11-24",
+        "article_id": "521582743e61a1aad1adb1ad584135978abc509ae050f1aa91e404eb3f7a482c",
+        "text_hash": "cbec2e064b5fb0249af0a58e7a5e4a8c304aa87e037f37587c731095fb5be9aa",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "7d09c7f3852b535c23e945487fec7a329995b813b0b7edd6c869b2afffaa9264",
+        "genre": "Метафизическая живопись",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-07"
+      },
+      {
+        "key": "c12b8f0bdebd96eda6278bdb38460b5cf454979e9fbe68f95c1572b782dbd1ca",
+        "date": "2026-11-24",
+        "article_id": "f59ee0f9e25c5a0f8c1a655bb038181ea974634e507d52bc6499ab179692bcfe",
+        "text_hash": "7c58bd1a971dc09b55b805388c41a72aa06f052685b5d95200fe731a44a6a3d9",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "812c2a24bfde23eba07cb3d36f0cb75b87aea74370b37b4d204b2d264f723f61",
+        "genre": "Абстракционизм",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-08"
+      },
+      {
+        "key": "553fbb0895d5b32380e9d01cfb0fb91431aefb4effe463442a9ddf5c04c4a561",
+        "date": "2026-11-24",
+        "article_id": "720d87723e961090091a888198b9d07be856a1c5b4ae945f34eaab9623604e3b",
+        "text_hash": "892d578e879b77448c5f57aac220fed03d7b1fbab5be5c9e2376473895e32bba",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "33b268f42005d88c138a23d55142b3fd091d10b67b77cbd2a0c0354bc387a139",
+        "genre": "Коллаж",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-09"
+      },
+      {
+        "key": "06455e41a298e7fab4c12fffa8ab3cfa098f49acb73e3e89d62602aec89266e6",
+        "date": "2026-11-24",
+        "article_id": "7900ce225ccf93b217b9d64387001eb1808ca1d15ff6097099aef95e47fae1e1",
+        "text_hash": "30e0378ea559dce9e66cfc3848794fa21c447d83f9dff2207a0cc38bbb5643c5",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "696d1849cbd0648af48e1790e0683a874070024b42b55b4f920e7eb7452699c3",
+        "genre": "Конструктивизм",
+        "ratio": "16:9",
+        "protocol": 2,
+        "article_slug": "feature-10"
+      },
+      {
+        "key": "5500a28cf2784cf34ca2e86a5f4d30985bd45c06e988cc7f98483cbe23c2c30b",
+        "date": "2026-11-24",
+        "article_id": "c4ebf7418a0c2c279dd0ecd2eabe3d9dc2fa03931da1bc378ec561d5fb3e8850",
+        "text_hash": "951a46f7dfff91abc8940dcf764e672c10d1a027d10a9eed4d78eb31b9a0531b",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "b8d2f76f6c35c0a4ee24c0312e9f831f3346e81eea7a469564e2f1b93dd45605",
+        "genre": "Импрессионизм",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-11"
+      }
+    ]
+  },
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Самая тяжелая летающая птица",
+      "text": "Дрофа-красотка считается самой тяжелой летающей птицей в мире. Масса этих птиц варьируется от 11 до 19 килограммов.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/birds/heaviest-flying-bird-world",
+        "title": "What is the world's heaviest flying bird? The heavyweights that somehow get airborne – including one that defies the laws of physics",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-22T11:18:58+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Размеры Ватикана",
+      "text": "Площадь государства Ватикан составляет всего 0,44 квадратных километра. Территория расположена внутри Рима.",
+      "source": {
+        "url": "https://www.mentalfloss.com/geography/wanderlust/european-countries-so-small-visit-multiple-one-trip?utm_source=RSS",
+        "title": "6 European Countries So Small You Can Visit Multiple in One Trip",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-22T20:00:00Z"
+      }
+    },
+    {
+      "kind": "news",
+      "title": "Землетрясение на Марсе",
+      "text": "Ученые связали марсианское землетрясение с гигантской системой каньонов Вalles Marineris. Событие было зафиксировано посадочным модулем InSight.",
+      "source": {
+        "url": "https://eos.org/articles/quake-traced-to-a-fault-deep-below-marss-largest-canyon",
+        "title": "Quake Traced to a Fault Deep Below Mars’s Largest Canyon - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-20T14:11:45+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Юбилей Патриарха Кирилла",
+      "text": "Святейший Патриарх Московский и всея Руси Кирилл отмечает свое 80-летие. К этой дате был выпущен специальный подкаст с участием Владимира Легойды.",
+      "source": {
+        "url": "https://foma.ru/zhizn-zamechatelnyh-speczialnyj-vypusk-k-80-letiyu-patriarha-kirilla.html",
+        "title": "Опубликован специальный выпуск подкаста «Жизнь замечательных» к 80-летию Патриарха Кирилла с участием",
+        "publisher": "Православный журнал «Фома»",
+        "language": "ru",
+        "published": "2026-11-20T10:15:11+03:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Посадка птиц",
+      "text": "Физическая модель показала, что теоретически любая птица может приземлиться со скоростью, равной нулю. Однако для выполнения такого маневра голублю потребовалось бы около 60 метров свободного пространства.",
+      "source": {
+        "url": "https://physicsworld.com/a/birds-could-glide-to-a-perfect-zero-speed-landing-but-the-swoop-would-be-enormous/",
+        "title": "Birds could glide to a perfect zero-speed landing, but the swoop would be enormous",
+        "publisher": "Physics World",
+        "language": "en",
+        "published": "2026-11-20T09:30:19+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Рост числа пожаров в отдельных регионах в период ограничений",
+      "text": "Во время пандемийных ограничений мобильности в некоторых странах, включая Индию и Гондурас, было зафиксировано существенное увеличение количества пожаров. Эксперты связывают это с ослаблением потенциала противопожарных служб и мониторинга.",
+      "source": {
+        "url": "https://arstechnica.com/science/2026/11/how-the-worlds-fires-changed-while-humanity-hit-pause/",
+        "title": "How the world’s fires changed while humanity hit pause",
+        "publisher": "Ars Technica",
+        "language": "en",
+        "published": "2026-11-15T12:07:34+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Масштабы алтайского заповедника Канас",
+      "text": "Природный парк Канас в Китае обладает огромной площадью и привлекает множество туристов. Его экосистема сочетает функции лесного, гео- и этнопарка.",
+      "source": {
+        "url": "https://scfh.ru/papers/kanas-v-serdtse-kitayskogo-altaya/",
+        "title": "Канас – в сердце китайского Алтая",
+        "publisher": "Наука из первых рук",
+        "language": "ru",
+        "published": "2022-10-22"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Развитие ИИ в задачах принятия решений",
+      "text": "Последний отчет организации METR показывает, что хотя нейросети прогрессируют в технических задачах, они по-прежнему демонстрируют слабые результаты в областях, требующих экспертного суждения. Например, модели не смогли самостоятельно разработать полезные критерии оценки для исследовательских целей.",
+      "source": {
+        "url": "https://www.technologyreview.com/2026/11/20/1149399/the-most-misunderstood-graph-in-ai-just-got-a-major-update/",
+        "title": "The most misunderstood graph in AI just got a major update",
+        "publisher": "MIT Technology Review",
+        "language": "en",
+        "published": "2026-11-20T13:15:15-05:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Кинокарьера Роберта Паттинсона",
+      "text": "Британский актер Роберт Паттинсон за свою многолетнюю карьеру снялся в десятках разноплановых картин, от масштабных франшиз до авторского кино.",
+      "source": {
+        "url": "https://www.mentalfloss.com/entertainment/movies/robert-pattinson-movies-ranked-rotten-tomatoes?utm_source=RSS",
+        "title": "All 33 Robert Pattinson Movies, Ranked by Rotten Tomatoes",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-19T00:00:00Z"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Заповедник Курильский",
+      "text": "Государственный природный заповедник «Курильский» был официально создан в 1984 году. Территория известна уникальными вулканическими ландшафтами, обитанием редких видов и наличием термальных источников.",
+      "source": {
+        "url": "https://scfh.ru/papers/zapovednik-kurilskiy-na-perekrestke-trekh-stikhiy/",
+        "title": "Заповедник «Курильский»: на перекрестке трех стихий",
+        "publisher": "Наука из первых рук",
+        "language": "ru",
+        "published": "2021-12-24"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Философский контекст популярной литературы",
+      "text": "Писательница Сьюзен Коллинз использовала труды философа эпохи Шотландского Просвещения Дэвида Юма как основу для своего нового романа о Голодных играх. В книге исследуются идеи о том, как мнение управляет обществом и почему немногочисленные правители могут удерживать власть над большинством населения.",
+      "source": {
+        "url": "https://www.mentalfloss.com/literature/books/philosopher-who-inspired-sunrise-on-reaping?utm_source=RSS",
+        "title": "The Real Philosopher Who Inspired ‘The Hunger Games: Sunrise on the Reaping’",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-19T22:00:01Z"
+      }
+    }
+  ],
+  "light_count": 11,
+  "homepage_hash": "6b5265b79c62ebcf847f1475b34f87465de7e4a1f26e750a5b34beafaec8a64a",
+  "overview_hash": "bdc92c5658e385643f3c6c0bd8434b44b3195547ed2759c2ece941ae29e306d2",
+  "markdown_hash": "aa16078995dab70bd2ccda14b6f33b648e4a2e1fc747cb7395080e8d653c77c4"
+}
