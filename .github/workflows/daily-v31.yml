@@ -545,14 +545,21 @@ jobs:
           PY
       - name: Restore shared encrypted editorial inventory
         if: ${{ steps.checkpoint.outputs.stock_found == 'true' }}
-        uses: actions/download-artifact@v4
-        with:
-          artifact-ids: ${{ steps.checkpoint.outputs.stock_id }}
-          run-id: ${{ steps.checkpoint.outputs.stock_run_id }}
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          path: ${{ runner.temp }}/editorial-stock
-          merge-multiple: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STOCK_ARTIFACT_ID: ${{ steps.checkpoint.outputs.stock_id }}
+        shell: bash
+        run: |
+          [[ "$STOCK_ARTIFACT_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$STOCK_ARTIFACT_ID/zip" > "$RUNNER_TEMP/stock-exact.zip"
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from scripts.locate_checkpoint import extract_stock_archive
+          root=Path(os.environ['RUNNER_TEMP'])
+          extract_stock_archive(root/'stock-exact.zip',root/'editorial-stock'/'editorial-stock.enc')
+          print('EXACT_ENCRYPTED_STOCK_RESTORED')
+          PY
       - name: Restore special checkpoint for shared quota recovery only
         if: ${{ steps.checkpoint.outputs.special_quota_found == 'true' }}
         uses: actions/download-artifact@v4

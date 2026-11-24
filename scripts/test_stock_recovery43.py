@@ -100,6 +100,9 @@ class StockRecoveryTests(unittest.TestCase):
         text=(e.p.ROOT/'.github/workflows/daily-v31.yml').read_text()
         section=text.split('Save only encrypted shared editorial inventory',1)[1].split('Project compact',1)[0]
         self.assertIn('editorial-stock.enc',section);self.assertNotIn('.md',section);self.assertNotIn('.json',section)
-        self.assertIn("'387-news-stage-v31'",text);self.assertIn('run-id: ${{ steps.checkpoint.outputs.stock_run_id }}',text)
+        self.assertIn("'387-news-stage-v31'",text)
+        restore=text.split('Restore shared encrypted editorial inventory',1)[1].split('Restore special checkpoint',1)[0]
+        self.assertIn('STOCK_ARTIFACT_ID: ${{ steps.checkpoint.outputs.stock_id }}',restore)
+        self.assertIn('extract_stock_archive',restore);self.assertNotIn('continue-on-error',restore)
 
 if __name__=='__main__':unittest.main()
