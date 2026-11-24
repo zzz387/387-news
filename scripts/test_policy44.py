@@ -37,6 +37,27 @@ def synthetic_art(state):
         state['art44']['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':hashlib.sha256(data).hexdigest(),'width':width,'height':height,'provider':'synthetic-test','model':'no-api'}
 
 class Policy44Tests(unittest.TestCase):
+    def test_capacity_backoff_resumes_one_unfinished_operation_without_rewriting_or_429_bypass(self):
+        from scripts import daily43 as daily,mosaic44
+        for mode,expected_calls in [('capacity',2),('still_unavailable',2),('global429',1),('deadline',1)]:
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temp:
+                s=issue(7,8);row=main_row(30);gate=copy.deepcopy(row['checks']['final43']);row['checks'].pop('final43');row['status']='preparing';s['candidates'].append(row)
+                article=copy.deepcopy(row['article']);calls=[];editor=Mock()
+                def finish(state,current):
+                    calls.append(current['id'])
+                    if len(calls)==1 or mode=='still_unavailable':raise news.runtime.GenerationPaused('synthetic capacity pause')
+                    current['checks']['final43']=gate;current['status']='ready'
+                editor.finish.side_effect=finish
+                cooldowns={'gemini-3.5-flash-lite':1120,'gemini-3.1-flash-lite':1140}
+                if mode=='global429':cooldowns['__all_models__']=1900
+                budget=SimpleNamespace(ledger={'cooldowns':cooldowns},deadline=float('inf'),can_request=lambda:True,remaining_requests=lambda:24,remaining_seconds=lambda:200 if mode=='deadline' else 600)
+                with patch.dict(os.environ,GEMINI_MODELS='gemini-3.5-flash-lite,gemini-3.1-flash-lite',NEWS_CATALOG_REFRESH='false'),patch.object(news.runtime,'ACTIVE_BUDGET',budget),patch.object(daily,'discover'),patch.object(daily.time,'time',return_value=1000),patch.object(daily.time,'sleep') as sleep,patch.object(mosaic44,'finalize',return_value=False):
+                    daily.advance(s,s['date'],False,SimpleNamespace(ROOT=root(temp)),now=NOW.replace(hour=4),editor=editor)
+                self.assertEqual(len(calls),expected_calls);self.assertEqual(row['article'],article)
+                if expected_calls==2:sleep.assert_called_once_with(120)
+                else:sleep.assert_not_called()
+                self.assertEqual(len(sel.composition(s)),8 if mode=='capacity' else 7)
+
     def test_unready_next_issue_keeps_automatic_archive_art_out_of_its_preparation_budget(self):
         from datetime import datetime
         for n,lights,clock,allowed in [(3,11,'04:00',False),(8,8,'04:00',True),(11,7,'04:00',False),(11,8,'04:00',True),(11,8,'05:29',True),(11,8,'05:30',False),(11,8,'05:54',False),(11,8,'06:00',False)]:
