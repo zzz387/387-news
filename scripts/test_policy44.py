@@ -38,11 +38,13 @@ def synthetic_art(state):
 
 class Policy44Tests(unittest.TestCase):
     def test_unready_next_issue_keeps_automatic_archive_art_out_of_its_preparation_budget(self):
-        for n,lights,allowed in [(3,11,False),(8,8,True),(11,7,False),(11,8,True)]:
-            with self.subTest(main=n,lights=lights):
+        from datetime import datetime
+        for n,lights,clock,allowed in [(3,11,'04:00',False),(8,8,'04:00',True),(11,7,'04:00',False),(11,8,'04:00',True),(11,8,'05:29',True),(11,8,'05:30',False),(11,8,'05:54',False),(11,8,'06:00',False)]:
+            with self.subTest(main=n,lights=lights,clock=clock):
                 s=issue(n,lights)
                 if n==11:s['candidates']=[main_row(i) for i in [0,1,4]+list(range(6,14))]
-                self.assertEqual(staged_news.optional_art_allowed(s),allowed)
+                now=datetime.fromisoformat(s['date']+'T'+clock).replace(tzinfo=news.TZ)
+                self.assertEqual(staged_news.optional_art_allowed(s,now),allowed)
 
     def test_relaxed_topic_admission_boundaries_preserve_actual_deficits(self):
         cases=[(13,(2,0,1),12,True,False),(11,(1,1,1),8,True,False),(12,(2,0,0),12,False,False),(10,(2,1,2),12,False,False),(8,(2,2,2),8,True,True),(15,(2,1,1),7,False,False),(13,(2,0,1),13,False,False)]
