@@ -6,7 +6,8 @@ retrieval, avoiding intermittent HTTP 401 errors from the direct REST redirect.
 """
 from __future__ import annotations
 from datetime import datetime,timedelta
-import os
+import os,json,zipfile
+from pathlib import Path
 from urllib.parse import quote
 try:
     from scripts import staged_news
@@ -20,6 +21,22 @@ def newest_artifact(records: list, label: str) -> dict | None:
     if not eligible:
         return None
     return max(eligible, key=lambda x: (x.get('created_at', ''), x['id']))
+
+
+def extract_quota_archive(archive,target):
+    """Exact-ID REST fallback: only the expected bounded JSON ledger, atomically."""
+    with zipfile.ZipFile(archive) as bundle:
+        files=bundle.infolist()
+        if len(files)!=1 or files[0].filename!='quota.json' or files[0].file_size>1024*1024:
+            raise RuntimeError('QUOTA_ARCHIVE_INVALID')
+        raw=bundle.read(files[0])
+    ledger=json.loads(raw)
+    if not isinstance(ledger,dict) or type(ledger.get('requests')) is not int or ledger['requests']<0:
+        raise RuntimeError('QUOTA_LEDGER_INVALID')
+    datetime.strptime(ledger['day'],'%Y-%m-%d')
+    if not isinstance(ledger.get('models',{}),dict) or not isinstance(ledger.get('cooldowns',{}),dict):raise RuntimeError('QUOTA_LEDGER_INVALID')
+    target=Path(target);target.parent.mkdir(parents=True,exist_ok=True)
+    temp=target.with_suffix('.tmp');temp.write_bytes(raw);temp.replace(target)
 
 
 def main():

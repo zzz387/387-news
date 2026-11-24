@@ -1,5 +1,5 @@
 """Regression tests for GitHub artifact downloads across workflow runs."""
-import os
+import os,json,zipfile
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -13,6 +13,18 @@ except ImportError:
 LABEL = '387news31-test-2026-10-25'
 
 class CrossRunDownloadTests(unittest.TestCase):
+    def test_exact_quota_archive_restore_preserves_counts_and_rejects_unsafe_members(self):
+        ledger={'day':'2026-11-24','requests':57,'models':{'fixture':57},'cooldowns':{'fixture':9999999999}}
+        for name,valid in [('quota.json',True),('../quota.json',False),('unexpected.json',False)]:
+            with self.subTest(name=name),tempfile.TemporaryDirectory() as temp:
+                archive=Path(temp)/'quota.zip';target=Path(temp)/'quota'/'quota.json'
+                with zipfile.ZipFile(archive,'w') as bundle:bundle.writestr(name,json.dumps(ledger))
+                if valid:
+                    locator.extract_quota_archive(archive,target);self.assertEqual(json.loads(target.read_text()),ledger)
+                else:
+                    with self.assertRaisesRegex(RuntimeError,'QUOTA_ARCHIVE_INVALID'):locator.extract_quota_archive(archive,target)
+                    self.assertFalse(target.exists())
+
     def run_locator(self, artifacts):
         with tempfile.TemporaryDirectory() as d:
             output = Path(d) / 'github-output'
