@@ -529,10 +529,13 @@ def recover_special_quota(ledger, key):
     RUNTIME.merge_snapshot(ledger,backup.get('_quota_snapshot',{}))
 
 
-def optional_art_allowed(state):
+def optional_art_allowed(state,now=None):
     """Automatic archive artwork yields until the active daily edition is ready."""
     from scripts import policy44,selection43
-    return not policy44.active(state) or policy44.standard(state,selection43.composition(state))['compliant']
+    if not policy44.active(state):return True
+    release=datetime.fromisoformat(state['date']+'T06:00:00').replace(tzinfo=TZ)
+    if release-(now or datetime.now(TZ))<=timedelta(minutes=30):return False
+    return policy44.standard(state,selection43.composition(state))['compliant']
 
 
 def main():
