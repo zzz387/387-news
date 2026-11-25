@@ -1661,6 +1661,76 @@
       "width": 480,
       "height": 298,
       "added_at": "2026-11-24T12:01:25.354924+00:00"
+    },
+    "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f": {
+      "museum": "SMK — National Gallery of Denmark",
+      "museum_id": "smk:KMS7495",
+      "title": "Komposition 1",
+      "artist": "Lundstrøm, Vilhelm",
+      "year": "1918",
+      "source_url": "https://api.smk.dk/api/v1/art/search/?keys=Collage&filters=%5Bpublic_domain%3Atrue%5D%2C%5Bhas_image%3Atrue%5D&offset=0&rows=40",
+      "license": "Public Domain Mark",
+      "license_url": "https://www.smk.dk/en/article/smk-open/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/mark/1.0/",
+      "public_domain": true,
+      "genre_evidence": "[{'title': 'Komposition 1', 'type': 'museumstitel', 'language': 'dansk'}, {'title': 'Kubistisk komposition', 'type': 'tidligere titel', 'language': 'dansk'}] ['Træ og metal på olie på træplade']     [{'name': 'Collage'}]",
+      "genre_id": "collage",
+      "verified": true,
+      "id": "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f",
+      "path": "assets/art/collage/2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f.webp",
+      "sha256": "cc9dd62a63a52d10acf2d3c52a38957483c3fb492434f32362e2eed453e8350b",
+      "original_sha256": "450b8755c59c6fc44689171898723e39887e769671cbe3df3d509d62575295d6",
+      "visual_hash": "12732388336907008819",
+      "perceptual_neighbours": [],
+      "width": 367,
+      "height": 480,
+      "added_at": "2026-11-25T06:16:22.707499+00:00"
+    },
+    "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:160709",
+      "title": "Fear",
+      "artist": "Odilon Redon (French, 1840–1916)",
+      "year": "1866",
+      "source_url": "https://clevelandart.org/art/1998.69",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Fear etching Odilon Redon used parallel lines of varying density throughout this etching to enhance its tonal and emotional darkness. The subject was inspired by Johann Wolfgang Goethe's 1782 poem describing a father who discovered his child's death after a cold and windy nighttime journey. The figures and the man's white cape contrast dramatically with the scale and tone of their surroundings. Redon made few etchings during his career. This one was a gift to his friend, French art critic and novelist Joris-Karl Huysmans, and features a personalized dedication at the bottom of the sheet. ['France'] Print ",
+      "genre_id": "etching",
+      "verified": true,
+      "id": "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c",
+      "path": "assets/art/etching/d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c.webp",
+      "sha256": "164d03e38754a22e7ff2c98579a0e1aa04dd7ebc836b4fb3089201412de65663",
+      "original_sha256": "90959dcd3e483bcf7bf479fbb5edd340d79ba49b8977ac924312e5332add0bab",
+      "visual_hash": "8151804896751071605",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 297,
+      "added_at": "2026-11-25T06:16:32.598443+00:00"
+    },
+    "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:118159",
+      "title": "Bathers Playing with a Crab",
+      "artist": "Pierre-Auguste Renoir (French, 1841–1919)",
+      "year": "c. 1897",
+      "source_url": "https://clevelandart.org/art/1939.269",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Bathers Playing with a Crab oil on canvas After viewing Renaissance paintings on a trip to Italy in 1881, Renoir attempted to bring greater order and stability to Impressionism by merging flickering light effects with solid forms. He conveyed this new ambition in a series of paintings of nude bathers, a subject that preoccupied him from 1883 until his death in 1919. Avant-garde artists of the 20th century admired his ability to blend modernist and classicizing tendencies. ['France'] Painting ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156",
+      "path": "assets/art/impressionism/dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156.webp",
+      "sha256": "7454506cddc151a0d713592e3976e9a9e6fcbaf9c78ce08ab3e2dbff2f1a7306",
+      "original_sha256": "fbb243222307b946b395ddd4b662325b15a39f471cf3f28e2520b60cb94ff8a0",
+      "visual_hash": "14907682715676319551",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 399,
+      "added_at": "2026-11-25T06:16:42.120175+00:00"
     }
   },
   "sets": {
@@ -2186,6 +2256,60 @@
       "sha256": [
         "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
         "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727"
+      ]
+    },
+    "2026-11-25/collage": {
+      "id": "2026-11-25/collage",
+      "issue_id": "2026-11-25",
+      "issue_date": "2026-11-25",
+      "issue_number": 32,
+      "genre_id": "collage",
+      "genre": "Коллаж",
+      "artwork_ids": [
+        "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f"
+      ],
+      "selected_at": "2026-11-25T06:16:25.200996+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "cc9dd62a63a52d10acf2d3c52a38957483c3fb492434f32362e2eed453e8350b"
+      ]
+    },
+    "2026-11-25/etching": {
+      "id": "2026-11-25/etching",
+      "issue_id": "2026-11-25",
+      "issue_date": "2026-11-25",
+      "issue_number": 32,
+      "genre_id": "etching",
+      "genre": "Офорт",
+      "artwork_ids": [
+        "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c"
+      ],
+      "selected_at": "2026-11-25T06:16:35.075523+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "164d03e38754a22e7ff2c98579a0e1aa04dd7ebc836b4fb3089201412de65663"
+      ]
+    },
+    "2026-11-25/impressionism": {
+      "id": "2026-11-25/impressionism",
+      "issue_id": "2026-11-25",
+      "issue_date": "2026-11-25",
+      "issue_number": 32,
+      "genre_id": "impressionism",
+      "genre": "Импрессионизм",
+      "artwork_ids": [
+        "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156"
+      ],
+      "selected_at": "2026-11-25T06:16:44.618643+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "7454506cddc151a0d713592e3976e9a9e6fcbaf9c78ce08ab3e2dbff2f1a7306"
       ]
     }
   },
