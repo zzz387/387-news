@@ -1,5 +1,5 @@
 """Independent public delivery control: dispatch the SAME production, never Gemini."""
-from datetime import datetime,timedelta
+from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from urllib.error import HTTPError,URLError
 import json,os,time
@@ -51,6 +51,27 @@ def prepare_date(date,now,request=monitor.github,exclude_run_id=0):
     if busy(productions(request)):return dict(result,code='PREPARATION_ALREADY_ACTIVE')
     request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'resume','preview':'false','target_date':date}})
     return dict(result,dispatched=True,code='PREPARATION_DISPATCHED',attempt=len(today)+1)
+
+
+def backfill_date(root,date,now,preparation,request=monitor.github,exclude_run_id=0,status=None):
+    """Two serial free-window continuations/day; daily editing always goes first."""
+    result={'date':date,'dispatched':False}
+    if preparation.get('code')!='PREPARATION_WAKEUP_LIMIT':return dict(result,code='DAILY_PREPARATION_FIRST')
+    if (datetime.fromisoformat(date+'T06:00').replace(tzinfo=queue.news.TZ)+timedelta(days=1)-now).total_seconds()<1800:return dict(result,code='DAILY_RELEASE_FIRST')
+    path=Path(root)/'issues'/date/'release.json'
+    if not path.is_file() or not json.loads(path.read_text()).get('art44',{}).get('missing',0):return dict(result,code='ARTWORK_COMPLETE')
+    if (status or {}).get('cloudflare_art',{}).get('cooldown_until',0)>now.timestamp():return dict(result,code='ARTWORK_COOLDOWN')
+    def busy(rows):return any(r['status'] in ACTIVE and r['id']!=exclude_run_id for r in rows)
+    rows=productions(request)
+    if busy(rows):return dict(result,code='PRODUCTION_ACTIVE')
+    prior=[r for r in rows if r.get('display_title')=='Artwork '+date and r.get('event')=='workflow_dispatch']
+    today=[r for r in prior if datetime.fromisoformat(r['created_at'].replace('Z','+00:00')).astimezone(timezone.utc).date()==now.astimezone(timezone.utc).date()]
+    if len(today)>=2:return dict(result,code='ARTWORK_WAKEUP_LIMIT')
+    last=max((datetime.fromisoformat(r['created_at'].replace('Z','+00:00')) for r in prior),default=now-RECOVERY_GAP)
+    if now-last<RECOVERY_GAP:return dict(result,code='ARTWORK_BACKOFF')
+    if busy(productions(request)):return dict(result,code='PRODUCTION_ACTIVE')
+    request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'backfill_issue_art','preview':'false','target_date':date}})
+    return dict(result,dispatched=True,code='ARTWORK_DISPATCHED')
 
 
 def current(date,check,diagnostic=None):
@@ -108,6 +129,9 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
             if prepare_early and os.getenv('NEWS_POLICY_VERSION')=='4.4':
                 try:result['preparation']=prepare_date((now.date()+timedelta(days=1)).isoformat(),now,request)
                 except Exception as exc:result['preparation']={'code':'PREPARATION_API_UNCERTAIN','error':type(exc).__name__}
+            if prepare_early and os.getenv('NEWS_POLICY_VERSION')=='4.4':
+                try:result['artwork_recovery']=backfill_date(root,date,now,result.get('preparation',{}),request)
+                except Exception as exc:result['artwork_recovery']={'code':'ARTWORK_API_UNCERTAIN','error':type(exc).__name__}
             try:result['incident']=monitor.incident(date,'VERIFIED',True,request)
             except Exception as exc:result['notification_error']=type(exc).__name__
             return result
@@ -157,3 +181,4 @@ def main():
     if result['publication_status']=='PUBLICATION_FAILED':raise RuntimeError('WATCHDOG_PUBLICATION_FAILED')
 
 if __name__=='__main__':main()
+

@@ -181,6 +181,11 @@ def main():
         try:art['incident']=artwork_incident(result['date'],art)
         except Exception as exc:art['notification_error']=type(exc).__name__
         print('[artwork-status] '+json.dumps(art),flush=True)
+        if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4' and art['ARTWORK_MISSING']:
+            try:
+                recovery=delivery_watchdog.backfill_date(news.ROOT,result['date'],datetime.now(news.TZ),wake,request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')),status=raw)
+            except Exception as exc:recovery={'code':'ARTWORK_API_UNCERTAIN','error':type(exc).__name__}
+            print('[artwork-wakeup] '+json.dumps(recovery),flush=True)
     summary=os.getenv('GITHUB_STEP_SUMMARY')
     if summary:
         with open(summary,'a') as stream:
@@ -190,3 +195,4 @@ def main():
         raise RuntimeError('Daily edition is not verified on the public site; incident/retry status recorded')
 
 if __name__=='__main__': main()
+

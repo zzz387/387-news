@@ -1,5 +1,7 @@
 {
   "enabled": true,
+  "text_only_fallback": true,
+  "compact_genres_from": "2026-11-26",
   "maximum_tiles": 12,
   "prompt_version": "387-art-single-reference-6-png",
   "provider": "cloudflare_workers_ai",
@@ -91,3 +93,4 @@
     }
   }
 }
+

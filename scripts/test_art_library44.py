@@ -24,6 +24,29 @@ class ArtLibraryTests(unittest.TestCase):
         return state
     def items(self,n,genre='Импрессионизм'):return [{'genre':genre,'descriptor':{'title':'Fixture '+str(i)},'key':str(i)} for i in range(n)]
 
+    def test_text_only_fallback_has_no_fictional_reference_and_uses_schnell(self):
+        with tempfile.TemporaryDirectory() as temp:
+            state={'date':'2026-11-25'};item=self.items(1,'Футуризм')[0]
+            item.update(date=state['date'],protocol=2,composition='Diagonal motion')
+            lib.attach(temp,state,[item],{})
+            self.assertEqual(item['generation_mode'],'TEXT_ONLY');self.assertEqual(item['reference_images_sent'],0)
+            self.assertNotIn('selected_reference_id',item);self.assertNotIn('attached',item['prompt'])
+            self.assertIn('futurism',item['prompt']);self.assertNotIn('muted ochre, cream, deep green',item['prompt'])
+            budget=runtime.RequestBudget({'day':'2026-11-25','requests':0,'models':{}},seconds=1000,gap=0)
+            env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
+            with patch.dict(os.environ,env),patch.object(cf,'free_usage',return_value=200),patch.object(cf,'api',return_value={'result':{'image':base64.b64encode(picture(99)).decode()}}) as api,patch.object(cf,'_LAST',0):
+                cf.generate(item,budget,dict(art.CONFIG,request_gap_seconds=0))
+                args,kwargs=api.call_args;self.assertTrue(args[0].endswith(cf.MODEL));self.assertNotIn('images',kwargs)
+                self.assertEqual(args[1]['steps'],4)
+                self.assertLessEqual(budget.ledger['cloudflare_ai']['reserved_neurons'],art.CONFIG['image_neuron_budget'])
+
+    def test_new_issue_uses_at_most_six_suitable_genres(self):
+        rows=[{'id':str(i),'article':{'title':word+' '+str(i),'teaser':word,'blocks':[]}} for i,word in enumerate(art.THEMES)]
+        with patch.object(art,'reference_genres',return_value={'Акварель','Конструктивизм'}):
+            plans=art.article_plans({'date':'2026-11-26'},rows)
+        self.assertLessEqual(len({i['genre'] for i in plans}),6)
+        for item,row in zip(plans,rows):self.assertIn(item['genre'],art.ISSUE_STYLES[art.theme(row['article'])])
+
     def test_one_quartet_for_one_or_five_articles_and_new_issue_rotates(self):
         for count in (1,5):
             with self.subTest(articles=count),tempfile.TemporaryDirectory() as temp:
@@ -462,3 +485,4 @@ class ArtLibraryTests(unittest.TestCase):
             self.assertEqual(fetch.call_count,1)
 
 if __name__=='__main__':unittest.main()
+
