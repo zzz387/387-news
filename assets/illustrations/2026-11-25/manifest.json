@@ -1,0 +1,692 @@
+{
+  "date": "2026-11-25",
+  "images": {
+    "cfb07c1aa2ce1c98babf3188585a88a8bf28f11d2c076dcfe579169482acd034": {
+      "key": "cfb07c1aa2ce1c98babf3188585a88a8bf28f11d2c076dcfe579169482acd034",
+      "article_id": "bbaf063f3db28261430537e88f7458c83003d8159bb1bb79e1653ac39670c116",
+      "description_hash": "ad58cb26058923c801bbd591095093f627130777dd8d8ccc5f09dfe4d339dacf",
+      "genre": "Акварель",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-25",
+      "text_hash": "613c8c0f34e4a3c930e71ee039626806b6794a44bae4bbaa5d076343e0adf802",
+      "protocol": 2,
+      "article_slug": "feature-04",
+      "sha256": "f9eeb07c8dd0bad4647e5d0a8d7163f75a5b33d1224ae4592e4bcca73aa15b9b",
+      "width": 896,
+      "height": 896,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-25/watercolor",
+      "reference_artwork_ids": [
+        "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+        "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb"
+      ],
+      "reference_sha256": [
+        "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727"
+      ],
+      "selected_reference_id": "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.78688,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.69555,
+        "palette_diversity": 1,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "groups": [
+          {
+            "color": "#897858",
+            "share": 0.1186,
+            "lab": [
+              51.217,
+              1.568,
+              20.013
+            ]
+          },
+          {
+            "color": "#767354",
+            "share": 0.112,
+            "lab": [
+              47.948,
+              -4.227,
+              17.621
+            ]
+          },
+          {
+            "color": "#585848",
+            "share": 0.1091,
+            "lab": [
+              36.971,
+              -3.126,
+              9.308
+            ]
+          },
+          {
+            "color": "#74694f",
+            "share": 0.1046,
+            "lab": [
+              44.775,
+              -0.021,
+              16.229
+            ]
+          },
+          {
+            "color": "#918863",
+            "share": 0.0951,
+            "lab": [
+              56.614,
+              -2.622,
+              21.13
+            ]
+          },
+          {
+            "color": "#878360",
+            "share": 0.0897,
+            "lab": [
+              54.269,
+              -4.403,
+              19.516
+            ]
+          },
+          {
+            "color": "#ac9978",
+            "share": 0.0822,
+            "lab": [
+              64.088,
+              1.884,
+              19.941
+            ]
+          },
+          {
+            "color": "#9b936f",
+            "share": 0.0699,
+            "lab": [
+              60.768,
+              -2.941,
+              20.171
+            ]
+          },
+          {
+            "color": "#f0e8df",
+            "share": 0.0696,
+            "lab": [
+              92.383,
+              1.167,
+              5.331
+            ]
+          },
+          {
+            "color": "#9e886a",
+            "share": 0.0557,
+            "lab": [
+              57.96,
+              3.716,
+              19.21
+            ]
+          },
+          {
+            "color": "#745d48",
+            "share": 0.047,
+            "lab": [
+              41.232,
+              6.125,
+              15.611
+            ]
+          },
+          {
+            "color": "#c1b296",
+            "share": 0.0465,
+            "lab": [
+              73.142,
+              0.842,
+              16.273
+            ]
+          }
+        ],
+        "dominant": [
+          "#897858"
+        ],
+        "secondary": [
+          "#897858",
+          "#767354",
+          "#585848",
+          "#74694f",
+          "#918863",
+          "#878360",
+          "#ac9978",
+          "#9b936f",
+          "#f0e8df",
+          "#9e886a"
+        ],
+        "accent": [
+          "#745d48",
+          "#c1b296"
+        ],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.284,
+        "lightness": 54.83,
+        "dark_share": 0.008,
+        "light_share": 0.087,
+        "contrast": "moderate",
+        "contrast_value": 54.45
+      },
+      "art_movement": "reference-defined movement",
+      "medium": "watercolor",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MISMATCH",
+        "lab_distance": 49.715,
+        "reference_temperature": "warm",
+        "generated_temperature": "neutral",
+        "reference_saturation": 0.284,
+        "generated_saturation": 0.055,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "f9eeb07c8dd0bad4647e5d0a8d7163f75a5b33d1224ae4592e4bcca73aa15b9b",
+          "groups": [
+            {
+              "color": "#fbfcf9",
+              "share": 0.1096,
+              "lab": [
+                98.816,
+                -0.854,
+                1.317
+              ]
+            },
+            {
+              "color": "#f3efe9",
+              "share": 0.1079,
+              "lab": [
+                94.599,
+                0.301,
+                3.369
+              ]
+            },
+            {
+              "color": "#f3f2ec",
+              "share": 0.1003,
+              "lab": [
+                95.419,
+                -0.712,
+                3.006
+              ]
+            },
+            {
+              "color": "#dfe1d9",
+              "share": 0.0894,
+              "lab": [
+                89.181,
+                -2.093,
+                3.671
+              ]
+            },
+            {
+              "color": "#f7f6f0",
+              "share": 0.0872,
+              "lab": [
+                96.811,
+                -0.71,
+                2.997
+              ]
+            },
+            {
+              "color": "#faf8f1",
+              "share": 0.0861,
+              "lab": [
+                97.555,
+                -0.544,
+                3.589
+              ]
+            },
+            {
+              "color": "#fafbf5",
+              "share": 0.0791,
+              "lab": [
+                98.397,
+                -1.374,
+                2.753
+              ]
+            },
+            {
+              "color": "#ecebe5",
+              "share": 0.0781,
+              "lab": [
+                92.974,
+                -0.715,
+                3.023
+              ]
+            },
+            {
+              "color": "#d3c7b6",
+              "share": 0.0755,
+              "lab": [
+                80.78,
+                1.338,
+                10.011
+              ]
+            },
+            {
+              "color": "#ece2d7",
+              "share": 0.0731,
+              "lab": [
+                90.383,
+                1.539,
+                6.582
+              ]
+            },
+            {
+              "color": "#f4ece0",
+              "share": 0.06,
+              "lab": [
+                93.713,
+                0.667,
+                6.768
+              ]
+            },
+            {
+              "color": "#faf5ea",
+              "share": 0.0536,
+              "lab": [
+                96.644,
+                -0.202,
+                5.879
+              ]
+            }
+          ],
+          "dominant": [
+            "#fbfcf9"
+          ],
+          "secondary": [
+            "#fbfcf9",
+            "#f3efe9",
+            "#f3f2ec",
+            "#dfe1d9",
+            "#f7f6f0",
+            "#faf8f1",
+            "#fafbf5",
+            "#ecebe5",
+            "#d3c7b6",
+            "#ece2d7",
+            "#f4ece0",
+            "#faf5ea"
+          ],
+          "accent": [],
+          "temperature": "neutral",
+          "saturation": "low",
+          "saturation_value": 0.055,
+          "lightness": 93.63,
+          "dark_share": 0.0,
+          "light_share": 0.981,
+          "contrast": "low",
+          "contrast_value": 17.52
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "wire_sha256": "a71f2dc5cd2abf49d9cbcb64cb97a1af85defdbd46f7be1fc96a88cb9a9957e6",
+        "decoded_pixels_sha256": "e02a3fd29933bd51c3ab96238c0c4e58cbdbea2ee2ad7247b310fc018e3c8439",
+        "width": 480,
+        "height": 340
+      },
+      "path": "assets/illustrations/2026-11-25/cfb07c1aa2ce1c98babf3188585a88a8bf28f11d2c076dcfe579169482acd034.webp"
+    },
+    "3823566b5bfbe0ad1c58c34ef89f352191185b9435829dcafbee38a5a8808ae8": {
+      "key": "3823566b5bfbe0ad1c58c34ef89f352191185b9435829dcafbee38a5a8808ae8",
+      "article_id": "0b8514f073b543ca5c03d6c8537a71eafecc75b8b1aba03beae018ebbe76d9a8",
+      "description_hash": "b24da311fc07dc6302a9e2c78a1157b22d5c94020a7c10a18053ec132c1f14f2",
+      "genre": "Акварель",
+      "ratio": "16:9",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-25",
+      "text_hash": "9cd9ff4f85486f01488bf1cd7e65c7df2ec3c384152d4b7a1ef4327b2461c238",
+      "protocol": 2,
+      "article_slug": "feature-11",
+      "sha256": "679c23dfd96f26a64166f8a01e6b3965d305f75b65bbc6002f6f54fde96ce1a7",
+      "width": 1024,
+      "height": 576,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-25/watercolor",
+      "reference_artwork_ids": [
+        "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+        "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb"
+      ],
+      "reference_sha256": [
+        "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727"
+      ],
+      "selected_reference_id": "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.61625,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.63967,
+        "palette_diversity": 0.56161,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727",
+        "groups": [
+          {
+            "color": "#77726a",
+            "share": 0.1161,
+            "lab": [
+              48.257,
+              0.404,
+              5.118
+            ]
+          },
+          {
+            "color": "#514944",
+            "share": 0.1095,
+            "lab": [
+              31.651,
+              2.369,
+              4.207
+            ]
+          },
+          {
+            "color": "#dfd2c2",
+            "share": 0.0991,
+            "lab": [
+              84.831,
+              1.827,
+              9.538
+            ]
+          },
+          {
+            "color": "#f2e7d3",
+            "share": 0.0966,
+            "lab": [
+              92.013,
+              0.437,
+              11.068
+            ]
+          },
+          {
+            "color": "#dccebd",
+            "share": 0.0939,
+            "lab": [
+              83.46,
+              2.041,
+              10.2
+            ]
+          },
+          {
+            "color": "#d8cbb8",
+            "share": 0.0916,
+            "lab": [
+              82.256,
+              1.373,
+              11.102
+            ]
+          },
+          {
+            "color": "#ddcfbe",
+            "share": 0.0894,
+            "lab": [
+              83.818,
+              2.038,
+              10.19
+            ]
+          },
+          {
+            "color": "#e1d4c4",
+            "share": 0.0863,
+            "lab": [
+              85.545,
+              1.822,
+              9.52
+            ]
+          },
+          {
+            "color": "#dbccba",
+            "share": 0.0703,
+            "lab": [
+              82.803,
+              2.253,
+              10.848
+            ]
+          },
+          {
+            "color": "#dfd1bf",
+            "share": 0.0614,
+            "lab": [
+              84.51,
+              1.874,
+              10.669
+            ]
+          },
+          {
+            "color": "#beb5a4",
+            "share": 0.0541,
+            "lab": [
+              73.982,
+              0.278,
+              9.805
+            ]
+          },
+          {
+            "color": "#dcd1c1",
+            "share": 0.0318,
+            "lab": [
+              84.312,
+              1.113,
+              9.293
+            ]
+          }
+        ],
+        "dominant": [
+          "#77726a"
+        ],
+        "secondary": [
+          "#77726a",
+          "#514944",
+          "#dfd2c2",
+          "#f2e7d3",
+          "#dccebd",
+          "#d8cbb8",
+          "#ddcfbe",
+          "#e1d4c4",
+          "#dbccba",
+          "#dfd1bf",
+          "#beb5a4"
+        ],
+        "accent": [
+          "#dcd1c1"
+        ],
+        "temperature": "warm",
+        "saturation": "low",
+        "saturation_value": 0.154,
+        "lightness": 74.26,
+        "dark_share": 0.04,
+        "light_share": 0.734,
+        "contrast": "high",
+        "contrast_value": 60.33
+      },
+      "art_movement": "reference-defined movement",
+      "medium": "watercolor",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 16.397,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.154,
+        "generated_saturation": 0.182,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "679c23dfd96f26a64166f8a01e6b3965d305f75b65bbc6002f6f54fde96ce1a7",
+          "groups": [
+            {
+              "color": "#191413",
+              "share": 0.114,
+              "lab": [
+                6.811,
+                2.127,
+                1.43
+              ]
+            },
+            {
+              "color": "#f7f1df",
+              "share": 0.0993,
+              "lab": [
+                95.166,
+                -1.001,
+                9.404
+              ]
+            },
+            {
+              "color": "#a28f79",
+              "share": 0.0986,
+              "lab": [
+                60.523,
+                3.542,
+                14.324
+              ]
+            },
+            {
+              "color": "#fefcef",
+              "share": 0.0935,
+              "lab": [
+                98.798,
+                -1.548,
+                6.453
+              ]
+            },
+            {
+              "color": "#f8e9d0",
+              "share": 0.0892,
+              "lab": [
+                92.922,
+                1.083,
+                13.985
+              ]
+            },
+            {
+              "color": "#e5dfcf",
+              "share": 0.0811,
+              "lab": [
+                88.894,
+                -0.676,
+                8.562
+              ]
+            },
+            {
+              "color": "#f7dcbd",
+              "share": 0.0775,
+              "lab": [
+                89.223,
+                4.634,
+                18.654
+              ]
+            },
+            {
+              "color": "#bbb4a2",
+              "share": 0.0765,
+              "lab": [
+                73.426,
+                -0.625,
+                10.07
+              ]
+            },
+            {
+              "color": "#735c4a",
+              "share": 0.0717,
+              "lab": [
+                40.887,
+                6.558,
+                13.916
+              ]
+            },
+            {
+              "color": "#3f332e",
+              "share": 0.0693,
+              "lab": [
+                22.38,
+                4.437,
+                5.187
+              ]
+            },
+            {
+              "color": "#d7c5ae",
+              "share": 0.0676,
+              "lab": [
+                80.425,
+                2.619,
+                13.832
+              ]
+            },
+            {
+              "color": "#fcf2da",
+              "share": 0.0616,
+              "lab": [
+                95.69,
+                -0.55,
+                12.784
+              ]
+            }
+          ],
+          "dominant": [
+            "#191413"
+          ],
+          "secondary": [
+            "#191413",
+            "#f7f1df",
+            "#a28f79",
+            "#fefcef",
+            "#f8e9d0",
+            "#e5dfcf",
+            "#f7dcbd",
+            "#bbb4a2",
+            "#735c4a",
+            "#3f332e",
+            "#d7c5ae",
+            "#fcf2da"
+          ],
+          "accent": [],
+          "temperature": "warm",
+          "saturation": "low",
+          "saturation_value": 0.182,
+          "lightness": 69.08,
+          "dark_share": 0.178,
+          "light_share": 0.582,
+          "contrast": "high",
+          "contrast_value": 92.96
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727",
+        "wire_sha256": "6bf8a4a65509ceed757bb169e61c33b803d21ca2de26042c25f017aec978cea7",
+        "decoded_pixels_sha256": "f08eb7da04588a6668326a5770ae9d804de8ec24a672970ebeac408885108767",
+        "width": 285,
+        "height": 480
+      },
+      "path": "assets/illustrations/2026-11-25/3823566b5bfbe0ad1c58c34ef89f352191185b9435829dcafbee38a5a8808ae8.webp"
+    }
+  },
+  "provider_status": "READY"
+}

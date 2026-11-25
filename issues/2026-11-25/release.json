@@ -1,0 +1,1105 @@
+{
+  "date": "2026-11-25",
+  "number": 32,
+  "policy_version": "4.4",
+  "article_count": 15,
+  "kind": "articles",
+  "minimum_articles": 8,
+  "standard_issue": true,
+  "preview": false,
+  "pages": {
+    "feature-01": {
+      "html": "49f55889872d9f8567602c2f0f0e0a0a8bbaacc6b85d10c8afbb87a3e4999117",
+      "markdown": "4378a27041a6bc4822c83e5ca1faae9c647f8829c8c47040f71f6a214073eab9"
+    },
+    "feature-02": {
+      "html": "d7eede149640d186818ce3909a1d99d19f771c21d37bdaa535d39e83e6a59af8",
+      "markdown": "2edd320c489693f6f78de819b006c9fa76e0f97e257f5ea764b302ba9e781553"
+    },
+    "feature-03": {
+      "html": "5278e0f12c36a412d6b289ca21607594370c9fd77842407f861d2d525a851714",
+      "markdown": "cf2251b40c92b385432da90f226ad90f9603ad08f9a1fdc0ab9227d792ca9c53"
+    },
+    "feature-04": {
+      "html": "b7438ddab6efb217c5546a19384f337e2c67472a15cd0923a0b3d4c81a7da751",
+      "markdown": "b27eebf3807fce2baaf9b6e7d0126f017727921821825fe54823753b0349364a"
+    },
+    "feature-05": {
+      "html": "e7b277388ac847e7ee5d9b6e22af33601111b86c4651761ec61ec4fa6ee63d95",
+      "markdown": "efc7b385005cde88dcac2f9347dba3550dcc201eca8a44c8cc364b2cfd719c92"
+    },
+    "feature-06": {
+      "html": "3400cc12684141662e4e6f07f6b7d798c9e65140e3b1f3e1b36fcfdf5abb8e30",
+      "markdown": "0d34049bdf1114804062826ee54f3c7fb354adc951eb105d72b5444b9b97db27"
+    },
+    "feature-07": {
+      "html": "fadadac8731a673c13f11ee64910e7dcb1a9d55ea80bf7d544ce58853a8108a6",
+      "markdown": "58bbf6c3d20ba96fff46dbe2283d4656262e447304d0f4d22372dfacc8048059"
+    },
+    "feature-08": {
+      "html": "369f1f445a307684d3a8c7b915e0edbe0bc3ed9674c94b3ffa64693187f4ebc3",
+      "markdown": "5b2c94093aa5f63bd9b7886579520371dc1ec2e577d60d197a0ec50f54c828b0"
+    },
+    "feature-09": {
+      "html": "bb8befd37c4a42371f5ef40c3674847890a60e78584efb344f1ebf86ac2ec698",
+      "markdown": "5a117b5abbd986c2a4f748e8cf564a7ce4cb9c22b2da2715a5983ea562444832"
+    },
+    "feature-10": {
+      "html": "aa115472b6345586d3335369a5b658a62c173481360e4f23399a221c36738b38",
+      "markdown": "c11112a39b1b443a4bea03ddc90f4dd382e72d9bc8a6544837b06d7f935fc5d5"
+    },
+    "feature-11": {
+      "html": "25ac3907c535c3dfe7325655c05d2035638b0a4094ab12602ac4069e43b2b10c",
+      "markdown": "c7ed5e98d3fcd0a57c7b8705613c2cccffd5c664170309a0939f9ef176cac520"
+    },
+    "feature-12": {
+      "html": "f02c3842098310d53b0aa650cc1b338abb0239a68b8a9283e9aa9f6e32415499",
+      "markdown": "12d1a06f99adba640fbb93002d62188bf2b22abcb80b55b099cd3e8646652b91"
+    },
+    "feature-13": {
+      "html": "c14fe1aba3de151dd8cf41112197f382a26870e0253826f30c344a6acd51b087",
+      "markdown": "747ad58904902bc9faceb72649b96b590fdc78e85902d3aef3456ca1f631e3a4"
+    },
+    "feature-14": {
+      "html": "d2ff2875e787a4d874f37488e552de99b08a7e0447bb8349167d612f2bd89a2a",
+      "markdown": "1d904c271703f4ac32aca794d78189a7a8c9e6723afec6aa4b3e877010c91e1e"
+    },
+    "feature-15": {
+      "html": "32b7f66dc1f78b26be5d7433a3c42b5d256e34cf6d8bd8575dcb8488e71e717e",
+      "markdown": "412b2f241d961bef9b74231165bc3b9056c1226289754c7c504a35772666f6ea"
+    }
+  },
+  "source_links_version": 1,
+  "prepared_at": "2026-11-25T06:00:02.002286+03:00",
+  "release_not_before": "2026-11-25T06:00:00+03:00",
+  "brief_policy_revision": 2,
+  "mosaic_revision": 2,
+  "illustrations": [
+    {
+      "key": "cfb07c1aa2ce1c98babf3188585a88a8bf28f11d2c076dcfe579169482acd034",
+      "article_id": "bbaf063f3db28261430537e88f7458c83003d8159bb1bb79e1653ac39670c116",
+      "description_hash": "ad58cb26058923c801bbd591095093f627130777dd8d8ccc5f09dfe4d339dacf",
+      "genre": "Акварель",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-25",
+      "text_hash": "613c8c0f34e4a3c930e71ee039626806b6794a44bae4bbaa5d076343e0adf802",
+      "protocol": 2,
+      "article_slug": "feature-04",
+      "sha256": "f9eeb07c8dd0bad4647e5d0a8d7163f75a5b33d1224ae4592e4bcca73aa15b9b",
+      "width": 896,
+      "height": 896,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-25/watercolor",
+      "reference_artwork_ids": [
+        "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+        "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb"
+      ],
+      "reference_sha256": [
+        "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727"
+      ],
+      "selected_reference_id": "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.78688,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.69555,
+        "palette_diversity": 1,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "groups": [
+          {
+            "color": "#897858",
+            "share": 0.1186,
+            "lab": [
+              51.217,
+              1.568,
+              20.013
+            ]
+          },
+          {
+            "color": "#767354",
+            "share": 0.112,
+            "lab": [
+              47.948,
+              -4.227,
+              17.621
+            ]
+          },
+          {
+            "color": "#585848",
+            "share": 0.1091,
+            "lab": [
+              36.971,
+              -3.126,
+              9.308
+            ]
+          },
+          {
+            "color": "#74694f",
+            "share": 0.1046,
+            "lab": [
+              44.775,
+              -0.021,
+              16.229
+            ]
+          },
+          {
+            "color": "#918863",
+            "share": 0.0951,
+            "lab": [
+              56.614,
+              -2.622,
+              21.13
+            ]
+          },
+          {
+            "color": "#878360",
+            "share": 0.0897,
+            "lab": [
+              54.269,
+              -4.403,
+              19.516
+            ]
+          },
+          {
+            "color": "#ac9978",
+            "share": 0.0822,
+            "lab": [
+              64.088,
+              1.884,
+              19.941
+            ]
+          },
+          {
+            "color": "#9b936f",
+            "share": 0.0699,
+            "lab": [
+              60.768,
+              -2.941,
+              20.171
+            ]
+          },
+          {
+            "color": "#f0e8df",
+            "share": 0.0696,
+            "lab": [
+              92.383,
+              1.167,
+              5.331
+            ]
+          },
+          {
+            "color": "#9e886a",
+            "share": 0.0557,
+            "lab": [
+              57.96,
+              3.716,
+              19.21
+            ]
+          },
+          {
+            "color": "#745d48",
+            "share": 0.047,
+            "lab": [
+              41.232,
+              6.125,
+              15.611
+            ]
+          },
+          {
+            "color": "#c1b296",
+            "share": 0.0465,
+            "lab": [
+              73.142,
+              0.842,
+              16.273
+            ]
+          }
+        ],
+        "dominant": [
+          "#897858"
+        ],
+        "secondary": [
+          "#897858",
+          "#767354",
+          "#585848",
+          "#74694f",
+          "#918863",
+          "#878360",
+          "#ac9978",
+          "#9b936f",
+          "#f0e8df",
+          "#9e886a"
+        ],
+        "accent": [
+          "#745d48",
+          "#c1b296"
+        ],
+        "temperature": "warm",
+        "saturation": "moderate",
+        "saturation_value": 0.284,
+        "lightness": 54.83,
+        "dark_share": 0.008,
+        "light_share": 0.087,
+        "contrast": "moderate",
+        "contrast_value": 54.45
+      },
+      "art_movement": "reference-defined movement",
+      "medium": "watercolor",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MISMATCH",
+        "lab_distance": 49.715,
+        "reference_temperature": "warm",
+        "generated_temperature": "neutral",
+        "reference_saturation": 0.284,
+        "generated_saturation": 0.055,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "f9eeb07c8dd0bad4647e5d0a8d7163f75a5b33d1224ae4592e4bcca73aa15b9b",
+          "groups": [
+            {
+              "color": "#fbfcf9",
+              "share": 0.1096,
+              "lab": [
+                98.816,
+                -0.854,
+                1.317
+              ]
+            },
+            {
+              "color": "#f3efe9",
+              "share": 0.1079,
+              "lab": [
+                94.599,
+                0.301,
+                3.369
+              ]
+            },
+            {
+              "color": "#f3f2ec",
+              "share": 0.1003,
+              "lab": [
+                95.419,
+                -0.712,
+                3.006
+              ]
+            },
+            {
+              "color": "#dfe1d9",
+              "share": 0.0894,
+              "lab": [
+                89.181,
+                -2.093,
+                3.671
+              ]
+            },
+            {
+              "color": "#f7f6f0",
+              "share": 0.0872,
+              "lab": [
+                96.811,
+                -0.71,
+                2.997
+              ]
+            },
+            {
+              "color": "#faf8f1",
+              "share": 0.0861,
+              "lab": [
+                97.555,
+                -0.544,
+                3.589
+              ]
+            },
+            {
+              "color": "#fafbf5",
+              "share": 0.0791,
+              "lab": [
+                98.397,
+                -1.374,
+                2.753
+              ]
+            },
+            {
+              "color": "#ecebe5",
+              "share": 0.0781,
+              "lab": [
+                92.974,
+                -0.715,
+                3.023
+              ]
+            },
+            {
+              "color": "#d3c7b6",
+              "share": 0.0755,
+              "lab": [
+                80.78,
+                1.338,
+                10.011
+              ]
+            },
+            {
+              "color": "#ece2d7",
+              "share": 0.0731,
+              "lab": [
+                90.383,
+                1.539,
+                6.582
+              ]
+            },
+            {
+              "color": "#f4ece0",
+              "share": 0.06,
+              "lab": [
+                93.713,
+                0.667,
+                6.768
+              ]
+            },
+            {
+              "color": "#faf5ea",
+              "share": 0.0536,
+              "lab": [
+                96.644,
+                -0.202,
+                5.879
+              ]
+            }
+          ],
+          "dominant": [
+            "#fbfcf9"
+          ],
+          "secondary": [
+            "#fbfcf9",
+            "#f3efe9",
+            "#f3f2ec",
+            "#dfe1d9",
+            "#f7f6f0",
+            "#faf8f1",
+            "#fafbf5",
+            "#ecebe5",
+            "#d3c7b6",
+            "#ece2d7",
+            "#f4ece0",
+            "#faf5ea"
+          ],
+          "accent": [],
+          "temperature": "neutral",
+          "saturation": "low",
+          "saturation_value": 0.055,
+          "lightness": 93.63,
+          "dark_share": 0.0,
+          "light_share": 0.981,
+          "contrast": "low",
+          "contrast_value": 17.52
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "wire_sha256": "a71f2dc5cd2abf49d9cbcb64cb97a1af85defdbd46f7be1fc96a88cb9a9957e6",
+        "decoded_pixels_sha256": "e02a3fd29933bd51c3ab96238c0c4e58cbdbea2ee2ad7247b310fc018e3c8439",
+        "width": 480,
+        "height": 340
+      },
+      "path": "assets/illustrations/2026-11-25/cfb07c1aa2ce1c98babf3188585a88a8bf28f11d2c076dcfe579169482acd034.webp"
+    },
+    {
+      "key": "3823566b5bfbe0ad1c58c34ef89f352191185b9435829dcafbee38a5a8808ae8",
+      "article_id": "0b8514f073b543ca5c03d6c8537a71eafecc75b8b1aba03beae018ebbe76d9a8",
+      "description_hash": "b24da311fc07dc6302a9e2c78a1157b22d5c94020a7c10a18053ec132c1f14f2",
+      "genre": "Акварель",
+      "ratio": "16:9",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-25",
+      "text_hash": "9cd9ff4f85486f01488bf1cd7e65c7df2ec3c384152d4b7a1ef4327b2461c238",
+      "protocol": 2,
+      "article_slug": "feature-11",
+      "sha256": "679c23dfd96f26a64166f8a01e6b3965d305f75b65bbc6002f6f54fde96ce1a7",
+      "width": 1024,
+      "height": 576,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-2-klein-4b",
+      "reference_status": "ONE_REFERENCE_READY",
+      "reference_set_id": "2026-11-25/watercolor",
+      "reference_artwork_ids": [
+        "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+        "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb"
+      ],
+      "reference_sha256": [
+        "72b777637b0a6477eaf6a5bd28e420e43258e7a256e17e318f6f368979905df5",
+        "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727"
+      ],
+      "selected_reference_id": "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb",
+      "reference_images_sent": 1,
+      "reference_selection_version": "387-reference-selection-1",
+      "reference_selection_score": 0.61625,
+      "reference_selection_reason": {
+        "metadata_and_tonal_proxy": 0.63967,
+        "palette_diversity": 0.56161,
+        "weights": {
+          "meaning": 0.7,
+          "diversity": 0.3
+        },
+        "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+        "preserved_for_prompt_correction": false
+      },
+      "palette": {
+        "version": "387-color-lab-1",
+        "sha256": "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727",
+        "groups": [
+          {
+            "color": "#77726a",
+            "share": 0.1161,
+            "lab": [
+              48.257,
+              0.404,
+              5.118
+            ]
+          },
+          {
+            "color": "#514944",
+            "share": 0.1095,
+            "lab": [
+              31.651,
+              2.369,
+              4.207
+            ]
+          },
+          {
+            "color": "#dfd2c2",
+            "share": 0.0991,
+            "lab": [
+              84.831,
+              1.827,
+              9.538
+            ]
+          },
+          {
+            "color": "#f2e7d3",
+            "share": 0.0966,
+            "lab": [
+              92.013,
+              0.437,
+              11.068
+            ]
+          },
+          {
+            "color": "#dccebd",
+            "share": 0.0939,
+            "lab": [
+              83.46,
+              2.041,
+              10.2
+            ]
+          },
+          {
+            "color": "#d8cbb8",
+            "share": 0.0916,
+            "lab": [
+              82.256,
+              1.373,
+              11.102
+            ]
+          },
+          {
+            "color": "#ddcfbe",
+            "share": 0.0894,
+            "lab": [
+              83.818,
+              2.038,
+              10.19
+            ]
+          },
+          {
+            "color": "#e1d4c4",
+            "share": 0.0863,
+            "lab": [
+              85.545,
+              1.822,
+              9.52
+            ]
+          },
+          {
+            "color": "#dbccba",
+            "share": 0.0703,
+            "lab": [
+              82.803,
+              2.253,
+              10.848
+            ]
+          },
+          {
+            "color": "#dfd1bf",
+            "share": 0.0614,
+            "lab": [
+              84.51,
+              1.874,
+              10.669
+            ]
+          },
+          {
+            "color": "#beb5a4",
+            "share": 0.0541,
+            "lab": [
+              73.982,
+              0.278,
+              9.805
+            ]
+          },
+          {
+            "color": "#dcd1c1",
+            "share": 0.0318,
+            "lab": [
+              84.312,
+              1.113,
+              9.293
+            ]
+          }
+        ],
+        "dominant": [
+          "#77726a"
+        ],
+        "secondary": [
+          "#77726a",
+          "#514944",
+          "#dfd2c2",
+          "#f2e7d3",
+          "#dccebd",
+          "#d8cbb8",
+          "#ddcfbe",
+          "#e1d4c4",
+          "#dbccba",
+          "#dfd1bf",
+          "#beb5a4"
+        ],
+        "accent": [
+          "#dcd1c1"
+        ],
+        "temperature": "warm",
+        "saturation": "low",
+        "saturation_value": 0.154,
+        "lightness": 74.26,
+        "dark_share": 0.04,
+        "light_share": 0.734,
+        "contrast": "high",
+        "contrast_value": 60.33
+      },
+      "art_movement": "reference-defined movement",
+      "medium": "watercolor",
+      "color_match": {
+        "metric": "CIELAB_GREEDY_COLOR_MASS_TRANSPORT_V1",
+        "status": "COLOR_MATCH_WARNING",
+        "lab_distance": 16.397,
+        "reference_temperature": "warm",
+        "generated_temperature": "warm",
+        "reference_saturation": 0.154,
+        "generated_saturation": 0.182,
+        "generated_profile": {
+          "version": "387-color-lab-1",
+          "sha256": "679c23dfd96f26a64166f8a01e6b3965d305f75b65bbc6002f6f54fde96ce1a7",
+          "groups": [
+            {
+              "color": "#191413",
+              "share": 0.114,
+              "lab": [
+                6.811,
+                2.127,
+                1.43
+              ]
+            },
+            {
+              "color": "#f7f1df",
+              "share": 0.0993,
+              "lab": [
+                95.166,
+                -1.001,
+                9.404
+              ]
+            },
+            {
+              "color": "#a28f79",
+              "share": 0.0986,
+              "lab": [
+                60.523,
+                3.542,
+                14.324
+              ]
+            },
+            {
+              "color": "#fefcef",
+              "share": 0.0935,
+              "lab": [
+                98.798,
+                -1.548,
+                6.453
+              ]
+            },
+            {
+              "color": "#f8e9d0",
+              "share": 0.0892,
+              "lab": [
+                92.922,
+                1.083,
+                13.985
+              ]
+            },
+            {
+              "color": "#e5dfcf",
+              "share": 0.0811,
+              "lab": [
+                88.894,
+                -0.676,
+                8.562
+              ]
+            },
+            {
+              "color": "#f7dcbd",
+              "share": 0.0775,
+              "lab": [
+                89.223,
+                4.634,
+                18.654
+              ]
+            },
+            {
+              "color": "#bbb4a2",
+              "share": 0.0765,
+              "lab": [
+                73.426,
+                -0.625,
+                10.07
+              ]
+            },
+            {
+              "color": "#735c4a",
+              "share": 0.0717,
+              "lab": [
+                40.887,
+                6.558,
+                13.916
+              ]
+            },
+            {
+              "color": "#3f332e",
+              "share": 0.0693,
+              "lab": [
+                22.38,
+                4.437,
+                5.187
+              ]
+            },
+            {
+              "color": "#d7c5ae",
+              "share": 0.0676,
+              "lab": [
+                80.425,
+                2.619,
+                13.832
+              ]
+            },
+            {
+              "color": "#fcf2da",
+              "share": 0.0616,
+              "lab": [
+                95.69,
+                -0.55,
+                12.784
+              ]
+            }
+          ],
+          "dominant": [
+            "#191413"
+          ],
+          "secondary": [
+            "#191413",
+            "#f7f1df",
+            "#a28f79",
+            "#fefcef",
+            "#f8e9d0",
+            "#e5dfcf",
+            "#f7dcbd",
+            "#bbb4a2",
+            "#735c4a",
+            "#3f332e",
+            "#d7c5ae",
+            "#fcf2da"
+          ],
+          "accent": [],
+          "temperature": "warm",
+          "saturation": "low",
+          "saturation_value": 0.182,
+          "lightness": 69.08,
+          "dark_share": 0.178,
+          "light_share": 0.582,
+          "contrast": "high",
+          "contrast_value": 92.96
+        },
+        "quality_claim": "COLOR_ONLY_NOT_ARTISTIC_QUALITY"
+      },
+      "reference_transport": {
+        "format": "PNG",
+        "library_sha256": "3cde55951c7feb5c40b5492ce1a85fae58ed323f1e7c942c254c4641fbce4727",
+        "wire_sha256": "6bf8a4a65509ceed757bb169e61c33b803d21ca2de26042c25f017aec978cea7",
+        "decoded_pixels_sha256": "f08eb7da04588a6668326a5770ae9d804de8ec24a672970ebeac408885108767",
+        "width": 285,
+        "height": 480
+      },
+      "path": "assets/illustrations/2026-11-25/3823566b5bfbe0ad1c58c34ef89f352191185b9435829dcafbee38a5a8808ae8.webp"
+    }
+  ],
+  "art44": {
+    "status": "ARTWORK_INCOMPLETE",
+    "required": 15,
+    "ready": 2,
+    "missing": 13,
+    "emergency_text": true,
+    "provider_status": "READY",
+    "bindings": [
+      {
+        "key": "6e764aa82118234f01d89e84257c17c7e0358ee2886ac7a25a0952ff6e78eed2",
+        "date": "2026-11-25",
+        "article_id": "2fc7cb0bb4bd5ce3d652585bdb658a4125146d7e1ec3ab03d9b76808d659fc79",
+        "text_hash": "8c760639fe2ef592fa192c28354d4422d5234d4fa2e66c180772de8c13bfa9e0",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "a90b0c8c7c7032889fa7d0836ba3357dff5863541b694496f7ad57e3933796da",
+        "genre": "Ар-нуво",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-01"
+      },
+      {
+        "key": "a53aa52c6f0aa7b79ac1638ff2e441e6a927e8221efeb0d93db8e0203d8be804",
+        "date": "2026-11-25",
+        "article_id": "27d5f128fdb819a0d46bd9d7a64aeef904e9a8fae38c6d8865eca5342cc712fa",
+        "text_hash": "6bc1ee51591cd4ecf25846b9c4948aa770eb9de700a39334f9f09a2a098813a6",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "c00af8edb40633a1644e76a7f1162a9eaaf406891df722c895f334608a434609",
+        "genre": "Футуризм",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-02"
+      },
+      {
+        "key": "97ef7e768011741823b41090469e11e5d31cfa330174cd8d7ffd42e794286404",
+        "date": "2026-11-25",
+        "article_id": "d77c776d07b6b06c53b007f54f41edd65cfcd310afa23032f8a6a72824b0d28f",
+        "text_hash": "e0c0e2b80015324a9eb87df6ccdd9fd001ac999167bab012c0b769e6ecd0ac04",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "977b6c6780f64155a7f3510ff883348f64bba8f5ee6540648641be4a3d78da5e",
+        "genre": "Футуризм",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-03"
+      },
+      {
+        "key": "cfb07c1aa2ce1c98babf3188585a88a8bf28f11d2c076dcfe579169482acd034",
+        "date": "2026-11-25",
+        "article_id": "bbaf063f3db28261430537e88f7458c83003d8159bb1bb79e1653ac39670c116",
+        "text_hash": "613c8c0f34e4a3c930e71ee039626806b6794a44bae4bbaa5d076343e0adf802",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "ad58cb26058923c801bbd591095093f627130777dd8d8ccc5f09dfe4d339dacf",
+        "genre": "Акварель",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-04"
+      },
+      {
+        "key": "75311fc2079a0487c26f869159834184d517b27da934e5a5745e2ea5003de471",
+        "date": "2026-11-25",
+        "article_id": "8b1b586046c9b0c1285110d640831383664ba1f9e4e4a422780dd11fa1044a1c",
+        "text_hash": "9873193290a35d96c513b3d5e3644a8aac3a0c39511f891c8deffad211107e9f",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "1b4ec8318a65fa21684b0270221a58626774389ac223c295152df59f6e9514ac",
+        "genre": "Конструктивизм",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-05"
+      },
+      {
+        "key": "a3c055ea7c9b32e43270367b45c3615172667a99380318adc90cc0d97e5f33e6",
+        "date": "2026-11-25",
+        "article_id": "f7f39af495b1a7775d03a112311a92539cc0d6de709f793ad987a2ec4be635c4",
+        "text_hash": "d566a6e0f4d248ba664ec25466dacdfe77f8952b316afb96affbbd72b5f13e0f",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "229e1d39feb8580bd4cb2ea7f7675c356010e6e19c7566c74f7710400d874857",
+        "genre": "Коллаж",
+        "ratio": "16:9",
+        "protocol": 2,
+        "article_slug": "feature-06"
+      },
+      {
+        "key": "7f68628ecb5e7db62422ad3a55089239a80177bd684f9f4a2694127a9ee0f68b",
+        "date": "2026-11-25",
+        "article_id": "e3e9142c5cb3c6b2b652c4ed1251ddfeafd2f5a33fb68da24dcf14e70d6f5558",
+        "text_hash": "6f9c0ced5e752e214fe70b420c4fcd573fcdc778b18967234ddcb11d552f1fca",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "a781ed50eb77fa27faa64aeaf178b4ec10e0950e4c2aac52e7949bb26ee47c99",
+        "genre": "Офорт",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-07"
+      },
+      {
+        "key": "15620ddc7c40b14c5626f5f889bbe78891eef3204f12be1a5c820c7c9b2c9fd8",
+        "date": "2026-11-25",
+        "article_id": "8d871f9b89ae9940eecff8dd12e9c44597672c636dbfc2c10d8ce6346547d69e",
+        "text_hash": "1a0cd1b1cdbeb4b23763d461a16d0a77666e1c8176cf348b727b11dbbe171e1f",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "ae88e7f4f7ed4c36efac45c1559ab18e2246d8ab2e5f77be8169d897aed89477",
+        "genre": "Импрессионизм",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-08"
+      },
+      {
+        "key": "c783f25cde1b72c0ae68199bf0d65a660bc086219da8795c4f65efc077b3be31",
+        "date": "2026-11-25",
+        "article_id": "1510afecb532cd27ad5100e7094676fd0e8a4f0b7e723f8ec85980e1489872ea",
+        "text_hash": "90011364dc0be55f265cf97ff9b150e61a48c1775454ec8b9384deb150fcde88",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "8b7c8941b7e9ab4cd1f2edf9b02801e641089420219d902a17d00ed9d04d226c",
+        "genre": "Пастель",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-09"
+      },
+      {
+        "key": "e8d0bd2dcb9a6d77f0cddafedf1446aae5becdc98f720e8d25dffc072a3162f8",
+        "date": "2026-11-25",
+        "article_id": "92cbd027bbf1aeae17e99c00a689559ef020bee943c8b4eb7abd50d2b9e82508",
+        "text_hash": "e639fa6446b46e6e5095769f46efd7574bc7a1dda8aa709e1d4c779863a4534a",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "dac057a59e21ff47aa6d821ed397e742c66c7c627efe5183ce6409c89e63d991",
+        "genre": "Кубизм",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-10"
+      },
+      {
+        "key": "3823566b5bfbe0ad1c58c34ef89f352191185b9435829dcafbee38a5a8808ae8",
+        "date": "2026-11-25",
+        "article_id": "0b8514f073b543ca5c03d6c8537a71eafecc75b8b1aba03beae018ebbe76d9a8",
+        "text_hash": "9cd9ff4f85486f01488bf1cd7e65c7df2ec3c384152d4b7a1ef4327b2461c238",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "b24da311fc07dc6302a9e2c78a1157b22d5c94020a7c10a18053ec132c1f14f2",
+        "genre": "Акварель",
+        "ratio": "16:9",
+        "protocol": 2,
+        "article_slug": "feature-11"
+      },
+      {
+        "key": "0e592ef84232b28aed11aee43a0ee31d229a3c3376304970f5bbe2f61527346c",
+        "date": "2026-11-25",
+        "article_id": "e518ec561110490a83b64913fa567e4518d85bc81fb254bc4f99fc580ad298ba",
+        "text_hash": "86fddee3f492ba83ca9efe5b6c4ade7face65e55aa62d5d1fe0e9a30dffcf23d",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "78abfa5812385803caac79dfcd727a3ee7d016312659f302007d8c4ba74a6b36",
+        "genre": "Экспрессионизм",
+        "ratio": "3:2",
+        "protocol": 2,
+        "article_slug": "feature-12"
+      },
+      {
+        "key": "0593ab98e34c599a9b2dbd8fd232677def75a505a8acc45f6ec284258f2fde26",
+        "date": "2026-11-25",
+        "article_id": "43d246f073e318a75f13731b5f36d7a86dda2727fc9d8f07af30d261b1f10b9e",
+        "text_hash": "e2d77d0e6cb9e1129190e6fd5787413d84e485a9e8336293b2479ad1245389a7",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "588ff46e59acd7b840dcad0de89f4251935e9e4c6aceb62dc6578fecc08dc4a4",
+        "genre": "Ар-деко",
+        "ratio": "4:5",
+        "protocol": 2,
+        "article_slug": "feature-13"
+      },
+      {
+        "key": "0039b10aa0adf6d44cfb5bf87a6132929470c4bc018660ed7f562d47b3a1a808",
+        "date": "2026-11-25",
+        "article_id": "1c34f08970e87abed9bcf949692f74b1c0532a9cc91c17e8170d04d048a3f9d1",
+        "text_hash": "88482f24afd8ab5f3dd14545ae77d9a82f49fcae92966eb4cbe936978bafdea1",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "359eda7bcbe3fd930e9cc667054e6e9eddfa1f1dc211b468ce7c2a92d84583d2",
+        "genre": "Масло",
+        "ratio": "1:1",
+        "protocol": 2,
+        "article_slug": "feature-14"
+      },
+      {
+        "key": "c7c6a33b56fd9272ede2fcf4c60eda78a4cf5f947c58bbb3df5f501d97bd0409",
+        "date": "2026-11-25",
+        "article_id": "99db43b5a703a13bcc55bbc456e0d55f4304dab661a08fba36d7e044b6f571b1",
+        "text_hash": "2ed8154085ca05c7d9ff8c62f9ed345b08d7010531e7098c965883147e92efdc",
+        "prompt_version": "387-art-single-reference-6-png",
+        "description_hash": "e812212be7160859a440ae50eb016c2a336abee07678ed9462989898b349a05f",
+        "genre": "Геометрическая абстракция",
+        "ratio": "3:4",
+        "protocol": 2,
+        "article_slug": "feature-15"
+      }
+    ]
+  },
+  "light_news": [
+    {
+      "kind": "unusual_fact",
+      "title": "Масштабы Аравийского полуострова",
+      "text": "Аравийский полуостров является крупнейшим в мире. Его площадь составляет около 3 237 500 квадратных километров, а на его территории расположено девять государств.",
+      "source": {
+        "url": "https://www.discoverwildlife.com/animal-facts/arabian-peninsula-what-is-it",
+        "title": "It's bigger than India, scorching hot and almost waterless: The deadly wilderness hiding some of the world's rarest creatures",
+        "publisher": "Discover Wildlife",
+        "language": "en",
+        "published": "2026-11-21T21:40:27+00:00"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Дорога на работу как рабочее время",
+      "text": "Большинство опрошенных жителей Москвы поддержали идею учитывать долгую дорогу в офис в составе рабочего времени или компенсировать её. Предложение касается поездок, занимающих более полутора часов в одну сторону.",
+      "source": {
+        "url": "https://moskvichmag.ru/gorod/76-moskvichej-za-to-chtoby-dolguyu-dorogu-v-ofis-schitat-rabochim-vremenem/",
+        "title": "76% москвичей за то, чтобы долгую дорогу в офис считать рабочим временем",
+        "publisher": "Москвич Mag",
+        "language": "ru",
+        "published": "2026-11-17T07:50:31+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Интервью о древних истоках свободной речи",
+      "text": "Редактор Марк Бауэрлайн обсудил с Майклом Фонтейном его книгу, посвященную античным традициям свободной речи и инакомыслия. Беседа доступна для прослушивания в формате подкаста.",
+      "source": {
+        "url": "https://firstthings.com/the-birth-of-free-speech/",
+        "title": "The Birth of Free Speech",
+        "publisher": "First Things",
+        "language": "en",
+        "published": "2026-11-23T10:00:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Деликатес из муравьиных личинок",
+      "text": "В Мексике блюдо из съедобных личинок и куколок муравьев под названием эскамолес известна как «пустынная икра». Сбор этого продукта требует аккуратного извлечения личинок из подземелий агрессивных древесных муравьев.",
+      "source": {
+        "url": "https://www.mentalfloss.com/food/what-are-escamoles-mexican-caviar?utm_source=RSS",
+        "title": "The Most Expensive Eggs in Mexico Don't Come From Fish",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-23T23:00:00Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Восприятие лиц, созданных искусственным интеллектом",
+      "text": "Исследование психологов показало, что участники эксперимента воспринимали сгенерированные искусственным интеллектом лица как более реалистичные, чем лица реальных людей. При этом у пожилых людей эта гиперреалистичная предвзятость проявлялась сильнее.",
+      "source": {
+        "url": "https://nautil.us/what-goes-on-in-our-brains-when-we-see-an-ai-face-1286763/",
+        "title": "What Goes on in Our Brains When We See an AI Face",
+        "publisher": "nautil.us",
+        "language": "en",
+        "published": "2026-11-17T22:30:00+00:00"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Философские споры о сознании ИИ",
+      "text": "В 1974 году философ Томас Нагель опубликовал эссе, проиллюстрировавшее сложность определения субъективного опыта на примере летучей мыши. В современном контексте попытки приписать сознание языковым моделям вызывают острые дискуссии среди ученых.",
+      "source": {
+        "url": "https://www.technologyreview.com/2026/11/23/1149569/a-legendary-philosopher-isnt-buying-anthropics-consciousness-argument/",
+        "title": "A legendary philosopher isn’t buying Anthropic’s consciousness argument",
+        "publisher": "MIT Technology Review",
+        "language": "en",
+        "published": "2026-11-23T12:36:08-05:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Первый парад в Нью-Йорке",
+      "text": "27 ноября 1924 года в Нью-Йорке прошёл первый парад в честь Дня благодарения, организованный универмагом Macy's. Эта традиция стала ежегодной для многих американцев.",
+      "source": {
+        "url": "https://www.mentalfloss.com/holidays/thanksgiving/solve-thanksgiving-themed-crossword-puzzle?utm_source=RSS",
+        "title": "Can You Solve This Thanksgiving-Themed Crossword Puzzle?",
+        "publisher": "Mental Floss",
+        "language": "en",
+        "published": "2026-11-24T00:00:01Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Назначение виртуальной машины Java",
+      "text": "Язык программирования Java использует виртуальную машину (JVM) для обеспечения работы приложений на различных типах аппаратного обеспечения и операционных систем.",
+      "source": {
+        "url": "https://theconversation.com/ai-helps-uncover-critical-flaw-in-ubiquitous-internet-software-296930",
+        "title": "AI helps uncover critical flaw in ubiquitous internet software",
+        "publisher": "The Conversation",
+        "language": "en",
+        "published": "2026-11-18T21:43:47Z"
+      }
+    },
+    {
+      "kind": "source_report",
+      "title": "Метод определения влажности почвы",
+      "text": "Ученые предложили способ оценки содержания влаги в почве, основанный на наблюдении за скоростью распространения компрессионных волн. Этот подход использует теорию физики горных пород для анализа частотной зависимости скорости волн в частично насыщенных зернистых средах.",
+      "source": {
+        "url": "https://eos.org/editor-highlights/soil-water-content-determined-by-elastic-wave-dispersion",
+        "title": "Soil Water Content Determined by Elastic Wave Dispersion - Eos",
+        "publisher": "Eos",
+        "language": "en",
+        "published": "2026-11-17T14:00:00+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "История феномена Эль-Ниньо",
+      "text": "Термин Эль-Ниньо возник после завоевания империи инков в XVI веке. Первоначально рыбаки так назвали ежегодное потепление воды около берегов Перу примерно во время Рождества.",
+      "source": {
+        "url": "https://aeon.co/essays/what-can-we-learn-from-the-past-experience-of-el-nino",
+        "title": "What can we learn from the past experience of El Niño?",
+        "publisher": "aeon.co",
+        "language": "en",
+        "published": "2026-11-23T11:00:00.000Z"
+      }
+    },
+    {
+      "kind": "unusual_fact",
+      "title": "Образовательные материалы о диких пчелах",
+      "text": "Существует более 20 000 видов пчел, большинство из которых являются дикими и не производят мед. Новые учебные программы помогают школьникам узнать об их роли в опылении растений и сохранении биоразнообразия.",
+      "source": {
+        "url": "https://news.mongabay.com/short-article/2026/11/mongabay-kids-launches-wild-guardians-a-free-education-initiative-to-engage-children-with-nature/",
+        "title": "Mongabay Kids launches Wild Guardians: A free education initiative to engage children with nature",
+        "publisher": "Mongabay Environmental News",
+        "language": "en",
+        "published": "2026-11-23T19:22:18+00:00"
+      }
+    },
+    {
+      "kind": "historical_fact",
+      "title": "Столыпинская аграрная реформа",
+      "text": "Начатая в 1906 году земельная реформа Петра Столыпина была направлена на формирование класса зажиточных собственников. К концу 1916 года на обособленных участках хозяйствовало около 10,7% крестьянских дворов Европейской России.",
+      "source": {
+        "url": "https://expert.ru/ekonomika/po-nadelam-vashim-vozdastsya-vam",
+        "title": "Почему столыпинский передел собственности не смог спасти монархию",
+        "publisher": "expert.ru",
+        "language": "ru",
+        "published": "2026-11-18T19:10:00+03:00"
+      }
+    }
+  ],
+  "light_count": 12,
+  "homepage_hash": "602b03558329b22117318baeb225bb97d2fead7e46a58782a5d172876632fa70",
+  "overview_hash": "149a8e1f0aaa2c3031ecd7db4e6f61c31366ef2f2f723dbc3facdb324f2b9b65",
+  "markdown_hash": "834d4ee7c0f76368c7234bda90702742c1cd7f66e3b31d99828ae4ece917ce55"
+}
