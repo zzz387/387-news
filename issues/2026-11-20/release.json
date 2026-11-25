@@ -53,15 +53,15 @@
       "markdown": "8c67de23208df83f26a60cf0a67369acee5adee9dfbceb034bd05d5f6a0b3043"
     },
     "feature-12": {
-      "html": "7841ef54ebb4284513e391a3c3bad2bc3fd336594cd481dcdd13f0ac471120cb",
+      "html": "d7f2eb80697e11a2ee97f5b9f23978047c92cf3401767bc6522bef8997131782",
       "markdown": "7ed89e128f0645b7d0ba0ab6d5bff4ac517c3b4815d0241ded37fb91df4073a2"
     },
     "feature-13": {
-      "html": "ec74ca54c74cba553be4f0e02e667d7e626444d79e7d2df4caef2c9a5692bbe0",
+      "html": "3b4b5762299865b87f6dab7fe181105860dd86f37882715758fad5dae215d8ab",
       "markdown": "da7ad7243761df4b25f1792851db4280af1555ae4c050e59507ed217bf0f2a7d"
     },
     "feature-14": {
-      "html": "9f5c0cdaf1dc8c47a35fd0322345a1492d9a11a50564bf834d2ef84485af92f4",
+      "html": "f00bc496dddd967e1f82eca8867e6e0ab826e3b02aa1a9e0ae74e752834bb906",
       "markdown": "97774b08bb21bfffee5c27777cc580025063858a46e710984242fa83dd5cd311"
     }
   },
@@ -261,13 +261,70 @@
       "model": "@cf/black-forest-labs/flux-1-schnell",
       "palette": "reference-derived",
       "path": "assets/illustrations/2026-11-20/7a681f2e8a40d73dcfc6c0b6740f6d56ebccab252e28d7bfbc4a8f6d73090ed4.webp"
+    },
+    {
+      "key": "e8c2f7ba35123d41c7f48c7600398125ff301ada6661d99a1a0e80afbe7e976d",
+      "article_id": "9f0e054936778e4449d570d66f5d962e3775d7c71d2bfb954bf0f73c5293b3dc",
+      "description_hash": "51d60ba5e946a074a65e336cc782b04ea7c4da69c2112dc63f6799303fddbf80",
+      "genre": "Импрессионизм",
+      "ratio": "4:5",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "19b2b4e2aafa2d6db1bb9933aabf1f90a4b15cd9567a102538c8f239a3899678",
+      "protocol": 2,
+      "article_slug": "feature-12",
+      "sha256": "16ace7c4eb73c6ea4cc33f78cfae219838f37e334fd0b135618ae45247ba457e",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/e8c2f7ba35123d41c7f48c7600398125ff301ada6661d99a1a0e80afbe7e976d.webp"
+    },
+    {
+      "key": "dcdfd2487d25469d902ed7cb393d0c22e4e8c7f44df8d4d0f4bda4bde2a577c1",
+      "article_id": "b253ed4370953de91f59247a7116242534e181d016ef458054cc833513cad8f6",
+      "description_hash": "9303f357166bc9b23ca13fa12fefa585c74e163bf8b5049b80478507d15e1fdc",
+      "genre": "Кубизм",
+      "ratio": "1:1",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "eab4d446789d37289cace436fbb7d936678fe60591e115a96a31edc77a0fd21a",
+      "protocol": 2,
+      "article_slug": "feature-13",
+      "sha256": "0d57868f0670387ca2bb099238f6aa41b54d0e26e619fc346fe2e3ef923dcb0f",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/dcdfd2487d25469d902ed7cb393d0c22e4e8c7f44df8d4d0f4bda4bde2a577c1.webp"
+    },
+    {
+      "key": "8213c100cec0c16d7ecbee09ad188217f1e12187bafbf744c32b645151f4b4c0",
+      "article_id": "5e4b7c6d7b17f6721e333a2c9d5b6280e99fe2620bd121306e4f6be7666df464",
+      "description_hash": "12db9a156511f225c32a5e7532a986681464d3f13542afd1bca4452634849ffb",
+      "genre": "Метафизическая живопись",
+      "ratio": "3:4",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "ec937a7c880b87daf04b6e7f5a4e0e1c4ad4e483995f9a59dab80885ff20657c",
+      "protocol": 2,
+      "article_slug": "feature-14",
+      "sha256": "18e7e2b971c8ee420f74f61bf153757687df57524b239f537e74d6bb8b87e457",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/8213c100cec0c16d7ecbee09ad188217f1e12187bafbf744c32b645151f4b4c0.webp"
     }
   ],
   "art44": {
     "status": "ARTWORK_INCOMPLETE",
     "required": 14,
-    "ready": 10,
-    "missing": 4,
+    "ready": 13,
+    "missing": 1,
     "emergency_text": true,
     "provider_status": "READY",
     "bindings": [
@@ -588,7 +645,7 @@
     }
   ],
   "light_count": 12,
-  "homepage_hash": "359175625e5a9c9236445bfe3fbd4749660c980f030ea4a82de723d1f2086209",
-  "overview_hash": "60a3f75a18f728fee84b920b4ea73e78c00e62fb097f582d18cd7821adcaab76",
+  "homepage_hash": "4e91617a4c6b15d0472d618568768cbd9c86d29c59c49d168b170776e74e9630",
+  "overview_hash": "e0bfa5f9540879cc48cd36f895921fd2d26771bb9ec983a7ffff3560b412d913",
   "markdown_hash": "4436642cb8397c6a3b331426bb3fdf71329450b1e17217a0451e3ad74a4d2359"
 }

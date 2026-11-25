@@ -1731,6 +1731,76 @@
       "width": 480,
       "height": 399,
       "added_at": "2026-11-25T06:16:42.120175+00:00"
+    },
+    "0b649e516fb3537a5a7e621a6081f420c93b8fec67b7813f499763e6be8e198c": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:172828",
+      "title": "Holiday on the Hudson",
+      "artist": "George Luks (American, 1866–1933)",
+      "year": "c. 1912",
+      "source_url": "https://clevelandart.org/art/1933.2291",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Holiday on the Hudson oil on canvas A sun-dappled scene of middle-class leisure, <em>Holiday on the Hudson</em> is an atypical work by Luks, who more often turned to gritty tenement subjects for inspiration. Throughout his career, the painter fashioned himself as a brash, profane, and hard-drinking antagonist to New York’s genteel art-world establishment. The museum purchased this work just four months before the artist was beaten to death in the wake of a speakeasy argument. ['United States'] Painting ",
+      "genre_id": "oil",
+      "verified": true,
+      "id": "0b649e516fb3537a5a7e621a6081f420c93b8fec67b7813f499763e6be8e198c",
+      "path": "assets/art/oil/0b649e516fb3537a5a7e621a6081f420c93b8fec67b7813f499763e6be8e198c.webp",
+      "sha256": "5f466544a4cf6d0fadbefce9c9431ec5263e7361d87c9bbfbf438915064ee40b",
+      "original_sha256": "0c385385d1eff8ad04551fbb608bc549bcd83f5880dc3f6759bb6e96f722564a",
+      "visual_hash": "17002043399275383249",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 401,
+      "added_at": "2026-11-25T13:02:37.569091+00:00"
+    },
+    "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:447789",
+      "title": "Footpath in the Woods",
+      "artist": "Paul Cezanne (French, 1839–1906)",
+      "year": "1882–84",
+      "source_url": "https://clevelandart.org/art/2021.165",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Footpath in the Woods watercolor and graphite on modern laid paper Paul Cezanne is known for moving beyond the visible brushwork of Impressionism toward a “constructive stroke,” in which each mark built a cohesive whole. He favored subjects that he saw as timeless, including landscape, the focus of this watercolor. Cezanne depicted chestnut trees at the Jas de Bouffan, his family estate outside Aix-en-Provence in southern France. He used graphite lines and areas of muted watercolor, but also the whiteness of his sheet of paper to represent the scene. The artist worked in watercolor throughout his entire career, seeing it as a site of experimentation and for developing new ideas. ['France'] Drawing ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733",
+      "path": "assets/art/impressionism/e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733.webp",
+      "sha256": "5a7a4ecd6309a2e865e0eaab46a5230381b63436c080fb04f9b75451118de273",
+      "original_sha256": "479894e3fa87a835d16f7236530bc1c08c4fb3fe4a780a25e70140f68754551b",
+      "visual_hash": "10061924674669656088",
+      "perceptual_neighbours": [],
+      "width": 317,
+      "height": 480,
+      "added_at": "2026-11-25T13:02:49.151618+00:00"
+    },
+    "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a": {
+      "museum": "Paris Musées — Petit Palais, musée des Beaux-arts de la Ville de Paris",
+      "museum_id": "paris:160025973",
+      "title": "Nécessaire",
+      "artist": "Anonyme",
+      "year": "Vers 1927",
+      "source_url": "https://www.parismuseescollections.paris.fr/fr/petit-palais/oeuvres/necessaire-25",
+      "license": "CC0",
+      "license_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "rights_evidence": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "genre_evidence": "Art Deco — museum-curated Art déco / Bijou gouache design drawing, circa 1927",
+      "genre_evidence_url": "https://www.parismuseescollections.paris.fr/fr/petit-palais/oeuvres/necessaire-25",
+      "genre_id": "art-deco",
+      "verified": true,
+      "id": "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a",
+      "path": "assets/art/art-deco/c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a.webp",
+      "sha256": "e468fa96a3b126003533cb52c02d3e4069d5f14ecb5f33470808b92ee4ed0e60",
+      "original_sha256": "c7b08e777af4ccaff8e32959a2a4fdc47692fe6e0d4302064b9331669129c5e0",
+      "visual_hash": "7443712742706337077",
+      "perceptual_neighbours": [],
+      "width": 192,
+      "height": 300,
+      "added_at": "2026-11-25T13:02:57.733710+00:00"
     }
   },
   "sets": {
@@ -2310,6 +2380,60 @@
       "status": "READY",
       "sha256": [
         "7454506cddc151a0d713592e3976e9a9e6fcbaf9c78ce08ab3e2dbff2f1a7306"
+      ]
+    },
+    "2026-11-26/oil": {
+      "id": "2026-11-26/oil",
+      "issue_id": "2026-11-26",
+      "issue_date": "2026-11-26",
+      "issue_number": null,
+      "genre_id": "oil",
+      "genre": "Масло",
+      "artwork_ids": [
+        "0b649e516fb3537a5a7e621a6081f420c93b8fec67b7813f499763e6be8e198c"
+      ],
+      "selected_at": "2026-11-25T13:02:40.460741+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "5f466544a4cf6d0fadbefce9c9431ec5263e7361d87c9bbfbf438915064ee40b"
+      ]
+    },
+    "2026-11-26/impressionism": {
+      "id": "2026-11-26/impressionism",
+      "issue_id": "2026-11-26",
+      "issue_date": "2026-11-26",
+      "issue_number": null,
+      "genre_id": "impressionism",
+      "genre": "Импрессионизм",
+      "artwork_ids": [
+        "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733"
+      ],
+      "selected_at": "2026-11-25T13:02:51.942763+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "5a7a4ecd6309a2e865e0eaab46a5230381b63436c080fb04f9b75451118de273"
+      ]
+    },
+    "2026-11-26/art-deco": {
+      "id": "2026-11-26/art-deco",
+      "issue_id": "2026-11-26",
+      "issue_date": "2026-11-26",
+      "issue_number": null,
+      "genre_id": "art-deco",
+      "genre": "Ар-деко",
+      "artwork_ids": [
+        "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a"
+      ],
+      "selected_at": "2026-11-25T13:03:00.529819+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "e468fa96a3b126003533cb52c02d3e4069d5f14ecb5f33470808b92ee4ed0e60"
       ]
     }
   },
