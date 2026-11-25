@@ -485,10 +485,18 @@ def attach(root,state,items,sets):
     for item in items:
         row=sets.get(item['genre'])
         item['reference_status']='REFERENCE_SET_UNAVAILABLE'
-        if not row:continue
+        if not row:
+            from scripts import mosaic44
+            if mosaic44.CONFIG.get('text_only_fallback'):
+                for key in ('reference_images','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_selection_version','reference_selection_score','reference_selection_reason','reference_transport','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation'):
+                    item.pop(key,None)
+                item.update(generation_mode='TEXT_ONLY',reference_images_sent=0,reference_status='NO_REFERENCE_AVAILABLE')
+                item.update({k:color.direction(item['genre'])[k] for k in ('art_movement','medium')})
+                item['prompt']=color.prompt(item)
+            continue
         work,choice=color.select(root,state,item,row,registry,previous)
         item.update({k:v for k,v in choice.items() if k!='sha256'})
-        item.update(reference_status='ONE_REFERENCE_READY',reference_set_id=row['id'],reference_artwork_ids=row['artwork_ids'],reference_sha256=row['sha256'],reference_images_sent=1)
+        item.update(generation_mode='REFERENCE',reference_status='ONE_REFERENCE_READY',reference_set_id=row['id'],reference_artwork_ids=row['artwork_ids'],reference_sha256=row['sha256'],reference_images_sent=1)
         item['reference_images']=[{'path':work['path'],'sha256':work['sha256']}]
         if work.get('license')=='CC BY-SA 4.0':
             item.update(artwork_license=CC_BY_SA,reference_attribution=work['attribution'],reference_source_url=work['source_url'],reference_adaptation='Original AI composition after a museum reference; resized WebP reference')
@@ -700,3 +708,4 @@ if __name__=='__main__':
     parser.add_argument('--probe-source',action='store_true',required=True)
     parser.add_argument('--output',required=True)
     args=parser.parse_args();probe_source(args.output)
+

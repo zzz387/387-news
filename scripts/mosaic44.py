@@ -42,6 +42,26 @@ def theme(article):
     value=(article.get('title','')+' '+article.get('teaser','')).casefold()
     return next((key for key,pattern in THEMES.items() if re.search(pattern,value)),'culture')
 
+ISSUE_STYLES={
+ 'family':['Акварель','Импрессионизм'],'health':['Символизм','Акварель'],
+ 'yoga':['Символизм','Импрессионизм'],'sport':['Футуризм','Импрессионизм'],
+ 'moscow':['Импрессионизм','Конструктивизм'],'architecture':['Конструктивизм','Импрессионизм'],
+ 'nature':['Акварель','Импрессионизм'],'history':['Романтизм','Акварель'],
+ 'philosophy':['Символизм','Романтизм'],'economy':['Конструктивизм','Символизм'],
+ 'technology':['Конструктивизм','Футуризм'],'science':['Символизм','Конструктивизм'],
+ 'culture':['Импрессионизм','Романтизм']}
+
+def issue_styles(subject,date):
+    return (ISSUE_STYLES if date>=CONFIG.get('compact_genres_from','9999-12-31') else STYLES)[subject]
+
+def reference_genres(date):
+    if date<CONFIG.get('compact_genres_from','9999-12-31'):return set()
+    from scripts import art_library44 as lib
+    registry=lib.load(p.ROOT)
+    return {g for g in dict.fromkeys(g for choices in ISSUE_STYLES.values() for g in choices)
+        if date+'/'+lib.genre_id(g) in registry['sets'] or lib.available_works(p.ROOT,registry,date,date,g)}
+
+
 def plan(articles,date,existing=()):
     pending=list(articles);selected=[];themes=Counter();genres=Counter()
     while pending and len(selected)<CONFIG['maximum_tiles']:
@@ -50,7 +70,7 @@ def plan(articles,date,existing=()):
             return (themes[subject],-interest,hashlib.sha256(article.get('title','').encode()).hexdigest())
         article=min(pending,key=rank);pending.remove(article)
         if any(selection43.duplicate({'article':article},{'article':other['_article']}) for other in selected):continue
-        subject=theme(article);genre=min(STYLES[subject],key=lambda x:(genres[x],STYLES[subject].index(x)))
+        subject=theme(article);choices=issue_styles(subject,date);genre=min(choices,key=lambda x:(genres[x],choices.index(x)))
         i=len(selected);ratio=RATIOS[i%len(RATIOS)]
         descriptor={'title':re.sub(r'\s+',' ',article['title']).strip(),'summary':re.sub(r'\s+',' ',article.get('teaser','')).strip(),'idea':re.sub(r'\s+',' ',article['title']).strip(),
             'key_facts':[s.strip() for s in re.split(r'(?<=[.!?])\s+',article.get('teaser','')) if s.strip()][:3]}
@@ -117,13 +137,14 @@ def approve(state):
 
 def article_plans(state,rows=None):
     """All final articles, independent of the 8–12 front-page selection."""
-    rows=approved_rows(state) if rows is None else rows;genres=Counter();result=[]
+    rows=approved_rows(state) if rows is None else rows;genres=Counter();result=[];available=reference_genres(state['date'])
     for record in rows:
         article=record['article'];body=' '.join(b.get('text','') for b in article.get('blocks',[]))
         activity=' '.join(a.get('title','')+' '+a.get('benefit','') for a in article.get('activities',[]))
         sentences=[s.strip() for s in re.split(r'(?<=[.!?])\s+',body+' '+activity) if s.strip()]
         subject=theme(article)
-        genre=min(STYLES[subject],key=lambda value:(genres[value],STYLES[subject].index(value)))
+        choices=issue_styles(subject,state['date'])
+        genre=min(choices,key=lambda value:(bool(available) and value not in available,genres[value],choices.index(value)))
         i=len(result);text_hash=p.digest(final_text(article))
         basis={'date':state['date'],'article_id':record['id'],'text_hash':text_hash,'prompt_version':CONFIG['prompt_version']}
         key=p.digest(basis)
@@ -187,8 +208,10 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
     saved['plan']=items;state['assembly_status44']='ART_GENERATION';persist()
     from scripts import news
     budget=news.runtime.ACTIVE_BUDGET
-    # One sequential batch, bounded only by the existing request/time budgets.
-    for item in items:
+    # Match the existing mosaic selection; retain full plan order for HTML assembly.
+    selected=plan([{'title':i['descriptor']['title'],'teaser':i['descriptor'].get('summary','')} for i in items],state['date'])
+    front={i['descriptor']['title'] for i in selected}
+    for item in sorted(items,key=lambda i:i['descriptor']['title'] not in front):
         if item['key'] in saved.get('rejected_keys',{}):continue
         public=cached(p.ROOT,state['date']).get(item['key'])
         if public and valid_image(p.ROOT,state['date'],item['key'],public) and not object_valid(saved['objects'].get(item['key'],{})):
@@ -200,7 +223,7 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             persist()
         if not allow_request or saved['provider_status']!='READY' or not budget or (budget.remaining_seconds()<90 if CONFIG.get('provider')=='cloudflare_workers_ai' else not budget.can_request()):break
         if sum(h.get('key')==item['key'] for h in saved['history'])>=CONFIG.get('max_retries_per_article',2):continue
-        if CONFIG.get('reference_required') and state['date']>=CONFIG.get('first_reference_issue','9999-12-31') and item.get('reference_status')!='ONE_REFERENCE_READY':
+        if CONFIG.get('reference_required') and state['date']>=CONFIG.get('first_reference_issue','9999-12-31') and item.get('reference_status')!='ONE_REFERENCE_READY' and not (CONFIG.get('text_only_fallback') and item.get('generation_mode')=='TEXT_ONLY'):
             saved['code']='REFERENCE_SET_UNAVAILABLE';continue
         saved['current_key']=item['key'];persist()
         try:
@@ -216,7 +239,7 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
             saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
                 'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['reference_model'] if item.get('reference_images') else CONFIG['model'],'status':'READY',
-                **{k:item[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in item},
+                **{k:item[k] for k in ('generation_mode','reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in item},
                 'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
                 'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
             persist()  # Keep the first usable result even if its one color retry fails.
@@ -371,7 +394,7 @@ def materialize(state,articles,root,items=None):
             continue
         images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version','date','text_hash','protocol','article_slug')},
             **{k:row[k] for k in ('sha256','width','height','provider','model')},
-            **{k:row[k] for k in ('reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in row},'path':file.relative_to(root).as_posix()}
+            **{k:row[k] for k in ('generation_mode','reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in row},'path':file.relative_to(root).as_posix()}
     (folder/'manifest.json').write_text(json.dumps({'date':date,'images':images,'provider_status':provider_status()},ensure_ascii=False,indent=2)+'\n')
     return images
 
@@ -402,3 +425,4 @@ def color_retry_available(state,items,budget):
     observed=ledger.get('observed_account_neurons')
     if not isinstance(observed,(int,float)):return False
     return ledger.get('reserved_neurons',0)+(missing+1)*reserve<=CONFIG['image_neuron_budget'] and observed+(missing+1)*reserve<=10000-CONFIG.get('account_headroom',1500)
+

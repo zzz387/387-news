@@ -29,7 +29,7 @@ class API:
         if path=='actions/workflows/daily-v31.yml':return {'state':'active'}
         if path.endswith('/dispatches'):
             self.posts.append((self.clock(),copy.deepcopy(payload)))
-            title=('Preparation ' if payload['inputs']['phase']=='resume' else 'Delivery ')+payload['inputs']['target_date']
+            title=('Preparation ' if payload['inputs']['phase']=='resume' else 'Artwork ' if payload['inputs']['phase']=='backfill_issue_art' else 'Delivery ')+payload['inputs']['target_date']
             self.rows.append({'id':100+len(self.posts),'head_branch':'main','event':'workflow_dispatch','display_title':title,'status':'completed','created_at':self.clock().isoformat()})
             if self.dispatch_succeeds:self.healthy_at=self.clock()+timedelta(seconds=60)
             return None  # Actual dispatch REST response is204, not JSON.
@@ -41,6 +41,22 @@ class API:
         raise AssertionError('Unexpected endpoint '+path)
 
 class WatchdogTests(unittest.TestCase):
+    def test_artwork_wakeup_is_serial_bounded_and_yields_to_daily_preparation(self):
+        for mode,expected in [('idle','ARTWORK_DISPATCHED'),('daily','DAILY_PREPARATION_FIRST'),('active','PRODUCTION_ACTIVE'),('limit','ARTWORK_WAKEUP_LIMIT'),('complete','ARTWORK_COMPLETE'),('cooldown','ARTWORK_COOLDOWN')]:
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temp:
+                clock=Clock(at('12:00'));api=API(clock);folder=Path(temp)/'issues'/DAY;folder.mkdir(parents=True)
+                (folder/'release.json').write_text(json.dumps({'art44':{'missing':0 if mode=='complete' else 13}}))
+                if mode=='active':api.active_until=at('13:00')
+                if mode=='limit':api.rows=[{'id':i+1,'head_branch':'main','event':'workflow_dispatch','display_title':'Artwork '+DAY,'status':'completed','created_at':at('10:00').isoformat()} for i in range(2)]
+                wake={'code':'PREPARATION_DISPATCHED' if mode=='daily' else 'PREPARATION_WAKEUP_LIMIT'}
+                status={'cloudflare_art':{'cooldown_until':clock().timestamp()+900}} if mode=='cooldown' else {}
+                result=w.backfill_date(temp,DAY,clock(),wake,api,status=status)
+                self.assertEqual(result['code'],expected)
+                if mode=='idle':
+                    self.assertEqual(api.posts[-1][1]['inputs']['phase'],'backfill_issue_art')
+                    self.assertEqual(w.backfill_date(temp,DAY,clock(),wake,api)['code'],'ARTWORK_BACKOFF')
+                else:self.assertFalse(api.posts)
+
     def test_preparation_wakeups_are_bounded_backed_off_and_use_existing_controller(self):
         for mode,expected in [('idle','PREPARATION_DISPATCHED'),('active','PREPARATION_ALREADY_ACTIVE'),('limit','PREPARATION_WAKEUP_LIMIT'),('recent','PREPARATION_BACKOFF')]:
             with self.subTest(mode=mode):
@@ -265,3 +281,4 @@ class WorkflowContractTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
