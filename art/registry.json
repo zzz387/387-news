@@ -1801,6 +1801,29 @@
       "width": 192,
       "height": 300,
       "added_at": "2026-11-25T13:02:57.733710+00:00"
+    },
+    "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:108544",
+      "title": "Orpheus",
+      "artist": "Odilon Redon (French, 1840–1916)",
+      "year": "c. 1903–10",
+      "source_url": "https://clevelandart.org/art/1926.25",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Orpheus pastel on brown paper Drawn in vivid layers of pastel crayon, this work depicts the head of the poet and musician Orpheus. The story of the god of music, whose music carried on after his death through his lyre and head, fascinated Redon, who related to Orpheus's dedication to his art. The subject also aligned with Redon's broader interest in dreams and spirituality around this time and he represented Orpheus several times throughout his career, in various media. Here, the god's head floats as if in stasis while Mount Parnassus—the home of Apollo and the Muses—soars from behind. ['France'] Drawing ",
+      "genre_id": "pastel",
+      "verified": true,
+      "id": "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172",
+      "path": "assets/art/pastel/6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172.webp",
+      "sha256": "aa30b39eec7aea716da7f928cd5305aafcd3c16db44c07bb38cf66b1d8f919f9",
+      "original_sha256": "83cc1378994e93dd5a81f1cca2470547920679a693a9a1e12ad9e9dd03567376",
+      "visual_hash": "4267574557883154302",
+      "perceptual_neighbours": [],
+      "width": 397,
+      "height": 480,
+      "added_at": "2026-11-25T14:27:44.774711+00:00"
     }
   },
   "sets": {
@@ -2434,6 +2457,24 @@
       "status": "READY",
       "sha256": [
         "e468fa96a3b126003533cb52c02d3e4069d5f14ecb5f33470808b92ee4ed0e60"
+      ]
+    },
+    "2026-11-26/pastel": {
+      "id": "2026-11-26/pastel",
+      "issue_id": "2026-11-26",
+      "issue_date": "2026-11-26",
+      "issue_number": null,
+      "genre_id": "pastel",
+      "genre": "Пастель",
+      "artwork_ids": [
+        "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172"
+      ],
+      "selected_at": "2026-11-25T14:27:48.035186+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "aa30b39eec7aea716da7f928cd5305aafcd3c16db44c07bb38cf66b1d8f919f9"
       ]
     }
   },
