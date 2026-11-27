@@ -1824,6 +1824,98 @@
       "width": 397,
       "height": 480,
       "added_at": "2026-11-25T14:27:44.774711+00:00"
+    },
+    "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:167712",
+      "title": "Seaweed Gatherers, Yport",
+      "artist": "Claude-Emile Schuffenecker (French, 1851–1934)",
+      "year": "c. 1889",
+      "source_url": "https://clevelandart.org/art/2009.380",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Seaweed Gatherers, Yport black chalk Claude-Emile Schuffenecker worked closely with Paul Gauguin to form Synthetism, a style of art that broke from Impressionism in favor of flat planes of bold color and invented subjects. This drawing, which exists in two versions, is one of Schuffenecker’s most important works from the period. The other interpretation (owned by the Art Institute of Chicago) was featured in an influential 1889 exhibition organized by Gauguin and Schuffenecker at the Café Volpini on the grounds of the Universal Exposition. Both artists saw imagery of seaweed gatherers—a task undertaken by working-class people in rural French coastal towns—as exemplifying the simplicity they sought in their art. ['France'] Drawing ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+      "path": "assets/art/impressionism/79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7.webp",
+      "sha256": "2f5cefcb17e0567bd97a6170a681e9b2361a3bdc81e499142c10b6fa2fee9d0b",
+      "original_sha256": "9fe058df7eed4753b7a82f0584baa4994bb5a002e94cc30dccde2d8a9794afa5",
+      "visual_hash": "12978067579370630777",
+      "perceptual_neighbours": [],
+      "width": 363,
+      "height": 480,
+      "added_at": "2026-11-27T03:52:34.449396+00:00"
+    },
+    "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:150174",
+      "title": "Dancing Sailors",
+      "artist": "Charles Demuth (American, 1883–1935)",
+      "year": "1917",
+      "source_url": "https://clevelandart.org/art/1980.9",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Dancing Sailors watercolor over graphite This drawing was inspired by Charles Demuth's participation in the nightlife of New York's Greenwich Village during the early 20th century. Around this time, the artist made numerous watercolors of nightclubs, performers, and bathhouses. Demuth created two almost identical compositions (the other is in the collection of the Museum of Modern Art, New York), which both show groups of three couples, with two sailors dancing together while others dance with women. Demuth kept these and other homoerotic watercolors private throughout his career, and almost never showed them publicly. The sheet's planes of textured watercolor blur figure and background, presenting a subtle but pointedly erotic scene. ['America'] Drawing ",
+      "genre_id": "watercolor",
+      "verified": true,
+      "id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+      "path": "assets/art/watercolor/a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987.webp",
+      "sha256": "339f13d976d2ba16bfe142f2e975894a91377bdd94ac5bf4f3b2cf48bccbdf09",
+      "original_sha256": "6dceebd327388d6290c0068a54c984bd35560bd9c5bc444b5e023b2c2b7d1de1",
+      "visual_hash": "6218722693111207766",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 384,
+      "added_at": "2026-11-27T03:52:43.119981+00:00"
+    },
+    "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:117715",
+      "title": "The Old Road to the Sea",
+      "artist": "William Merritt Chase (American, 1849–1916)",
+      "year": "c. 1893",
+      "source_url": "https://clevelandart.org/art/1938.333",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The Old Road to the Sea oil on canvas One of the most influential of the American Impressionists, William Merritt Chase established his own summer school at Shinnecock, on the eastern tip of Long Island, New York. Attracted to the low-lying dunes and beaches, Chase and his students were among the first American artists to pursue open-air painting. With its varied brushwork and warm colors, this painting is among the finest works Chase produced at Shinnecock. The panoramic scene glows with the light of a summer day. The Chase school at Shinnecock, active from 1891-1902, was instrumental in expanding the influence of Impressionism in the United States. ['United States'] Painting ",
+      "genre_id": "impressionism",
+      "verified": true,
+      "id": "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb",
+      "path": "assets/art/impressionism/ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb.webp",
+      "sha256": "6d18559f399a5d07b5e240a0a9fc6ee532367af13afd85a356a540b20703d9d7",
+      "original_sha256": "990e2ce6eb666788aede26e8cbb2654d1cf2922c1c069dc9ea4273450f7a4938",
+      "visual_hash": "2684312749077600796",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 383,
+      "added_at": "2026-11-27T03:57:51.086154+00:00"
+    },
+    "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:159769",
+      "title": "Italian Landscape",
+      "artist": "John Robert Cozens (British, 1752–1797)",
+      "year": "c. 1790–92",
+      "source_url": "https://clevelandart.org/art/1997.137",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Italian Landscape watercolor over graphite During the 18th century, views of Italy and the Continent were in great demand among British aristocrats on the Grand Tour. Cozens journeyed to Italy and Switzerland twice in his career, making pencil and wash sketches from which he later derived highly finished watercolors for various patrons. The artist’s somber palette, limited to muted greens, grays, and blues, produces a melancholy, hazy effect in this landscape. The site depicted here has thus far proved unidentifiable and may be an amalgamation of memory and imagination. The left portion of the composition relates to another watercolor depicting a view of Velletri, a town outside of Rome; the cottage and trees in the right foreground seem English, and the central plain and winding river appear to be pure invention. ['England, London'] Drawing ",
+      "genre_id": "watercolor",
+      "verified": true,
+      "id": "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380",
+      "path": "assets/art/watercolor/e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380.webp",
+      "sha256": "ab14a2868adaeb25d368208494eee423bbfd3db7764a35e7c2f22187b3d493e2",
+      "original_sha256": "07522921d33ed4174a37443ae8da38279d5009d0c88b6b9d45b5405cc3955864",
+      "visual_hash": "14187959374307270196",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 349,
+      "added_at": "2026-11-27T03:58:07.427566+00:00"
     }
   },
   "sets": {
@@ -2475,6 +2567,78 @@
       "status": "READY",
       "sha256": [
         "aa30b39eec7aea716da7f928cd5305aafcd3c16db44c07bb38cf66b1d8f919f9"
+      ]
+    },
+    "2026-11-28/impressionism": {
+      "id": "2026-11-28/impressionism",
+      "issue_id": "2026-11-28",
+      "issue_date": "2026-11-28",
+      "issue_number": null,
+      "genre_id": "impressionism",
+      "genre": "Импрессионизм",
+      "artwork_ids": [
+        "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7"
+      ],
+      "selected_at": "2026-11-27T03:52:37.607795+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "2f5cefcb17e0567bd97a6170a681e9b2361a3bdc81e499142c10b6fa2fee9d0b"
+      ]
+    },
+    "2026-11-28/watercolor": {
+      "id": "2026-11-28/watercolor",
+      "issue_id": "2026-11-28",
+      "issue_date": "2026-11-28",
+      "issue_number": null,
+      "genre_id": "watercolor",
+      "genre": "Акварель",
+      "artwork_ids": [
+        "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987"
+      ],
+      "selected_at": "2026-11-27T03:52:46.302089+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "339f13d976d2ba16bfe142f2e975894a91377bdd94ac5bf4f3b2cf48bccbdf09"
+      ]
+    },
+    "2026-11-27/impressionism": {
+      "id": "2026-11-27/impressionism",
+      "issue_id": "2026-11-27",
+      "issue_date": "2026-11-27",
+      "issue_number": 34,
+      "genre_id": "impressionism",
+      "genre": "Импрессионизм",
+      "artwork_ids": [
+        "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb"
+      ],
+      "selected_at": "2026-11-27T03:57:54.188375+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "6d18559f399a5d07b5e240a0a9fc6ee532367af13afd85a356a540b20703d9d7"
+      ]
+    },
+    "2026-11-27/watercolor": {
+      "id": "2026-11-27/watercolor",
+      "issue_id": "2026-11-27",
+      "issue_date": "2026-11-27",
+      "issue_number": 34,
+      "genre_id": "watercolor",
+      "genre": "Акварель",
+      "artwork_ids": [
+        "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380"
+      ],
+      "selected_at": "2026-11-27T03:58:10.315979+00:00",
+      "verification_status": "VERIFIED",
+      "assignment_status": "ASSIGNED",
+      "status": "READY",
+      "sha256": [
+        "ab14a2868adaeb25d368208494eee423bbfd3db7764a35e7c2f22187b3d493e2"
       ]
     }
   },
