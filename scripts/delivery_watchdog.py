@@ -55,8 +55,8 @@ def prepare_date(date,now,request=monitor.github,exclude_run_id=0):
 
 def reference_repair_pending(root,date):
     from scripts import mosaic44
-    spec=mosaic44.CONFIG.get('repair_reference_art',{});path=Path(root)/'issues'/date/'release.json'
-    if date!=spec.get('date') or not path.is_file():return False
+    spec=mosaic44.CONFIG.get('repair_reference_art',{});target=spec.get('date','9999-12-31');path=Path(root)/'issues'/target/'release.json'
+    if date<target or not path.is_file():return False
     row=json.loads(path.read_text())
     return row.get('number')==spec.get('number') and any(i.get('model')==spec['source_model'] for i in row.get('illustrations',[]))
 
@@ -89,6 +89,13 @@ def backfill_date(root,date,now,preparation,request=monitor.github,exclude_run_i
     if (datetime.fromisoformat(date+'T06:00').replace(tzinfo=queue.news.TZ)+timedelta(days=1)-now).total_seconds()<1800:return dict(result,code='DAILY_RELEASE_FIRST')
     path=Path(root)/'issues'/date/'release.json'
     repair=reference_repair_pending(root,date)
+    current_missing=path.is_file() and json.loads(path.read_text()).get('art44',{}).get('missing',0)
+    if repair and not current_missing:
+        from scripts import mosaic44
+        date=mosaic44.CONFIG['repair_reference_art']['date'];path=Path(root)/'issues'/date/'release.json';result['date']=date
+    elif current_missing:
+        from scripts import mosaic44
+        repair=repair and date==mosaic44.CONFIG['repair_reference_art']['date']
     if not path.is_file() or (not json.loads(path.read_text()).get('art44',{}).get('missing',0) and not repair):return dict(result,code='ARTWORK_COMPLETE')
     if (status or {}).get('cloudflare_art',{}).get('cooldown_until',0)>now.timestamp():return dict(result,code='ARTWORK_COOLDOWN')
     def busy(rows):return any(r['status'] in ACTIVE and r['id']!=exclude_run_id for r in rows)

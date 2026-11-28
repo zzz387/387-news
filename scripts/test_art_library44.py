@@ -72,6 +72,33 @@ class ArtLibraryTests(unittest.TestCase):
             self.assertEqual(len({w['original_sha256'] for w in registry['artworks'].values()}),4)
             self.assertTrue(lib.genre_matches('Темпера','Tempera on panel'));self.assertFalse(lib.genre_matches('Темпера','Oil painting'))
 
+    def test_prefill_resumes_partial_pages_independently_for_each_museum(self):
+        from datetime import datetime,timezone,timedelta
+        from urllib.parse import urlparse,parse_qs
+        with tempfile.TemporaryDirectory() as temp:
+            state={'date':'2026-11-28'};requests=[]
+            rows=[{'id':i,'title':'Impressionist study '+str(i),'technique':'Oil painting','description':'Impressionism',
+                'type':'Painting','share_license_status':'CC0','creators':[{'description':'Claude Monet'}],
+                'creation_date':'1890','url':'https://www.clevelandart.org/art/'+str(i),
+                'images':{'web':{'url':'https://openaccess-cdn.clevelandart.org/'+str(i)+'.png'}}} for i in range(4)]
+            def get(url,**kwargs):
+                requests.append(url);host=urlparse(url).hostname
+                if host=='openaccess-cdn.clevelandart.org':return picture(1000+int(url.rsplit('/',1)[1].split('.')[0]))
+                if host=='openaccess-api.clevelandart.org':
+                    skip=int(parse_qs(urlparse(url).query)['skip'][0]);return json.dumps({'data':rows if skip==0 else []}).encode()
+                return json.dumps({'data':[],'items':[]}).encode()
+            now=datetime(2026,11,28,8,tzinfo=timezone.utc)
+            with patch.object(lib,'prefill_genres',return_value=['Импрессионизм']),patch.object(lib.Museum,'get',side_effect=get),patch.object(lib,'datetime',wraps=datetime) as clock:
+                clock.now.return_value=now;first=lib.library_prefill(temp,state,limit=2)
+                journal=list(state['art_library44']['registry']['prefill_log'].values())[-1]
+                self.assertEqual(journal['next_pages']['aic'],3)
+                self.assertEqual(journal['next_pages'].get('cleveland',1),1)
+                restored=json.loads(json.dumps(state));clock.now.return_value=now+timedelta(hours=1)
+                second=lib.library_prefill(temp,restored,limit=2)
+            self.assertEqual((first['added'],second['added']),(2,2))
+            self.assertEqual(len(restored['art_library44']['registry']['artworks']),4)
+            self.assertEqual([int(parse_qs(urlparse(u).query)['skip'][0]) for u in requests if urlparse(u).hostname=='openaccess-api.clevelandart.org'],[0,0])
+
     def test_no_text_only_or_unreferenced_inference_is_allowed(self):
         state={'date':'2026-11-28'};item=self.items(1,'Футуризм')[0]
         item.update(date=state['date'],protocol=2,generation_mode='TEXT_ONLY',reference_images_sent=0)
