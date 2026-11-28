@@ -3154,7 +3154,298 @@
       "created_at": "2026-11-22T18:58:48.830113+00:00"
     }
   },
-  "reference_assignments": {},
+  "reference_assignments": {
+    "c4408a056f69afa6cc4bd5d1fb3918ec4c3f7c9366165d86d4cf28800674b198": {
+      "id": "c4408a056f69afa6cc4bd5d1fb3918ec4c3f7c9366165d86d4cf28800674b198",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "ad14e00bfb274fec390d5194315a6778a24788043d81df5432354aa987589e1f",
+      "text_hash": "f608442e8b64c4500e409d8f10596d613a436338a3974b842642dd6f99fbf977",
+      "artwork_id": "af0b0bd3c251cbbea840eadb244327085eaa0fd62034df2bdd335df7893e515e",
+      "genre": "Конструктивизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.71071,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.59005,
+          "palette_diversity": 0.99224,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "af0b0bd3c251cbbea840eadb244327085eaa0fd62034df2bdd335df7893e515e"
+      ],
+      "sha256": [
+        "7730f20b65815aa3ff656ee240e2781be990d6244bea65d008910d33ed51b08c"
+      ]
+    },
+    "6682556c323991379a653236b0ae5c84ae33164df6a5017c3375a486ca63810d": {
+      "id": "6682556c323991379a653236b0ae5c84ae33164df6a5017c3375a486ca63810d",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "985676a49b4927814b232dbe8b8fba9b2daa0c6576abbcc76fedc321d1ab9c88",
+      "text_hash": "71acf444574a4a29b6a320aa878da06d5e9fdc9b58f8e13fa36182b9d77ecfde",
+      "artwork_id": "c39b3f0bf41df322a1dbf7311649f12bf29c61e6ddd3e1ece51c29cb606c336b",
+      "genre": "Конструктивизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.55759,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.54247,
+          "palette_diversity": 0.59286,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "c39b3f0bf41df322a1dbf7311649f12bf29c61e6ddd3e1ece51c29cb606c336b"
+      ],
+      "sha256": [
+        "3541584475b80ca4092be20e84b67da02c40f3fe5eb80d564604ff34986ebcf3"
+      ]
+    },
+    "febfbcc4db01cd6723809eef3850cdb2e1372476dfff986f6dc84153bf33295a": {
+      "id": "febfbcc4db01cd6723809eef3850cdb2e1372476dfff986f6dc84153bf33295a",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "ef0e7adcadac91babf79e84c7940bc0f282f48ca35e8f85a6620b646b12683e8",
+      "text_hash": "ad38a15aefb12fcbf252b6ed2145cef5574c417fa62df62112c64ba428796b70",
+      "artwork_id": "3bf6b724af922ed6f20f1557f3f59463479f3289597d02e3513167fb3bc3953c",
+      "genre": "Романтизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.5297,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.56071,
+          "palette_diversity": 0.45733,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "3bf6b724af922ed6f20f1557f3f59463479f3289597d02e3513167fb3bc3953c"
+      ],
+      "sha256": [
+        "e5f83240254a5f6f9672741cacabcbdc9acccf2cb5b2d2a642800dcb32cf376f"
+      ]
+    },
+    "a8fdd24976b37506b7042a1c3c58537c22f8a4c2e109582b7f5428f8ad8764f0": {
+      "id": "a8fdd24976b37506b7042a1c3c58537c22f8a4c2e109582b7f5428f8ad8764f0",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "bb5d1394dc0df0a56b7f252dcd29f63f0cf487140002eb22b44940f276a5b8b1",
+      "text_hash": "1a1670b02665653c5d75a171d7904c27411ad8e96e6e37cd8bc7cd746d5a6789",
+      "artwork_id": "46cec5835d5ecf67601ed7acfdbaf56f5b2396b16da08d701cdd0e8e7da8c3d9",
+      "genre": "Романтизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.46097,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.56574,
+          "palette_diversity": 0.2165,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "46cec5835d5ecf67601ed7acfdbaf56f5b2396b16da08d701cdd0e8e7da8c3d9"
+      ],
+      "sha256": [
+        "cc223cb25d6423cbf78c1da2f37af8bc10541728bc69d0c91bd1ca22810591bb"
+      ]
+    },
+    "bdc87e74437687fe327d34f35a71a82614a8db1197a51c8cbbbcbee056d611bf": {
+      "id": "bdc87e74437687fe327d34f35a71a82614a8db1197a51c8cbbbcbee056d611bf",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "4620c1691a561a68010eec9714e3a7231c7f8b103fa0bac35ff5e24c2f44f841",
+      "text_hash": "dd481667986ca6b685ed737557e0aeab0bc1ad206843931ff745263450775b11",
+      "artwork_id": "18c52fcdf20e03bd788a1690083881fe21847ab6e7a7e563ea9ba792bb890f45",
+      "genre": "Конструктивизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.55459,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.52646,
+          "palette_diversity": 0.62024,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "18c52fcdf20e03bd788a1690083881fe21847ab6e7a7e563ea9ba792bb890f45"
+      ],
+      "sha256": [
+        "c68017ce30b32171a517c20e0dfad2a6dbbef39329482e5198fa33e06701f63e"
+      ]
+    },
+    "85538cf4e5279e09d365086c1526778c1ab459983d09fc1df23ae9d1ab937c3c": {
+      "id": "85538cf4e5279e09d365086c1526778c1ab459983d09fc1df23ae9d1ab937c3c",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "5419af1ee36df102929f532c201196149151c193e99ffd5d298f8a8d79b73aaf",
+      "text_hash": "400544c9666a1a0e5ca9e41688bc23047949320c178d5a51d113af9899439358",
+      "artwork_id": "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def",
+      "genre": "Символизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.46578,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.54014,
+          "palette_diversity": 0.29229,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def"
+      ],
+      "sha256": [
+        "b52b9603abfa3f0e326e67c28ea86e2995cd3fc8313a8dc0a19e2a63cb60eae0"
+      ]
+    },
+    "9a11fd931b04d8c71103657ddbb9d1deb65922eff04cd40e25796135bc1e36dc": {
+      "id": "9a11fd931b04d8c71103657ddbb9d1deb65922eff04cd40e25796135bc1e36dc",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "27fd35fe6d402ad171efb2d46eaef558ae7c07cad670027fefd859142da5fe57",
+      "text_hash": "f05969a6eead8ac2f57fac9adaea7257e3ab74aa070f4096528df4540f7dec2c",
+      "artwork_id": "e6f4184fb1d50012c356c9d60fdcf5612c9e3366bbb18dbc9053dd39b6c0ba84",
+      "genre": "Абстракционизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.5123,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.55826,
+          "palette_diversity": 0.40506,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "e6f4184fb1d50012c356c9d60fdcf5612c9e3366bbb18dbc9053dd39b6c0ba84"
+      ],
+      "sha256": [
+        "7eb952cd999fc8c22c285ae4e9a54e67e99fb6765b180191685b42f093662063"
+      ]
+    },
+    "049df3c612fd1c27acee12afd912657822649817fadf9aee37c85be80900d199": {
+      "id": "049df3c612fd1c27acee12afd912657822649817fadf9aee37c85be80900d199",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "5e89d79a414801661cbdb2a1cffa0898594218a868fb2d1978d291fc57b297f5",
+      "text_hash": "9b747511259d81c1373c9b934b844dc86c2534b4abe73b2a7193df4b1630cc5f",
+      "artwork_id": "dfa234b6d7b4c88ed4d7c29b98aade697336ee5954ba8b9c65c224dfc6174749",
+      "genre": "Коллаж",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.48288,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.53589,
+          "palette_diversity": 0.35918,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "dfa234b6d7b4c88ed4d7c29b98aade697336ee5954ba8b9c65c224dfc6174749"
+      ],
+      "sha256": [
+        "60904308e60bd4a406d2f54a8d0790a10c56fb8a342df31b2022ac280ef44672"
+      ]
+    },
+    "6b296360954ad33f6df45e0b2b4a73282518ebd74f57b78c5dc9fdf6298b78ea": {
+      "id": "6b296360954ad33f6df45e0b2b4a73282518ebd74f57b78c5dc9fdf6298b78ea",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "6f33a189e81d44a16209d98ecbd60d0d84088c108747f85b72c3890907b79272",
+      "text_hash": "dad9bcd8ffb7111248f2d48331658cecfc13fae82fc9eaa07487a6221a4de0c9",
+      "artwork_id": "36fb4c4cf6688d4b15a0145fbde588c85b2a80fd1c37ba0ce42633885f7d7e59",
+      "genre": "Импрессионизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.49023,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.56489,
+          "palette_diversity": 0.31601,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "36fb4c4cf6688d4b15a0145fbde588c85b2a80fd1c37ba0ce42633885f7d7e59"
+      ],
+      "sha256": [
+        "ac638cf37e6f5097de25c025ad633c55354f32240b5ebd4a76bf3a793e95d085"
+      ]
+    },
+    "ab0210efa45a82745c89e65f3a9b99c4f67dfe649bdd29fea0881f2405701446": {
+      "id": "ab0210efa45a82745c89e65f3a9b99c4f67dfe649bdd29fea0881f2405701446",
+      "issue_id": "2026-11-28",
+      "date": "2026-11-28",
+      "article_id": "34692c239e72978f7258672a0be0fea06952adfd813aa3ee97c9710a6261ec90",
+      "text_hash": "4df35a158ce36e82bc76cf0d8245eb2ea8768f2281f477480fc38e69403cd530",
+      "artwork_id": "b67e63d7c3ec511f42383f8c9681a723a5cce6087e9f37ec4f7abd0d131690d7",
+      "genre": "Романтизм",
+      "selection": {
+        "reference_selection_version": "387-reference-selection-1",
+        "reference_selection_score": 0.4441,
+        "reference_selection_reason": {
+          "metadata_and_tonal_proxy": 0.54114,
+          "palette_diversity": 0.21766,
+          "weights": {
+            "meaning": 0.7,
+            "diversity": 0.3
+          },
+          "mood_inference": "TRANSPARENT_HEURISTIC_NOT_VERIFIED_MOOD",
+          "preserved_for_prompt_correction": false
+        }
+      },
+      "artwork_ids": [
+        "b67e63d7c3ec511f42383f8c9681a723a5cce6087e9f37ec4f7abd0d131690d7"
+      ],
+      "sha256": [
+        "ffe3c1c37e707f385924fd99c422dcfab9828461e766b32987962dc4a0f9460c"
+      ]
+    }
+  },
   "reference_uses": {
     "ce8ad343828a8ebeb898f78178c12b7c2254710f20f90b2d6a0331297acae2e7": {
       "artwork_id": "5ad0fa72f18268352ea8100ae74290605a1a266aa360142aa2b0488bf9590f48",
@@ -3449,6 +3740,76 @@
       "issue_id": "2026-11-28",
       "article_id": "e301814a4ec0501f92c06ef303417fd3d6c415be0fc58fef9c9264cb07b1d22d",
       "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "e3ca82e62e68544bd712a6c8b5b6f1dc2bb539517ace5835a269373db7d3ca46": {
+      "artwork_id": "af0b0bd3c251cbbea840eadb244327085eaa0fd62034df2bdd335df7893e515e",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "ad14e00bfb274fec390d5194315a6778a24788043d81df5432354aa987589e1f",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "3b9b393b3fb5481121a83e76f7b4ee53a2c1d8c40728ace3c04808a9ba0af1f8": {
+      "artwork_id": "c39b3f0bf41df322a1dbf7311649f12bf29c61e6ddd3e1ece51c29cb606c336b",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "985676a49b4927814b232dbe8b8fba9b2daa0c6576abbcc76fedc321d1ab9c88",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "3d17c772d81268bd3962b3e9adb98fb0fa1fb2ac5ce3cf5ad09c6c442a18b010": {
+      "artwork_id": "3bf6b724af922ed6f20f1557f3f59463479f3289597d02e3513167fb3bc3953c",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "ef0e7adcadac91babf79e84c7940bc0f282f48ca35e8f85a6620b646b12683e8",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "201420cc65b1f08a333c357ffde0baeb3c37a19abd86cf877049a77b78a599e1": {
+      "artwork_id": "46cec5835d5ecf67601ed7acfdbaf56f5b2396b16da08d701cdd0e8e7da8c3d9",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "bb5d1394dc0df0a56b7f252dcd29f63f0cf487140002eb22b44940f276a5b8b1",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "2799217f629438e30e9e154a2746fc9387b11fabc3afe0d73108cab0aa3e4e00": {
+      "artwork_id": "18c52fcdf20e03bd788a1690083881fe21847ab6e7a7e563ea9ba792bb890f45",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "4620c1691a561a68010eec9714e3a7231c7f8b103fa0bac35ff5e24c2f44f841",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "fbde378850f3f17076c4d52ce4ea977227ef8b6092a3d64721e4adee1cdf39e1": {
+      "artwork_id": "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "5419af1ee36df102929f532c201196149151c193e99ffd5d298f8a8d79b73aaf",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "b8df8bf71000ab5a24e07203b52bbded62630bb8d390f833128fb1c801c85e94": {
+      "artwork_id": "e6f4184fb1d50012c356c9d60fdcf5612c9e3366bbb18dbc9053dd39b6c0ba84",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "27fd35fe6d402ad171efb2d46eaef558ae7c07cad670027fefd859142da5fe57",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "bfd339f1b08f70fde9847d9e50498f4cbcf1da2734fab7600335ca7cb43f2249": {
+      "artwork_id": "dfa234b6d7b4c88ed4d7c29b98aade697336ee5954ba8b9c65c224dfc6174749",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "5e89d79a414801661cbdb2a1cffa0898594218a868fb2d1978d291fc57b297f5",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "84e1d8dbfe9515f0857bdeb00437bec6b0ce450176da5bdf7e0d6f8fcc551614": {
+      "artwork_id": "36fb4c4cf6688d4b15a0145fbde588c85b2a80fd1c37ba0ce42633885f7d7e59",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "6f33a189e81d44a16209d98ecbd60d0d84088c108747f85b72c3890907b79272",
+      "provenance": "GENERATED_IMAGE"
+    },
+    "779b78ffefdfb1af40041e2f04eced69dc24345c73ae9c9cc05582c44e31db00": {
+      "artwork_id": "b67e63d7c3ec511f42383f8c9681a723a5cce6087e9f37ec4f7abd0d131690d7",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "34692c239e72978f7258672a0be0fea06952adfd813aa3ee97c9710a6261ec90",
+      "provenance": "GENERATED_IMAGE"
     }
   },
   "prefill_log": {
