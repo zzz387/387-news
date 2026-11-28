@@ -5,7 +5,7 @@ from urllib.request import Request,urlopen
 from urllib.error import HTTPError
 from scripts.generation_runtime import GenerationPaused
 
-MODEL='@cf/black-forest-labs/flux-1-schnell'
+MODEL='@cf/black-forest-labs/flux-2-klein-4b'
 REFERENCE_MODEL='@cf/black-forest-labs/flux-2-klein-4b'
 BASE='https://api.cloudflare.com/client/v4'
 _LAST=0
@@ -131,8 +131,7 @@ def generate(item,budget,config):
     if status(config)!='READY':raise RuntimeError(status(config))
     protected()
     references=item.get('reference_images')
-    text_only=config.get('text_only_fallback') and item.get('generation_mode')=='TEXT_ONLY' and item.get('reference_images_sent')==0
-    if text_only and references is not None:raise RuntimeError('CF_GENERATION_MODE_INVALID')
+    if item.get('generation_mode')=='TEXT_ONLY' or not references:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
     images=[];input_tiles=0;model=MODEL
     if references is not None:
         if len(references)!=1:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
@@ -149,6 +148,9 @@ def generate(item,budget,config):
             registry=art_library44.load(policy41.ROOT)
             chosen=registry['artworks'].get(item.get('selected_reference_id'),{})
             group=registry['sets'].get(item.get('reference_set_id'),{})
+            if item.get('reference_assignment_id'):
+                group=registry.get('reference_assignments',{}).get(item['reference_assignment_id'],{})
+                if item.get('reference_set_id')!='binding/'+item['reference_assignment_id'] or group.get('article_id')!=item.get('article_id') or group.get('text_hash')!=item.get('text_hash'):raise RuntimeError('CF_REFERENCE_LIBRARY_INVALID')
             if chosen.get('path')!=ref['path'] or chosen.get('sha256')!=ref['sha256'] or group.get('artwork_ids')!=item.get('reference_artwork_ids') or item.get('selected_reference_id') not in group.get('artwork_ids',[]):raise RuntimeError('CF_REFERENCE_LIBRARY_INVALID')
             raw=target.read_bytes()
             if hashlib.sha256(raw).hexdigest()!=ref['sha256']:raise RuntimeError('CF_REFERENCE_HASH_INVALID')
@@ -163,7 +165,7 @@ def generate(item,budget,config):
                 item['reference_transport']={'format':'PNG','library_sha256':ref['sha256'],'wire_sha256':hashlib.sha256(encoded).hexdigest(),'decoded_pixels_sha256':hashlib.sha256(rgb.tobytes()).hexdigest(),'width':w,'height':h}
             images.append(encoded)
         model=REFERENCE_MODEL
-    if config.get('reference_required') and item.get('protocol')==2 and item.get('date','')>=config.get('first_reference_issue','9999-12-31') and not images and not text_only:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
+    if config.get('reference_required') and item.get('protocol')==2 and item.get('date','')>=config.get('first_reference_issue','9999-12-31') and not images:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
     date=item.get('date')
     if not date and os.getenv('CF_FREE_SMOKE')!='true':raise RuntimeError('CF_FINAL_APPROVAL_DATE_REQUIRED')
     if date and date<config['first_automatic_issue'] and date not in ('2026-11-20','2026-11-21'):raise RuntimeError('CF_DATE_NOT_AUTHORIZED')
@@ -194,7 +196,7 @@ def generate(item,budget,config):
         try:
             if images:
                 result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'width':width,'height':height},images=images)
-            else:result=api('/accounts/'+account+'/ai/run/'+model,{'prompt':prompt(item),'steps':config['steps']})
+            else:raise RuntimeError('CF_ONE_REFERENCE_REQUIRED')
             data=base64.b64decode(result['result']['image'],validate=True)
             if not data:raise ValueError()
             from PIL import Image
@@ -244,4 +246,5 @@ def diagnose(config,probe=False):
         code=result['status'] if re.fullmatch('[A-Z_0-9]+',result['status']) else 'CF_PROBE_FAILED'
         with open(os.environ['GITHUB_ENV'],'a') as stream:stream.write('NEWS_CF_PROBE_STATUS='+code+'\n')
     print('[cloudflare-capability] '+json.dumps(result),flush=True);return result
+
 

@@ -53,13 +53,43 @@ def prepare_date(date,now,request=monitor.github,exclude_run_id=0):
     return dict(result,dispatched=True,code='PREPARATION_DISPATCHED',attempt=len(today)+1)
 
 
+def reference_repair_pending(root,date):
+    from scripts import mosaic44
+    spec=mosaic44.CONFIG.get('repair_reference_art',{});path=Path(root)/'issues'/date/'release.json'
+    if date!=spec.get('date') or not path.is_file():return False
+    row=json.loads(path.read_text())
+    return row.get('number')==spec.get('number') and any(i.get('model')==spec['source_model'] for i in row.get('illustrations',[]))
+
+def library_date(root,date,now,preparation,request=monitor.github,exclude_run_id=0):
+    """Museum-only jobs occupy idle windows after bounded daily preparation."""
+    from scripts import art_library44 as lib
+    result={'date':date,'dispatched':False}
+    if preparation.get('code')!='PREPARATION_WAKEUP_LIMIT':return dict(result,code='DAILY_PREPARATION_FIRST')
+    if (datetime.fromisoformat(date+'T06:00').replace(tzinfo=queue.news.TZ)+timedelta(days=1)-now).total_seconds()<1800:return dict(result,code='DAILY_RELEASE_FIRST')
+    registry=lib.load(root);lib.queue_topups(root,registry);report=lib.library_report(registry)
+    if report['complete'] and not report['pending_topups']:return dict(result,code='LIBRARY_COMPLETE')
+    if not lib.prefill_genres(registry,now.astimezone(timezone.utc)):return dict(result,code='LIBRARY_SOURCE_BACKOFF')
+    rows=productions(request)
+    def busy(rows):return any(r['status'] in ACTIVE and r['id']!=exclude_run_id for r in rows)
+    if busy(rows):return dict(result,code='PRODUCTION_ACTIVE')
+    prior=[r for r in rows if r.get('event')=='workflow_dispatch' and r.get('display_title','').startswith('Library ')]
+    today=[r for r in prior if datetime.fromisoformat(r['created_at'].replace('Z','+00:00')).astimezone(timezone.utc).date()==now.astimezone(timezone.utc).date()]
+    if len(today)>=4:return dict(result,code='LIBRARY_WAKEUP_LIMIT')
+    last=max((datetime.fromisoformat(r['created_at'].replace('Z','+00:00')) for r in prior),default=now-RECOVERY_GAP)
+    if now-last<RECOVERY_GAP:return dict(result,code='LIBRARY_BACKOFF')
+    if busy(productions(request)):return dict(result,code='PRODUCTION_ACTIVE')
+    request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'library_prefill','preview':'false','target_date':date}})
+    return dict(result,dispatched=True,code='LIBRARY_DISPATCHED')
+
+
 def backfill_date(root,date,now,preparation,request=monitor.github,exclude_run_id=0,status=None):
     """Two serial free-window continuations/day; daily editing always goes first."""
     result={'date':date,'dispatched':False}
     if preparation.get('code')!='PREPARATION_WAKEUP_LIMIT':return dict(result,code='DAILY_PREPARATION_FIRST')
     if (datetime.fromisoformat(date+'T06:00').replace(tzinfo=queue.news.TZ)+timedelta(days=1)-now).total_seconds()<1800:return dict(result,code='DAILY_RELEASE_FIRST')
     path=Path(root)/'issues'/date/'release.json'
-    if not path.is_file() or not json.loads(path.read_text()).get('art44',{}).get('missing',0):return dict(result,code='ARTWORK_COMPLETE')
+    repair=reference_repair_pending(root,date)
+    if not path.is_file() or (not json.loads(path.read_text()).get('art44',{}).get('missing',0) and not repair):return dict(result,code='ARTWORK_COMPLETE')
     if (status or {}).get('cloudflare_art',{}).get('cooldown_until',0)>now.timestamp():return dict(result,code='ARTWORK_COOLDOWN')
     def busy(rows):return any(r['status'] in ACTIVE and r['id']!=exclude_run_id for r in rows)
     rows=productions(request)
@@ -70,7 +100,9 @@ def backfill_date(root,date,now,preparation,request=monitor.github,exclude_run_i
     last=max((datetime.fromisoformat(r['created_at'].replace('Z','+00:00')) for r in prior),default=now-RECOVERY_GAP)
     if now-last<RECOVERY_GAP:return dict(result,code='ARTWORK_BACKOFF')
     if busy(productions(request)):return dict(result,code='PRODUCTION_ACTIVE')
-    request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':{'phase':'backfill_issue_art','preview':'false','target_date':date}})
+    inputs={'phase':'backfill_issue_art','preview':'false','target_date':date}
+    if repair:inputs['repair_schnell_images']='true'
+    request('POST',f'actions/workflows/{WORKFLOW}/dispatches',{'ref':'main','inputs':inputs})
     return dict(result,dispatched=True,code='ARTWORK_DISPATCHED')
 
 
@@ -132,6 +164,9 @@ def run(root,*,clock=queue.moscow,sleep=time.sleep,request=monitor.github,check=
             if prepare_early and os.getenv('NEWS_POLICY_VERSION')=='4.4':
                 try:result['artwork_recovery']=backfill_date(root,date,now,result.get('preparation',{}),request)
                 except Exception as exc:result['artwork_recovery']={'code':'ARTWORK_API_UNCERTAIN','error':type(exc).__name__}
+            if prepare_early and os.getenv('NEWS_POLICY_VERSION')=='4.4' and not result.get('artwork_recovery',{}).get('dispatched'):
+                try:result['library_recovery']=library_date(root,date,now,result.get('preparation',{}),request)
+                except Exception as exc:result['library_recovery']={'code':'LIBRARY_API_UNCERTAIN','error':type(exc).__name__}
             try:result['incident']=monitor.incident(date,'VERIFIED',True,request)
             except Exception as exc:result['notification_error']=type(exc).__name__
             return result
@@ -181,4 +216,5 @@ def main():
     if result['publication_status']=='PUBLICATION_FAILED':raise RuntimeError('WATCHDOG_PUBLICATION_FAILED')
 
 if __name__=='__main__':main()
+
 

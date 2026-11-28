@@ -7,7 +7,6 @@ from urllib.parse import urlencode,urlparse
 from urllib.request import Request,urlopen
 from urllib.robotparser import RobotFileParser
 from urllib.error import HTTPError
-from PIL import Image
 
 AGENT='387News-ArtLibrary/1.0 (+https://387.su)'
 GENRES={
@@ -46,6 +45,10 @@ def issue_id(state):
 
 def genre_matches(genre,tokens):
     text=''.join(c for c in unicodedata.normalize('NFKD',tokens) if not unicodedata.combining(c)).casefold().replace('-',' ')
+    techniques={'Акварель':r'watercolou?r|akvarel','Масло':r'\boil\b|huile|\bolie\b',
+        'Темпера':r'tempera','Пастель':r'pastel','Офорт':r'etching|radering|eau.forte',
+        'Графика тушью':r'\bink\b|туш|blæk|encre','Линогравюра':r'linocut|linoleum|linolsnit'}
+    if genre in techniques:return bool(re.search(techniques[genre],text))
     if genre=='Конструктивизм':return bool(re.search(r'\b(?:constructivis(?:m|t)|konstruktivis(?:m|t))',text))
     if genre=='Романтизм':return bool(re.search(r'\b(?:romantic(?:ism)?|romantik)\b',text))
     if genre=='Кубизм' and re.search(r'neo[ -]?plastic|vorticis|progressed from cubism',text):return False
@@ -57,12 +60,15 @@ def genre_matches(genre,tokens):
     if genre=='Масло':return bool(re.search(r'\boil\b',text))
     return GENRES[genre][1].casefold() in text
 
-def empty():return {'version':1,'artworks':{},'sets':{},'studies':{}}
+SECTIONS=('artworks','sets','studies','reference_assignments','reference_uses','prefill_log','topup_tasks','topup_done')
+def empty():return dict(version=2,**{k:{} for k in SECTIONS})
 def load(root,state=None):
     root=Path(root);path=root/'art/registry.json';public=json.loads(path.read_text()) if path.is_file() else empty()
+    public['version']=2
     saved=(state or {}).get('art_library44',{});registry=saved.get('registry',empty())
     # Public commits and private resume snapshots may arrive in either order.
-    for section in ('artworks','sets','studies'):
+    for section in SECTIONS:
+        public.setdefault(section,{})
         for key,row in registry.get(section,{}).items():
             if key in public[section] and public[section][key]!=row:raise ValueError('ART_REGISTRY_CONFLICT')
             public[section][key]=row
@@ -192,6 +198,7 @@ def paris_work(payload,identifier,genre):
         'genre_evidence_url':source,'genre_id':genre_id(genre),'verified':True}
 
 def file_valid(root,work):
+    from PIL import Image
     try:
         expected='assets/art/'+work['genre_id']+'/'+work['id']+'.webp'
         if work['path']!=expected or not re.fullmatch(r'[a-f0-9]{64}',work['id']):return False
@@ -217,7 +224,7 @@ def restore(root,state):
 
 class Museum:
     """A bounded official-API client. robots, bytes and deadline fail closed."""
-    def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set();self.known_ids=set()
+    def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set();self.known_ids=set();self.checked_ids=set();self.scanned_pages=[];self.failures=[];self.gap_seconds=0;self.last_request=0
     def get(self,url,limit=5000000,robots=True,accept=None):
         parsed=urlparse(url)
         if parsed.scheme!='https' or parsed.hostname not in HOSTS or parsed.username or parsed.password:raise ValueError('ART_SOURCE_HOST_INVALID')
@@ -233,7 +240,11 @@ class Museum:
                 self.robots[origin]=parser
             if not self.robots[origin].can_fetch(AGENT,url):raise ValueError('ART_ROBOTS_DISALLOWED')
         if self.left<=0 or time.monotonic()>=self.deadline:raise ValueError('ART_DISCOVERY_BUDGET')
-        self.left-=1
+        gap=max(self.gap_seconds,((self.robots.get('https://'+parsed.netloc).crawl_delay(AGENT) or 0) if 'https://'+parsed.netloc in self.robots else 0))
+        wait=max(0,gap-(time.monotonic()-self.last_request))
+        if time.monotonic()+wait>=self.deadline:raise ValueError('ART_DISCOVERY_BUDGET')
+        if wait:time.sleep(wait)
+        self.last_request=time.monotonic();self.left-=1
         try:
             with urlopen(Request(url,headers={'User-Agent':AGENT,**({'Accept':accept} if accept else {})}),timeout=min(12,max(1,self.deadline-time.monotonic()))) as response:
                 if urlparse(response.url).scheme!='https' or urlparse(response.url).hostname not in HOSTS:raise ValueError('ART_REDIRECT_HOST_INVALID')
@@ -268,11 +279,11 @@ class Museum:
                 if mid in self.known_ids:continue
                 source='https://www.searchculture.gr/aggregator/edm/momus/000179-'+str(identifier)
                 try:
-                    work=self.linked_work(source,genre)
+                    work=self.linked_work(source,genre);self.checked_ids.add(mid)
                     print('[art-museum-source] '+json.dumps({'museum':'momus-searchculture','item':identifier,'admissible':bool(work)}),flush=True)
                     if work:
                         self.known_ids.add(mid);yield work
-                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'momus-searchculture','code':safe_code(exc)}),flush=True)
+                except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'momus-searchculture','code':safe_code(exc)}),flush=True)
         if genre in PARIS_SEEDS:
             for identifier in PARIS_SEEDS[genre]:
                 if 'paris:'+str(identifier) in self.known_ids:continue
@@ -281,7 +292,7 @@ class Museum:
                     print('[art-museum-source] '+json.dumps({'museum':'paris-musees','item':identifier,'admissible':bool(work)}),flush=True)
                     if work:
                         self.known_ids.add(work['museum_id']);yield work
-                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'paris-musees','code':safe_code(exc)}),flush=True)
+                except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'paris-musees','code':safe_code(exc)}),flush=True)
         if genre in MET_SEEDS:
             for identifier in MET_SEEDS[genre]:
                 if 'met:'+str(identifier) in self.known_ids:continue
@@ -290,7 +301,7 @@ class Museum:
                     print('[art-museum-source] '+json.dumps({'museum':'met-curated','item':identifier,'admissible':bool(work)}),flush=True)
                     if work:
                         self.known_ids.add(work['museum_id']);yield work
-                except Exception as exc:print('[art-museum] '+json.dumps({'museum':'met-curated','code':safe_code(exc)}),flush=True)
+                except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'met-curated','code':safe_code(exc)}),flush=True)
         query=GENRES[genre][1]
         fields='id,title,artist_title,date_display,date_start,image_id,is_public_domain,style_titles,medium_display,artwork_type_title,place_of_origin'
         url='https://api.artic.edu/api/v1/artworks/search?'+urlencode({'q':query,'limit':60,'fields':fields})
@@ -299,6 +310,9 @@ class Museum:
                 if 'www.artic.edu' in self.blocked_hosts:break
                 rows=json.loads(self.get(url+'&page='+str(page)))['data']
                 for row in rows:
+                    mid='aic:'+str(row.get('id'))
+                    if mid in self.known_ids:continue
+                    self.checked_ids.add(mid)
                     if 'www.artic.edu' in self.blocked_hosts:break
                     tokens=' '.join(str(x) for x in (row.get('style_titles') or []) if x)+' '+str(row.get('medium_display') or '')+' '+str(row.get('place_of_origin',''))
                     if not any(t in str(row.get('artwork_type_title','')).casefold() for t in ('painting','drawing','print')):continue
@@ -307,13 +321,18 @@ class Museum:
                     yield {'museum':'Art Institute of Chicago','museum_id':'aic:'+str(row['id']),'title':row['title'],'artist':row['artist_title'],'year':row['date_display'],
                         'source_url':'https://www.artic.edu/artworks/'+str(row['id']),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images',
                         'image_url':'https://www.artic.edu/iiif/2/'+row['image_id']+'/full/480,/0/default.jpg','search_page':page,'genre_evidence':tokens,'genre_id':genre_id(genre),'verified':True}
-        except Exception as exc:print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
+                self.scanned_pages.append(page)
+        except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
             query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial','Кубизм':'Cubist'}.get(genre,query)
             for page in range(start_page,start_page+2):
                 url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,'skip':(page-1)*60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
-                for row in json.loads(self.get(url))['data']:
+                rows=json.loads(self.get(url))['data']
+                for row in rows:
+                    mid='cma:'+str(row.get('id'))
+                    if mid in self.known_ids:continue
+                    self.checked_ids.add(mid)
                     tokens=' '.join(str(row.get(k) or '') for k in ('title','technique','description','culture','type','period'))
                     image=(row.get('images') or {}).get('web',{}).get('url')
                     if image and urlparse(image).hostname in self.blocked_hosts:break
@@ -326,7 +345,8 @@ class Museum:
                     self.known_ids.add(mid)
                     yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],
                         'source_url':row['url'],'license':'CC0','license_url':'https://www.clevelandart.org/open-access','image_url':image,'search_page':page,'genre_evidence':tokens[:1000],'genre_id':genre_id(genre),'verified':True}
-        except Exception as exc:print('[art-museum] '+json.dumps({'museum':'cleveland','code':safe_code(exc)}),flush=True)
+                self.scanned_pages.append(page)
+        except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'cleveland','code':safe_code(exc)}),flush=True)
         # A third independent open collection, with a deliberately narrow curatorial
         # fallback: documented Monet paintings, not arbitrary search matches.
         if genre=='Импрессионизм':
@@ -346,7 +366,7 @@ class Museum:
                     yield {'museum':'The Metropolitan Museum of Art','museum_id':'met:'+str(identity),'title':row['title'],'artist':row['artistDisplayName'],'year':row['objectDate'],
                         'source_url':row['objectURL'],'license':'CC0','license_url':'https://www.metmuseum.org/policies/image-resources',
                         'image_url':image,'genre_evidence':'Curatorial selection: Claude Monet painting; '+row.get('medium',''),'genre_id':genre_id(genre),'verified':True}
-            except Exception as exc:print('[art-museum] '+json.dumps({'museum':'met','code':safe_code(exc)}),flush=True)
+            except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'met','code':safe_code(exc)}),flush=True)
 
 
         # Independent official open collection. Only explicit public-domain rights
@@ -354,11 +374,14 @@ class Museum:
         try:
             queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('Juan Gris','kubisme'),'Романтизм':('romantik',)}.get(genre,()))))
             for query in queries:
-                url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':0,'rows':40})
+                url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':(start_page-1)*40,'rows':80})
                 payload=json.loads(self.get(url));items=payload.get('items')
                 if not isinstance(items,list):raise ValueError('ART_SOURCE_SCHEMA_INVALID')
                 print('[art-museum-source] '+json.dumps({'museum':'smk','technical_access':'verified','records':len(items)}),flush=True)
                 for row in items:
+                    mid='smk:'+str(row.get('object_number'))
+                    if mid in self.known_ids:continue
+                    self.checked_ids.add(mid)
                     rights=row.get('rights_url') or row.get('rights') or '';rights=rights.replace('http://creativecommons.org/','https://creativecommons.org/') if isinstance(rights,str) else ''
                     if rights=='https://creativecommons.org/share-your-work/public-domain/cc0/':rights='https://creativecommons.org/publicdomain/zero/1.0/'
                     license={'https://creativecommons.org/publicdomain/zero/1.0/':'CC0','https://creativecommons.org/publicdomain/mark/1.0/':'Public Domain Mark'}.get(rights)
@@ -383,7 +406,7 @@ class Museum:
                     yield {'museum':'SMK — National Gallery of Denmark','museum_id':'smk:'+identity,'title':title,'artist':artist,'year':year,
                         'source_url':url,'license':license,'license_url':'https://www.smk.dk/en/article/smk-open/','rights_evidence':rights,'public_domain':True,'image_url':image,
                         'genre_evidence':evidence[:1000],'genre_id':genre_id(genre),'verified':True}
-        except Exception as exc:print('[art-museum] '+json.dumps({'museum':'smk','code':safe_code(exc)}),flush=True)
+        except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'smk','code':safe_code(exc)}),flush=True)
 
 
 def safe_code(exc):
@@ -391,6 +414,8 @@ def safe_code(exc):
     return value if re.fullmatch(r'[A-Z_0-9]+',value) else 'HTTP_'+str(exc.code) if isinstance(exc,HTTPError) else type(exc).__name__
 
 def ingest(root,registry,work,raw,state,persist):
+    from PIL import Image
+    if re.search(r'(?i)unknown|unidentified|anonymous|неизвест',str(work.get('artist',''))):raise ValueError('ART_AUTHOR_UNESTABLISHED')
     for url in (work['source_url'],work['license_url']):
         if urlparse(url).scheme!='https' or urlparse(url).hostname not in HOSTS:raise ValueError('ART_METADATA_URL_INVALID')
     if work.get('genre_id') not in {g[0] for g in GENRES.values()}:raise ValueError('ART_GENRE_UNSUPPORTED')
@@ -403,7 +428,7 @@ def ingest(root,registry,work,raw,state,persist):
         if image.width*image.height>30000000:raise ValueError('ART_IMAGE_TOO_LARGE')
         image.load()
         image=image.convert('RGB');image.thumbnail((480,480))
-        out=io.BytesIO();image.save(out,format='WEBP',quality=88);data=out.getvalue();width,height=image.size
+        out=io.BytesIO();image.save(out,format='WEBP',quality=84,method=6);data=out.getvalue();width,height=image.size
     if width<32 or height<32:raise ValueError('ART_IMAGE_TOO_SMALL')
     checksum=digest(data)
     with Image.open(io.BytesIO(data)) as check:
@@ -422,14 +447,51 @@ def ingest(root,registry,work,raw,state,persist):
     file=Path(root)/path;file.parent.mkdir(parents=True,exist_ok=True);file.write_bytes(data)
     return key
 
-def available_works(root,registry,issue,issue_date,genre):
-    """Immutable issue assignments retain the full legacy and rolling use history."""
-    day=date.fromisoformat(issue_date);gid=genre_id(genre)
-    recent={i for group in registry['sets'].values()
-        if group['issue_id']!=issue and (day-date.fromisoformat(group['issue_date'])).days<30
-        for i in group['artwork_ids']}
-    return [w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in recent
-        and file_valid(root,w) and not (genre=='Кубизм' and not genre_matches(genre,w.get('genre_evidence','')))]
+def migrate_usage(root,registry):
+    """Recover actual selected IDs; old unidentified quartets remain quarantined."""
+    from zoneinfo import ZoneInfo
+    uses=registry.setdefault('reference_uses',{})
+    for path in sorted((Path(root)/'assets/illustrations').glob('*/manifest.json')):
+        data=json.loads(path.read_text());issue=data.get('date',path.parent.name)
+        for row in data.get('images',{}).values():
+            ids=[row['selected_reference_id']] if row.get('selected_reference_id') else row.get('reference_artwork_ids',[]) if row.get('reference_images_sent')==4 else []
+            for wid in ids:
+                if wid not in registry['artworks']:continue
+                article=row.get('article_id') or row.get('article_slug') or row['key']
+                used_issue=registry.get('reference_assignments',{}).get(row.get('reference_assignment_id'),{}).get('issue_id',registry['sets'].get(row.get('reference_set_id'),{}).get('issue_id',issue))
+                key=digest((used_issue+'/'+article+'/'+wid).encode())
+                if key in uses:continue
+                group=registry['sets'].get(row.get('reference_set_id'),{})
+                when=row.get('reference_use_date') or issue
+                if not row.get('reference_use_date') and group.get('selected_at'):
+                    when=max(when,datetime.fromisoformat(group['selected_at'].replace('Z','+00:00')).astimezone(ZoneInfo('Europe/Moscow')).date().isoformat())
+                uses[key]={'artwork_id':wid,'date':when,'issue_id':used_issue,'article_id':article,'provenance':'GENERATED_IMAGE' if row.get('reference_assignment_id') else 'SELECTED_REFERENCE_METADATA'}
+    for key,row in registry.get('studies',{}).items():
+        ids=[row['selected_reference_id']] if row.get('selected_reference_id') else row.get('reference_artwork_ids',[]) if row.get('reference_images_sent')==4 else []
+        for wid in ids:
+            if wid not in registry['artworks'] or not row.get('created_at'):continue
+            when=datetime.fromisoformat(row['created_at'].replace('Z','+00:00')).astimezone(ZoneInfo('Europe/Moscow')).date().isoformat()
+            issue=row.get('issue_id') or registry['sets'].get(row.get('reference_set_id'),{}).get('issue_id') or 'art-study-'+when;article=row.get('article_id') or key
+            identity=digest((issue+'/'+article+'/'+wid).encode())
+            uses.setdefault(identity,{'artwork_id':wid,'date':row.get('reference_use_date',when),'issue_id':issue,'article_id':article,'provenance':'STUDY_METADATA'})
+    return uses
+
+def reference_day():
+    from zoneinfo import ZoneInfo
+    return datetime.now(ZoneInfo('Europe/Moscow')).date().isoformat()
+
+def available_works(root,registry,issue,issue_date,genre,article_id=None):
+    day=date.fromisoformat(issue_date);gid=genre_id(genre);uses=migrate_usage(root,registry)
+    def other(u):return not (u['issue_id']==issue and article_id is not None and u['article_id']==article_id)
+    blocked={u['artwork_id'] for u in uses.values() if other(u) and (day-date.fromisoformat(u['date'])).days<14}
+    for row in registry.setdefault('reference_assignments',{}).values():
+        completed=any(u['issue_id']==row['issue_id'] and u['article_id']==row['article_id'] and u['artwork_id']==row['artwork_id'] for u in uses.values())
+        if not completed and other(row):blocked.add(row['artwork_id'])
+    for group in registry['sets'].values():
+        known=any(u['issue_id']==group['issue_id'] and u['artwork_id'] in group['artwork_ids'] for u in uses.values())
+        if not known and (day-date.fromisoformat(group['issue_date'])).days<14:blocked.update(group['artwork_ids'])
+    return [w for w in registry['artworks'].values() if w['genre_id']==gid and w['id'] not in blocked and file_valid(root,w)
+        and not (genre=='Кубизм' and not genre_matches(genre,w.get('genre_evidence','')))]
 
 
 def assign(root,registry,issue,issue_date,genre,number=None,persist=lambda:None):
@@ -485,15 +547,7 @@ def attach(root,state,items,sets):
     for item in items:
         row=sets.get(item['genre'])
         item['reference_status']='REFERENCE_SET_UNAVAILABLE'
-        if not row:
-            from scripts import mosaic44
-            if mosaic44.CONFIG.get('text_only_fallback'):
-                for key in ('reference_images','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_selection_version','reference_selection_score','reference_selection_reason','reference_transport','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation'):
-                    item.pop(key,None)
-                item.update(generation_mode='TEXT_ONLY',reference_images_sent=0,reference_status='NO_REFERENCE_AVAILABLE')
-                item.update({k:color.direction(item['genre'])[k] for k in ('art_movement','medium')})
-                item['prompt']=color.prompt(item)
-            continue
+        if not row:continue
         work,choice=color.select(root,state,item,row,registry,previous)
         item.update({k:v for k,v in choice.items() if k!='sha256'})
         item.update(generation_mode='REFERENCE',reference_status='ONE_REFERENCE_READY',reference_set_id=row['id'],reference_artwork_ids=row['artwork_ids'],reference_sha256=row['sha256'],reference_images_sent=1)
@@ -506,10 +560,127 @@ def attach(root,state,items,sets):
         previous.append(choice['palette'])
     return items
 
+def prepare_references(root,state,items,persist=lambda:None):
+    """Reserve one unique work per immutable article; no synchronous museum search."""
+    from scripts import mosaic44 as art,art_reference44 as color
+    registry=restore(root,state);migrate_usage(root,registry);issue=issue_id(state)
+    cached=art.cached(root,state['date']);objects=state.get('art44',{}).get('objects',{})
+    previous=[row['palette'] for row in list(cached.values())+list(objects.values()) if isinstance(row.get('palette'),dict)]
+    for item in items:
+        if art.object_valid(objects.get(item['key'],{})) or (item['key'] in cached and art.valid_image(root,state['date'],item['key'],cached[item['key']])):continue
+        binding=digest((issue+'/'+item['article_id']+'/'+item['text_hash']).encode())
+        assigned=registry['reference_assignments'].get(binding)
+        if assigned:
+            work=registry['artworks'][assigned['artwork_id']]
+            if not file_valid(root,work):item['reference_status']='REFERENCE_FILE_UNAVAILABLE';continue
+            item['genre']=assigned['genre']
+        else:
+            subject=art.theme({'title':item['descriptor']['title'],'teaser':item['descriptor'].get('summary','')})
+            choices=list(dict.fromkeys([item['genre'],*art.ISSUE_STYLES[subject],*art.STYLES[subject]]));pool=[]
+            prior=cached.get(item['key'],{});wid=prior.get('selected_reference_id')
+            if wid in registry['artworks'] and prior.get('article_id')==item['article_id'] and prior.get('text_hash')==item['text_hash'] and file_valid(root,registry['artworks'][wid]):
+                pool=[registry['artworks'][wid]];item['preferred_reference_id']=wid
+            for genre in ([] if pool else choices):
+                pool=available_works(root,registry,issue,reference_day(),genre,item['article_id'])
+                preferred=cached.get(item['key'],{}).get('selected_reference_id')
+                if preferred and any(w['id']==preferred for w in pool):item['preferred_reference_id']=preferred
+                if pool:item['genre']=genre;break
+            if not pool:item['reference_status']='REFERENCE_SET_UNAVAILABLE';continue
+            row={'id':'pool/'+binding,'kind':'LIBRARY_POOL','artwork_ids':[w['id'] for w in pool]}
+            work,choice=color.select(root,state,item,row,registry,previous)
+            assigned={'id':binding,'issue_id':issue,'date':reference_day(),'article_id':item['article_id'],'text_hash':item['text_hash'],
+                'artwork_id':work['id'],'genre':item['genre'],'selection':{k:choice[k] for k in ('reference_selection_version','reference_selection_score','reference_selection_reason')},'artwork_ids':[work['id']],'sha256':[work['sha256']]}
+            registry['reference_assignments'][binding]=assigned;persist()
+        item.update(assigned.get('selection',{}))
+        profile=color.work_profile(root,work,state);previous.append(profile)
+        item.update(generation_mode='REFERENCE',reference_status='ONE_REFERENCE_READY',reference_assignment_id=binding,
+            reference_set_id='binding/'+binding,reference_artwork_ids=[work['id']],reference_sha256=[work['sha256']],
+            selected_reference_id=work['id'],reference_title=work['title'],reference_artist=work['artist'],reference_images_sent=1,
+            reference_images=[{'path':work['path'],'sha256':work['sha256']}],palette=profile)
+        item.update({k:color.direction(item['genre'])[k] for k in ('art_movement','medium')})
+        if work.get('license')=='CC BY-SA 4.0':item.update(artwork_license=CC_BY_SA,reference_attribution=work['attribution'],reference_source_url=work['source_url'],reference_adaptation='Original AI composition after a museum reference; resized WebP reference')
+        item['prompt']=color.prompt(item)
+    render(root,registry);persist();return items
+
+def note_generated(root,state,item):
+    if not item.get('reference_assignment_id'):return
+    from zoneinfo import ZoneInfo
+    registry=load(root,state);row=registry['reference_assignments'][item['reference_assignment_id']]
+    key=digest((row['issue_id']+'/'+row['article_id']+'/'+row['artwork_id']).encode())
+    uses=registry['reference_uses'];uses.setdefault(key,{'artwork_id':row['artwork_id'],'date':reference_day(),
+        'issue_id':row['issue_id'],'article_id':row['article_id'],'provenance':'GENERATED_IMAGE'})
+    item['reference_use_date']=uses[key]['date']
+
+def queue_topups(root,registry):
+    """Only published releases enqueue one permanent task per issue and genre."""
+    for path in sorted((Path(root)/'issues').glob('*/release.json')):
+        row=json.loads(path.read_text());issue=row.get('issue_id') or path.parent.name
+        for genre in dict.fromkeys(i['genre'] for i in row.get('illustrations',[])):
+            if genre not in GENRES:continue
+            key=issue+'/'+genre_id(genre)
+            registry['topup_tasks'].setdefault(key,{'issue_id':issue,'genre':genre,'queued_at':issue})
+    for wid,work in registry['artworks'].items():
+        task=work.get('topup_task_id')
+        if task and task in registry['topup_tasks']:
+            registry['topup_done'].setdefault(task,{'artwork_id':wid,'completed_at':work['added_at']})
+
+def library_report(registry):
+    counts={g:sum(w['genre_id']==genre_id(g) for w in registry['artworks'].values()) for g in GENRES}
+    return {'target_per_genre':70,'artworks':len(registry['artworks']),'genres':counts,'complete':all(n>=70 for n in counts.values()),
+        'pending_topups':len(set(registry['topup_tasks'])-set(registry['topup_done']))}
+
+def prefill_genres(registry,at):
+    counts=library_report(registry)['genres'];journals=registry['prefill_log']
+    pending={t['genre'] for k,t in registry['topup_tasks'].items() if k not in registry['topup_done']}
+    def last(g):return max((r for r in journals.values() if r['genre']==g),key=lambda r:r['at'],default={})
+    return sorted((g for g in GENRES if last(g).get('retry_after','')<=at.isoformat() and (counts[g]<70 or g in pending)),
+        key=lambda g:(g not in pending,counts[g],last(g).get('at','')))
+
+def library_prefill(root,state,persist=lambda:None,limit=20,seconds=180,requests=80):
+    """One resumable, bounded museum-only batch. Journals are immutable and shared."""
+    registry=restore(root,state);migrate_usage(root,registry);queue_topups(root,registry)
+    before=len(registry['artworks']);client=Museum(seconds=min(180,seconds),requests=min(80,requests));client.gap_seconds=1;limit=min(30,max(1,limit));at=datetime.now(timezone.utc)
+    journals=registry['prefill_log'];pending=[(k,v) for k,v in registry['topup_tasks'].items() if k not in registry['topup_done']]
+    counts=library_report(registry)['genres']
+    genres=prefill_genres(registry,at)
+    for genre in genres:
+        if len(registry['artworks'])-before>=limit or client.left<4 or time.monotonic()>=client.deadline:break
+        history=[r for r in journals.values() if r['genre']==genre];page=max((r.get('next_page',1) for r in history),default=1)
+        seen={i for row in history for i in row.get('checked_ids',[])}
+        client.known_ids={w['museum_id'] for w in registry['artworks'].values()}|seen;client.checked_ids=set();client.scanned_pages=[];client.failures=[];added=[];reason='NO_ADMISSIBLE_MATCHES'
+        try:
+            for work in client.candidates(genre,start_page=page):
+                if client.left<1 or time.monotonic()>=client.deadline:break
+                if known(registry,work):continue
+                identity=work['museum_id'];client.checked_ids.add(identity)
+                task=next(((k,t) for k,t in pending if t['genre']==genre and k not in registry['topup_done']),None)
+                if task:work['topup_task_id']=task[0]
+                try:
+                    key=ingest(root,registry,work,client.get(work.pop('image_url')),state,persist)
+                    if key:
+                        added.append(key)
+                        if task:registry['topup_done'][task[0]]={'artwork_id':key,'completed_at':registry['artworks'][key]['added_at']}
+                        persist()
+                except Exception as exc:
+                    reason=safe_code(exc)
+                    if reason in ('HTTP_429','HTTP_500','HTTP_502','HTTP_503','ART_DISCOVERY_BUDGET','TimeoutError','URLError'):
+                        client.checked_ids.discard(identity);break
+                if len(registry['artworks'])-before>=limit:break
+                if counts[genre]+len(added)>=70 and not any(t['genre']==genre and k not in registry['topup_done'] for k,t in pending):break
+        except Exception as exc:reason=safe_code(exc)
+        if not added and client.failures:reason='SOURCE_FAILURE_'+client.failures[-1]
+        entry={'genre':genre,'at':stamp(),'next_page':(1 if page>=100 else max(client.scanned_pages)+1) if client.scanned_pages else page,'checked_ids':sorted(client.checked_ids),
+            'added':added,'code':'ADDED' if added else reason,'retry_after':(at+__import__('datetime').timedelta(minutes=30 if added else 360)).isoformat()}
+        journals[digest((genre+entry['at']).encode())]=entry;persist()
+    render(root,registry);persist();report=library_report(registry);report['added']=len(registry['artworks'])-before
+    print('[art-library-prefill] '+json.dumps(report,ensure_ascii=False),flush=True);return report
+
 def render(root,registry):
     from scripts import news
     root=Path(root);target=root/'art';target.mkdir(exist_ok=True)
     (target/'registry.json').write_text(json.dumps(registry,ensure_ascii=False,indent=2)+'\n')
+    usage={i:{'artwork_id':i,'last_used':max((u['date'] for u in registry.get('reference_uses',{}).values() if u['artwork_id']==i),default=None),'history':[u for u in registry.get('reference_uses',{}).values() if u['artwork_id']==i]} for i in registry['artworks']}
+    (target/'usage.json').write_text(json.dumps(usage,ensure_ascii=False,indent=2)+'\n')
     current=max(registry['sets'].values(),key=lambda s:s['selected_at'],default={'issue_date':datetime.now().date().isoformat(),'issue_number':0})
     date=current['issue_date'];number=current.get('issue_number') or 0
     def page(title,canonical,body):
@@ -519,14 +690,14 @@ def render(root,registry):
         return header.replace('</head>','<link rel="stylesheet" href="/assets/art.css"></head>')+'<main class="wrap art-library"><h1>'+escape(title)+'</h1>'+body+'</main>'+news.page_footer()
     groups={}  # Only verified, nonempty genre collections.
     for label,(gid,_) in GENRES.items():
-        if any(w['genre_id']==gid for w in registry['artworks'].values()):groups[gid]=label
+        groups[gid]=label
     body='<p>Открытая коллекция музейных произведений. Референсы помогают изучать художественный язык; иллюстрации газеты создаются отдельно.</p><ul class="art-genres">'
     for gid,label in groups.items():
         count=sum(w['genre_id']==gid for w in registry['artworks'].values());body+='<li><a href="/art/'+gid+'/">'+escape(label)+'</a> · '+str(count)+'</li>'
         works=sorted((w for w in registry['artworks'].values() if w['genre_id']==gid),key=lambda w:w['added_at'],reverse=True)
         sets=sorted((s for s in registry['sets'].values() if s['genre_id']==gid),key=lambda s:s['selected_at'],reverse=True)
         used={i:s for s in sets for i in s['artwork_ids']}
-        content='<a href="/art/">Все направления</a><h2>Наборы по выпускам</h2>'
+        content='<a href="/art/">Все направления</a><p>Произведений: '+str(len(works))+'</p><h2>Наборы по выпускам</h2>'
         for s in sets:
             is_study=s['issue_id'].startswith('art-study-');url='/art/studies/' if is_study else '/issues/'+s['issue_id']+'/'
             label='Художественная проба · '+s['issue_date'] if is_study else 'Выпуск '+('№'+str(s['issue_number'])+' · ' if s.get('issue_number') else '')+s['issue_date']
@@ -558,14 +729,14 @@ def rollout(root,date,state,persist):
         brief=a.CONFIG.get('visual_brief_repairs',{}).get((prior or {}).get('text_hash'),{})
         if brief:item['descriptor']['visual_subject_en']=brief['scene_en']
         item['key']=digest((study+'|'+item['article_id']).encode())
-    sets=prepare_sets(root,state,chosen,persist,identity_override=study)
-    attach(root,state,chosen,sets);registry=load(root,state)
+    study_state={'date':date,'issue_id':study,'art_library44':state.setdefault('art_library44',{})}
+    prepare_references(root,study_state,chosen,persist);registry=load(root,state)
     for item in chosen:
         if item['key'] in registry['studies']:continue
         if not item.get('reference_images'):break
-        raw=a.generate(item,news.runtime.ACTIVE_BUDGET);encoded,w,h=a.encode_image(raw)
+        raw=a.generate(item,news.runtime.ACTIVE_BUDGET);encoded,w,h=a.encode_image(raw);note_generated(root,study_state,item)
         key=item['key'];path='assets/illustrations/'+study+'/'+key+'.webp'
-        row={'key':key,'path':path,'width':w,'height':h,'sha256':digest(encoded),'title':item['descriptor']['title'],'article_url':'/issues/'+date+'/articles/'+item['article_id'].split('/')[-1]+'/',
+        row={'key':key,'issue_id':study,'article_id':item['article_id'],'reference_use_date':item.get('reference_use_date'),'path':path,'width':w,'height':h,'sha256':digest(encoded),'title':item['descriptor']['title'],'article_url':'/issues/'+date+'/articles/'+item['article_id'].split('/')[-1]+'/',
             'reference_images_sent':1,'selected_reference_id':item['selected_reference_id'],'reference_set_id':item['reference_set_id'],'reference_artwork_ids':item['reference_artwork_ids'],'reference_sha256':item['reference_sha256'],'model':a.CONFIG['reference_model'],'created_at':stamp()}
         if any(study['sha256']==row['sha256'] for study in registry['studies'].values()):raise ValueError('ART_STUDY_NOT_UNIQUE')
         registry['studies'][key]=row
@@ -620,7 +791,8 @@ def merge_checkpoint(state,incoming):
     if not incoming:return
     target=state.setdefault('art_library44',{})
     registry=target.setdefault('registry',empty())
-    for section in ('artworks','sets','studies'):
+    for section in SECTIONS:
+        registry.setdefault(section,{})
         for key,row in incoming.get('registry',{}).get(section,{}).items():
             if key in registry[section] and registry[section][key]!=row:raise ValueError('ART_REGISTRY_CONFLICT')
             registry[section][key]=json.loads(json.dumps(row))
@@ -708,4 +880,5 @@ if __name__=='__main__':
     parser.add_argument('--probe-source',action='store_true',required=True)
     parser.add_argument('--output',required=True)
     args=parser.parse_args();probe_source(args.output)
+
 

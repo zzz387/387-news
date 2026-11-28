@@ -304,8 +304,9 @@ def check_art_library(root,base='https://387.su'):
     for group in actual['sets'].values():
         if not 1<=len(group['artwork_ids'])<=4 or len(set(group['artwork_ids']))!=len(group['artwork_ids']):raise RuntimeError('PUBLIC_ART_SET_INVALID')
         if [actual['artworks'][i]['sha256'] for i in group['artwork_ids']]!=group['sha256']:raise RuntimeError('PUBLIC_ART_SET_CHANGED')
-    latest=max((g['issue_date'] for g in actual['sets'].values()),default='')
+    latest=max([g['issue_date'] for g in actual['sets'].values()]+[g['date'] for g in actual.get('reference_assignments',{}).values()],default='')
     current={i for g in actual['sets'].values() if g['issue_date']==latest for i in g['artwork_ids']}
+    current.update(g['artwork_id'] for g in actual.get('reference_assignments',{}).values() if g['date']==latest)
     images=[actual['artworks'][i] for i in current]+[s for s in actual['studies'].values() if '/'+latest+'/' in s['article_url']]
     # The complete immutable registry is compared above; binary HTTPS checks stay
     # bounded to the newest assignments rather than growing with the whole archive.
@@ -328,3 +329,4 @@ def check_delivery(base='https://387.su',expected_date=None,root=None):
 
 
 if __name__=='__main__': main()
+

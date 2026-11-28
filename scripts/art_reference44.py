@@ -72,7 +72,7 @@ def select(root,state,item,row,registry,previous):
     from scripts import art_library44
     saved=state.setdefault('art_library44',{}).setdefault('reference_choices',{});key=row['id']+'/'+item['key']
     works=[registry['artworks'][i] for i in row['artwork_ids']]
-    if not 1<=len(works)<=4 or not all(art_library44.file_valid(root,w) for w in works):raise ValueError('ART_SET_INTEGRITY')
+    if not works or (len(works)>4 and row.get('kind')!='LIBRARY_POOL') or not all(art_library44.file_valid(root,w) for w in works):raise ValueError('ART_SET_INTEGRITY')
     cached=saved.get(key)
     if cached:
         work=next((w for w in works if w['id']==cached['selected_reference_id']),None)
@@ -101,31 +101,8 @@ def select(root,state,item,row,registry,previous):
 
 def direction(genre):return CONFIG['directions'].get(genre,CONFIG['directions']['Графика тушью'])
 
-def text_prompt(item):
-    from scripts import mosaic44
-    d=item['descriptor'];style=direction(item['genre'])
-    subject=(d.get('visual_subject_en') or d['title']+'. '+d.get('summary','')+'. '+d.get('idea',''))[:1100]
-    palettes={
-        'family':'warm coral, ivory and soft blue', 'health':'ultramarine, pale violet and silver',
-        'yoga':'sand, ink and mist blue', 'sport':'vermilion, cobalt and charcoal',
-        'moscow':'brick red, limestone and slate blue', 'architecture':'graphite, terracotta and chalk',
-        'nature':'earth browns, leaf colors and sky blue', 'history':'umber, parchment and burgundy',
-        'philosophy':'midnight blue, amber and pearl', 'economy':'charcoal, burgundy and brass',
-        'technology':'copper, graphite and ice blue', 'science':'indigo, coral and silver',
-        'culture':'wine red, cream and lavender'}
-    palette=palettes[mosaic44.theme({'title':d['title'],'teaser':d.get('summary','')})]
-    item['palette']=palette
-    conventions='; '.join(style[k] for k in ('space','line','light','texture','abstraction'))
-    return (f"Create an original unsigned fine-art illustration. ARTICLE SUBJECT: {subject}. "
-        f"ART MOVEMENT: {style['art_movement']}. MEDIUM: {style['medium']}. "
-        f"STYLE: {style['characteristics']} {conventions}. "
-        f"COLOR: {palette}; adapt tonal balance to the article and the stated movement. "
-        f"COMPOSITION: {item.get('composition','Asymmetric composition serving the subject')}. "
-        "Respect article facts. No text, signatures, logos, labels, watermarks, plastic 3D surfaces or artificial glow.")
-
-
 def prompt(item):
-    if item.get('generation_mode')=='TEXT_ONLY':return text_prompt(item)
+    if item.get('generation_mode')=='TEXT_ONLY':raise ValueError('CF_ONE_REFERENCE_REQUIRED')
     d=item['descriptor'];scene=(d.get('visual_subject_en') or d['title']+'. '+d.get('summary','')).strip()
     style=direction(item['genre']);palette=item.get('palette')
     color=description(palette) if isinstance(palette,dict) else 'Use the actual colors of the attached painting.'
@@ -186,4 +163,5 @@ def comparison(root,state,items,baseline,output):
         body+='<pre>'+escape(json.dumps({'palette':r['palette'],'color_match':r['color_match']},ensure_ascii=False,indent=2))+'</pre></section>'
     (output/'index.html').write_text(body+'</html>')
     return rows
+
 

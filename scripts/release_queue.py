@@ -50,13 +50,14 @@ def context(phase, preview, date, event, root=None, now=None, check_public=None)
     now = moscow(now)
     if date:
         datetime.strptime(date,'%Y-%m-%d')
-    if phase=='backfill_issue_art' and date:
+    if phase in ('backfill_issue_art','library_prefill') and date:
         if not preview and date<now.date().isoformat() and not edition_exists(root,now.date().isoformat()):
             print('[release-context] ARTWORK_YIELD_TO_UNPUBLISHED_DAILY',flush=True)
             return 'run',False,now.date().isoformat()
         return phase,preview,date
     if phase=='recover_missing_issue' and date=='2026-11-20':
         return 'run',preview,date
+    if phase=='library_prefill':return phase,preview,now.date().isoformat()
     if event in ('push','schedule'):
         return 'run',False,target_date(root,now,check_public)
     if date:
@@ -136,3 +137,4 @@ if __name__=='__main__':
     import sys
     if len(sys.argv)==3 and sys.argv[1]=='--wait-until':wait_until_release(sys.argv[2])
     else:main()
+

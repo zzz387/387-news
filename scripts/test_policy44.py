@@ -185,25 +185,30 @@ class Policy44Tests(unittest.TestCase):
         ledger={'day':'2026-11-21','requests':17,'models':{}};budget=rt.RequestBudget(ledger,run_limit=24,day_limit=220,gap=0,seconds=1000)
         item=art.article_plans({'date':'2026-11-22','art44':{}},[{'id':'one','article':main_row(0)['article']}])[0]
         seen=[]
-        def api(path,data=None):
+        def api(path,data=None,images=None):
             seen.append((path,data))
             if path.endswith('/subscriptions'):return {'result':[]}
             if path=='/graphql':return {'data':{'viewer':{'accounts':[{'aiInferenceAdaptiveGroups':[{'sum':{'totalNeurons':100}}]}]}}}
             return {'result':{'image':base64.b64encode(raw).decode()}}
-        env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
-        with patch.dict(os.environ,env),patch.object(cf,'api',side_effect=api),patch.object(cf,'_LAST',0):
-            self.assertEqual(cf.generate(item,budget,art.CONFIG),raw)
-            posts=[(path,data) for path,data in seen if '/ai/run/' in path]
-            self.assertEqual(len(posts),1);self.assertEqual(set(posts[0][1]),{'prompt','steps'});self.assertLessEqual(len(posts[0][1]['prompt']),2048);self.assertEqual(posts[0][1]['prompt'],item['prompt'])
-            self.assertIn('$account:string!',next(data['query'] for path,data in seen if path=='/graphql'))
-            self.assertEqual(ledger['requests'],17);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
-            with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
-            self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
-            with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'paid'},'price':5}]}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
-            with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'free'},'price':0}],'result_info':{'total_count':2}}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
-            bad=dict(art.CONFIG,billing_allowed=True)
-            with self.assertRaisesRegex(RuntimeError,'CF_FREE_CONFIGURATION_REQUIRED'):cf.generate(item,budget,bad)
-        with patch.dict(os.environ,{'CLOUDFLARE_ACCOUNT_ID':'','CLOUDFLARE_API_TOKEN':''}):self.assertEqual(cf.status(art.CONFIG),'CLOUDFLARE_CREDENTIALS_MISSING')
+        from scripts.test_art_library44 import ArtLibraryTests
+        from scripts import art_library44 as lib
+        with tempfile.TemporaryDirectory() as temp,patch.object(art.p,'ROOT',Path(temp)):
+            state=ArtLibraryTests().stock(temp,1,'Акварель');state['date']=item['date']
+            lib.prepare_references(temp,state,[item])
+            env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
+            with patch.dict(os.environ,env),patch.object(cf,'api',side_effect=api),patch.object(cf,'_LAST',0):
+                self.assertEqual(cf.generate(item,budget,art.CONFIG),raw)
+                posts=[(path,data) for path,data in seen if '/ai/run/' in path]
+                self.assertEqual(len(posts),1);self.assertEqual(set(posts[0][1]),{'prompt','width','height'});self.assertLessEqual(len(posts[0][1]['prompt']),2200);self.assertEqual(posts[0][1]['prompt'],item['prompt'])
+                self.assertIn('$account:string!',next(data['query'] for path,data in seen if path=='/graphql'))
+                self.assertEqual(ledger['requests'],17);self.assertEqual(ledger['cloudflare_ai']['requests'],1)
+                with patch.object(cf,'free_usage',return_value=9990),self.assertRaises(rt.GenerationPaused):cf.generate(item,budget,art.CONFIG)
+                self.assertEqual(len([x for x in seen if '/ai/run/' in x[0]]),1)
+                with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'paid'},'price':5}]}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
+                with patch.object(cf,'api',return_value={'result':[{'rate_plan':{'id':'free'},'price':0}],'result_info':{'total_count':2}}),self.assertRaisesRegex(RuntimeError,'CF_FREE_PLAN_UNVERIFIED'):cf.free_usage()
+                bad=dict(art.CONFIG,billing_allowed=True)
+                with self.assertRaisesRegex(RuntimeError,'CF_FREE_CONFIGURATION_REQUIRED'):cf.generate(item,budget,bad)
+            with patch.dict(os.environ,{'CLOUDFLARE_ACCOUNT_ID':'','CLOUDFLARE_API_TOKEN':''}):self.assertEqual(cf.status(art.CONFIG),'CLOUDFLARE_CREDENTIALS_MISSING')
 
     def test_cloudflare_ledger_restore_preserves_other_daily_counters(self):
         from scripts import generation_runtime as rt
@@ -739,3 +744,4 @@ class Policy44Tests(unittest.TestCase):
             self.assertTrue(e.high_risk(named(title)))
 
 if __name__=='__main__':unittest.main()
+

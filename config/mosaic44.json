@@ -1,11 +1,11 @@
 {
   "enabled": true,
-  "text_only_fallback": true,
+  "text_only_fallback": false,
   "compact_genres_from": "2026-11-26",
   "maximum_tiles": 12,
-  "prompt_version": "387-art-single-reference-6-png",
+  "prompt_version": "387-art-klein-unique14-1",
   "provider": "cloudflare_workers_ai",
-  "model": "@cf/black-forest-labs/flux-1-schnell",
+  "model": "@cf/black-forest-labs/flux-2-klein-4b",
   "free_tier_verified": false,
   "max_image_bytes": 8388608,
   "web_width": 1200,
@@ -91,6 +91,14 @@
         "review": "One reference, correct article subject and palette; advisory ornamental/texture limitations retained, not a claim of perfect artistic quality."
       }
     }
+  },
+  "reference_reuse_days": 14,
+  "library_target_per_genre": 70,
+  "repair_reference_art": {
+    "date": "2026-11-28",
+    "number": 35,
+    "stage": "all",
+    "source_model": "@cf/black-forest-labs/flux-1-schnell",
+    "pilot_slugs": []
   }
 }
-
