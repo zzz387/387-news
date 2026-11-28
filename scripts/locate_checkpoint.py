@@ -1,4 +1,4 @@
-+#!/usr/bin/env python3
+#!/usr/bin/env python3
 """Choose the newest unexpired encrypted checkpoint, without downloading it.
 
 The official actions/download-artifact step handles cross-run artifact ZIP
