@@ -70,6 +70,18 @@ class WatchdogTests(unittest.TestCase):
                     self.assertEqual(w.backfill_date(temp,DAY,clock(),wake,api)['code'],'ARTWORK_BACKOFF')
                 else:self.assertFalse(api.posts)
 
+    def test_configured_reference_repair_survives_calendar_rollover(self):
+        from scripts import mosaic44
+        with tempfile.TemporaryDirectory() as temp:
+            clock=Clock(at('12:00')+timedelta(days=1));api=API(clock);today=clock().date().isoformat()
+            for day in (DAY,today):
+                folder=Path(temp)/'issues'/day;folder.mkdir(parents=True)
+                (folder/'release.json').write_text(json.dumps({'number':35,'art44':{'missing':0},'illustrations':[{'model':'legacy'}] if day==DAY else []}))
+            with patch.dict(mosaic44.CONFIG,{'repair_reference_art':{'date':DAY,'number':35,'source_model':'legacy'}}):
+                result=w.backfill_date(temp,today,clock(),{'code':'PREPARATION_WAKEUP_LIMIT'},api)
+            self.assertEqual(result['code'],'ARTWORK_DISPATCHED');self.assertEqual(result['date'],DAY)
+            self.assertEqual(api.posts[-1][1]['inputs'],{'phase':'backfill_issue_art','preview':'false','target_date':DAY,'repair_schnell_images':'true'})
+
     def test_preparation_wakeups_are_bounded_backed_off_and_use_existing_controller(self):
         for mode,expected in [('idle','PREPARATION_DISPATCHED'),('active','PREPARATION_ALREADY_ACTIVE'),('limit','PREPARATION_WAKEUP_LIMIT'),('recent','PREPARATION_BACKOFF')]:
             with self.subTest(mode=mode):

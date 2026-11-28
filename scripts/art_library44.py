@@ -224,7 +224,7 @@ def restore(root,state):
 
 class Museum:
     """A bounded official-API client. robots, bytes and deadline fail closed."""
-    def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set();self.known_ids=set();self.checked_ids=set();self.scanned_pages=[];self.failures=[];self.gap_seconds=0;self.last_request=0
+    def __init__(self,seconds=75,requests=24):self.deadline=time.monotonic()+seconds;self.left=requests;self.robots={};self.blocked_hosts=set();self.known_ids=set();self.checked_ids=set();self.scanned_pages=[];self.failures=[];self.gap_seconds=0;self.last_request=0;self.resume_pages={};self.completed_pages={}
     def get(self,url,limit=5000000,robots=True,accept=None):
         parsed=urlparse(url)
         if parsed.scheme!='https' or parsed.hostname not in HOSTS or parsed.username or parsed.password:raise ValueError('ART_SOURCE_HOST_INVALID')
@@ -306,7 +306,8 @@ class Museum:
         fields='id,title,artist_title,date_display,date_start,image_id,is_public_domain,style_titles,medium_display,artwork_type_title,place_of_origin'
         url='https://api.artic.edu/api/v1/artworks/search?'+urlencode({'q':query,'limit':60,'fields':fields})
         try:
-            for page in range(start_page,start_page+2):
+            first=self.resume_pages.get('aic',start_page)
+            for page in range(first,first+2):
                 if 'www.artic.edu' in self.blocked_hosts:break
                 rows=json.loads(self.get(url+'&page='+str(page)))['data']
                 for row in rows:
@@ -321,12 +322,13 @@ class Museum:
                     yield {'museum':'Art Institute of Chicago','museum_id':'aic:'+str(row['id']),'title':row['title'],'artist':row['artist_title'],'year':row['date_display'],
                         'source_url':'https://www.artic.edu/artworks/'+str(row['id']),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images',
                         'image_url':'https://www.artic.edu/iiif/2/'+row['image_id']+'/full/480,/0/default.jpg','search_page':page,'genre_evidence':tokens,'genre_id':genre_id(genre),'verified':True}
-                self.scanned_pages.append(page)
+                self.scanned_pages.append(page);self.completed_pages['aic']=page+1
         except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'aic','code':safe_code(exc)}),flush=True)
         # Independent museum fallback. Only explicit CC0 records and genre metadata.
         try:
             query={'Конструктивизм':'Constructivist','Индустриальная графика':'Industrial','Кубизм':'Cubist'}.get(genre,query)
-            for page in range(start_page,start_page+2):
+            first=self.resume_pages.get('cleveland',start_page)
+            for page in range(first,first+2):
                 url='https://openaccess-api.clevelandart.org/api/artworks/?'+urlencode({'search':query,'cc0':1,'has_image':1,'limit':60,'skip':(page-1)*60,**({'type':'Print'} if genre=='Индустриальная графика' else {})})
                 rows=json.loads(self.get(url))['data']
                 for row in rows:
@@ -345,7 +347,7 @@ class Museum:
                     self.known_ids.add(mid)
                     yield {'museum':'Cleveland Museum of Art','museum_id':'cma:'+str(row['id']),'title':row['title'],'artist':artist,'year':row['creation_date'],
                         'source_url':row['url'],'license':'CC0','license_url':'https://www.clevelandart.org/open-access','image_url':image,'search_page':page,'genre_evidence':tokens[:1000],'genre_id':genre_id(genre),'verified':True}
-                self.scanned_pages.append(page)
+                self.scanned_pages.append(page);self.completed_pages['cleveland']=page+1
         except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'cleveland','code':safe_code(exc)}),flush=True)
         # A third independent open collection, with a deliberately narrow curatorial
         # fallback: documented Monet paintings, not arbitrary search matches.
@@ -374,7 +376,8 @@ class Museum:
         try:
             queries=list(dict.fromkeys((GENRES[genre][1],*{'Конструктивизм':('Constructivist','konstruktivisme','konstruktivistisk'),'Ар-нуво':('Jugendstil','skønvirke'),'Кубизм':('Juan Gris','kubisme'),'Романтизм':('romantik',)}.get(genre,()))))
             for query in queries:
-                url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':(start_page-1)*40,'rows':80})
+                source='smk/'+normalized(query);first=self.resume_pages.get(source,start_page)
+                url='https://api.smk.dk/api/v1/art/search/?'+urlencode({'keys':query,'filters':'[public_domain:true],[has_image:true]','offset':(first-1)*40,'rows':80})
                 payload=json.loads(self.get(url));items=payload.get('items')
                 if not isinstance(items,list):raise ValueError('ART_SOURCE_SCHEMA_INVALID')
                 print('[art-museum-source] '+json.dumps({'museum':'smk','technical_access':'verified','records':len(items)}),flush=True)
@@ -406,6 +409,7 @@ class Museum:
                     yield {'museum':'SMK — National Gallery of Denmark','museum_id':'smk:'+identity,'title':title,'artist':artist,'year':year,
                         'source_url':url,'license':license,'license_url':'https://www.smk.dk/en/article/smk-open/','rights_evidence':rights,'public_domain':True,'image_url':image,
                         'genre_evidence':evidence[:1000],'genre_id':genre_id(genre),'verified':True}
+                self.completed_pages[source]=first+2
         except Exception as exc:self.failures.append(safe_code(exc));print('[art-museum] '+json.dumps({'museum':'smk','code':safe_code(exc)}),flush=True)
 
 
@@ -645,7 +649,11 @@ def library_prefill(root,state,persist=lambda:None,limit=20,seconds=180,requests
     genres=prefill_genres(registry,at)
     for genre in genres:
         if len(registry['artworks'])-before>=limit or client.left<4 or time.monotonic()>=client.deadline:break
-        history=[r for r in journals.values() if r['genre']==genre];page=max((r.get('next_page',1) for r in history),default=1)
+        history=[r for r in journals.values() if r['genre']==genre];recent=max(history,key=lambda r:r['at'],default={})
+        page=recent.get('next_page',1)
+        # A successful old-format batch may have stopped mid-page in a later museum.
+        if 'next_pages' not in recent and recent.get('added'):page=1
+        client.resume_pages=dict(recent.get('next_pages',{}));client.completed_pages={}
         seen={i for row in history for i in row.get('checked_ids',[])}
         client.known_ids={w['museum_id'] for w in registry['artworks'].values()}|seen;client.checked_ids=set();client.scanned_pages=[];client.failures=[];added=[];reason='NO_ADMISSIBLE_MATCHES'
         try:
@@ -669,7 +677,9 @@ def library_prefill(root,state,persist=lambda:None,limit=20,seconds=180,requests
                 if counts[genre]+len(added)>=70 and not any(t['genre']==genre and k not in registry['topup_done'] for k,t in pending):break
         except Exception as exc:reason=safe_code(exc)
         if not added and client.failures:reason='SOURCE_FAILURE_'+client.failures[-1]
-        entry={'genre':genre,'at':stamp(),'next_page':(1 if page>=100 else max(client.scanned_pages)+1) if client.scanned_pages else page,'checked_ids':sorted(client.checked_ids),
+        cursors=dict(client.resume_pages);cursors.update(client.completed_pages)
+        cursors={k:(1 if v>100 else v) for k,v in cursors.items()}
+        entry={'genre':genre,'at':stamp(),'next_page':page,'next_pages':cursors,'checked_ids':sorted(client.checked_ids),
             'added':added,'code':'ADDED' if added else reason,'retry_after':(at+__import__('datetime').timedelta(minutes=30 if added else 360)).isoformat()}
         journals[digest((genre+entry['at']).encode())]=entry;persist()
     render(root,registry);persist();report=library_report(registry);report['added']=len(registry['artworks'])-before

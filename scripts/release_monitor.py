@@ -175,7 +175,7 @@ def main():
             wake=delivery_watchdog.prepare_date(next_date,datetime.now(news.TZ),request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')))
         except Exception as exc:wake={'code':'PREPARATION_API_UNCERTAIN','error':type(exc).__name__}
         print('[preparation-wakeup] '+json.dumps(wake),flush=True)
-    art=None
+    art=None;art_recovery={}
     if result['date']>='2026-11-22' and release_queue.edition_exists(news.ROOT,result['date']):
         art=artwork_status(news.ROOT,result['date'],result['verified'],raw)
         try:art['incident']=artwork_incident(result['date'],art)
@@ -185,8 +185,9 @@ def main():
             try:
                 recovery=delivery_watchdog.backfill_date(news.ROOT,result['date'],datetime.now(news.TZ),wake,request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')),status=raw)
             except Exception as exc:recovery={'code':'ARTWORK_API_UNCERTAIN','error':type(exc).__name__}
+            art_recovery=recovery
             print('[artwork-wakeup] '+json.dumps(recovery),flush=True)
-    if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4':
+    if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4' and not art_recovery.get('dispatched'):
         try:
             library=delivery_watchdog.library_date(news.ROOT,result['date'],datetime.now(news.TZ),wake,request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')))
         except Exception as exc:library={'code':'LIBRARY_API_UNCERTAIN','error':type(exc).__name__}
