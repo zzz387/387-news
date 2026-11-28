@@ -1,5 +1,5 @@
 name: 387 News — autonomous daily edition
-run-name: ${{ github.event_name == 'workflow_dispatch' && inputs.phase == 'backfill_issue_art' && format('Artwork {0}', inputs.target_date) || github.event_name == 'workflow_dispatch' && inputs.phase == 'resume' && !inputs.preview && inputs.target_date != '' && format('Preparation {0}', inputs.target_date) || github.event_name == 'workflow_dispatch' && (inputs.phase == 'run' || inputs.phase == 'publish') && !inputs.preview && inputs.target_date != '' && format('Delivery {0}', inputs.target_date) || format('387 News {0}', github.event_name) }}
+run-name: ${{ github.event_name == 'workflow_dispatch' && inputs.phase == 'library_prefill' && format('Library {0}', inputs.target_date) || github.event_name == 'workflow_dispatch' && inputs.phase == 'backfill_issue_art' && format('Artwork {0}', inputs.target_date) || github.event_name == 'workflow_dispatch' && inputs.phase == 'resume' && !inputs.preview && inputs.target_date != '' && format('Preparation {0}', inputs.target_date) || github.event_name == 'workflow_dispatch' && (inputs.phase == 'run' || inputs.phase == 'publish') && !inputs.preview && inputs.target_date != '' && format('Delivery {0}', inputs.target_date) || format('387 News {0}', github.event_name) }}
 
 on:
   push:
@@ -22,7 +22,7 @@ on:
       phase:
         description: 'run: automatic next action; inspect: restore only; preview prevents publication'
         type: choice
-        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, backfill_issue_art, recover_missing_issue, trial, trial-inspect, trial-route]
+        options: [run, inspect, check, plan, research, write, audit, publish, resume, status, backfill_issue_art, library_prefill, recover_missing_issue, trial, trial-inspect, trial-route]
         default: run
         required: true
       preview:
@@ -35,6 +35,10 @@ on:
         type: string
         required: false
 
+      repair_schnell_images:
+        description: 'Explicit artwork-only replacement of old Schnell images for configured issue'
+        type: boolean
+        default: false
       repair_legacy_images:
         description: 'Owner-authorized targeted replacement of Schnell illustrations in issue 029 only'
         type: boolean
@@ -446,6 +450,7 @@ jobs:
     env:
       NEWS_POLICY_VERSION: "4.4"
       NEWS_REPAIR_LEGACY_IMAGES: ${{ (inputs.repair_legacy_images || (github.event_name == 'push' && contains(github.event.head_commit.message, '[repair-legacy-art]'))) && 'true' || 'false' }}
+      NEWS_REPAIR_SCHNELL_IMAGES: ${{ inputs.repair_schnell_images && 'true' || 'false' }}
       NEWS_ART_LIBRARY_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-library]') }}
       NEWS_CATALOG_REFRESH: "true"
       NEWS_LIGHT_NEWS_ENABLED: "true"
@@ -490,6 +495,7 @@ jobs:
           CF_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[cf-art]') }}
           ART_LIBRARY_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-library]') }}
           NOV22_ART_ROLLOUT: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[art-nov22]') }}
+          LIBRARY_PREFILL: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[library-prefill]') }}
           ART_BACKFILL: ${{ github.event_name == 'push' && contains(github.event.head_commit.message, '[backfill-art]') }}
         run: |
           if [[ "$GITHUB_EVENT_NAME" == 'workflow_dispatch' ]]; then
@@ -502,6 +508,7 @@ jobs:
           if [[ "$NEWS_REPAIR_LEGACY_IMAGES" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-23; fi
           if [[ "$CF_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-21; fi
           if [[ "$NOV22_ART_ROLLOUT" == 'true' ]]; then phase=backfill_issue_art; MANUAL_DATE=2026-11-22; fi
+          if [[ "$LIBRARY_PREFILL" == 'true' ]]; then phase=library_prefill; MANUAL_DATE=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Europe/Moscow")).date())'); fi
           if [[ "$ART_BACKFILL" == 'true' ]]; then
             phase=backfill_issue_art
             MANUAL_DATE=$(python -c 'from datetime import datetime; from zoneinfo import ZoneInfo; print(datetime.now(ZoneInfo("Europe/Moscow")).date())')
@@ -937,4 +944,5 @@ jobs:
           path: ${{ runner.temp }}/pre-mosaic-backup/
           retention-days: 90
           if-no-files-found: error
+
 

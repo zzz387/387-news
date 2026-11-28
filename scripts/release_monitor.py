@@ -181,11 +181,16 @@ def main():
         try:art['incident']=artwork_incident(result['date'],art)
         except Exception as exc:art['notification_error']=type(exc).__name__
         print('[artwork-status] '+json.dumps(art),flush=True)
-        if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4' and art['ARTWORK_MISSING']:
+        if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4' and (art['ARTWORK_MISSING'] or delivery_watchdog.reference_repair_pending(news.ROOT,result['date'])):
             try:
                 recovery=delivery_watchdog.backfill_date(news.ROOT,result['date'],datetime.now(news.TZ),wake,request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')),status=raw)
             except Exception as exc:recovery={'code':'ARTWORK_API_UNCERTAIN','error':type(exc).__name__}
             print('[artwork-wakeup] '+json.dumps(recovery),flush=True)
+    if result['verified'] and os.getenv('NEWS_POLICY_VERSION')=='4.4':
+        try:
+            library=delivery_watchdog.library_date(news.ROOT,result['date'],datetime.now(news.TZ),wake,request=github,exclude_run_id=int(os.getenv('GITHUB_RUN_ID','0')))
+        except Exception as exc:library={'code':'LIBRARY_API_UNCERTAIN','error':type(exc).__name__}
+        print('[library-wakeup] '+json.dumps(library),flush=True)
     summary=os.getenv('GITHUB_STEP_SUMMARY')
     if summary:
         with open(summary,'a') as stream:
@@ -195,4 +200,5 @@ def main():
         raise RuntimeError('Daily edition is not verified on the public site; incident/retry status recorded')
 
 if __name__=='__main__': main()
+
 

@@ -29,7 +29,7 @@ class API:
         if path=='actions/workflows/daily-v31.yml':return {'state':'active'}
         if path.endswith('/dispatches'):
             self.posts.append((self.clock(),copy.deepcopy(payload)))
-            title=('Preparation ' if payload['inputs']['phase']=='resume' else 'Artwork ' if payload['inputs']['phase']=='backfill_issue_art' else 'Delivery ')+payload['inputs']['target_date']
+            title=('Preparation ' if payload['inputs']['phase']=='resume' else 'Artwork ' if payload['inputs']['phase']=='backfill_issue_art' else 'Library ' if payload['inputs']['phase']=='library_prefill' else 'Delivery ')+payload['inputs']['target_date']
             self.rows.append({'id':100+len(self.posts),'head_branch':'main','event':'workflow_dispatch','display_title':title,'status':'completed','created_at':self.clock().isoformat()})
             if self.dispatch_succeeds:self.healthy_at=self.clock()+timedelta(seconds=60)
             return None  # Actual dispatch REST response is204, not JSON.
@@ -41,6 +41,19 @@ class API:
         raise AssertionError('Unexpected endpoint '+path)
 
 class WatchdogTests(unittest.TestCase):
+    def test_library_wakeup_uses_idle_windows_and_a_bounded_existing_workflow(self):
+        for mode,expected in [('idle','LIBRARY_DISPATCHED'),('daily','DAILY_PREPARATION_FIRST'),('active','PRODUCTION_ACTIVE'),('limit','LIBRARY_WAKEUP_LIMIT')]:
+            with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temp:
+                clock=Clock(at('12:00'));api=API(clock)
+                if mode=='active':api.active_until=at('13:00')
+                if mode=='limit':api.rows=[{'id':i+1,'head_branch':'main','event':'workflow_dispatch','display_title':'Library '+DAY,'status':'completed','created_at':at('10:00').isoformat()} for i in range(4)]
+                result=w.library_date(temp,DAY,clock(),{'code':'PREPARATION_DISPATCHED' if mode=='daily' else 'PREPARATION_WAKEUP_LIMIT'},api)
+                self.assertEqual(result['code'],expected)
+                if mode=='idle':
+                    self.assertEqual(api.posts[-1][1]['inputs']['phase'],'library_prefill')
+                    self.assertEqual(w.library_date(temp,DAY,clock(),{'code':'PREPARATION_WAKEUP_LIMIT'},api)['code'],'LIBRARY_BACKOFF')
+                else:self.assertFalse(api.posts)
+
     def test_artwork_wakeup_is_serial_bounded_and_yields_to_daily_preparation(self):
         for mode,expected in [('idle','ARTWORK_DISPATCHED'),('daily','DAILY_PREPARATION_FIRST'),('active','PRODUCTION_ACTIVE'),('limit','ARTWORK_WAKEUP_LIMIT'),('complete','ARTWORK_COMPLETE'),('cooldown','ARTWORK_COOLDOWN')]:
             with self.subTest(mode=mode),tempfile.TemporaryDirectory() as temp:
@@ -281,4 +294,5 @@ class WorkflowContractTests(unittest.TestCase):
 
 
 if __name__=='__main__':unittest.main()
+
 

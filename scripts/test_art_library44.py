@@ -24,21 +24,64 @@ class ArtLibraryTests(unittest.TestCase):
         return state
     def items(self,n,genre='Импрессионизм'):return [{'genre':genre,'descriptor':{'title':'Fixture '+str(i)},'key':str(i)} for i in range(n)]
 
-    def test_text_only_fallback_has_no_fictional_reference_and_uses_schnell(self):
+    def test_direct_references_are_unique_repeatable_and_use_actual_fourteen_day_history(self):
         with tempfile.TemporaryDirectory() as temp:
-            state={'date':'2026-11-25'};item=self.items(1,'Футуризм')[0]
-            item.update(date=state['date'],protocol=2,composition='Diagonal motion')
-            lib.attach(temp,state,[item],{})
-            self.assertEqual(item['generation_mode'],'TEXT_ONLY');self.assertEqual(item['reference_images_sent'],0)
-            self.assertNotIn('selected_reference_id',item);self.assertNotIn('attached',item['prompt'])
-            self.assertIn('futurism',item['prompt']);self.assertNotIn('muted ochre, cream, deep green',item['prompt'])
-            budget=runtime.RequestBudget({'day':'2026-11-25','requests':0,'models':{}},seconds=1000,gap=0)
-            env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
-            with patch.dict(os.environ,env),patch.object(cf,'free_usage',return_value=200),patch.object(cf,'api',return_value={'result':{'image':base64.b64encode(picture(99)).decode()}}) as api,patch.object(cf,'_LAST',0):
-                cf.generate(item,budget,dict(art.CONFIG,request_gap_seconds=0))
-                args,kwargs=api.call_args;self.assertTrue(args[0].endswith(cf.MODEL));self.assertNotIn('images',kwargs)
-                self.assertEqual(args[1]['steps'],4)
-                self.assertLessEqual(budget.ledger['cloudflare_ai']['reserved_neurons'],art.CONFIG['image_neuron_budget'])
+            state=self.stock(temp,4);state['date']='2026-11-28';registry=state['art_library44']['registry']
+            ids=list(registry['artworks']);folder=Path(temp)/'assets/illustrations/2026-11-27';folder.mkdir(parents=True)
+            (folder/'manifest.json').write_text(json.dumps({'date':'2026-11-27','images':{'old':{'key':'old','article_id':'old-article','selected_reference_id':ids[0],'reference_images_sent':1}}}))
+            items=self.items(3)
+            for i,item in enumerate(items):item.update(article_id='article'+str(i),text_hash='text'+str(i),date=state['date'])
+            with patch.object(lib,'reference_day',return_value='2026-11-28'),patch.object(lib.Museum,'get',side_effect=AssertionError('No synchronous museum search')):
+                lib.prepare_references(temp,state,items);chosen=[i['selected_reference_id'] for i in items]
+                self.assertEqual(len(set(chosen)),3);self.assertNotIn(ids[0],chosen)
+                for item in items:lib.note_generated(temp,state,item)
+                lib.prepare_references(temp,state,items);self.assertEqual(chosen,[i['selected_reference_id'] for i in items])
+            for day,expected in (('2026-12-11',0),('2026-12-12',3)):
+                available={w['id'] for w in lib.available_works(temp,lib.load(temp,state),'next',day,'Импрессионизм')}
+                self.assertEqual(len(available&set(chosen)),expected)
+            self.assertEqual(len(state['art_library44']['registry']['reference_uses']),4)
+
+    def test_library_prefill_uses_existing_checkpoint_locator(self):
+        from scripts import locate_checkpoint as locate,staged_news
+        with tempfile.TemporaryDirectory() as temp:
+            out=Path(temp)/'outputs'
+            with patch.dict(os.environ,{'PHASE':'library_prefill','TARGET_DATE':'2026-11-28','PREVIEW':'false','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_OUTPUT':str(out),'NEWS_POLICY_VERSION':'4.4'}),patch.object(staged_news,'request_json',return_value={'artifacts':[]}) as api:
+                locate.main()
+            self.assertIn('found=false',out.read_text())
+            self.assertTrue(any('name=387news31-production-2026-11-28' in c.args[0] for c in api.call_args_list))
+
+    def test_prefill_resumes_without_duplicates_and_queues_one_topup_per_used_genre(self):
+        from datetime import datetime,timezone,timedelta
+        with tempfile.TemporaryDirectory() as temp:
+            state={'date':'2026-11-28'};root=Path(temp);folder=root/'issues/2026-11-28';folder.mkdir(parents=True)
+            (folder/'release.json').write_text(json.dumps({'date':state['date'],'illustrations':[{'genre':'Импрессионизм'}]*3}))
+            def candidates(client,genre,start_page=1):
+                if genre!='Импрессионизм':return
+                for i in range(5):
+                    mid='fixture:prefill'+str(i)
+                    if mid in client.known_ids:continue
+                    yield {'genre_id':'impressionism','museum':'Fixture','museum_id':mid,'artist':'Verified author '+str(i),'title':'Verified painting '+str(i),'year':'1890','source_url':'https://www.artic.edu/artworks/'+str(i),'license':'CC0','license_url':'https://www.artic.edu/open-access/open-access-images','verified':True,'genre_evidence':'Impressionism','image_url':'https://www.artic.edu/image/'+str(i)}
+            now=datetime(2026,11,28,8,tzinfo=timezone.utc)
+            with patch.object(lib.Museum,'candidates',autospec=True,side_effect=candidates),patch.object(lib.Museum,'get',side_effect=lambda url:picture(900+int(url.rsplit('/',1)[1]))),patch.object(lib,'datetime',wraps=datetime) as clock,patch.object(art,'generate',side_effect=AssertionError('No inference in prefill')):
+                clock.now.return_value=now;first=lib.library_prefill(root,state,limit=2)
+                restored=json.loads(json.dumps(state));clock.now.return_value=now+timedelta(hours=1)
+                second=lib.library_prefill(root,restored,limit=2)
+            self.assertEqual(first['added'],2);self.assertEqual(second['added'],2)
+            registry=restored['art_library44']['registry'];self.assertEqual(len(registry['artworks']),4)
+            lib.queue_topups(root,registry);self.assertEqual(len(registry['topup_tasks']),1);self.assertEqual(len(registry['topup_done']),1)
+            self.assertEqual(len({w['original_sha256'] for w in registry['artworks'].values()}),4)
+            self.assertTrue(lib.genre_matches('Темпера','Tempera on panel'));self.assertFalse(lib.genre_matches('Темпера','Oil painting'))
+
+    def test_no_text_only_or_unreferenced_inference_is_allowed(self):
+        state={'date':'2026-11-28'};item=self.items(1,'Футуризм')[0]
+        item.update(date=state['date'],protocol=2,generation_mode='TEXT_ONLY',reference_images_sent=0)
+        env={'GITHUB_ACTIONS':'true','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_REF_NAME':'main','CLOUDFLARE_ACCOUNT_ID':'a'*32,'CLOUDFLARE_API_TOKEN':'SYNTHETIC'}
+        with patch.dict(os.environ,env),patch.object(cf,'api') as api:
+            for mode in ('TEXT_ONLY','REFERENCE'):
+                item['generation_mode']=mode
+                with self.assertRaisesRegex(RuntimeError,'CF_ONE_REFERENCE_REQUIRED'):cf.generate(item,None,art.CONFIG)
+            api.assert_not_called()
+        self.assertEqual(cf.MODEL,cf.REFERENCE_MODEL);self.assertFalse(art.CONFIG['text_only_fallback'])
 
     def test_new_issue_uses_at_most_six_suitable_genres(self):
         rows=[{'id':str(i),'article':{'title':word+' '+str(i),'teaser':word,'blocks':[]}} for i,word in enumerate(art.THEMES)]
@@ -107,7 +150,7 @@ class ArtLibraryTests(unittest.TestCase):
                 sets=lib.prepare_sets(temp,{'date':'2026-11-24'},self.items(1))
                 self.assertEqual(len(sets),1);self.assertEqual(download.call_count,1)
 
-    def test_single_reference_and_thirty_day_reuse_preserve_history(self):
+    def test_single_reference_and_fourteen_day_reuse_preserve_history(self):
         with tempfile.TemporaryDirectory() as temp:
             state=self.stock(temp,1);items=self.items(2)
             with patch.object(lib.Museum,'get',side_effect=AssertionError('Use saved library')):
@@ -115,7 +158,7 @@ class ArtLibraryTests(unittest.TestCase):
                 self.assertEqual(len(sets['Импрессионизм']['artwork_ids']),1)
                 self.assertTrue(all(i['reference_images_sent']==1 for i in items))
                 self.assertEqual(items[0]['selected_reference_id'],items[1]['selected_reference_id'])
-                for day,allowed in (('2026-12-22',False),('2026-12-23',True),('2027-01-21',False),('2027-01-22',True)):
+                for day,allowed in (('2026-12-06',False),('2026-12-07',True),('2026-12-20',False),('2026-12-21',True)):
                     result=lib.prepare_sets(temp,{'date':day},self.items(1),discover=False)
                     self.assertEqual(bool(result),allowed,day)
                 self.assertEqual(len(lib.load(temp)['sets']),3)
@@ -178,6 +221,32 @@ class ArtLibraryTests(unittest.TestCase):
             red_prompt=cf.prompt(dict(items[0],palette=a));self.assertIn('reference has no dominant green field',red_prompt)
 
 
+    def test_issue035_repair_preserves_seven_klein_images_and_replaces_ten_schnell(self):
+        from scripts.test_policy44 import issue,synthetic_art
+        from scripts.test_daily43 import root as site_root
+        from scripts import publication43 as pub
+        with tempfile.TemporaryDirectory() as temp:
+            root=site_root(temp);state=issue(17,12);state['date']='2026-11-28';state['brief_policy_revision']=2
+            state['art_library44']=self.stock(root,24)['art_library44'];ids=list(state['art_library44']['registry']['artworks'])
+            with patch.object(art,'CONFIG',dict(art.CONFIG,references_enabled=False,compact_genres_from='9999-12-31',prompt_version='387-art-single-reference-6-png')),patch.object(art,'STYLES',{k:['Импрессионизм'] for k in art.STYLES}),patch.object(pub.news,'get_next_number',return_value=35):
+                synthetic_art(state)
+                for i,obj in enumerate(state['art44']['objects'].values()):
+                    obj['model']=cf.REFERENCE_MODEL if i<7 else '@cf/black-forest-labs/flux-1-schnell'
+                    if i<7:obj.update(selected_reference_id=ids[i%2],reference_images_sent=1)
+                pub.build(state,root)
+            before=pub.metadata(root,state['date']);text={p:p.read_bytes() for p in (root/'issues').rglob('*.md')}
+            parent={'date':state['date'],'art_library44':state['art_library44']};budget=type('Budget',(),{'ledger':{},'remaining_seconds':lambda self:1000})()
+            n=[950]
+            def generate(*args):n[0]+=1;return picture(n[0])
+            with patch.object(art.p,'ROOT',root),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget),patch.object(art,'generate',side_effect=generate) as calls:
+                self.assertTrue(pub.backfill_issue_art(root,state['date'],parent,repair_schnell_images=True))
+                after=pub.metadata(root,state['date']);self.assertEqual(calls.call_count,10)
+                self.assertTrue(all(i['model']==cf.REFERENCE_MODEL for i in after['illustrations']))
+                self.assertEqual(before['illustrations'][:7],after['illustrations'][:7])
+                replaced=after['illustrations'][7:];self.assertEqual(len({i['selected_reference_id'] for i in replaced}),10)
+                pub.backfill_issue_art(root,state['date'],parent,repair_schnell_images=True);self.assertEqual(calls.call_count,10)
+            for p,content in text.items():self.assertEqual(p.read_bytes(),content)
+
     def test_targeted_repair_has_new_keys_but_preserves_two_images_and_all_text(self):
         from scripts.test_policy44 import issue,synthetic_art
         from scripts.test_daily43 import root as site_root
@@ -185,11 +254,11 @@ class ArtLibraryTests(unittest.TestCase):
         from scripts import generation_runtime as runtime
         with tempfile.TemporaryDirectory() as temp:
             target=site_root(temp);s=issue(13,12);s['date']='2026-11-23';s['brief_policy_revision']=2
-            s['art_library44']=self.stock(target,4)['art_library44'];styles={key:['Импрессионизм'] for key in art.STYLES}
+            s['art_library44']=self.stock(target,20)['art_library44'];styles={key:['Импрессионизм'] for key in art.STYLES}
             old_config=dict(art.CONFIG,prompt_version='387-art-cloudflare-5',references_enabled=False)
             with patch.object(art,'STYLES',styles),patch.object(art,'CONFIG',old_config),patch.object(pub.news,'get_next_number',return_value=29):
                 synthetic_art(s)
-                for index,obj in enumerate(s['art44']['objects'].values()):obj['model']=cf.REFERENCE_MODEL if index in (2,5) else cf.MODEL
+                for index,obj in enumerate(s['art44']['objects'].values()):obj['model']=cf.REFERENCE_MODEL if index in (2,5) else '@cf/black-forest-labs/flux-1-schnell'
                 pub.build(s,target)
             before=pub.metadata(target,s['date']);originals={r['article_slug']:r for r in before['illustrations']}
             texts={p:p.read_bytes() for p in (target/'issues'/s['date']).rglob('*.md')}
@@ -357,7 +426,7 @@ class ArtLibraryTests(unittest.TestCase):
             with patch.object(art,'STYLES',styles),patch.object(art,'CONFIG',dict(art.CONFIG,references_enabled=False)):
                 synthetic_art(s);sets=lib.prepare_sets(target,s,self.items(8),discover=False)
                 reference=sets['Импрессионизм']
-                for obj in s['art44']['objects'].values():obj.update(reference_status='FOUR_REFERENCES_READY',reference_set_id=reference['id'],reference_artwork_ids=reference['artwork_ids'],reference_sha256=reference['sha256'])
+                for i,obj in enumerate(s['art44']['objects'].values()):obj.update(selected_reference_id=reference['artwork_ids'][i%4],reference_images_sent=1,reference_status='ONE_REFERENCE_READY',reference_set_id=reference['id'],reference_artwork_ids=reference['artwork_ids'],reference_sha256=reference['sha256'])
                 pub.build(s,target)
             metadata=pub.validate(target,s['date']);missing=metadata['illustrations'][-1];(target/missing['path']).unlink()
             later={'date':'2026-11-24'};lib.merge_checkpoint(later,lib.checkpoint(s,target))
@@ -365,7 +434,7 @@ class ArtLibraryTests(unittest.TestCase):
             with patch.object(art.p,'ROOT',target),patch.object(art,'provider_status',return_value='READY'),patch.object(runtime,'ACTIVE_BUDGET',budget),patch.object(lib.Museum,'get',side_effect=AssertionError('Do not search another quartet')),patch.object(art,'generate',return_value=picture(888)) as generate:
                 self.assertTrue(pub.backfill_issue_art(target,s['date'],later))
                 generate.assert_called_once();item=generate.call_args.args[0]
-                self.assertEqual(item['reference_set_id'],'2026-11-23/impressionism');self.assertEqual(len(item['reference_images']),1)
+                self.assertTrue(item['reference_set_id'].startswith('binding/'));self.assertEqual(len(item['reference_images']),1)
                 self.assertEqual(pub.validate(target,s['date'])['art44']['ready'],8)
 
     def test_pages_keep_original_proportions_sources_and_issue_grouping(self):
@@ -485,4 +554,5 @@ class ArtLibraryTests(unittest.TestCase):
             self.assertEqual(fetch.call_count,1)
 
 if __name__=='__main__':unittest.main()
+
 

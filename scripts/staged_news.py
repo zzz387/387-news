@@ -541,7 +541,7 @@ def optional_art_allowed(state,now=None):
 def main():
     global PERSIST
     p = argparse.ArgumentParser()
-    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art'], required=True)
+    p.add_argument('--phase', choices=['auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art','library_prefill'], required=True)
     p.add_argument('--preview', action='store_true')
     p.add_argument('--target-date', default=None)
     args = p.parse_args()
@@ -614,7 +614,7 @@ def main():
                 if state:
                     f.write(f'checkpoint=true\nartifact_name={label}\n')
 
-    if state is None and args.phase in ('run','resume','write','audit','auto','plan','backfill_issue_art'):
+    if state is None and args.phase in ('run','resume','write','audit','auto','plan','backfill_issue_art','library_prefill'):
         state=editorial43.migrate(None,date) if use43 else editorial41.new_state(date)
 
     if state and use43 and not args.preview and os.getenv('NEWS_STOCK_FILE'):
@@ -649,7 +649,10 @@ def main():
                 published=publication43.metadata(ROOT,today)
                 if published.get('art44',{}).get('ready',0)<published['article_count'] and publication43.backfill_issue_art(ROOT,today,state,persist):
                     ready=True;art_publication_date=today
-        if os.getenv('NEWS_ART_LIBRARY_ROLLOUT')=='true':
+        if args.phase=='library_prefill':
+            from scripts import art_library44
+            art_library44.library_prefill(ROOT,state,persist);ready=True
+        elif os.getenv('NEWS_ART_LIBRARY_ROLLOUT')=='true':
             from scripts import art_library44
             ready=art_library44.rollout(ROOT,date,state,persist)
             pipeline.status(state,'PUBLISHING','commit_and_deploy')
@@ -657,7 +660,7 @@ def main():
             pipeline.status(state,'PUBLISHING','commit_and_deploy')
         elif args.phase=='backfill_issue_art':
             from scripts import publication43
-            changed=publication43.backfill_issue_art(ROOT,date,state,persist,repair_legacy_images=os.getenv('NEWS_REPAIR_LEGACY_IMAGES')=='true')
+            changed=publication43.backfill_issue_art(ROOT,date,state,persist,repair_legacy_images=os.getenv('NEWS_REPAIR_LEGACY_IMAGES')=='true',repair_schnell_images=os.getenv('NEWS_REPAIR_SCHNELL_IMAGES')=='true')
             ready=changed or publication43.metadata(ROOT,date).get('art44',{}).get('ready',0)>0
             pipeline.status(state,'PUBLISHING' if ready else 'PUBLISHED','commit_and_deploy' if ready else 'resume_missing_art')
         elif state.get('version')==43:
@@ -756,3 +759,4 @@ if __name__=='__main__':
         # Never echo secrets, API responses, or unpublished draft contents.
         print('STAGE FAILED; WEBSITE UNCHANGED: '+type(e).__name__+'; private diagnostics retained',file=sys.stderr,flush=True)
         sys.exit(1)
+

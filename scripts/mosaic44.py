@@ -189,8 +189,7 @@ def prepare(state,persist=lambda:None,allow_request=True):
         from scripts import art_library44
         from scripts import news
         budget=news.runtime.ACTIVE_BUDGET
-        sets=art_library44.prepare_sets(p.ROOT,state,items,persist,discover=bool(allow_request and budget and budget.remaining_seconds()>180))
-        art_library44.attach(p.ROOT,state,items,sets)
+        art_library44.prepare_references(p.ROOT,state,items,persist)
     return prepare_items(state,items,persist,allow_request)
 
 def prepare_items(state,items,persist=lambda:None,allow_request=True):
@@ -223,7 +222,7 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             persist()
         if not allow_request or saved['provider_status']!='READY' or not budget or (budget.remaining_seconds()<90 if CONFIG.get('provider')=='cloudflare_workers_ai' else not budget.can_request()):break
         if sum(h.get('key')==item['key'] for h in saved['history'])>=CONFIG.get('max_retries_per_article',2):continue
-        if CONFIG.get('reference_required') and state['date']>=CONFIG.get('first_reference_issue','9999-12-31') and item.get('reference_status')!='ONE_REFERENCE_READY' and not (CONFIG.get('text_only_fallback') and item.get('generation_mode')=='TEXT_ONLY'):
+        if CONFIG.get('reference_required') and state['date']>=CONFIG.get('first_reference_issue','9999-12-31') and item.get('reference_status')!='ONE_REFERENCE_READY':
             saved['code']='REFERENCE_SET_UNAVAILABLE';continue
         saved['current_key']=item['key'];persist()
         try:
@@ -233,13 +232,16 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
                 after=budget.ledger.get('cloudflare_ai',{}).get('requests',0) if CONFIG.get('provider')=='cloudflare_workers_ai' else budget.used
                 saved['requests']=saved.get('requests',0)+max(0,after-before)
             data,width,height=encode_image(raw);digest=hashlib.sha256(data).hexdigest()
+            if item.get('reference_assignment_id'):
+                from scripts import art_library44
+                art_library44.note_generated(p.ROOT,state,item)
             if item.get('selected_reference_id'):
                 from scripts import art_reference44
                 item['color_match']=art_reference44.compare(item['palette'],art_reference44.profile(data))
             if any(obj.get('sha256')==digest for obj in saved['objects'].values()):raise ValueError('IMAGE_NOT_UNIQUE')
             saved['objects'][item['key']]={'webp':base64.b64encode(data).decode(),'sha256':digest,'width':width,'height':height,
                 'size':len(data),'genre':item['genre'],'provider':CONFIG['provider'],'model':CONFIG['reference_model'] if item.get('reference_images') else CONFIG['model'],'status':'READY',
-                **{k:item[k] for k in ('generation_mode','reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in item},
+                **{k:item[k] for k in ('reference_assignment_id','reference_title','reference_artist','reference_use_date','generation_mode','reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in item},
                 'article_id':item['article_id'],'date':state['date'],'text_hash':item['text_hash'],'prompt':item['prompt'],
                 'path':'assets/illustrations/'+state['date']+'/'+item['key']+'.webp'}
             persist()  # Keep the first usable result even if its one color retry fails.
@@ -270,6 +272,9 @@ def prepare_items(state,items,persist=lambda:None,allow_request=True):
             if code in ('IMAGE_HTTP_429','IMAGE_HTTP_503','IMAGE_HTTP_401','IMAGE_HTTP_403'):
                 persist();break
         persist()
+    if any(i.get('reference_assignment_id') for i in items):
+        from scripts import art_library44
+        art_library44.render(p.ROOT,art_library44.load(p.ROOT,state))
     saved.pop('current_key',None);report=art_report(state)
     saved['completion']='COMPLETE' if report['complete'] else 'INCOMPLETE'
     print('[art44] '+json.dumps(report),flush=True);persist();return report
@@ -394,7 +399,7 @@ def materialize(state,articles,root,items=None):
             continue
         images[item['key']]={**{k:item[k] for k in ('key','article_id','description_hash','genre','ratio','prompt_version','date','text_hash','protocol','article_slug')},
             **{k:row[k] for k in ('sha256','width','height','provider','model')},
-            **{k:row[k] for k in ('generation_mode','reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in row},'path':file.relative_to(root).as_posix()}
+            **{k:row[k] for k in ('reference_assignment_id','reference_title','reference_artist','reference_use_date','generation_mode','reference_status','reference_set_id','reference_artwork_ids','reference_sha256','selected_reference_id','reference_images_sent','reference_selection_version','reference_selection_score','reference_selection_reason','palette','art_movement','medium','color_match','artwork_license','reference_attribution','reference_source_url','reference_adaptation','reference_transport') if k in row},'path':file.relative_to(root).as_posix()}
     (folder/'manifest.json').write_text(json.dumps({'date':date,'images':images,'provider_status':provider_status()},ensure_ascii=False,indent=2)+'\n')
     return images
 
@@ -425,4 +430,5 @@ def color_retry_available(state,items,budget):
     observed=ledger.get('observed_account_neurons')
     if not isinstance(observed,(int,float)):return False
     return ledger.get('reserved_neurons',0)+(missing+1)*reserve<=CONFIG['image_neuron_budget'] and observed+(missing+1)*reserve<=10000-CONFIG.get('account_headroom',1500)
+
 
