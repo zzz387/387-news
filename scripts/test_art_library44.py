@@ -41,6 +41,15 @@ class ArtLibraryTests(unittest.TestCase):
                 self.assertEqual(len(available&set(chosen)),expected)
             self.assertEqual(len(state['art_library44']['registry']['reference_uses']),4)
 
+    def test_library_prefill_uses_existing_checkpoint_locator(self):
+        from scripts import locate_checkpoint as locate,staged_news
+        with tempfile.TemporaryDirectory() as temp:
+            out=Path(temp)/'outputs'
+            with patch.dict(os.environ,{'PHASE':'library_prefill','TARGET_DATE':'2026-11-28','PREVIEW':'false','GITHUB_REPOSITORY':'zzz387/387-news','GITHUB_OUTPUT':str(out),'NEWS_POLICY_VERSION':'4.4'}),patch.object(staged_news,'request_json',return_value={'artifacts':[]}) as api:
+                locate.main()
+            self.assertIn('found=false',out.read_text())
+            self.assertTrue(any('name=387news31-production-2026-11-28' in c.args[0] for c in api.call_args_list))
+
     def test_prefill_resumes_without_duplicates_and_queues_one_topup_per_used_genre(self):
         from datetime import datetime,timezone,timedelta
         with tempfile.TemporaryDirectory() as temp:

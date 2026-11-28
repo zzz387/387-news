@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
++#!/usr/bin/env python3
 """Choose the newest unexpired encrypted checkpoint, without downloading it.
 
 The official actions/download-artifact step handles cross-run artifact ZIP
@@ -52,7 +52,7 @@ def extract_stock_archive(archive,target):
 
 def main():
     phase = os.environ.get('PHASE','').strip()
-    if phase not in ('auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art'):
+    if phase not in ('auto','plan','research','write','audit','publish','check','resume','run','inspect','backfill_issue_art','library_prefill'):
         raise RuntimeError('Unknown requested phase')
     raw_date = os.environ.get('TARGET_DATE','').strip() or None
     date = staged_news.phase_date(phase,datetime.now(staged_news.TZ),raw_date)
@@ -142,3 +142,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
