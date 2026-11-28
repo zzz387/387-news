@@ -1,0 +1,855 @@
+{
+  "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843": {
+    "artwork_id": "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843",
+    "last_used": null,
+    "history": []
+  },
+  "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5": {
+    "artwork_id": "b47377f60ac6e28c0c18bfce301dd2ddf558d4be8d85e138ee29836345a5b6d5",
+    "last_used": null,
+    "history": []
+  },
+  "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb": {
+    "artwork_id": "e61d1fc979aa2b3039ce48878b796c6e03a6e2a5010406f9652c83522976ceeb",
+    "last_used": null,
+    "history": []
+  },
+  "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3": {
+    "artwork_id": "53de9761bf50731c35e2ed3133e9feb0693d496c3a5f8c2604e1da0674c3cdf3",
+    "last_used": null,
+    "history": []
+  },
+  "1d780a95f1598ae6e25e67919b061dd4afc4d0e81ff642cf0d1a96ffe8a372ec": {
+    "artwork_id": "1d780a95f1598ae6e25e67919b061dd4afc4d0e81ff642cf0d1a96ffe8a372ec",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "1d780a95f1598ae6e25e67919b061dd4afc4d0e81ff642cf0d1a96ffe8a372ec",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "aacd5bb3542046f0abb1b39fa662fae256c93745a685564fe9834038845bc3d4",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "1d09faa7566085b920c0c3d41290657715e34d3d54155e45721469918ceec88a": {
+    "artwork_id": "1d09faa7566085b920c0c3d41290657715e34d3d54155e45721469918ceec88a",
+    "last_used": null,
+    "history": []
+  },
+  "b666d2392594a4292cb12e2f08ada3df2e19fc470cf4e3c2c185262ac5aa0d6f": {
+    "artwork_id": "b666d2392594a4292cb12e2f08ada3df2e19fc470cf4e3c2c185262ac5aa0d6f",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "b666d2392594a4292cb12e2f08ada3df2e19fc470cf4e3c2c185262ac5aa0d6f",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "197cae75dd19cca8e2f7862fe941d5df07a47f384f44e1d88e2f6065ff1df85c",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "080abad448e544ca3d67ba00b4835c2e88709f8e10e57d5723bcca21d516943b": {
+    "artwork_id": "080abad448e544ca3d67ba00b4835c2e88709f8e10e57d5723bcca21d516943b",
+    "last_used": null,
+    "history": []
+  },
+  "bfb97340b75d66d8daf0843a58c9982c7dbdd849ea7cde2498b97cd26986d40f": {
+    "artwork_id": "bfb97340b75d66d8daf0843a58c9982c7dbdd849ea7cde2498b97cd26986d40f",
+    "last_used": null,
+    "history": []
+  },
+  "4a88cb5cdb52402afdd241b1218cd88ddc69b0bd59020156dae4cfb661a95765": {
+    "artwork_id": "4a88cb5cdb52402afdd241b1218cd88ddc69b0bd59020156dae4cfb661a95765",
+    "last_used": null,
+    "history": []
+  },
+  "61bd8458495302e2a43deb1a1b72dcc2d53efd25ad0784fe5fce7259d13f050c": {
+    "artwork_id": "61bd8458495302e2a43deb1a1b72dcc2d53efd25ad0784fe5fce7259d13f050c",
+    "last_used": null,
+    "history": []
+  },
+  "95241980cc507773b23c878b1a3535052b2bc85d7844cb3dadae53d98836947f": {
+    "artwork_id": "95241980cc507773b23c878b1a3535052b2bc85d7844cb3dadae53d98836947f",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "95241980cc507773b23c878b1a3535052b2bc85d7844cb3dadae53d98836947f",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "7368c251556740dff49eecd9e2cdadb2f06337c51bb0d140b2512a5d7a00d782",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "dfa234b6d7b4c88ed4d7c29b98aade697336ee5954ba8b9c65c224dfc6174749": {
+    "artwork_id": "dfa234b6d7b4c88ed4d7c29b98aade697336ee5954ba8b9c65c224dfc6174749",
+    "last_used": null,
+    "history": []
+  },
+  "bd06ff98dd88ee6173f91726f093f5cbcbb5194d8a78de4bd6efaad6ab6f2fe1": {
+    "artwork_id": "bd06ff98dd88ee6173f91726f093f5cbcbb5194d8a78de4bd6efaad6ab6f2fe1",
+    "last_used": null,
+    "history": []
+  },
+  "5cc8c0d41c4b533f7706545174bbacb4a1b8fc5061b2b0ed971d98653a18ee07": {
+    "artwork_id": "5cc8c0d41c4b533f7706545174bbacb4a1b8fc5061b2b0ed971d98653a18ee07",
+    "last_used": null,
+    "history": []
+  },
+  "61312254c28ed845fc6ca27056f468162b812cbe9985ac704a1df3574880844d": {
+    "artwork_id": "61312254c28ed845fc6ca27056f468162b812cbe9985ac704a1df3574880844d",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "61312254c28ed845fc6ca27056f468162b812cbe9985ac704a1df3574880844d",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-23",
+        "article_id": "1f9058ee02b37d64917f24fb389f467263bb5731fb1cc5bf5407c5496b56db56",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "8102b361a7d0904d5895b4f1aded7a3e83c8fce50aeb294b39c3e8b0f2e049c0": {
+    "artwork_id": "8102b361a7d0904d5895b4f1aded7a3e83c8fce50aeb294b39c3e8b0f2e049c0",
+    "last_used": null,
+    "history": []
+  },
+  "8ba354644ec099950c20a766fab170b43124eff28a49d37300804b15a3ea4d13": {
+    "artwork_id": "8ba354644ec099950c20a766fab170b43124eff28a49d37300804b15a3ea4d13",
+    "last_used": null,
+    "history": []
+  },
+  "27b40c704da884ebffa88ec78dbb0ebba6d1b2f7560eeddadba7a72d7f09dd37": {
+    "artwork_id": "27b40c704da884ebffa88ec78dbb0ebba6d1b2f7560eeddadba7a72d7f09dd37",
+    "last_used": null,
+    "history": []
+  },
+  "60e006594b77d9c3feae2b732c7c37012451d3bed5021a656d46157d31cb7669": {
+    "artwork_id": "60e006594b77d9c3feae2b732c7c37012451d3bed5021a656d46157d31cb7669",
+    "last_used": null,
+    "history": []
+  },
+  "9c8c82a30bfe002ace5a416f051c7737d5114af9afe31e366b0a048239969c5c": {
+    "artwork_id": "9c8c82a30bfe002ace5a416f051c7737d5114af9afe31e366b0a048239969c5c",
+    "last_used": null,
+    "history": []
+  },
+  "608d1752abb319e5b61623ed6406ee08e3e693262a15143ef5090a360cc5a050": {
+    "artwork_id": "608d1752abb319e5b61623ed6406ee08e3e693262a15143ef5090a360cc5a050",
+    "last_used": null,
+    "history": []
+  },
+  "e41997c1e7eff8dd18bf1e58a6afeb6bc466a59f2e4e6d301e6c5144a2699ea5": {
+    "artwork_id": "e41997c1e7eff8dd18bf1e58a6afeb6bc466a59f2e4e6d301e6c5144a2699ea5",
+    "last_used": null,
+    "history": []
+  },
+  "37877c573c7bb899eaf47c0107387e387bc9f1eeb08bdce9966c4d723715cb8f": {
+    "artwork_id": "37877c573c7bb899eaf47c0107387e387bc9f1eeb08bdce9966c4d723715cb8f",
+    "last_used": null,
+    "history": []
+  },
+  "95af143c4aeb9ea92260831cbcd73beaa956a49608aa88c78d728170cec29011": {
+    "artwork_id": "95af143c4aeb9ea92260831cbcd73beaa956a49608aa88c78d728170cec29011",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "95af143c4aeb9ea92260831cbcd73beaa956a49608aa88c78d728170cec29011",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "9d7b3d899f1012d1bba295f9a73a4dbe008d98c65ca6a3a5d339c0a5e0b7f5d8",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "3bf6b724af922ed6f20f1557f3f59463479f3289597d02e3513167fb3bc3953c": {
+    "artwork_id": "3bf6b724af922ed6f20f1557f3f59463479f3289597d02e3513167fb3bc3953c",
+    "last_used": null,
+    "history": []
+  },
+  "b67e63d7c3ec511f42383f8c9681a723a5cce6087e9f37ec4f7abd0d131690d7": {
+    "artwork_id": "b67e63d7c3ec511f42383f8c9681a723a5cce6087e9f37ec4f7abd0d131690d7",
+    "last_used": null,
+    "history": []
+  },
+  "78f450fd154da8ab7d2960efb7c6b885ccd6ed4e06ba76922f5151428035b766": {
+    "artwork_id": "78f450fd154da8ab7d2960efb7c6b885ccd6ed4e06ba76922f5151428035b766",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "78f450fd154da8ab7d2960efb7c6b885ccd6ed4e06ba76922f5151428035b766",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "200ac34ccf3311386da6554bbf44325a0087e6e929744381a84f31b23fbcb652",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "36fb4c4cf6688d4b15a0145fbde588c85b2a80fd1c37ba0ce42633885f7d7e59": {
+    "artwork_id": "36fb4c4cf6688d4b15a0145fbde588c85b2a80fd1c37ba0ce42633885f7d7e59",
+    "last_used": null,
+    "history": []
+  },
+  "38429b498ae83c77da96eede361631de440c859d1b0a01daf6541ad33b37a2ed": {
+    "artwork_id": "38429b498ae83c77da96eede361631de440c859d1b0a01daf6541ad33b37a2ed",
+    "last_used": null,
+    "history": []
+  },
+  "d04258f31e821bfa98ef8dc4f72f052f10b7cabe8f0c4c52f83d3a65937caa58": {
+    "artwork_id": "d04258f31e821bfa98ef8dc4f72f052f10b7cabe8f0c4c52f83d3a65937caa58",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "d04258f31e821bfa98ef8dc4f72f052f10b7cabe8f0c4c52f83d3a65937caa58",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "13d21670f769d5cd09700c1e8ada144590ce58b5213d6c98cd53ad34be1c0e4f",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "b0ca0c0adcb8bdfe823c955e9616aabef815fb7d4481aa1fa2fdb5df3b697f6b": {
+    "artwork_id": "b0ca0c0adcb8bdfe823c955e9616aabef815fb7d4481aa1fa2fdb5df3b697f6b",
+    "last_used": null,
+    "history": []
+  },
+  "92aeb9d45419b8bc0bb69b6cc8dbefa59e50ec67e71e5571f219f4b116035adc": {
+    "artwork_id": "92aeb9d45419b8bc0bb69b6cc8dbefa59e50ec67e71e5571f219f4b116035adc",
+    "last_used": null,
+    "history": []
+  },
+  "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e": {
+    "artwork_id": "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "c4ebf7418a0c2c279dd0ecd2eabe3d9dc2fa03931da1bc378ec561d5fb3e8850",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "a67f80cca3f2e4acd0500100dbbb56289e76721aa325fcf8cbcf9c740ee09ed7": {
+    "artwork_id": "a67f80cca3f2e4acd0500100dbbb56289e76721aa325fcf8cbcf9c740ee09ed7",
+    "last_used": null,
+    "history": []
+  },
+  "c0a3769e60fe477be8db71eda1980538afed6839056cf8c68dd56d8e70b420e5": {
+    "artwork_id": "c0a3769e60fe477be8db71eda1980538afed6839056cf8c68dd56d8e70b420e5",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "c0a3769e60fe477be8db71eda1980538afed6839056cf8c68dd56d8e70b420e5",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "ccb32cf7c86b5a8050d6eda265dd7954300679a3a208dfc522543a52f5ab512e",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "ca36523a686ae7cf399100c8ba249dad576a729499ce64d514d1304b88768d8a": {
+    "artwork_id": "ca36523a686ae7cf399100c8ba249dad576a729499ce64d514d1304b88768d8a",
+    "last_used": null,
+    "history": []
+  },
+  "799d35fc7cb01b1cd4a8c9cc6d6f1ad3657eccf390b3b25f3d11d438f5f96bcc": {
+    "artwork_id": "799d35fc7cb01b1cd4a8c9cc6d6f1ad3657eccf390b3b25f3d11d438f5f96bcc",
+    "last_used": null,
+    "history": []
+  },
+  "eef64f218dacb6b84e5ab7edf2fb05276b415ab7d7471a5047347e276d994c74": {
+    "artwork_id": "eef64f218dacb6b84e5ab7edf2fb05276b415ab7d7471a5047347e276d994c74",
+    "last_used": null,
+    "history": []
+  },
+  "069f4b2e5fee7bc6fccba0c53fe4982c2550fc940ccbba7c205caacd7c01c805": {
+    "artwork_id": "069f4b2e5fee7bc6fccba0c53fe4982c2550fc940ccbba7c205caacd7c01c805",
+    "last_used": null,
+    "history": []
+  },
+  "af0b0bd3c251cbbea840eadb244327085eaa0fd62034df2bdd335df7893e515e": {
+    "artwork_id": "af0b0bd3c251cbbea840eadb244327085eaa0fd62034df2bdd335df7893e515e",
+    "last_used": null,
+    "history": []
+  },
+  "5ad0fa72f18268352ea8100ae74290605a1a266aa360142aa2b0488bf9590f48": {
+    "artwork_id": "5ad0fa72f18268352ea8100ae74290605a1a266aa360142aa2b0488bf9590f48",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "5ad0fa72f18268352ea8100ae74290605a1a266aa360142aa2b0488bf9590f48",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "9056d49942ca34f29681d781b0d216ff7484a85caa44c71617c16f5e4e5463b2",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f": {
+    "artwork_id": "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "7900ce225ccf93b217b9d64387001eb1808ca1d15ff6097099aef95e47fae1e1",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "18c52fcdf20e03bd788a1690083881fe21847ab6e7a7e563ea9ba792bb890f45": {
+    "artwork_id": "18c52fcdf20e03bd788a1690083881fe21847ab6e7a7e563ea9ba792bb890f45",
+    "last_used": null,
+    "history": []
+  },
+  "c39b3f0bf41df322a1dbf7311649f12bf29c61e6ddd3e1ece51c29cb606c336b": {
+    "artwork_id": "c39b3f0bf41df322a1dbf7311649f12bf29c61e6ddd3e1ece51c29cb606c336b",
+    "last_used": null,
+    "history": []
+  },
+  "311ffa24a3c50ec72e75fc5149725a606adfe22b2b2a2a324920bd3b36218fde": {
+    "artwork_id": "311ffa24a3c50ec72e75fc5149725a606adfe22b2b2a2a324920bd3b36218fde",
+    "last_used": null,
+    "history": []
+  },
+  "617f039ed6c844667c8badbdaff4705842f6b38f11bca57a496e9efbae47752a": {
+    "artwork_id": "617f039ed6c844667c8badbdaff4705842f6b38f11bca57a496e9efbae47752a",
+    "last_used": null,
+    "history": []
+  },
+  "3d6567f65c8ac8b09dc163da0773f89cb938b3b8803494208ac8e21458ca9ad9": {
+    "artwork_id": "3d6567f65c8ac8b09dc163da0773f89cb938b3b8803494208ac8e21458ca9ad9",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "3d6567f65c8ac8b09dc163da0773f89cb938b3b8803494208ac8e21458ca9ad9",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "82a154fe158bb1993db33be11d728093a236438c8b2258e9dc5a0efc12d85045",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "b55781ca4ef11bab97d86255df3c63904e07a64a976cb712bcb98157ada7b8bf": {
+    "artwork_id": "b55781ca4ef11bab97d86255df3c63904e07a64a976cb712bcb98157ada7b8bf",
+    "last_used": null,
+    "history": []
+  },
+  "46cec5835d5ecf67601ed7acfdbaf56f5b2396b16da08d701cdd0e8e7da8c3d9": {
+    "artwork_id": "46cec5835d5ecf67601ed7acfdbaf56f5b2396b16da08d701cdd0e8e7da8c3d9",
+    "last_used": null,
+    "history": []
+  },
+  "ce225532b7a9eed33a136d3d290b33f9666bae7015b388fbae87857b0e3b9da2": {
+    "artwork_id": "ce225532b7a9eed33a136d3d290b33f9666bae7015b388fbae87857b0e3b9da2",
+    "last_used": "2026-11-23",
+    "history": [
+      {
+        "artwork_id": "ce225532b7a9eed33a136d3d290b33f9666bae7015b388fbae87857b0e3b9da2",
+        "date": "2026-11-23",
+        "issue_id": "2026-11-23",
+        "article_id": "b2b13908e4f30289a02da3998324f7ddda04cb4a86fd02c907b606e7d30728ad",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce": {
+    "artwork_id": "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "720d87723e961090091a888198b9d07be856a1c5b4ae945f34eaab9623604e3b",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "14f0e709d68510f9db410ac81eee61ffbd1ba2d9712f82e09c5939be0e292fff": {
+    "artwork_id": "14f0e709d68510f9db410ac81eee61ffbd1ba2d9712f82e09c5939be0e292fff",
+    "last_used": null,
+    "history": []
+  },
+  "fe0c90b8c62f68233510beab976642babf55e1306f0350de0b7b3c41d6247add": {
+    "artwork_id": "fe0c90b8c62f68233510beab976642babf55e1306f0350de0b7b3c41d6247add",
+    "last_used": null,
+    "history": []
+  },
+  "07e2a1744cfc9ec275fad7da5fab9af999848c63c44068f51d30bd65ee510385": {
+    "artwork_id": "07e2a1744cfc9ec275fad7da5fab9af999848c63c44068f51d30bd65ee510385",
+    "last_used": null,
+    "history": []
+  },
+  "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e": {
+    "artwork_id": "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "7eb01cd915a914780828cbe855eb1ac3e2233a6134ecec42474ebb06f7e248f1",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def": {
+    "artwork_id": "92494146a1dd7f774ab4068e2c4dfa6a058d1a98f77128cd12bf206f6cd86def",
+    "last_used": null,
+    "history": []
+  },
+  "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702": {
+    "artwork_id": "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "5856733ff2a748582c28b9d85b9010b1cf9c4bfb6991b163d38a40f6794bf083",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5": {
+    "artwork_id": "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "5c695bbfdd66c23f7c2a03a26b73d9c63d73732b3b6219a7cac6af6f35ab44a8",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c": {
+    "artwork_id": "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "5ee0423831d3d9ebde6dc095d4b4463a727b62985ce1be1bf88b65c88aa50777",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "bea582d794561a11ce5178b7838fde2f6221824edd54f3552746b2c5e7290222": {
+    "artwork_id": "bea582d794561a11ce5178b7838fde2f6221824edd54f3552746b2c5e7290222",
+    "last_used": null,
+    "history": []
+  },
+  "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8": {
+    "artwork_id": "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+    "last_used": "2026-11-25",
+    "history": [
+      {
+        "artwork_id": "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+        "date": "2026-11-25",
+        "issue_id": "2026-11-25",
+        "article_id": "bbaf063f3db28261430537e88f7458c83003d8159bb1bb79e1653ac39670c116",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "9c39be40db216d322d5cbe894cae015f2c348f1c0862049bda604eaed4d6574c": {
+    "artwork_id": "9c39be40db216d322d5cbe894cae015f2c348f1c0862049bda604eaed4d6574c",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "9c39be40db216d322d5cbe894cae015f2c348f1c0862049bda604eaed4d6574c",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "32cbb2d821753a5452c322d8f90497a3ce187c6445c1d53598f9a62daeffe6f7",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "908831977ed6724a4e0be7cea90eca74844ad410125e1915791dc08261ad97c3": {
+    "artwork_id": "908831977ed6724a4e0be7cea90eca74844ad410125e1915791dc08261ad97c3",
+    "last_used": null,
+    "history": []
+  },
+  "381bfd81138e9b240f1b38f2e03f29426cb2a2693c6d29cb94d97e49efdc2d1b": {
+    "artwork_id": "381bfd81138e9b240f1b38f2e03f29426cb2a2693c6d29cb94d97e49efdc2d1b",
+    "last_used": null,
+    "history": []
+  },
+  "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb": {
+    "artwork_id": "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb",
+    "last_used": "2026-11-25",
+    "history": [
+      {
+        "artwork_id": "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb",
+        "date": "2026-11-25",
+        "issue_id": "2026-11-25",
+        "article_id": "0b8514f073b543ca5c03d6c8537a71eafecc75b8b1aba03beae018ebbe76d9a8",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "5d84cf7dece3911b208904ffcebe43f2beb6a606b51ce42ecc7622d86e9ace03": {
+    "artwork_id": "5d84cf7dece3911b208904ffcebe43f2beb6a606b51ce42ecc7622d86e9ace03",
+    "last_used": null,
+    "history": []
+  },
+  "a6d5d9687b756cbef574a9fb3112f8a5c9e729f8bb612a7f73ab7f3fc5bea838": {
+    "artwork_id": "a6d5d9687b756cbef574a9fb3112f8a5c9e729f8bb612a7f73ab7f3fc5bea838",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "a6d5d9687b756cbef574a9fb3112f8a5c9e729f8bb612a7f73ab7f3fc5bea838",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "f59ee0f9e25c5a0f8c1a655bb038181ea974634e507d52bc6499ab179692bcfe",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "b92f30c98f05557b40d009d7792a4503d2db3e852d144cd9dcb38fbd8be92d4a": {
+    "artwork_id": "b92f30c98f05557b40d009d7792a4503d2db3e852d144cd9dcb38fbd8be92d4a",
+    "last_used": null,
+    "history": []
+  },
+  "593f6c62909ea5140c7efaa118567f834864a154ecd095d6fb1b06f63bb90782": {
+    "artwork_id": "593f6c62909ea5140c7efaa118567f834864a154ecd095d6fb1b06f63bb90782",
+    "last_used": null,
+    "history": []
+  },
+  "dc7436ed81279ebe1097ebc12806e9c7bf0a261764d75dc094082e6776d6d0f7": {
+    "artwork_id": "dc7436ed81279ebe1097ebc12806e9c7bf0a261764d75dc094082e6776d6d0f7",
+    "last_used": null,
+    "history": []
+  },
+  "e6f4184fb1d50012c356c9d60fdcf5612c9e3366bbb18dbc9053dd39b6c0ba84": {
+    "artwork_id": "e6f4184fb1d50012c356c9d60fdcf5612c9e3366bbb18dbc9053dd39b6c0ba84",
+    "last_used": null,
+    "history": []
+  },
+  "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb": {
+    "artwork_id": "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "858b33cfd633a9681a571f9b521410bc4d77dd32272fc3ae39246283770c0c8b",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b": {
+    "artwork_id": "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b",
+    "last_used": "2026-11-24",
+    "history": [
+      {
+        "artwork_id": "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b",
+        "date": "2026-11-24",
+        "issue_id": "2026-11-24",
+        "article_id": "521582743e61a1aad1adb1ad584135978abc509ae050f1aa91e404eb3f7a482c",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f": {
+    "artwork_id": "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f",
+    "last_used": "2026-11-25",
+    "history": [
+      {
+        "artwork_id": "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f",
+        "date": "2026-11-25",
+        "issue_id": "2026-11-25",
+        "article_id": "f7f39af495b1a7775d03a112311a92539cc0d6de709f793ad987a2ec4be635c4",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c": {
+    "artwork_id": "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c",
+    "last_used": "2026-11-25",
+    "history": [
+      {
+        "artwork_id": "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c",
+        "date": "2026-11-25",
+        "issue_id": "2026-11-25",
+        "article_id": "e3e9142c5cb3c6b2b652c4ed1251ddfeafd2f5a33fb68da24dcf14e70d6f5558",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156": {
+    "artwork_id": "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156",
+    "last_used": "2026-11-25",
+    "history": [
+      {
+        "artwork_id": "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156",
+        "date": "2026-11-25",
+        "issue_id": "2026-11-25",
+        "article_id": "8d871f9b89ae9940eecff8dd12e9c44597672c636dbfc2c10d8ce6346547d69e",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "0b649e516fb3537a5a7e621a6081f420c93b8fec67b7813f499763e6be8e198c": {
+    "artwork_id": "0b649e516fb3537a5a7e621a6081f420c93b8fec67b7813f499763e6be8e198c",
+    "last_used": null,
+    "history": []
+  },
+  "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733": {
+    "artwork_id": "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733",
+    "last_used": "2026-11-26",
+    "history": [
+      {
+        "artwork_id": "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733",
+        "date": "2026-11-26",
+        "issue_id": "2026-11-26",
+        "article_id": "25b46c76a13a844d2b4dba91c8dda272e233aff17c37ddefc4406b3a25cb7024",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733",
+        "date": "2026-11-26",
+        "issue_id": "2026-11-26",
+        "article_id": "6d1419bcbd24e842f642ff808b13a6eae999aaeda618928b933ef4477053ae04",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a": {
+    "artwork_id": "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a",
+    "last_used": "2026-11-26",
+    "history": [
+      {
+        "artwork_id": "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a",
+        "date": "2026-11-26",
+        "issue_id": "2026-11-26",
+        "article_id": "86ba97c7fb676b78cc2d19e58b0be9727e48e022c5e89cfe6ce717f3de819d5b",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172": {
+    "artwork_id": "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172",
+    "last_used": "2026-11-26",
+    "history": [
+      {
+        "artwork_id": "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172",
+        "date": "2026-11-26",
+        "issue_id": "2026-11-26",
+        "article_id": "78b239bd73f521d3d031c47fa5018568df5f9619935e83cff199a965fd89326e",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7": {
+    "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+    "last_used": "2026-11-28",
+    "history": [
+      {
+        "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "afbc77da2f5b1b745711447d67633f1e7ad66d7a5c4836913575c480c2d619f1",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "70da6e5d8887ad363e07100281cbe72776f9d719ee35863875a47cb8fa406b48",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "ec76f513437181755818781a91cbef846a4878e262bfa5bd1467df2b6ee874f3",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987": {
+    "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+    "last_used": "2026-11-28",
+    "history": [
+      {
+        "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "f1a7ae55d383ba8b7e9c353b34745bdcd10364344d16d3d3dd0d2522931d0f8a",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "1aeeb30ba0e735e02048bce538f0fc13c73d33c514aca71691331d05b3d46f19",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "c84e00e7d007f398fda683ec4855b746eafa9d3ee180bb7b39cf5c3bd058124b",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+        "date": "2026-11-28",
+        "issue_id": "2026-11-28",
+        "article_id": "e301814a4ec0501f92c06ef303417fd3d6c415be0fc58fef9c9264cb07b1d22d",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb": {
+    "artwork_id": "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb",
+    "last_used": "2026-11-27",
+    "history": [
+      {
+        "artwork_id": "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb",
+        "date": "2026-11-27",
+        "issue_id": "2026-11-27",
+        "article_id": "b8ecd1821114700a3d758520ec7de909da7740c85f12ff01a35eee325482a4a7",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb",
+        "date": "2026-11-27",
+        "issue_id": "2026-11-27",
+        "article_id": "50950bf9ee9c20254add207b718232996edf3fb0f7ad4ecb26eb4cbef8a5a6d2",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380": {
+    "artwork_id": "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380",
+    "last_used": "2026-11-27",
+    "history": [
+      {
+        "artwork_id": "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380",
+        "date": "2026-11-27",
+        "issue_id": "2026-11-27",
+        "article_id": "1fba922c9f1fdba533ecab382d28b2f3e5b7fd723be7ad98a2e69c53b60cd042",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      },
+      {
+        "artwork_id": "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380",
+        "date": "2026-11-27",
+        "issue_id": "2026-11-27",
+        "article_id": "f0d31ef90c8bc0eda113b0516bc9a2b01661356aa6f769f9dddc830bc8bff7bf",
+        "provenance": "SELECTED_REFERENCE_METADATA"
+      }
+    ]
+  },
+  "99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860": {
+    "artwork_id": "99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860",
+    "last_used": null,
+    "history": []
+  },
+  "ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c": {
+    "artwork_id": "ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c",
+    "last_used": null,
+    "history": []
+  },
+  "f272c1ea49d9637660f1852cbba55bc153baf524a30dffedde8f875b04140b75": {
+    "artwork_id": "f272c1ea49d9637660f1852cbba55bc153baf524a30dffedde8f875b04140b75",
+    "last_used": null,
+    "history": []
+  },
+  "f016ef0f4981a5783e93bb2796c3f6e6aa11634d190988ad2f3506c95f536f64": {
+    "artwork_id": "f016ef0f4981a5783e93bb2796c3f6e6aa11634d190988ad2f3506c95f536f64",
+    "last_used": null,
+    "history": []
+  },
+  "8e2a455c2027e513757b09cf75fcafa5570b965944515d436cc2b7739663090f": {
+    "artwork_id": "8e2a455c2027e513757b09cf75fcafa5570b965944515d436cc2b7739663090f",
+    "last_used": null,
+    "history": []
+  },
+  "f56b965747aafae793ea07dfe6ea781c7ebce58d105bd58c3fdb70d7c80a7239": {
+    "artwork_id": "f56b965747aafae793ea07dfe6ea781c7ebce58d105bd58c3fdb70d7c80a7239",
+    "last_used": null,
+    "history": []
+  },
+  "0c9399b87555206da8fcd796fc6c26546e0bb8833959f286849ed557bc806461": {
+    "artwork_id": "0c9399b87555206da8fcd796fc6c26546e0bb8833959f286849ed557bc806461",
+    "last_used": null,
+    "history": []
+  },
+  "99144bfad8b26587555654f352c124a16bec5baf6dbe5ca3237c79a0f2ab8735": {
+    "artwork_id": "99144bfad8b26587555654f352c124a16bec5baf6dbe5ca3237c79a0f2ab8735",
+    "last_used": null,
+    "history": []
+  },
+  "60898846ae9eeca7c56e8751776bb1f8cd3b520e8d80472c039877bc8b161b8c": {
+    "artwork_id": "60898846ae9eeca7c56e8751776bb1f8cd3b520e8d80472c039877bc8b161b8c",
+    "last_used": null,
+    "history": []
+  },
+  "f40c57f00485dd02b219adc4cfa321f61983c180a3f279ef21a9984bddd212cf": {
+    "artwork_id": "f40c57f00485dd02b219adc4cfa321f61983c180a3f279ef21a9984bddd212cf",
+    "last_used": null,
+    "history": []
+  },
+  "29ac92694eb59402091e0d8a64056e1a010e3e76e0de98532dac72404842b469": {
+    "artwork_id": "29ac92694eb59402091e0d8a64056e1a010e3e76e0de98532dac72404842b469",
+    "last_used": null,
+    "history": []
+  },
+  "20804b650197ff1eb28c691c4a11ada2477e3e10add8b9ff971f808c71b75a83": {
+    "artwork_id": "20804b650197ff1eb28c691c4a11ada2477e3e10add8b9ff971f808c71b75a83",
+    "last_used": null,
+    "history": []
+  },
+  "6a9d9977cd08dd4c203afef4b9c02797712e83859827902f6e98a7a15834f76f": {
+    "artwork_id": "6a9d9977cd08dd4c203afef4b9c02797712e83859827902f6e98a7a15834f76f",
+    "last_used": null,
+    "history": []
+  },
+  "dfbcf74f037318a59a7b88022a475d6d2fa1d3ac8d7d56df37a7a51f8324f947": {
+    "artwork_id": "dfbcf74f037318a59a7b88022a475d6d2fa1d3ac8d7d56df37a7a51f8324f947",
+    "last_used": null,
+    "history": []
+  },
+  "ca9f3898d37be2b8b6da5b9f35f44a543e6e29450151cc933d193e00f671b035": {
+    "artwork_id": "ca9f3898d37be2b8b6da5b9f35f44a543e6e29450151cc933d193e00f671b035",
+    "last_used": null,
+    "history": []
+  },
+  "52973fc05ea5b16791a59f774c3e3502dcc34a53a2a2c53c4c98f8234346892a": {
+    "artwork_id": "52973fc05ea5b16791a59f774c3e3502dcc34a53a2a2c53c4c98f8234346892a",
+    "last_used": null,
+    "history": []
+  },
+  "373be6f9fce3b3f9dcbb47f25d5feb4562451a6f30d44c587117a9cdb4c41814": {
+    "artwork_id": "373be6f9fce3b3f9dcbb47f25d5feb4562451a6f30d44c587117a9cdb4c41814",
+    "last_used": null,
+    "history": []
+  },
+  "f1786a5d02da9a23bcc9c2c25650bbfca9d3eac8001f0039b6281600e737691e": {
+    "artwork_id": "f1786a5d02da9a23bcc9c2c25650bbfca9d3eac8001f0039b6281600e737691e",
+    "last_used": null,
+    "history": []
+  },
+  "01de1b0ad4c23680b203e4d5e19cd4085544ee773839e9d9a8302df6ec33b6e7": {
+    "artwork_id": "01de1b0ad4c23680b203e4d5e19cd4085544ee773839e9d9a8302df6ec33b6e7",
+    "last_used": null,
+    "history": []
+  },
+  "c4e7caecfe88474b7228ff0add6f340a75062c19ec40c03f930da9bc2b3db9a7": {
+    "artwork_id": "c4e7caecfe88474b7228ff0add6f340a75062c19ec40c03f930da9bc2b3db9a7",
+    "last_used": null,
+    "history": []
+  }
+}

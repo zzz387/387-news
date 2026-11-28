@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "artworks": {
     "4076e155934d5d211b12ad88300d040d44b12b3a0c1fa8965544dc8f8adcf843": {
       "museum": "Cleveland Museum of Art",
@@ -1916,6 +1916,468 @@
       "width": 480,
       "height": 349,
       "added_at": "2026-11-27T03:58:07.427566+00:00"
+    },
+    "99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:144270",
+      "title": "Saint Paul the Hermit",
+      "artist": "Mattia Preti (Italian, 1613–1699)",
+      "year": "c. 1662–64",
+      "source_url": "https://clevelandart.org/art/1969.109",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Saint Paul the Hermit oil on canvas After training in Rome in the 1630s and 1640s, Preti went to Naples where he continued working in a mode inspired by the work of Caravaggio. In this painting, dramatic lighting and intense naturalism depict the intersection of the heavenly and earthly realms. According to Catholic tradition, Saint Paul the Hermit fled into the desert to escape persecution from the Romans in the third century, and is revered as the first of many hermit saints. A raven brought Saint Paul a half a loaf of bread daily, which enabled him to survive to the age of 113 years. Preti depicted the saint looking heavenward in appreciation and awe of his heavenly provider. ['Italy'] Painting ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "topup_task_id": "2026-11-20/naturalism",
+      "id": "99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860",
+      "path": "assets/art/naturalism/99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860.webp",
+      "sha256": "c8ca0bcc2871bf5787ecf67eaaa39aee7d1bf9f8bb3a36ee3a77f4d9cdcdbda6",
+      "original_sha256": "6fd39a0c57717687718bba0249a27bc9fa73057b9898278dda87ec8cbcddd4c3",
+      "visual_hash": "13610057023064421004",
+      "perceptual_neighbours": [],
+      "width": 354,
+      "height": 480,
+      "added_at": "2026-11-28T08:01:12.842030+00:00"
+    },
+    "ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:370119",
+      "title": "Holy Family with the Mystic Marriage of Saint Catherine",
+      "artist": "Tommaso d’Antonio Manzuoli, called Maso da San Friano (Italian, 1531–1571)",
+      "year": "c. 1560",
+      "source_url": "https://clevelandart.org/art/2019.168",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Holy Family with the Mystic Marriage of Saint Catherine oil on panel The marriage shown in this painting is called “mystic” because it was a purely symbolic. The infant Jesus places a ring on the finger of Catherine of Alexandria, a fourth-century saint who had a vision of dedicating herself to God and remaining a virgin instead of marrying. Note the otherworldly quality of the women and children’s elegant faces, compared to the naturalism of elderly Saint Joseph, who may be a likeness of someone the artist knew. ['Italy'] Painting ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "topup_task_id": "2026-11-21/naturalism",
+      "id": "ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c",
+      "path": "assets/art/naturalism/ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c.webp",
+      "sha256": "374be42cc8a288881ea975b09a6f11444215df9cbf8c3db4fb4768122e9897eb",
+      "original_sha256": "d240834ca5e3d20f579df3bea0867d819d812923f72282c6f694099ae5132769",
+      "visual_hash": "7799943002627389063",
+      "perceptual_neighbours": [],
+      "width": 366,
+      "height": 480,
+      "added_at": "2026-11-28T08:01:19.805709+00:00"
+    },
+    "f272c1ea49d9637660f1852cbba55bc153baf524a30dffedde8f875b04140b75": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:147430",
+      "title": "Flowering Bush above an Eroded Bank",
+      "artist": "Federico Barocci (Italian, 1528–1612)",
+      "year": "c. 1572–1604",
+      "source_url": "https://clevelandart.org/art/1973.171",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Flowering Bush above an Eroded Bank black chalk, brush and brown wash, and lead white (partially oxidized), with traces of red chalk Federico Barocci, who worked in Urbino, made landscape sketches for use in his paintings and as independent studies. The artist’s multimedia approach—combining chalks, ink washes, and opaque paints—was novel at the time but would become standard practice for landscape artists working in later centuries. Novel, as well, was his interest in excerpts of the natural world rather than fully realized scenes. Here, the artist drew an eroded bank with a few bold lines in black chalk, then used a brush to layer brown and white ink washes, capturing the untamed clump of earth with <br>remarkable naturalism. ['Italy'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "f272c1ea49d9637660f1852cbba55bc153baf524a30dffedde8f875b04140b75",
+      "path": "assets/art/naturalism/f272c1ea49d9637660f1852cbba55bc153baf524a30dffedde8f875b04140b75.webp",
+      "sha256": "1e980964ec3b2e129fa15ad9844ff42289e3e8b14a0b7f0ca2d0068cf47eb33a",
+      "original_sha256": "700d2dedc630ce60f692e747da96b9867bb5329003f20cbac91746116bb2d6d7",
+      "visual_hash": "7840423653551813330",
+      "perceptual_neighbours": [],
+      "width": 320,
+      "height": 480,
+      "added_at": "2026-11-28T08:01:26.810699+00:00"
+    },
+    "f016ef0f4981a5783e93bb2796c3f6e6aa11634d190988ad2f3506c95f536f64": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:157331",
+      "title": "Standing Officer Holding a Boar's Spear",
+      "artist": "Hendrick Goltzius (Dutch, 1558–1617)",
+      "year": "1586",
+      "source_url": "https://clevelandart.org/art/1994.195",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Standing Officer Holding a Boar's Spear Pen and brown ink, brush and brown wash, red chalk with traces of white opaque watercolor over black chalk, on paper; traces of transfer This sheet is the only known preparatory drawing for an important group of engravings depicting military figures designed by Hendrick Goltzius between 1582 and 1600. Here Goltzius depicted a military officer with a confident stance and direct gaze as he staunchly holds a spear in his right hand and carries his sword on his hip. Details such as the fluttering scarf and the feather-trimmed hat enliven the image. The background portrays the deeds of the protagonist, including a scene with troops on the right, and two other officers, perhaps shown training with spears, on the left. Such imagery usually promoted militaristic values such as bravery in the period, as the Netherlands underwent continuous warfare with Spain. Goltzius's technique includes fine pen strokes and delicate brown washes combined with red chalk ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "f016ef0f4981a5783e93bb2796c3f6e6aa11634d190988ad2f3506c95f536f64",
+      "path": "assets/art/naturalism/f016ef0f4981a5783e93bb2796c3f6e6aa11634d190988ad2f3506c95f536f64.webp",
+      "sha256": "1482e82dd30f02c2e34737eb88856ccf13efd8fc5317f2b09776f4c268fa5926",
+      "original_sha256": "8666f3c6eb4f9447bd2bce6bb3a1054be2a931166ae03d7755b2304a8ea72a10",
+      "visual_hash": "4856873868841084225",
+      "perceptual_neighbours": [],
+      "width": 361,
+      "height": 480,
+      "added_at": "2026-11-28T08:01:33.776406+00:00"
+    },
+    "8e2a455c2027e513757b09cf75fcafa5570b965944515d436cc2b7739663090f": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:166681",
+      "title": "Head of a Boy Singing (Study for Music)",
+      "artist": "Luc-Olivier Merson (French, 1846–1920)",
+      "year": "c. 1898",
+      "source_url": "https://clevelandart.org/art/2008.394",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Head of a Boy Singing (Study for Music) black, white, and red chalk with stumping, pricked for transfer This sheet was a preparatory study for the face of a singing boy who appears near the center of <em>Music</em>, a mural decorating the left grand staircase at the Théâtre National de l’Opéra-Comique in Paris. Drawn from life with exquisite naturalism, Luc-Olivier Merson captured the sitter’s youthful beauty with such clarity that the purity of the boy’s voice seems to emanate from the drawing. ['France'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "8e2a455c2027e513757b09cf75fcafa5570b965944515d436cc2b7739663090f",
+      "path": "assets/art/naturalism/8e2a455c2027e513757b09cf75fcafa5570b965944515d436cc2b7739663090f.webp",
+      "sha256": "082a2e7715f9e1f5ed64d2020384dee693686d0bed7e0129e2c64d1f0bbd701b",
+      "original_sha256": "f09c026d73983e5af68e75695960c750818467bbbaac3c3c76f090122a40748b",
+      "visual_hash": "12702857068281011084",
+      "perceptual_neighbours": [],
+      "width": 411,
+      "height": 480,
+      "added_at": "2026-11-28T08:01:40.763766+00:00"
+    },
+    "f56b965747aafae793ea07dfe6ea781c7ebce58d105bd58c3fdb70d7c80a7239": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:109210",
+      "title": "Return of the Prodigal Son",
+      "artist": "Lucas van Leyden (Netherlandish, 1494–about 1533)",
+      "year": "c. 1510",
+      "source_url": "https://clevelandart.org/art/1927.361",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Return of the Prodigal Son engraving A leading 16th-century Dutch printmaker and painter, Lucas van Leyden is credited with bringing a high degree of naturalism to the craft of printmaking. Although the landscape never became the primary subject, in prints such as Return of the Prodigal Son Lucas created a plausible yet imaginary setting. ['Netherlands, 16th century'] Print ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "f56b965747aafae793ea07dfe6ea781c7ebce58d105bd58c3fdb70d7c80a7239",
+      "path": "assets/art/naturalism/f56b965747aafae793ea07dfe6ea781c7ebce58d105bd58c3fdb70d7c80a7239.webp",
+      "sha256": "0305b05d8221082b7be3df86a48604c3ee278a0104cda7d102330ca7b1e17e03",
+      "original_sha256": "22a34798825bec68e4b35a652bcbad804ec688b5770b5b8841ea6cef4cc1cec8",
+      "visual_hash": "6999450938730450060",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 363,
+      "added_at": "2026-11-28T08:01:48.007959+00:00"
+    },
+    "0c9399b87555206da8fcd796fc6c26546e0bb8833959f286849ed557bc806461": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:170789",
+      "title": "A mendicant bowing before a holy man, from the Prince Salim Album",
+      "artist": "Basavana (Indian, active c. 1560–1600)",
+      "year": "c. 1585; inner border added in Allahabad c. 1602; outer border added probably 1900s",
+      "source_url": "https://clevelandart.org/art/2013.296",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "A mendicant bowing before a holy man, from the Prince Salim Album Gum tempera, ink, and gold on paper As the Mughal atelier grew into the 1580s, Indian artists become increasingly adept at incorporating Persian styles with a new dimensionality and naturalism that Akbar promoted, possibly based on his appreciation of European prints and paintings. Here, a sincere holy man wears robes tinged lightly with blue. He stands beneath a tree in the wilderness with a loyal jackal by his side. A devotee touches his head to his feet. The artist’s tiny signature is written on the alms bowl. Connoisseurs of Persian art in the Islamic world praised an artist’s virtuoso ability to work on a microscopic scale. ['Mughal India, court of Akbar (reigned 1556–1605)'] Painting ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "0c9399b87555206da8fcd796fc6c26546e0bb8833959f286849ed557bc806461",
+      "path": "assets/art/naturalism/0c9399b87555206da8fcd796fc6c26546e0bb8833959f286849ed557bc806461.webp",
+      "sha256": "725ccd9a3813ffa86b1920d2036fc4f5eb924faaacae218c9bea998ac18bc1e7",
+      "original_sha256": "98f67dc1cbd4a1163cd0f047e8c01a7946fbe8168214ef28600610fb953d7de8",
+      "visual_hash": "14456153046622580424",
+      "perceptual_neighbours": [],
+      "width": 360,
+      "height": 480,
+      "added_at": "2026-11-28T08:01:55.071288+00:00"
+    },
+    "99144bfad8b26587555654f352c124a16bec5baf6dbe5ca3237c79a0f2ab8735": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:125580",
+      "title": "The siege of Arbela in the era of Hulagu Khan, page from a Chingiz-nama (Book of Chingiz Khan) of the Jami al-tavarikh (Compendium of Chronicles) of Rashid al-Din (Persian,1247–1318)",
+      "artist": "Basavana (Indian, active c. 1560–1600); Sur Das (Indian)",
+      "year": "c. 1596",
+      "source_url": "https://clevelandart.org/art/1947.502.a",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The siege of Arbela in the era of Hulagu Khan, page from a Chingiz-nama (Book of Chingiz Khan) of the Jami al-tavarikh (Compendium of Chronicles) of Rashid al-Din (Persian,1247–1318) Gum tempera and gold on paper A Mongol conqueror riding a white horse gazes stonily at his defeated West Asian opponent in a scene that took place more than 300 years before this painting was made. By the end of the 1500s there was a new emphasis on creating paintings to accompany historical texts. Visually, the diagonal composition with cityscape at the top of the page—also found among the earliest Mughal paintings—was expanded to include throngs of participants and a startling new naturalism. Painting from the Akbar period reached its maturity by the 1590s in works such as this: dynamic in composition and gestures but contained within organized spaces and emphasized three-dimensionality. ['Mughal India, court of Akbar (reigned 1556–1605)'] Painting ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "99144bfad8b26587555654f352c124a16bec5baf6dbe5ca3237c79a0f2ab8735",
+      "path": "assets/art/naturalism/99144bfad8b26587555654f352c124a16bec5baf6dbe5ca3237c79a0f2ab8735.webp",
+      "sha256": "aea7adb486adff94c87d52cc921b3aa0b0dbcff6752e4c338bae393e31bc92e4",
+      "original_sha256": "b1ad30744cd601b310650f6e1aca52f4aac07ea8832c02d151f934ef8a8af059",
+      "visual_hash": "13487068626563730775",
+      "perceptual_neighbours": [],
+      "width": 283,
+      "height": 480,
+      "added_at": "2026-11-28T08:02:02.106680+00:00"
+    },
+    "60898846ae9eeca7c56e8751776bb1f8cd3b520e8d80472c039877bc8b161b8c": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:125579",
+      "title": "The siege of Arbela in the era of Hulagu Khan, from a Chingiz-nama (Book of Chingiz Khan) of the Jami al-tavarikh (Compendium of Chronicles) of Rashid al-Din (Persian, 1247–1318)",
+      "artist": "Basavana (Indian, active c. 1560–1600); Sur Das Gujarati (Indian, active 16th century)",
+      "year": "c. 1596",
+      "source_url": "https://clevelandart.org/art/1947.502",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The siege of Arbela in the era of Hulagu Khan, from a Chingiz-nama (Book of Chingiz Khan) of the Jami al-tavarikh (Compendium of Chronicles) of Rashid al-Din (Persian, 1247–1318) Gum tempera, ink, and gold on paper A Mongol conqueror riding a white horse gazes stonily at his defeated West Asian opponent in a scene that took place more than 300 years before this painting was made. By the end of the 1500s there was a new emphasis on creating paintings to accompany historical texts. Visually, the diagonal composition with cityscape at the top of the page—also found among the earliest Mughal paintings—was expanded to include throngs of participants and a startling new naturalism. Painting from the Akbar period reached its maturity by the 1590s in works such as this: dynamic in composition and gestures but contained within organized spaces and emphasized three-dimensionality. ['Mughal India, court of Akbar (reigned 1556–1605)'] Painting ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "60898846ae9eeca7c56e8751776bb1f8cd3b520e8d80472c039877bc8b161b8c",
+      "path": "assets/art/naturalism/60898846ae9eeca7c56e8751776bb1f8cd3b520e8d80472c039877bc8b161b8c.webp",
+      "sha256": "6576d915a13ee6c90fd9001aff8cdd79a5af1d0f1e630951c1467a70b2ccac78",
+      "original_sha256": "7be12c783acaac86ad0d7b955dfa0a99ba7a3bda7e337b67ec506d96553e9b6c",
+      "visual_hash": "9485676639131312775",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 385,
+      "added_at": "2026-11-28T08:02:09.217895+00:00"
+    },
+    "f40c57f00485dd02b219adc4cfa321f61983c180a3f279ef21a9984bddd212cf": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:154024",
+      "title": "Plant Study",
+      "artist": "Eugene Bléry (French, 1805–1886)",
+      "year": "1857",
+      "source_url": "https://clevelandart.org/art/1988.148",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Plant Study graphite In addition to his landscapes, Bléry also produced closely focused botanical studies gracefully composed with an acute realization of species. Although he did not work alongside the artists of the Barbizon school, Bléry’s plant portraits are related to the aesthetic of Barbizon naturalism. ['France'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "f40c57f00485dd02b219adc4cfa321f61983c180a3f279ef21a9984bddd212cf",
+      "path": "assets/art/naturalism/f40c57f00485dd02b219adc4cfa321f61983c180a3f279ef21a9984bddd212cf.webp",
+      "sha256": "a01ab4c3a84ba1747dac894b2d2cfdc6f571d7a18ee842bce1f941a38c080764",
+      "original_sha256": "8774d93cf0ddd15dec0e89a4d2028f4de491f19db8f1a98226ef82ebd5d756d6",
+      "visual_hash": "2886613294105202374",
+      "perceptual_neighbours": [],
+      "width": 354,
+      "height": 480,
+      "added_at": "2026-11-28T08:02:16.252099+00:00"
+    },
+    "29ac92694eb59402091e0d8a64056e1a010e3e76e0de98532dac72404842b469": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:329347",
+      "title": "Horse Standing on a Mound",
+      "artist": "Cornelis Saftleven (Dutch, 1607–1681)",
+      "year": "1655",
+      "source_url": "https://clevelandart.org/art/2019.12",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Horse Standing on a Mound brush and black, brown, yellow, and gray watercolors over graphite and red chalk on antique laid paper Cornelis Saftleven’s drawing of a horse from the rear is an example of the animal subject matter that was outrageously popular and considered indigenous to the Netherlands in the 17th century. The artist made this drawing for sale, evident by his initials and date at the bottom center of the drawing, and by the drawing’s high degree of finish, combining several different media including yellow watercolor and red chalk. The awkward and nonheroic pose of the horse demonstrates the Dutch taste for everyday scenes and naturalism. ['Netherlands'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "29ac92694eb59402091e0d8a64056e1a010e3e76e0de98532dac72404842b469",
+      "path": "assets/art/naturalism/29ac92694eb59402091e0d8a64056e1a010e3e76e0de98532dac72404842b469.webp",
+      "sha256": "7eaea4eeedc3f44a65481bd51b3a0b5f3dd2fa57720f16b6a17fc4fbad9b575b",
+      "original_sha256": "faebc65f09ad9a958f07002a477fff1f49fd3dd32606922cfeb5def22e14550d",
+      "visual_hash": "2814551354777789120",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 405,
+      "added_at": "2026-11-28T08:02:23.271439+00:00"
+    },
+    "20804b650197ff1eb28c691c4a11ada2477e3e10add8b9ff971f808c71b75a83": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:95294",
+      "title": "The Dance ",
+      "artist": "Carl Wilhelm I Kolbe (German, 1757–1835)",
+      "year": "1799",
+      "source_url": "https://clevelandart.org/art/1916.1066",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The Dance  engraving The Dance represents a stylistic fusion of classicism and scientific naturalism that dominated landscape art at the end of the 18th century. The circle of nudes dancing to a satyr’s music, ancient ruins, and sacrificial alter evoke a classical idyll, while the surrounding landscape, particularly the tree and foreground burdocks, are rendered with botanical precision. ['Germany, 18th-19th century'] Print ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "20804b650197ff1eb28c691c4a11ada2477e3e10add8b9ff971f808c71b75a83",
+      "path": "assets/art/naturalism/20804b650197ff1eb28c691c4a11ada2477e3e10add8b9ff971f808c71b75a83.webp",
+      "sha256": "a3019310319b9b5f055f9114ada7808be63f9b3dcf90e32658c1b5976e55b08e",
+      "original_sha256": "6ccca64b4af87e052934243b9aa5a7690bab8ff2b1b688dfafbf6e1ad1d7cfdb",
+      "visual_hash": "5274123526511739751",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 411,
+      "added_at": "2026-11-28T08:02:30.365869+00:00"
+    },
+    "6a9d9977cd08dd4c203afef4b9c02797712e83859827902f6e98a7a15834f76f": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:166697",
+      "title": "Portrait of a Man",
+      "artist": "Jean-Baptiste Jacques Augustin (French, 1759–1832)",
+      "year": "1800",
+      "source_url": "https://clevelandart.org/art/2008.406",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Portrait of a Man Black chalk with stumping heightened with white gouache on light brown wove paper Although the size of this carefully worked crayon drawing is modest, it is actually much larger than a typical work by Jean-Baptiste Augustin. As a leading painter of ivory portrait miniatures in the late 18th and early 19th centuries, Augustin stood out because of the precision and naturalism of his style. Although the sitter in this drawing is no longer known, Augustin's naturalistic technique and the sitter's slight, easy smile encourage a familiar connection with the viewer. ['France, late 18th-early 19th Century'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "6a9d9977cd08dd4c203afef4b9c02797712e83859827902f6e98a7a15834f76f",
+      "path": "assets/art/naturalism/6a9d9977cd08dd4c203afef4b9c02797712e83859827902f6e98a7a15834f76f.webp",
+      "sha256": "0745fde9cea8d45f05d50b2b80ea602730969537afce9a50f5f2a48547c49516",
+      "original_sha256": "cb948e02ec58d6bf461f8a7f98c5cfc3d0384c844e40d6aca55f16de0accd59d",
+      "visual_hash": "4141960593899853161",
+      "perceptual_neighbours": [],
+      "width": 383,
+      "height": 480,
+      "added_at": "2026-11-28T08:02:37.805665+00:00"
+    },
+    "dfbcf74f037318a59a7b88022a475d6d2fa1d3ac8d7d56df37a7a51f8324f947": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:168193",
+      "title": "The Rabbit Hunt",
+      "artist": "Pieter Bruegel (Netherlandish, c. 1525/30–1569)",
+      "year": "1560",
+      "source_url": "https://clevelandart.org/art/2009.80",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The Rabbit Hunt etching In this etching considered the artist's only autograph print, Pieter Bruegel the Elder replicated the graphic vocabulary of dots and dashes of his pen-and-ink drawings to evoke a vivid sense of atmosphere and light and create a deep recession into space. His representations of nature, including majestic mountains—an unusual and popular subject in the flat Netherlands—exemplify an unprecedented naturalism that the artist helped to usher in. What at first appears to be a pleasant landscape with a hunter aiming his crossbow at some rabbits in the grass becomes more ominous when we notice the spear-bearing soldier stalking not the rabbits, but the hunter. Bruegel often translated popular proverbs into pictorial form: in this case, \"A hare yourself, you hunt for prey\" is the most apt. In Bruegel's world, reversals such as this suggested that humans, vainly believing they control their fate, are instead subject to powers outside of their control. ['Flanders'] Print ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "dfbcf74f037318a59a7b88022a475d6d2fa1d3ac8d7d56df37a7a51f8324f947",
+      "path": "assets/art/naturalism/dfbcf74f037318a59a7b88022a475d6d2fa1d3ac8d7d56df37a7a51f8324f947.webp",
+      "sha256": "5d355691ffc4c073f09ce9be044e9070fdc47f8acd3033afed5f512b547b0bcf",
+      "original_sha256": "aa8bb90892893e86d419d8e35092594e3d8c4aa384b355052adf35d8222e7b26",
+      "visual_hash": "2683368466905120233",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 372,
+      "added_at": "2026-11-28T08:02:44.981668+00:00"
+    },
+    "ca9f3898d37be2b8b6da5b9f35f44a543e6e29450151cc933d193e00f671b035": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:693408",
+      "title": "The Seven Archangels (recto); Studies of an Archangel and a Wind God (verso)",
+      "artist": "Massimo Stanzione (Italian, 1585–1656)",
+      "year": "c. 1620s",
+      "source_url": "https://clevelandart.org/art/2025.132",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The Seven Archangels (recto); Studies of an Archangel and a Wind God (verso) Pen and brown ink, brown wash, traces of black chalk (recto); pen and brown ink (verso), Massimo Stanzione worked in the Spanish-held Kingdom of Naples, where, during the 1600s, painting was characterized by dramatic expression, emphatic naturalism, and intense chiaroscuro derived from the profound influence of Caravaggio (1571–1610). Stanzione, however, was known in the city as one of the main purveyors of a more classical style, a kind of antithesis to the passion and drama of such Neapolitan painters as Jusepe de Ribera. This drawing relates directly to a painting Stanzione made depicting the seven archangels at the Monasterio de la Descalzas Reales in Madrid. The iconography of the seven archangels was a regional focus of devotion in the Neapolitan kingdom, and in Spain, where the cult of the “Seven Angelic Princes” had been promoted by the 16th-century Sicilian friar Antonio Del Duca (1491–1564). ['Italy'",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "ca9f3898d37be2b8b6da5b9f35f44a543e6e29450151cc933d193e00f671b035",
+      "path": "assets/art/naturalism/ca9f3898d37be2b8b6da5b9f35f44a543e6e29450151cc933d193e00f671b035.webp",
+      "sha256": "762245f1965d5c11dec68616bf666df19d1272cffaf5fb60c40fea76acd00e55",
+      "original_sha256": "5cb2429c065334ca6ca457fed814c9643f5c0a846cbfc85d1d762f8713b75773",
+      "visual_hash": "16486779696083200326",
+      "perceptual_neighbours": [],
+      "width": 435,
+      "height": 480,
+      "added_at": "2026-11-28T08:02:52.195864+00:00"
+    },
+    "52973fc05ea5b16791a59f774c3e3502dcc34a53a2a2c53c4c98f8234346892a": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:148959",
+      "title": "Portrait of a Woman",
+      "artist": "Govaert Flinck (Dutch, 1615–1660)",
+      "year": "1646",
+      "source_url": "https://clevelandart.org/art/1977.117",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Portrait of a Woman oil on wood Because of an inscription on the back, this painting was long considered a portrait of Anna Maria van Schurman, a prominent Dutch scholar and artist. These words, however, were added much later and incorrectly state that Anna Maria was 42 years old, when in reality she would have been 39. Furthermore, Flinck's likeness does not resemble other known portraits of this famous woman. Although her identity remains unknown, his sitter has an austere dignity and emotional complexity that captures her individuality through the careful description of her expression and dress. Due to this naturalism and elegant formality, Flinck achieved wealth and a high social standing throughout the 1640s as one of Amsterdam's most popular portraitists, rivaling his former master, Rembrandt. Joachim Sandrart, a contemporary German painter, once commented that compared to Rembrandt's portraits, Flinck's \"were more felicitous in the exactness and in the pleasing quality of the po",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "52973fc05ea5b16791a59f774c3e3502dcc34a53a2a2c53c4c98f8234346892a",
+      "path": "assets/art/naturalism/52973fc05ea5b16791a59f774c3e3502dcc34a53a2a2c53c4c98f8234346892a.webp",
+      "sha256": "97a36da9e336910314241fdb7ec1bfb426f6505552418bd7c1f89180373b5cc6",
+      "original_sha256": "31f9615aa5ebe8b10cd3c20cc94ea1e449b17003529172c06424b2362edd2cbe",
+      "visual_hash": "1540759874088145410",
+      "perceptual_neighbours": [],
+      "width": 400,
+      "height": 480,
+      "added_at": "2026-11-28T08:02:59.354044+00:00"
+    },
+    "373be6f9fce3b3f9dcbb47f25d5feb4562451a6f30d44c587117a9cdb4c41814": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:693409",
+      "title": "The Seven Archangels (recto)",
+      "artist": "Massimo Stanzione (Italian, 1585–1656)",
+      "year": "c. 1620s",
+      "source_url": "https://clevelandart.org/art/2025.132.a",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The Seven Archangels (recto) Pen and brown ink, brown wash, traces of black chalk (recto) Massimo Stanzione worked in the Spanish-held Kingdom of Naples, where, during the 17th century, painting was characterized by dramatic expression, emphatic naturalism, and intense chiaroscuro derived from the profound influence of Caravaggio (1571-1610). Stanzione, however, was known in the city as one of the main purveyors of a more classical style, a kind of antithesis to the passion and drama of such Neapolitan painters as Jusepe de Ribera. This drawing relates directly to a painting Stanzione made depicting the seven archangels at the Monasterio de la Descalzas Reales in Madrid. The iconography of the seven archangels was a regional focus of devotion in the Neapolitan kingdom, and in Spain, where the cult of the “Seven Angelic Princes” had been promoted by the 16th-century Sicilian friar, Antonio Del Duca (1491-1564). ['Italy'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "373be6f9fce3b3f9dcbb47f25d5feb4562451a6f30d44c587117a9cdb4c41814",
+      "path": "assets/art/naturalism/373be6f9fce3b3f9dcbb47f25d5feb4562451a6f30d44c587117a9cdb4c41814.webp",
+      "sha256": "f315257d15144020f8a5a73ba63537d46cfa6dc5da74563cb9247660100d40a0",
+      "original_sha256": "abb0f9989e5bc14c8b885e07a2687c1499a2d2e5949ccde38d3b5fc4a947ad3b",
+      "visual_hash": "7163864890101809926",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 263,
+      "added_at": "2026-11-28T08:03:06.535776+00:00"
+    },
+    "f1786a5d02da9a23bcc9c2c25650bbfca9d3eac8001f0039b6281600e737691e": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:114734",
+      "title": "The Virgin and Child on a Grassy Bench",
+      "artist": "Albrecht Dürer (German, 1471–1528)",
+      "year": "1503",
+      "source_url": "https://clevelandart.org/art/1934.335",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "The Virgin and Child on a Grassy Bench engraving This simple and intimate scene of the Virgin nursing the Christ Child is among Dürer’s most tender depictions of the subject. With affectionate devotion the Virgin cradles the infant in a warm embrace, providing protection and essential nourishment. The gentle play of hands at the center of the composition adds to the naturalism of the scene and captures the universal bond between a mother and her child. The dead tree and the goldfinch resting on the trellis behind them allude to Jesus’s inevitable Passion, making this private moment all the more meaningful. ['Germany, early 16th Century'] Print ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "f1786a5d02da9a23bcc9c2c25650bbfca9d3eac8001f0039b6281600e737691e",
+      "path": "assets/art/naturalism/f1786a5d02da9a23bcc9c2c25650bbfca9d3eac8001f0039b6281600e737691e.webp",
+      "sha256": "c2a29dc04137f3594a782fe2bec1e1e5636d4ab412ab0a3cd84be30231ae9c60",
+      "original_sha256": "65667389e8df8502d72ba052b1f7ba4532f41ef6befdd095c7cb62c932d667b3",
+      "visual_hash": "1389748823289477061",
+      "perceptual_neighbours": [],
+      "width": 313,
+      "height": 480,
+      "added_at": "2026-11-28T08:03:13.752465+00:00"
+    },
+    "01de1b0ad4c23680b203e4d5e19cd4085544ee773839e9d9a8302df6ec33b6e7": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:693410",
+      "title": "Studies of an Archangel and a Wind God (verso)",
+      "artist": "Massimo Stanzione (Italian, 1585–1656)",
+      "year": "c. 1620s",
+      "source_url": "https://clevelandart.org/art/2025.132.b",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Studies of an Archangel and a Wind God (verso) pen and brown ink (verso), Massimo Stanzione worked in the Spanish-held Kingdom of Naples, where, during the 1600s, painting was characterized by dramatic expression, emphatic naturalism, and intense chiaroscuro derived from the profound influence of Caravaggio (1571–1610). Stanzione, however, was known in the city as one of the main purveyors of a more classical style, a kind of antithesis to the passion and drama of such Neapolitan painters as Jusepe de Ribera. This drawing relates directly to a painting Stanzione made depicting the seven archangels at the Monasterio de la Descalzas Reales in Madrid. The iconography of the seven archangels was a regional focus of devotion in the Neapolitan kingdom, and in Spain, where the cult of the “Seven Angelic Princes” had been promoted by the 16th-century Sicilian friar Antonio Del Duca (1491–1564). ['Italy'] Drawing ",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "01de1b0ad4c23680b203e4d5e19cd4085544ee773839e9d9a8302df6ec33b6e7",
+      "path": "assets/art/naturalism/01de1b0ad4c23680b203e4d5e19cd4085544ee773839e9d9a8302df6ec33b6e7.webp",
+      "sha256": "d9080007f40accb66ef8f660bb4eb6cf4831fdcbbf935335eb0c8c30c8b5affd",
+      "original_sha256": "00cffb46ededb28c604ce594c1f7b64110c52c8f9e47c156dbee9f12ee0243fe",
+      "visual_hash": "17216923605499038400",
+      "perceptual_neighbours": [],
+      "width": 480,
+      "height": 263,
+      "added_at": "2026-11-28T08:03:21.013347+00:00"
+    },
+    "c4e7caecfe88474b7228ff0add6f340a75062c19ec40c03f930da9bc2b3db9a7": {
+      "museum": "Cleveland Museum of Art",
+      "museum_id": "cma:161383",
+      "title": "Dragon and Orchard",
+      "artist": "Arthur Wesley Dow (American, 1857–1922)",
+      "year": "c. 1908",
+      "source_url": "https://clevelandart.org/art/2000.1",
+      "license": "CC0",
+      "license_url": "https://www.clevelandart.org/open-access",
+      "search_page": 1,
+      "genre_evidence": "Dragon and Orchard color woodcut In his dual roles as artist and teacher, Dow was instrumental in reviving the color woodcut in America at the turn of the 20th century. Impressed by the flat, simplified compositions of Japanese color woodcuts, or ukiyo-e prints, Dow abandoned Western naturalism, with its linear modeling and one-point perspective, in favor of the basic elements of Japanese design: line, form, color, and notan—the harmonious arrangement of dark and light. Although in Japan the artist only executed the drawing—the carving and printing were carried out by craftsmen—Dow did everything himself. Like the Japanese, however, he printed by hand on mulberry paper. The picturesque Massachusetts fishing village of Ipswich and the surrounding area were Dow's subjects. The town is separated from the sea by sprawling salt marshes that are divided by canals and rivers. Dow expressed the changing effects of atmosphere and light by experimenting with color, which resulted in unique impre",
+      "genre_id": "naturalism",
+      "verified": true,
+      "id": "c4e7caecfe88474b7228ff0add6f340a75062c19ec40c03f930da9bc2b3db9a7",
+      "path": "assets/art/naturalism/c4e7caecfe88474b7228ff0add6f340a75062c19ec40c03f930da9bc2b3db9a7.webp",
+      "sha256": "b8455595c14d7060f3e8731a073767ed024089dc4a97656c06c472f20899a642",
+      "original_sha256": "bb306f381486e2a7a799614fb5a4315b4109d114583e9fe6188381ceeaf74cb7",
+      "visual_hash": "6737217132601607437",
+      "perceptual_neighbours": [],
+      "width": 371,
+      "height": 480,
+      "added_at": "2026-11-28T08:03:28.218298+00:00"
     }
   },
   "sets": {
@@ -2690,6 +3152,1233 @@
       ],
       "model": "@cf/black-forest-labs/flux-2-klein-4b",
       "created_at": "2026-11-22T18:58:48.830113+00:00"
+    }
+  },
+  "reference_assignments": {},
+  "reference_uses": {
+    "ce8ad343828a8ebeb898f78178c12b7c2254710f20f90b2d6a0331297acae2e7": {
+      "artwork_id": "5ad0fa72f18268352ea8100ae74290605a1a266aa360142aa2b0488bf9590f48",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "9056d49942ca34f29681d781b0d216ff7484a85caa44c71617c16f5e4e5463b2",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "a0689216d5f3100f641aa9979a38b3fe8dae7bd2cbbf663bacac8ed761bada86": {
+      "artwork_id": "1d780a95f1598ae6e25e67919b061dd4afc4d0e81ff642cf0d1a96ffe8a372ec",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "aacd5bb3542046f0abb1b39fa662fae256c93745a685564fe9834038845bc3d4",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "a32254ea4ddfaaa1b9d9f300321bf3440bb1165e4aa33373a90daae5d908120e": {
+      "artwork_id": "ce225532b7a9eed33a136d3d290b33f9666bae7015b388fbae87857b0e3b9da2",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "b2b13908e4f30289a02da3998324f7ddda04cb4a86fd02c907b606e7d30728ad",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "0954b2a68e3f5c88aca1df6df8da056a987ee810237b730d987b27e5864cb37d": {
+      "artwork_id": "61312254c28ed845fc6ca27056f468162b812cbe9985ac704a1df3574880844d",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-23",
+      "article_id": "1f9058ee02b37d64917f24fb389f467263bb5731fb1cc5bf5407c5496b56db56",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "7d1364a360f419aa4f35c8a0fe52cb45115ce2599be4323e1b4552857375c221": {
+      "artwork_id": "3d6567f65c8ac8b09dc163da0773f89cb938b3b8803494208ac8e21458ca9ad9",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "82a154fe158bb1993db33be11d728093a236438c8b2258e9dc5a0efc12d85045",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "490a93c779342600601b6c72d4ed9ef6e5c434165768d43bd25e763dab77bb87": {
+      "artwork_id": "95af143c4aeb9ea92260831cbcd73beaa956a49608aa88c78d728170cec29011",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "9d7b3d899f1012d1bba295f9a73a4dbe008d98c65ca6a3a5d339c0a5e0b7f5d8",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "b83ff4a234bc6a7a9cccb39590b3ea03a77b58be3aa996ba278c8804a0401988": {
+      "artwork_id": "78f450fd154da8ab7d2960efb7c6b885ccd6ed4e06ba76922f5151428035b766",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "200ac34ccf3311386da6554bbf44325a0087e6e929744381a84f31b23fbcb652",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "d3dfba23f415b02de814d597210af383951e9a02493512c5145da1b0b8672c04": {
+      "artwork_id": "b666d2392594a4292cb12e2f08ada3df2e19fc470cf4e3c2c185262ac5aa0d6f",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "197cae75dd19cca8e2f7862fe941d5df07a47f384f44e1d88e2f6065ff1df85c",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "677b93df987156ec8b206e3b3885c274b101d6b4b8455120ab4f7ce2b0023490": {
+      "artwork_id": "c0a3769e60fe477be8db71eda1980538afed6839056cf8c68dd56d8e70b420e5",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "ccb32cf7c86b5a8050d6eda265dd7954300679a3a208dfc522543a52f5ab512e",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "0b6dd55778dea65ad69e53bc6e7cd1bd9a9daa6914e045d7f06e6878bba8c9f4": {
+      "artwork_id": "d04258f31e821bfa98ef8dc4f72f052f10b7cabe8f0c4c52f83d3a65937caa58",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "13d21670f769d5cd09700c1e8ada144590ce58b5213d6c98cd53ad34be1c0e4f",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "77a4b82deaebc4203bdf603ab14379831616333a078ec08292b7edfc05fd5896": {
+      "artwork_id": "95241980cc507773b23c878b1a3535052b2bc85d7844cb3dadae53d98836947f",
+      "date": "2026-11-23",
+      "issue_id": "2026-11-23",
+      "article_id": "7368c251556740dff49eecd9e2cdadb2f06337c51bb0d140b2512a5d7a00d782",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "a8c62678d969678cc133d97cb8d255271dd0b0299649b048a39aadb26c18193d": {
+      "artwork_id": "9c39be40db216d322d5cbe894cae015f2c348f1c0862049bda604eaed4d6574c",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "32cbb2d821753a5452c322d8f90497a3ce187c6445c1d53598f9a62daeffe6f7",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "5e31476d239f40f2ce278eb01edf57bb9a6b121a413daf6d42824fd01defeaa3": {
+      "artwork_id": "a6d5d9687b756cbef574a9fb3112f8a5c9e729f8bb612a7f73ab7f3fc5bea838",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "f59ee0f9e25c5a0f8c1a655bb038181ea974634e507d52bc6499ab179692bcfe",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "12631e426de762db784807fab264db049d8277d7268027c3d83f944c6fe4a77c": {
+      "artwork_id": "f1e01b6c4004eb8f860d17d0ce2641812010397ab48b67b3fff3fedf6d849b3e",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "7eb01cd915a914780828cbe855eb1ac3e2233a6134ecec42474ebb06f7e248f1",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "9528d4e5338a5519240690f9c5a36c39324be112aa71e0dbb816629c0c32f14b": {
+      "artwork_id": "6d7fa625b92429b3f67c40dd249ed101b9aaf9e182de02c321afab0233015702",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "5856733ff2a748582c28b9d85b9010b1cf9c4bfb6991b163d38a40f6794bf083",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "9e99ad05eb99fdded59fac0275f5840f37fe148c7b6967462aed421a31948fe5": {
+      "artwork_id": "39ed0c1de41db82a434ece1d7316eae31a676497291572c9994e7b29764da9f5",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "5c695bbfdd66c23f7c2a03a26b73d9c63d73732b3b6219a7cac6af6f35ab44a8",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "876baede7bfdffdd7d02a970cf6d0f5149d9fc35ce83553ab74459754519ef86": {
+      "artwork_id": "31060dff9345e0fb51aaa94e815dc5d3d2e952befc1a4fce75f6aada2ebce71c",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "5ee0423831d3d9ebde6dc095d4b4463a727b62985ce1be1bf88b65c88aa50777",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "3427e24737d3d7220dde31c87c76cbda4094985554ca6bab0d75acd8720895ca": {
+      "artwork_id": "eec9b888bcb26834fd7d968cf12e76d93e08c5c9901aac39e394e840b4be72ce",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "720d87723e961090091a888198b9d07be856a1c5b4ae945f34eaab9623604e3b",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "62b3d78a7dfafeffbfbbd8ff649211b96422490693c28522a4a7a7d24e8d7718": {
+      "artwork_id": "1b32510cc6ed75c53fafde129f61b219e1ea8dd143ee09f38b7cda1615254d9f",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "7900ce225ccf93b217b9d64387001eb1808ca1d15ff6097099aef95e47fae1e1",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "82bc8612ba60c876c526f29ce9e7f32163eadfaf9e8f0461280c68bce0235206": {
+      "artwork_id": "ac2b4b317a8a27222b554a44fb158f39971384e1ecfbc0e2304c968167c3436e",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "c4ebf7418a0c2c279dd0ecd2eabe3d9dc2fa03931da1bc378ec561d5fb3e8850",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "dee44a431d7ce5783aba4a2c0202ff68873979e26d2b0672b8de01215f08c835": {
+      "artwork_id": "7e187016b93cd3f7d5369045fb7750c23ee5982a589d763c5f0f1c2152a007eb",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "858b33cfd633a9681a571f9b521410bc4d77dd32272fc3ae39246283770c0c8b",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "eae336da3ca11db9369f5aaf6ae11c0b4f9cb40b2582f3bbfd3baacb5eec0062": {
+      "artwork_id": "50649e3b790841a2b16b4c8c2b56eddcc31554f5681a333a6ad44908ecdd327b",
+      "date": "2026-11-24",
+      "issue_id": "2026-11-24",
+      "article_id": "521582743e61a1aad1adb1ad584135978abc509ae050f1aa91e404eb3f7a482c",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "9ffc477fd573744c864b0abc072b6b76d74a6195485d2e6f0c283760209b4c78": {
+      "artwork_id": "3a892da7ee6e4d07df69666d73355d98252a39f826eeaed8a505eff2948391f8",
+      "date": "2026-11-25",
+      "issue_id": "2026-11-25",
+      "article_id": "bbaf063f3db28261430537e88f7458c83003d8159bb1bb79e1653ac39670c116",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "14aee3fc6816fbbab675aa8f825e6657b886c917be45c558383aed8a5947aa4f": {
+      "artwork_id": "0fb61515e30b19ad94706c85cec40f46d20876077b3e86813bd5b5e368a849cb",
+      "date": "2026-11-25",
+      "issue_id": "2026-11-25",
+      "article_id": "0b8514f073b543ca5c03d6c8537a71eafecc75b8b1aba03beae018ebbe76d9a8",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "155638dcd6b06d19357ebd3708cc1fd7db4b221889dd7f1415e5d28d65d169fb": {
+      "artwork_id": "2786e9d531e61fe78276704984943b67df56ad59fddaac5160aeba36123f5b6f",
+      "date": "2026-11-25",
+      "issue_id": "2026-11-25",
+      "article_id": "f7f39af495b1a7775d03a112311a92539cc0d6de709f793ad987a2ec4be635c4",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "20f1b241a32c769929c7e6e0dbf9dc076d866e4c3de4421619f4e6cf0737a04d": {
+      "artwork_id": "d5bccf85590bf81bf8e6e144ab2c95d5ba592e4df1def122335cdc4468c7d94c",
+      "date": "2026-11-25",
+      "issue_id": "2026-11-25",
+      "article_id": "e3e9142c5cb3c6b2b652c4ed1251ddfeafd2f5a33fb68da24dcf14e70d6f5558",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "c9f2e5f24526841f76f3bcadfc0d924f14d904a0a9e416e42c0025742f4d7aa7": {
+      "artwork_id": "dd282b5d43ecac7e06f81c7e49f373862206bd121ccd2575cf21bbd5cf27d156",
+      "date": "2026-11-25",
+      "issue_id": "2026-11-25",
+      "article_id": "8d871f9b89ae9940eecff8dd12e9c44597672c636dbfc2c10d8ce6346547d69e",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "1eeacb100d904c79c1692ef85f54ccdddc8d7a419c2c0e0cd0257946fa22df39": {
+      "artwork_id": "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733",
+      "date": "2026-11-26",
+      "issue_id": "2026-11-26",
+      "article_id": "25b46c76a13a844d2b4dba91c8dda272e233aff17c37ddefc4406b3a25cb7024",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "7300e34c71e207040cbde2d1494dd50b2758ce609ce6b8e815e4aa8cf9432137": {
+      "artwork_id": "c016edf02ee144aa8b25ae819a3f673b868bdf3957f54bc320a30ded3f7bdf3a",
+      "date": "2026-11-26",
+      "issue_id": "2026-11-26",
+      "article_id": "86ba97c7fb676b78cc2d19e58b0be9727e48e022c5e89cfe6ce717f3de819d5b",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "2777e11d5659e538d3f39a3decd631c1ea2e65912cdd828f92493f4110b3912e": {
+      "artwork_id": "e29e4358cfa9106fbd9b4ed19cfb6154fc9fe37fd9687de1af65ed94d248d733",
+      "date": "2026-11-26",
+      "issue_id": "2026-11-26",
+      "article_id": "6d1419bcbd24e842f642ff808b13a6eae999aaeda618928b933ef4477053ae04",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "272784001c23a1b62e9ecacb5cc938116d8416fca8344b2716d2836bdc9a22d2": {
+      "artwork_id": "6105a3ca697a158e2ea9f0d8bc8cda72508c5a7a0f19808a3b7edbc6d8bb9172",
+      "date": "2026-11-26",
+      "issue_id": "2026-11-26",
+      "article_id": "78b239bd73f521d3d031c47fa5018568df5f9619935e83cff199a965fd89326e",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "94cf16d0082a725b3c8b3a1fb584d6058c35b1a36eb80742ed450624ff149faf": {
+      "artwork_id": "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380",
+      "date": "2026-11-27",
+      "issue_id": "2026-11-27",
+      "article_id": "1fba922c9f1fdba533ecab382d28b2f3e5b7fd723be7ad98a2e69c53b60cd042",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "400a6051d043416ad8b7a167ecb84b787eb0bebd9b9301cff13dd273239de4f4": {
+      "artwork_id": "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb",
+      "date": "2026-11-27",
+      "issue_id": "2026-11-27",
+      "article_id": "b8ecd1821114700a3d758520ec7de909da7740c85f12ff01a35eee325482a4a7",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "ce2c1d6a647230832fbbe849a96d0c51d3183640f0d531b36e08f73b2085a0fe": {
+      "artwork_id": "ae978ecdd2ccebf60272e2677c9b056e7cbf168cd0867345ca7032bb64f763fb",
+      "date": "2026-11-27",
+      "issue_id": "2026-11-27",
+      "article_id": "50950bf9ee9c20254add207b718232996edf3fb0f7ad4ecb26eb4cbef8a5a6d2",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "a171acf6b5b7328f09bf2fcbef8b33b3d3bba7cea40945628e68ff44c7b1b716": {
+      "artwork_id": "e437dfeaa2379b30b10e2650f053a01df28dfd7de52f9deae1bd3724c9fed380",
+      "date": "2026-11-27",
+      "issue_id": "2026-11-27",
+      "article_id": "f0d31ef90c8bc0eda113b0516bc9a2b01661356aa6f769f9dddc830bc8bff7bf",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "0c68cb1b531ef5068c60f0059c10943df825906d75da9f11e1b283d16bb1b8e3": {
+      "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "f1a7ae55d383ba8b7e9c353b34745bdcd10364344d16d3d3dd0d2522931d0f8a",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "560fcce752d5f352b468ffa480bda42f3920a00be86ac1ac08890c16363e9e9a": {
+      "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "afbc77da2f5b1b745711447d67633f1e7ad66d7a5c4836913575c480c2d619f1",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "2659cb75f9f213e39a82dedbb0cbad457bd6207b98799a1f94d8c0ffd6b8fd47": {
+      "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "1aeeb30ba0e735e02048bce538f0fc13c73d33c514aca71691331d05b3d46f19",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "ec91961ee7b679309cd939d4da72c55b2e28290be7c5c629d3f4c37469f2244b": {
+      "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "c84e00e7d007f398fda683ec4855b746eafa9d3ee180bb7b39cf5c3bd058124b",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "71dccd1147245e2ce2988806dc9a1663e229c244831370f412120a304813ea19": {
+      "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "70da6e5d8887ad363e07100281cbe72776f9d719ee35863875a47cb8fa406b48",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "c98d710e34d5ae6270dbb8319762d07c0009b60a2ca9dea72c277a48f30a0ddf": {
+      "artwork_id": "79a98660a91e49db3fad9bf664de1ca515c1007ce8135320f002f538735faab7",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "ec76f513437181755818781a91cbef846a4878e262bfa5bd1467df2b6ee874f3",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    },
+    "1fb0b83a14481eab2fae349562ec233827ab1965d0730c290f9b6e0381667e31": {
+      "artwork_id": "a911053de80716b58fbdd151dc2f9080f73ec8a271a11e3427a88ed8a13d4987",
+      "date": "2026-11-28",
+      "issue_id": "2026-11-28",
+      "article_id": "e301814a4ec0501f92c06ef303417fd3d6c415be0fc58fef9c9264cb07b1d22d",
+      "provenance": "SELECTED_REFERENCE_METADATA"
+    }
+  },
+  "prefill_log": {
+    "b484b0d89e9d76a4d551519a7729bcc74a5e8cdad378ee4067377553dacce1e6": {
+      "genre": "Сюрреализм",
+      "at": "2026-11-28T08:00:54.763713+00:00",
+      "next_page": 3,
+      "checked_ids": [
+        "aic:10000",
+        "aic:100328",
+        "aic:100329",
+        "aic:103405",
+        "aic:105527",
+        "aic:109278",
+        "aic:110970",
+        "aic:111077",
+        "aic:111654",
+        "aic:117188",
+        "aic:117350",
+        "aic:117359",
+        "aic:117507",
+        "aic:117825",
+        "aic:118655",
+        "aic:118661",
+        "aic:118662",
+        "aic:118664",
+        "aic:118666",
+        "aic:118718",
+        "aic:118730",
+        "aic:118731",
+        "aic:118735",
+        "aic:11902",
+        "aic:119116",
+        "aic:119117",
+        "aic:119118",
+        "aic:119147",
+        "aic:119150",
+        "aic:119152",
+        "aic:12408",
+        "aic:125871",
+        "aic:125872",
+        "aic:133852",
+        "aic:134050",
+        "aic:136951",
+        "aic:145241",
+        "aic:145246",
+        "aic:151424",
+        "aic:153498",
+        "aic:153681",
+        "aic:159810",
+        "aic:159814",
+        "aic:16773",
+        "aic:17915",
+        "aic:182805",
+        "aic:185184",
+        "aic:185760",
+        "aic:185765",
+        "aic:185841",
+        "aic:186680",
+        "aic:189807",
+        "aic:198809",
+        "aic:198810",
+        "aic:200283",
+        "aic:202084",
+        "aic:20243",
+        "aic:203128",
+        "aic:20356",
+        "aic:20573",
+        "aic:209555",
+        "aic:210471",
+        "aic:218144",
+        "aic:223367",
+        "aic:236501",
+        "aic:238749",
+        "aic:26082",
+        "aic:28809",
+        "aic:34181",
+        "aic:38593",
+        "aic:38596",
+        "aic:38599",
+        "aic:38603",
+        "aic:38642",
+        "aic:38648",
+        "aic:39193",
+        "aic:40668",
+        "aic:48819",
+        "aic:52983",
+        "aic:53042",
+        "aic:53237",
+        "aic:53501",
+        "aic:55501",
+        "aic:56682",
+        "aic:57826",
+        "aic:60747",
+        "aic:61859",
+        "aic:62296",
+        "aic:62309",
+        "aic:62312",
+        "aic:62315",
+        "aic:62317",
+        "aic:62323",
+        "aic:62326",
+        "aic:63773",
+        "aic:63776",
+        "aic:63783",
+        "aic:65819",
+        "aic:70374",
+        "aic:72728",
+        "aic:73657",
+        "aic:73669",
+        "aic:75375",
+        "aic:79387",
+        "aic:79390",
+        "aic:83654",
+        "aic:83905",
+        "aic:8681",
+        "aic:88624",
+        "aic:93779",
+        "aic:93798",
+        "aic:93801",
+        "aic:93812",
+        "aic:94082",
+        "aic:94085",
+        "aic:94089",
+        "aic:94090",
+        "aic:94091",
+        "aic:9614",
+        "aic:99766",
+        "cma:102578",
+        "cma:123168",
+        "cma:124804",
+        "cma:126769",
+        "cma:136836",
+        "cma:136837",
+        "cma:142792",
+        "cma:144705",
+        "cma:155871",
+        "cma:165408",
+        "cma:171157",
+        "cma:173113"
+      ],
+      "added": [],
+      "code": "NO_ADMISSIBLE_MATCHES",
+      "retry_after": "2026-11-28T14:00:47.177644+00:00"
+    },
+    "6fbf2206220e8609168fb2ea7939141b9668f57bab23369104019e12e662792e": {
+      "genre": "Экспрессионизм",
+      "at": "2026-11-28T08:01:04.218887+00:00",
+      "next_page": 3,
+      "checked_ids": [
+        "aic:100",
+        "aic:100858",
+        "aic:10943",
+        "aic:109439",
+        "aic:11",
+        "aic:110",
+        "aic:111",
+        "aic:11106",
+        "aic:11143",
+        "aic:111436",
+        "aic:11144",
+        "aic:111442",
+        "aic:111628",
+        "aic:117266",
+        "aic:129",
+        "aic:131385",
+        "aic:137043",
+        "aic:137044",
+        "aic:137045",
+        "aic:145",
+        "aic:14655",
+        "aic:14700",
+        "aic:151424",
+        "aic:152961",
+        "aic:153",
+        "aic:158",
+        "aic:16",
+        "aic:164",
+        "aic:16568",
+        "aic:16571",
+        "aic:181",
+        "aic:185",
+        "aic:186867",
+        "aic:186913",
+        "aic:188528",
+        "aic:188530",
+        "aic:19",
+        "aic:191",
+        "aic:20",
+        "aic:201",
+        "aic:205",
+        "aic:2068",
+        "aic:20684",
+        "aic:22",
+        "aic:23",
+        "aic:24",
+        "aic:246",
+        "aic:24645",
+        "aic:247707",
+        "aic:25",
+        "aic:257131",
+        "aic:27",
+        "aic:27992",
+        "aic:28",
+        "aic:28067",
+        "aic:28560",
+        "aic:30",
+        "aic:34",
+        "aic:34181",
+        "aic:4",
+        "aic:4371",
+        "aic:44",
+        "aic:4534",
+        "aic:4536",
+        "aic:454",
+        "aic:4541",
+        "aic:46",
+        "aic:463",
+        "aic:4714",
+        "aic:47149",
+        "aic:48",
+        "aic:4884",
+        "aic:50",
+        "aic:56",
+        "aic:566",
+        "aic:5668",
+        "aic:56682",
+        "aic:58",
+        "aic:594",
+        "aic:59426",
+        "aic:60",
+        "aic:61128",
+        "aic:614",
+        "aic:61428",
+        "aic:616",
+        "aic:6160",
+        "aic:61859",
+        "aic:62",
+        "aic:64818",
+        "aic:65",
+        "aic:656",
+        "aic:6565",
+        "aic:66",
+        "aic:67",
+        "aic:70",
+        "aic:71",
+        "aic:72",
+        "aic:73417",
+        "aic:7624",
+        "aic:76244",
+        "aic:793",
+        "aic:80607",
+        "aic:81",
+        "aic:83642",
+        "aic:83889",
+        "aic:86",
+        "aic:862",
+        "aic:863",
+        "aic:86385",
+        "aic:87",
+        "aic:874",
+        "aic:87479",
+        "aic:89",
+        "aic:9",
+        "aic:93",
+        "aic:93798",
+        "aic:9484",
+        "aic:94841",
+        "aic:95",
+        "aic:99",
+        "cma:103708",
+        "cma:129386",
+        "cma:133107",
+        "cma:133108",
+        "cma:133267",
+        "cma:135310",
+        "cma:135691",
+        "cma:135759",
+        "cma:135772",
+        "cma:135773",
+        "cma:136154",
+        "cma:136193",
+        "cma:136595",
+        "cma:137078",
+        "cma:138356",
+        "cma:138357",
+        "cma:138833",
+        "cma:138862",
+        "cma:140070",
+        "cma:140334",
+        "cma:142693",
+        "cma:142792",
+        "cma:144705",
+        "cma:144706",
+        "cma:146911",
+        "cma:147504",
+        "cma:147525",
+        "cma:147653",
+        "cma:148329",
+        "cma:155952",
+        "cma:156571",
+        "cma:171157",
+        "cma:173113"
+      ],
+      "added": [],
+      "code": "NO_ADMISSIBLE_MATCHES",
+      "retry_after": "2026-11-28T14:00:47.177644+00:00"
+    },
+    "e7f6002c0f3160f6d08d9fb55d21e26eae085d4fab935af9f94a66abc6f7e40a": {
+      "genre": "Натурализм",
+      "at": "2026-11-28T08:03:35.271243+00:00",
+      "next_page": 3,
+      "checked_ids": [
+        "aic:100191",
+        "aic:102254",
+        "aic:103918",
+        "aic:106381",
+        "aic:109938",
+        "aic:110687",
+        "aic:111318",
+        "aic:115925",
+        "aic:117467",
+        "aic:117717",
+        "aic:122230",
+        "aic:129637",
+        "aic:129769",
+        "aic:143097",
+        "aic:143098",
+        "aic:146894",
+        "aic:146953",
+        "aic:147513",
+        "aic:184095",
+        "aic:184096",
+        "aic:18590",
+        "aic:18799",
+        "aic:190409",
+        "aic:19758",
+        "aic:202012",
+        "aic:2061",
+        "aic:2091",
+        "aic:210161",
+        "aic:221885",
+        "aic:22343",
+        "aic:27992",
+        "aic:2990",
+        "aic:3016",
+        "aic:33772",
+        "aic:34299",
+        "aic:37228",
+        "aic:40697",
+        "aic:4531",
+        "aic:4534",
+        "aic:4537",
+        "aic:4541",
+        "aic:47947",
+        "aic:49714",
+        "aic:51500",
+        "aic:5366",
+        "aic:5370",
+        "aic:5371",
+        "aic:5519",
+        "aic:57996",
+        "aic:64818",
+        "aic:65360",
+        "aic:7997",
+        "aic:81537",
+        "aic:81545",
+        "aic:85259",
+        "aic:85295",
+        "aic:85395",
+        "aic:85445",
+        "aic:85541",
+        "aic:85586",
+        "aic:87918",
+        "aic:886",
+        "aic:896",
+        "aic:90205",
+        "aic:90838",
+        "aic:9386",
+        "cma:109210",
+        "cma:114734",
+        "cma:124417",
+        "cma:124418",
+        "cma:125579",
+        "cma:125580",
+        "cma:128187",
+        "cma:136472",
+        "cma:138014",
+        "cma:140086",
+        "cma:144270",
+        "cma:147036",
+        "cma:147430",
+        "cma:147577",
+        "cma:148959",
+        "cma:150120",
+        "cma:151077",
+        "cma:153318",
+        "cma:153387",
+        "cma:154024",
+        "cma:154216",
+        "cma:156273",
+        "cma:157331",
+        "cma:157501",
+        "cma:159837",
+        "cma:161383",
+        "cma:166681",
+        "cma:166697",
+        "cma:168193",
+        "cma:170436",
+        "cma:170789",
+        "cma:329347",
+        "cma:370119",
+        "cma:687265",
+        "cma:687266",
+        "cma:693408",
+        "cma:693409",
+        "cma:693410",
+        "cma:95294"
+      ],
+      "added": [
+        "99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860",
+        "ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c",
+        "f272c1ea49d9637660f1852cbba55bc153baf524a30dffedde8f875b04140b75",
+        "f016ef0f4981a5783e93bb2796c3f6e6aa11634d190988ad2f3506c95f536f64",
+        "8e2a455c2027e513757b09cf75fcafa5570b965944515d436cc2b7739663090f",
+        "f56b965747aafae793ea07dfe6ea781c7ebce58d105bd58c3fdb70d7c80a7239",
+        "0c9399b87555206da8fcd796fc6c26546e0bb8833959f286849ed557bc806461",
+        "99144bfad8b26587555654f352c124a16bec5baf6dbe5ca3237c79a0f2ab8735",
+        "60898846ae9eeca7c56e8751776bb1f8cd3b520e8d80472c039877bc8b161b8c",
+        "f40c57f00485dd02b219adc4cfa321f61983c180a3f279ef21a9984bddd212cf",
+        "29ac92694eb59402091e0d8a64056e1a010e3e76e0de98532dac72404842b469",
+        "20804b650197ff1eb28c691c4a11ada2477e3e10add8b9ff971f808c71b75a83",
+        "6a9d9977cd08dd4c203afef4b9c02797712e83859827902f6e98a7a15834f76f",
+        "dfbcf74f037318a59a7b88022a475d6d2fa1d3ac8d7d56df37a7a51f8324f947",
+        "ca9f3898d37be2b8b6da5b9f35f44a543e6e29450151cc933d193e00f671b035",
+        "52973fc05ea5b16791a59f774c3e3502dcc34a53a2a2c53c4c98f8234346892a",
+        "373be6f9fce3b3f9dcbb47f25d5feb4562451a6f30d44c587117a9cdb4c41814",
+        "f1786a5d02da9a23bcc9c2c25650bbfca9d3eac8001f0039b6281600e737691e",
+        "01de1b0ad4c23680b203e4d5e19cd4085544ee773839e9d9a8302df6ec33b6e7",
+        "c4e7caecfe88474b7228ff0add6f340a75062c19ec40c03f930da9bc2b3db9a7"
+      ],
+      "code": "ADDED",
+      "retry_after": "2026-11-28T08:30:47.177644+00:00"
+    }
+  },
+  "topup_tasks": {
+    "2026-11-20/romanticism": {
+      "issue_id": "2026-11-20",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/futurism": {
+      "issue_id": "2026-11-20",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/art-nouveau": {
+      "issue_id": "2026-11-20",
+      "genre": "Ар-нуво",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/constructivism": {
+      "issue_id": "2026-11-20",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/expressionism": {
+      "issue_id": "2026-11-20",
+      "genre": "Экспрессионизм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/naturalism": {
+      "issue_id": "2026-11-20",
+      "genre": "Натурализм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/geometric-abstraction": {
+      "issue_id": "2026-11-20",
+      "genre": "Геометрическая абстракция",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/linocut": {
+      "issue_id": "2026-11-20",
+      "genre": "Линогравюра",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/industrial": {
+      "issue_id": "2026-11-20",
+      "genre": "Индустриальная графика",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/symbolism": {
+      "issue_id": "2026-11-20",
+      "genre": "Символизм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/impressionism": {
+      "issue_id": "2026-11-20",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/cubism": {
+      "issue_id": "2026-11-20",
+      "genre": "Кубизм",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/metaphysical": {
+      "issue_id": "2026-11-20",
+      "genre": "Метафизическая живопись",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-20/watercolor": {
+      "issue_id": "2026-11-20",
+      "genre": "Акварель",
+      "queued_at": "2026-11-20"
+    },
+    "2026-11-21/romanticism": {
+      "issue_id": "2026-11-21",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/futurism": {
+      "issue_id": "2026-11-21",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/symbolism": {
+      "issue_id": "2026-11-21",
+      "genre": "Символизм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/expressionism": {
+      "issue_id": "2026-11-21",
+      "genre": "Экспрессионизм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/naturalism": {
+      "issue_id": "2026-11-21",
+      "genre": "Натурализм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/geometric-abstraction": {
+      "issue_id": "2026-11-21",
+      "genre": "Геометрическая абстракция",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/constructivism": {
+      "issue_id": "2026-11-21",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/metaphysical": {
+      "issue_id": "2026-11-21",
+      "genre": "Метафизическая живопись",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/watercolor": {
+      "issue_id": "2026-11-21",
+      "genre": "Акварель",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/impressionism": {
+      "issue_id": "2026-11-21",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/cubism": {
+      "issue_id": "2026-11-21",
+      "genre": "Кубизм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/pastel": {
+      "issue_id": "2026-11-21",
+      "genre": "Пастель",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-21/surrealism": {
+      "issue_id": "2026-11-21",
+      "genre": "Сюрреализм",
+      "queued_at": "2026-11-21"
+    },
+    "2026-11-22/futurism": {
+      "issue_id": "2026-11-22",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/constructivism": {
+      "issue_id": "2026-11-22",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/surrealism": {
+      "issue_id": "2026-11-22",
+      "genre": "Сюрреализм",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/symbolism": {
+      "issue_id": "2026-11-22",
+      "genre": "Символизм",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/art-nouveau": {
+      "issue_id": "2026-11-22",
+      "genre": "Ар-нуво",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/watercolor": {
+      "issue_id": "2026-11-22",
+      "genre": "Акварель",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/metaphysical": {
+      "issue_id": "2026-11-22",
+      "genre": "Метафизическая живопись",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-22/impressionism": {
+      "issue_id": "2026-11-22",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-22"
+    },
+    "2026-11-23/symbolism": {
+      "issue_id": "2026-11-23",
+      "genre": "Символизм",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/watercolor": {
+      "issue_id": "2026-11-23",
+      "genre": "Акварель",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/constructivism": {
+      "issue_id": "2026-11-23",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/art-nouveau": {
+      "issue_id": "2026-11-23",
+      "genre": "Ар-нуво",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/collage": {
+      "issue_id": "2026-11-23",
+      "genre": "Коллаж",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/cubism": {
+      "issue_id": "2026-11-23",
+      "genre": "Кубизм",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/art-deco": {
+      "issue_id": "2026-11-23",
+      "genre": "Ар-деко",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/oil": {
+      "issue_id": "2026-11-23",
+      "genre": "Масло",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/romanticism": {
+      "issue_id": "2026-11-23",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/impressionism": {
+      "issue_id": "2026-11-23",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-23/industrial": {
+      "issue_id": "2026-11-23",
+      "genre": "Индустриальная графика",
+      "queued_at": "2026-11-23"
+    },
+    "2026-11-24/watercolor": {
+      "issue_id": "2026-11-24",
+      "genre": "Акварель",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/abstract": {
+      "issue_id": "2026-11-24",
+      "genre": "Абстракционизм",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/symbolism": {
+      "issue_id": "2026-11-24",
+      "genre": "Символизм",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/geometric-abstraction": {
+      "issue_id": "2026-11-24",
+      "genre": "Геометрическая абстракция",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/art-nouveau": {
+      "issue_id": "2026-11-24",
+      "genre": "Ар-нуво",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/romanticism": {
+      "issue_id": "2026-11-24",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/collage": {
+      "issue_id": "2026-11-24",
+      "genre": "Коллаж",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/constructivism": {
+      "issue_id": "2026-11-24",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/impressionism": {
+      "issue_id": "2026-11-24",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/futurism": {
+      "issue_id": "2026-11-24",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-24/metaphysical": {
+      "issue_id": "2026-11-24",
+      "genre": "Метафизическая живопись",
+      "queued_at": "2026-11-24"
+    },
+    "2026-11-25/watercolor": {
+      "issue_id": "2026-11-25",
+      "genre": "Акварель",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/art-nouveau": {
+      "issue_id": "2026-11-25",
+      "genre": "Ар-нуво",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/futurism": {
+      "issue_id": "2026-11-25",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/constructivism": {
+      "issue_id": "2026-11-25",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/collage": {
+      "issue_id": "2026-11-25",
+      "genre": "Коллаж",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/etching": {
+      "issue_id": "2026-11-25",
+      "genre": "Офорт",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/impressionism": {
+      "issue_id": "2026-11-25",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/pastel": {
+      "issue_id": "2026-11-25",
+      "genre": "Пастель",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/cubism": {
+      "issue_id": "2026-11-25",
+      "genre": "Кубизм",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/expressionism": {
+      "issue_id": "2026-11-25",
+      "genre": "Экспрессионизм",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/art-deco": {
+      "issue_id": "2026-11-25",
+      "genre": "Ар-деко",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/oil": {
+      "issue_id": "2026-11-25",
+      "genre": "Масло",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-25/geometric-abstraction": {
+      "issue_id": "2026-11-25",
+      "genre": "Геометрическая абстракция",
+      "queued_at": "2026-11-25"
+    },
+    "2026-11-26/art-nouveau": {
+      "issue_id": "2026-11-26",
+      "genre": "Ар-нуво",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/symbolism": {
+      "issue_id": "2026-11-26",
+      "genre": "Символизм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/constructivism": {
+      "issue_id": "2026-11-26",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/watercolor": {
+      "issue_id": "2026-11-26",
+      "genre": "Акварель",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/cubism": {
+      "issue_id": "2026-11-26",
+      "genre": "Кубизм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/futurism": {
+      "issue_id": "2026-11-26",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/collage": {
+      "issue_id": "2026-11-26",
+      "genre": "Коллаж",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/oil": {
+      "issue_id": "2026-11-26",
+      "genre": "Масло",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/impressionism": {
+      "issue_id": "2026-11-26",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/art-deco": {
+      "issue_id": "2026-11-26",
+      "genre": "Ар-деко",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/romanticism": {
+      "issue_id": "2026-11-26",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/expressionism": {
+      "issue_id": "2026-11-26",
+      "genre": "Экспрессионизм",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-26/pastel": {
+      "issue_id": "2026-11-26",
+      "genre": "Пастель",
+      "queued_at": "2026-11-26"
+    },
+    "2026-11-27/impressionism": {
+      "issue_id": "2026-11-27",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-27"
+    },
+    "2026-11-27/futurism": {
+      "issue_id": "2026-11-27",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-27"
+    },
+    "2026-11-27/watercolor": {
+      "issue_id": "2026-11-27",
+      "genre": "Акварель",
+      "queued_at": "2026-11-27"
+    },
+    "2026-11-27/constructivism": {
+      "issue_id": "2026-11-27",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-27"
+    },
+    "2026-11-27/romanticism": {
+      "issue_id": "2026-11-27",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-27"
+    },
+    "2026-11-27/symbolism": {
+      "issue_id": "2026-11-27",
+      "genre": "Символизм",
+      "queued_at": "2026-11-27"
+    },
+    "2026-11-28/watercolor": {
+      "issue_id": "2026-11-28",
+      "genre": "Акварель",
+      "queued_at": "2026-11-28"
+    },
+    "2026-11-28/constructivism": {
+      "issue_id": "2026-11-28",
+      "genre": "Конструктивизм",
+      "queued_at": "2026-11-28"
+    },
+    "2026-11-28/impressionism": {
+      "issue_id": "2026-11-28",
+      "genre": "Импрессионизм",
+      "queued_at": "2026-11-28"
+    },
+    "2026-11-28/romanticism": {
+      "issue_id": "2026-11-28",
+      "genre": "Романтизм",
+      "queued_at": "2026-11-28"
+    },
+    "2026-11-28/symbolism": {
+      "issue_id": "2026-11-28",
+      "genre": "Символизм",
+      "queued_at": "2026-11-28"
+    },
+    "2026-11-28/futurism": {
+      "issue_id": "2026-11-28",
+      "genre": "Футуризм",
+      "queued_at": "2026-11-28"
+    }
+  },
+  "topup_done": {
+    "2026-11-20/naturalism": {
+      "artwork_id": "99d83231314201ba7a3665e27e5bb5fa7ef8f45891d3d74947233e53cb737860",
+      "completed_at": "2026-11-28T08:01:12.842030+00:00"
+    },
+    "2026-11-21/naturalism": {
+      "artwork_id": "ce3fbba12c814e81b8a2ed773a13004e98c3dbb3bf0d72929845d8b860200c0c",
+      "completed_at": "2026-11-28T08:01:19.805709+00:00"
     }
   }
 }
