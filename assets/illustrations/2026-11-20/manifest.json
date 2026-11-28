@@ -247,6 +247,25 @@
       "model": "@cf/black-forest-labs/flux-1-schnell",
       "palette": "reference-derived",
       "path": "assets/illustrations/2026-11-20/8213c100cec0c16d7ecbee09ad188217f1e12187bafbf744c32b645151f4b4c0.webp"
+    },
+    "7b81b31cec1ddaee6c3addf20a9abf48f5dc9d2b74105eab2c09afa96fc34c18": {
+      "key": "7b81b31cec1ddaee6c3addf20a9abf48f5dc9d2b74105eab2c09afa96fc34c18",
+      "article_id": "83600b50793a32716488daeff6c9830fbc729ad0268527f4bbc685934a299511",
+      "description_hash": "1b342f7e394bcf5bbc95c273379205bdc348e9cd9c2a9289941a9cbdd73e8337",
+      "genre": "Акварель",
+      "ratio": "3:2",
+      "prompt_version": "387-art-single-reference-6-png",
+      "date": "2026-11-20",
+      "text_hash": "ba9f374a13c00b8675aabbcd69af2b3fb343aa4c86aba11e448d160ad9cd3c7f",
+      "protocol": 2,
+      "article_slug": "feature-11",
+      "sha256": "f0c04e310c1a461420349d5f0b3d3ddae40794eec50d3c00853fbdf0f4547968",
+      "width": 1024,
+      "height": 1024,
+      "provider": "cloudflare_workers_ai",
+      "model": "@cf/black-forest-labs/flux-1-schnell",
+      "palette": "reference-derived",
+      "path": "assets/illustrations/2026-11-20/7b81b31cec1ddaee6c3addf20a9abf48f5dc9d2b74105eab2c09afa96fc34c18.webp"
     }
   },
   "provider_status": "READY"
